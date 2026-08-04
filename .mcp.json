@@ -24,6 +24,19 @@
     "vercel": {
       "type": "http",
       "url": "https://mcp.vercel.com"
+    },
+    "render": {
+      "type": "http",
+      "url": "https://mcp.render.com/mcp"
+    },
+    "task-master": {
+      "command": "npx",
+      "args": ["-y", "task-master-ai"],
+      "env": {
+        "ANTHROPIC_API_KEY": "${user_config.anthropic_api_key}",
+        "PERPLEXITY_API_KEY": "${user_config.perplexity_api_key}",
+        "TASK_MASTER_TOOLS": "parse_prd,get_tasks,get_task,next_task,expand_task,set_task_status,update_subtask,add_task,analyze_project_complexity"
+      }
     }
   }
 }

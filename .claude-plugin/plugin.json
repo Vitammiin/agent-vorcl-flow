@@ -1,10 +1,10 @@
 {
   "name": "agent-vorcl-flow",
   "displayName": "Agent Vorcl Flow",
-  "version": "1.0.0",
-  "description": "Специализированные субагенты (architect, backend) со скиллами, слэш-командами и MCP для Claude Code.",
+  "version": "1.1.0",
+  "description": "Специализированные субагенты (architect, backend, frontend, analyzer) со скиллами, слэш-командами, единым workflow через Task Master и MCP для Claude Code.",
   "author": { "name": "Avis" },
-  "keywords": ["agents", "architect", "backend", "workflow"],
+  "keywords": ["agents", "architect", "backend", "frontend", "analyzer", "task-master", "workflow"],
   "hooks": "./hooks/hooks.json",
   "mcpServers": "./.mcp.json",
   "userConfig": {
@@ -25,6 +25,27 @@
       "type": "string",
       "title": "Redis URL",
       "description": "redis://host:6379 для MCP redis",
+      "required": false
+    },
+    "render_api_key": {
+      "type": "string",
+      "title": "Render API Key",
+      "description": "Опционально: API-ключ Render для headless/CI. По умолчанию используется OAuth (/mcp).",
+      "sensitive": true,
+      "required": false
+    },
+    "anthropic_api_key": {
+      "type": "string",
+      "title": "Anthropic API Key",
+      "description": "Ключ Anthropic для MCP task-master (parse-prd, expand). Без него Task Master пробует авторизацию среды.",
+      "sensitive": true,
+      "required": false
+    },
+    "perplexity_api_key": {
+      "type": "string",
+      "title": "Perplexity API Key",
+      "description": "Опционально: ключ Perplexity для research-режима Task Master (expand --research).",
+      "sensitive": true,
       "required": false
     }
   }

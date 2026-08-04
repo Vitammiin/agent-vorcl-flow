@@ -5,19 +5,23 @@
 ## Что внутри
 ```
 codex/
-├── skills/<name>/SKILL.md   # навыки Codex (.agents/skills): 2 персоны + 9 доменных + 7 задач
+├── skills/<name>/SKILL.md   # навыки Codex (.agents/skills): 4 персоны + 19 доменных + 26 задач
 ├── config.toml              # MCP-серверы [mcp_servers.*] + профили ролей [profiles.*]
-├── AGENTS.md                # роутинг ролей (architect, backend)
+├── AGENTS.md                # роутинг ролей (architect, backend, frontend, analyzer)
 └── scripts/install.sh       # установка в ~/.agents/skills и ~/.codex
 ```
+
+## Роли
+`$architect` · `$backend` · `$frontend` · `$analyzer`. Все работают через Task Master (`$workflow` + `$task-master`); единая точка входа — `$goal`, у каждой роли свой `$<role>-goal`.
 
 ## Маппинг Claude Code → Codex
 | Claude Code | Codex |
 |---|---|
-| субагент `@…:architect` | скилл-персона `$architect` + `codex --profile architect` |
-| скилл `system-design` | скилл `$system-design` |
-| команда `/architect:analyze` | скилл-задача `$architect-analyze` |
-| `.mcp.json` | `[mcp_servers.*]` в `config.toml` |
+| субагент `@…:frontend` | скилл-персона `$frontend` + `codex --profile frontend` |
+| скилл `frontend-architecture` | скилл `$frontend-architecture` |
+| команда `/analyzer:audit` | скилл-задача `$analyzer-audit` |
+| команда `/goal` | скилл-задача `$goal` |
+| `.mcp.json` (task-master) | `[mcp_servers.task-master]` в `config.toml` |
 | хук SessionStart | роутинг ролей в `AGENTS.md` |
 
 > У Codex нет субагентов и слэш-команд как в Claude Code — всё выражено через **skills** (вызов `$name`), **profiles** и **AGENTS.md**.
@@ -32,9 +36,14 @@ bash codex/scripts/install.sh
 ## Использование
 ```
 codex
+> $goal  добавить корзину в чекаут          # цель → задачи → цикл (роутит к роли)
 > $architect  спроектируй биллинг для SaaS
-> $architect-analyze  требования к биллингу
 > $backend-create-api  POST /invoices
+> $frontend-create-component  список заказов с пагинацией
+> $frontend-goal  экран профиля пользователя
+> $analyzer-audit                            # полный read-only аудит
+> $analyzer-mocks  src/features              # mockup-данные на фронте
+> $render-deploy  api  --clear-cache        # деплой на Render (сначала выбери workspace)
 
-codex --profile architect   # роль с повышенным reasoning
+codex --profile analyzer    # роль аудита с повышенным reasoning
 ```
