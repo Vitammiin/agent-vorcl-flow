@@ -5,7 +5,6 @@
   "description": "Специализированные субагенты (architect, backend, frontend, analyzer) со скиллами, слэш-командами, единым workflow через Task Master и MCP для Claude Code.",
   "author": { "name": "Avis" },
   "keywords": ["agents", "architect", "backend", "frontend", "analyzer", "task-master", "workflow"],
-  "hooks": "./hooks/hooks.json",
   "mcpServers": "./.mcp.json",
   "userConfig": {
     "github_token": {
