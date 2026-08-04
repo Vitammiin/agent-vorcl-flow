@@ -1,0 +1,14 @@
+{
+  "name": "agent-vorcl-flow",
+  "owner": { "name": "Avis" },
+  "metadata": {
+    "description": "Маркетплейс плагина Agent-Vorcl-Flow: субагенты architect/backend со скиллами, командами и MCP."
+  },
+  "plugins": [
+    {
+      "name": "agent-vorcl-flow",
+      "source": "./",
+      "description": "Субагенты architect и backend со скиллами, командами и MCP."
+    }
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "name": "agent-vorcl-flow",
+  "displayName": "Agent Vorcl Flow",
+  "version": "1.0.0",
+  "description": "Специализированные субагенты (architect, backend) со скиллами, слэш-командами и MCP для Claude Code.",
+  "author": { "name": "Avis" },
+  "keywords": ["agents", "architect", "backend", "workflow"],
+  "hooks": "./hooks/hooks.json",
+  "mcpServers": "./.mcp.json",
+  "userConfig": {
+    "github_token": {
+      "type": "string",
+      "title": "GitHub Token",
+      "description": "Personal Access Token для MCP-сервера github",
+      "sensitive": true,
+      "required": false
+    },
+    "postgres_url": {
+      "type": "string",
+      "title": "Postgres URL",
+      "description": "postgres://user:pass@host:5432/db для MCP postgres",
+      "required": false
+    },
+    "redis_url": {
+      "type": "string",
+      "title": "Redis URL",
+      "description": "redis://host:6379 для MCP redis",
+      "required": false
+    }
+  }
+}
