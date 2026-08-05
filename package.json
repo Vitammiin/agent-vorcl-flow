@@ -34,9 +34,8 @@
   },
   "os": ["darwin", "linux", "win32"],
   "license": "SEE LICENSE IN LICENSE",
-  "author": "Christian Avis",
+  "author": "Christian Avis (https://github.com/Vitammiin)",
   "contributors": [
-    "Christian Avis",
     "Vorcl"
   ],
   "repository": {
