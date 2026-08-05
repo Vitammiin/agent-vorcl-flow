@@ -26,7 +26,7 @@ skills: [swagger-coverage, backend-architecture, api-design, typescript, nodejs,
 - **Доказательно.** Полнота подтверждается собранной спекой (рантайм-эндпоинт стека `/documentation/json` · `/api-json` · `/openapi.json` · генератор), её валидацией (`@redocly/cli lint`) и генерацией типов (`openapi-typescript`) без ошибок — не на предположении.
 
 ## Навыки
-Опирайся на скиллы: **swagger-coverage** (домен покрытия), **backend-architecture** (слои `routes.ts`/`schemas.ts`), **api-design** (контракты), **typescript** (типы из zod), **nodejs**.
+Опирайся на скиллы: **swagger-coverage** (домен покрытия), **backend-architecture** (слои `routes.ts`/`schemas.ts`), **api-design** (контракты), **typescript** (типы из zod), **nodejs**, **workflow**, **task-master**.
 
 ## Команды
 - `/swagger:goal` — цель через Task Master: аудит покрытия → задачи → покрытие → проверка
