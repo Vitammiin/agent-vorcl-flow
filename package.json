@@ -33,8 +33,12 @@
     "node": ">=18"
   },
   "os": ["darwin", "linux", "win32"],
-  "license": "MIT",
-  "author": "Avis",
+  "license": "SEE LICENSE IN LICENSE",
+  "author": "Christian Avis",
+  "contributors": [
+    "Christian Avis",
+    "Vorcl"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Vitammiin/agent-vorcl-flow.git"
