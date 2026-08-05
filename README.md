@@ -1,81 +1,329 @@
+<div align="center">
+
 # Agent-Vorcl-Flow
 
-Плагин **Claude Code**: специализированные субагенты со скиллами, слэш-командами и MCP. Бэкенд/хостинг не нужны — всё исполняет Claude Code. Есть адаптер под **GPT Codex** — см. `codex/`.
+**A team of specialized AI sub-agents for [Claude Code](https://claude.com/claude-code) — with skills, slash commands, and MCP tools.**
+One `npx` command installs them. No backend, no hosting — Claude Code runs everything. A **GPT Codex** adapter is included too.
 
-## Агенты
-| Агент | Роль | Навыки | Команды |
-|---|---|---|---|
-| 🔵 **architect** | Архитектор систем | system-design, database, api-design, i18n, vercel, render, workflow, task-master | `/architect:goal` `/architect:analyze` `/architect:design` `/architect:review` |
-| 🟢 **backend** | Backend-разработчик | backend-architecture, nodejs, typescript, postgresql, mongodb, redis, i18n, vercel, render, workflow, task-master | `/backend:goal` `/backend:create-api` `/backend:refactor` `/backend:optimize` `/backend:test` |
-| 🟣 **frontend** | Frontend (React/Next.js) | frontend-architecture, react, nextjs, typescript, tailwind, state-management, data-fetching, i18n, react-testing, vercel, workflow, task-master | `/frontend:goal` `/frontend:create-component` `/frontend:refactor` `/frontend:optimize` `/frontend:test` |
-| 🟠 **analyzer** | Аудит кода (read-only) | typescript, backend-architecture, frontend-architecture, database, postgresql, mongodb, swagger-coverage, react, nextjs, i18n, workflow, task-master | `/analyzer:goal` `/analyzer:audit` `/analyzer:bugs` `/analyzer:types` `/analyzer:db` `/analyzer:mocks` `/analyzer:backend` |
-| 🟡 **swagger** | Покрытие OpenAPI/Swagger (любой стек) | swagger-coverage, backend-architecture, api-design, typescript, nodejs, workflow, task-master | `/swagger:goal` `/swagger:audit` `/swagger:cover` |
-| 🔴 **firecrawl** | Веб-исследователь (Firecrawl) | web-scraping, workflow, task-master | `/firecrawl:goal` `/firecrawl:search` `/firecrawl:scrape` `/firecrawl:map` `/firecrawl:crawl` `/firecrawl:extract` |
-| 🟤 **render** | Хостинг/деплой (Render) | render, postgresql, redis, backend-architecture, workflow, task-master | `/render:goal` `/render:deploy` `/render:logs` `/render:status` `/render:query` |
-| 🟦 **database** | Инженер БД / DBA | database, postgresql, mongodb, redis, backend-architecture, workflow, task-master | `/database:goal` `/database:query` `/database:schema` `/database:migrate` `/database:optimize` `/database:cache` |
-| ⚪ **resilience** | Надёжность: ошибки + логи | error-handling, backend-architecture, nodejs, typescript, react, i18n, workflow, task-master | `/resilience:goal` `/resilience:harden` `/resilience:logging` `/resilience:audit` |
-| 🖼️ **screenshot** | Скриншот UI → код | screenshot-to-code, react, nextjs, typescript, tailwind, frontend-architecture, i18n, workflow, task-master | `/screenshot:goal` `/screenshot:analyze` `/screenshot:convert` `/screenshot:tokens` `/screenshot:responsive` |
-| 📊 **drawio** | Диаграммы draw.io / diagrams.net | drawio-diagrams, pmp-diagrams, system-design, workflow, task-master | `/drawio:goal` `/drawio:create` `/drawio:pmp` `/drawio:convert` `/drawio:refine` |
+![Claude Code](https://img.shields.io/badge/Claude%20Code-plugin-6C5CE7)
+![GPT Codex](https://img.shields.io/badge/GPT%20Codex-adapter-1abc9c)
+![Node](https://img.shields.io/badge/node-%E2%89%A518-339933?logo=node.js&logoColor=white)
+![Agents](https://img.shields.io/badge/agents-11-blue)
+![Commands](https://img.shields.io/badge/commands-55%2B-blue)
+![License](https://img.shields.io/badge/license-proprietary-important)
 
-Агент `render` понимает Docker- и native-рантайм, помнит про доступ к БД по **IP-allowlist** (outbound-IP сервиса → allowlist базы; для Render Postgres — internal URL) и ведёт диагностику по логам до первопричины. Скилл `render` (операции через MCP) подключён также у `architect` и `backend`.
+🌐 [Русская версия](./README.ru.md)
 
-Агент `database` — прямая работа с данными через MCP `postgres`/`mongodb`/`redis`: схема и целостность, запросы и планы (`EXPLAIN`/`explain`), индексы и устранение N+1, безопасные обратимые миграции (expand→backfill→contract), кэш (TTL/инвалидация, distributed lock, rate limiting). Аналитика — read-only; мутации (DDL/DML/миграции) — только с явным подтверждением.
+</div>
 
-Агент `resilience` (скилл `error-handling`) грамотно покрывает код обработкой ошибок (`try/catch/finally`) и структурным логированием без «тихих» падений: try/catch на границах, нормализация ошибок (`cause`/`stack`), ретраи/таймауты, логи с уровнями и контекстом без секретов/PII. Хук `PostToolUse` (`catch-guard.js`) после каждого Edit/Write мягко (не блокируя) подсвечивает пустые `catch {}` в изменённом JS/TS-файле.
+---
 
-Агент `screenshot` (скилл `screenshot-to-code`) превращает **скриншот UI в production-ready код**: читает изображение (инструмент Read показывает картинку), разбирает layout/компоненты/состояния, извлекает точные цвета в семантические OKLCH-токены `@theme` и выдаёт полный запускаемый код — семантический HTML, точные spacing/пропорции, адаптивность (`clamp()`, брейкпоинты, container queries) и a11y. По умолчанию React + Tailwind v4; по запросу Vue / Next.js / чистый HTML/CSS. Отдельно умеет вытащить дизайн-токены (`/screenshot:tokens`) и довести вёрстку до адаптивности (`/screenshot:responsive`).
+## What is this?
 
-Агент `drawio` (скиллы `drawio-diagrams` + `pmp-diagrams`) строит диаграммы в **нативном XML draw.io / diagrams.net**: по описанию, из исходника (схема БД → ERD, структура папок → дерево, код → UML/sequence, mermaid/CSV/JSON) или правя существующий `.drawio`. Умеет flowchart, cross-functional (swimlane), BPMN, UML, network/cloud (AWS/Azure/GCP/Kubernetes), ERD, org chart, mind map, а также PMP/PMBOK — WBS, PERT/CPM (с подсветкой critical path), Gantt, RACI, risk matrix 5×5, stakeholder power-interest grid. Отдаёт готовый `.drawio` с аккуратной раскладкой (сетка, ортогональные рёбра), семантическими цветами и валидным XML и подсказывает, какие custom-библиотеки (`?clibs=…`) включить. Среда не рендерит draw.io — результат открывается в app.diagrams.net.
+Agent-Vorcl-Flow turns Claude Code into a **structured engineering team**. Instead of one general assistant, you get **11 focused sub-agents** (architect, backend, frontend, DB engineer, code auditor, and more), each with its own domain **skills**, quick **slash commands**, and the **MCP tools** it needs. Every non-trivial task runs through a disciplined **Task Master** loop — *goal → tasks → implement → verify → done* — so work is planned, tracked, and survives interruptions.
 
-Фронт всегда подключается к **реальному** API: источник истины — OpenAPI-спека бэка (Fastify/NestJS/Express и др.), типы генерируются из неё (`openapi-typescript` + `openapi-fetch`). Бэк держит спеку полной (агент `swagger`, скилл `swagger-coverage`), фронт из неё берёт контракт (скилл `data-fetching`); моков в прод-пути нет.
+- 🧩 **11 sub-agents**, 27 skills, 55+ slash commands
+- ⚡ **One-command install** for Claude Code and/or Codex — `npx`
+- 🔌 **10 MCP servers** wired in (GitHub, Postgres, MongoDB, Redis, Docker, Firecrawl, Vercel, Render, filesystem, Task Master)
+- 🔑 **Bring your own keys** via environment variables — the plugin hosts nothing
+- 🤝 **Runs on Claude Code and GPT Codex** from the same source
 
-Скилл `i18n` задаёт правило **«ноль языкового хардкода»**: агенты сначала определяют, мультиязычен ли проект (i18n-инфраструктура, несколько локалей), и адаптируются — при мультиязычности пользовательские строки идут только через слой перевода (**next-intl** / **react-i18next** / **i18next**), плюрализация/род — через ICU, даты/числа/валюты — через `Intl`, RTL — через логические CSS-свойства; логи и машинные коды ошибок не локализуются. Скилл подключён у `frontend`, `backend`, `screenshot`, `resilience`, `architect`, а `analyzer` ловит языковой хардкод как отдельную находку аудита.
+---
 
-## Workflow (Task Master)
-Все агенты работают через **Task Master** (`task-master-ai`, MCP-сервер `task-master`): любая нетривиальная задача идёт по циклу **цель → задачи (`parse_prd`/`add_task`) → `next_task` → `get_task` → `expand_task` → реализация → проверка `testStrategy` → `set_task_status done`**. Дисциплину задаёт скилл `workflow`, справочник команд — скилл `task-master`.
+## Quick start
 
-Единая точка входа — **`/goal <цель>`** (сам роутит к нужному субагенту); у каждого агента есть свой `/<agent>:goal`. Ключи Task Master задаются через env (`ANTHROPIC_API_KEY`, опц. `PERPLEXITY_API_KEY`).
+### Requirements
+- **Node.js ≥ 18**
+- **[Claude Code](https://claude.com/claude-code)** and/or **[GPT Codex](https://developers.openai.com/codex/cli/)** CLI installed and on your `PATH`
 
-## Структура (формат плагина Claude Code)
-```
-.claude-plugin/plugin.json     # манифест плагина
-.claude-plugin/marketplace.json# локальный маркетплейс (для установки)
-agents/       architect.md backend.md frontend.md analyzer.md swagger.md firecrawl.md render.md database.md resilience.md screenshot.md drawio.md
-skills/       <навык>/SKILL.md        (27 скиллов)
-commands/     <namespace>/<команда>.md (55 команд, namespace /namespace:команда) + /goal
-hooks/        hooks.json + scripts/session-start.js + scripts/catch-guard.js (PostToolUse: пустые catch)
-.mcp.json     # github, filesystem, postgres, mongodb, redis, docker, firecrawl, vercel, render, task-master
-codex/        # адаптер под GPT Codex (skills + config.toml + install.sh)
-```
+### Install (one command)
 
-## Связка
-`agents/*.md` объявляют роль и в frontmatter `skills:` подключают навыки → скиллы из `skills/*/SKILL.md` автоподхватываются по описанию → команды `commands/<агент>/*.md` дают быстрые `/агент:команда` и делегируют субагенту → `.mcp.json` даёт агентам инструменты. Хук `SessionStart` сообщает Claude о наличии агентов.
-
-## Установка
 ```bash
-# Одной командой — в Claude Code И/ИЛИ Codex (ставит в то, что найдёт в PATH):
-npx github:Vitammiin/agent-vorcl-flow      # без публикации в npm; флаги: --claude | --codex
-#   Claude → регистрирует репо как marketplace и включает плагин (CLI, фолбэк — settings.json)
-#   Codex  → skills + config.toml + AGENTS.md вмёрживаются в ~/.codex / ~/.agents
-# Ключи не трогает — задаёшь свои через env (см. «MCP и секреты»).
+# Installs into Claude Code AND/OR Codex — whichever is found on your PATH:
+npx github:Vitammiin/agent-vorcl-flow
+```
 
-# Быстрый способ — на текущую сессию:
-claude --plugin-dir /путь/к/agent-vorcl-flow
+Target a single runtime with a flag:
 
-# Через локальный маркетплейс (постоянно):
-/plugin marketplace add /путь/к/agent-vorcl-flow
+```bash
+npx github:Vitammiin/agent-vorcl-flow --claude   # Claude Code only
+npx github:Vitammiin/agent-vorcl-flow --codex    # GPT Codex only
+```
+
+What the installer does:
+
+| Runtime | Action |
+| --- | --- |
+| **Claude Code** | Registers this repo as a plugin **marketplace** and enables the plugin (via `claude plugin …`, with a direct `~/.claude/settings.json` fallback). |
+| **GPT Codex** | Merges the skills into `~/.agents/skills` and the `config.toml` + `AGENTS.md` blocks into `~/.codex` (idempotent, between markers). |
+
+> The installer never touches your secrets — you set your own keys via env (see [Configuration](#configuration-mcp--keys)).
+
+### Alternative installs (Claude Code)
+
+```bash
+# Load for the current session only (great for trying it out):
+claude --plugin-dir /path/to/agent-vorcl-flow
+
+# Or install persistently from a local marketplace:
+/plugin marketplace add /path/to/agent-vorcl-flow
 /plugin install agent-vorcl-flow
 ```
 
-## Проверка
-```bash
-claude plugin validate . --strict      # валидация манифеста и компонентов
-/plugin details agent-vorcl-flow       # список подхваченных агентов/скиллов/команд
-@agent-vorcl-flow:architect            # субагент в typeahead
-/architect:analyze биллинг для SaaS    # слэш-команда
+After install, **restart Claude Code** (or run `/reload-plugins` in an open session) to load the agents.
+
+---
+
+## How to use
+
+There are **three ways** to invoke the team. Pick whichever fits.
+
+### 1. Universal entry point — just state a goal
+```text
+/goal add a shopping cart to checkout
+```
+`/goal` figures out which sub-agent should own the work and drives the full Task Master cycle.
+
+### 2. Talk to a specific sub-agent
+```text
+@agent-vorcl-flow:architect  design billing for a SaaS
+@agent-vorcl-flow:backend    add a POST /invoices endpoint
 ```
 
-## MCP и секреты
-Плагин ничего не хостит — своего бэкенда и базы у него нет. MCP-серверам нужны токены, и каждый пользователь задаёт **свои** через переменные окружения: `.mcp.json` подставляет их формой `${VAR:-}`, а Claude Code берёт значения из окружения, в котором запущен. Экспортируй нужные (например в `~/.zshrc`): `GITHUB_TOKEN`, `FIRECRAWL_API_KEY`, `ANTHROPIC_API_KEY`, опц. `PERPLEXITY_API_KEY`; для агента `database` — `POSTGRES_URL` / `MONGODB_URI` / `REDIS_URL` (это подключение к БД **твоего** проекта, не плагина). Незаданный ключ = соответствующий MCP-сервер молчит, остальное работает.
+### 3. Run a specific slash command
+```text
+/backend:create-api   POST /invoices
+/analyzer:audit       src/
+/screenshot:convert   ./mockups/dashboard.png  react
+```
 
-Удалённые серверы **vercel** и **render** используют OAuth: подключены в `.mcp.json`, авторизация командой `/mcp` (браузер). Для Render в headless/CI можно вместо OAuth задать env `RENDER_API_KEY` и заменить запись `render` на header-форму: `"headers": { "Authorization": "Bearer ${RENDER_API_KEY:-}" }`.
+Every agent also has its own `/<agent>:goal` entry point that runs the Task Master loop scoped to that agent.
+
+### The Task Master loop
+Every non-trivial task flows through **Task Master** (`task-master-ai`):
+
+```text
+goal → tasks (parse_prd / add_task) → next_task → get_task → expand_task
+     → implement → verify (testStrategy) → set_task_status done
+```
+
+This keeps work planned, checkpointed, and resumable — nothing is declared "done" without passing its verification step.
+
+---
+
+## The agents
+
+| Agent | Role | Highlights |
+| --- | --- | --- |
+| 🔵 **architect** | Systems & solution architect | Requirements analysis, system/DB/API design, architecture reviews |
+| 🟢 **backend** | Backend developer | Node/TS, Postgres, Redis; modular architecture; every route fully covered by OpenAPI |
+| 🟣 **frontend** | Frontend (React 19 / Next.js App Router) | Components, state, data-fetching, render/bundle optimization, tests |
+| 🟠 **analyzer** | Code auditor (read-only) | Bugs, type safety, DB structure, frontend mocks, backend smells |
+| 🟡 **swagger** | OpenAPI/Swagger coverage (any stack) | Finds routes not fully documented and covers them, with verification |
+| 🔴 **firecrawl** | Web researcher | Search, scrape, map, crawl, structured extraction — LLM-ready output |
+| 🟤 **render** | Hosting & deploy (Render) | Deploys, log-driven diagnostics, metrics, env vars, Render Postgres |
+| 🟦 **database** | DB engineer / DBA | Schema, queries & plans, indexes, N+1, safe reversible migrations, cache |
+| ⚪ **resilience** | Reliability: errors + logging | try/catch at the right boundaries, typed errors, retries/timeouts, structured logs |
+| 🖼️ **screenshot** | Screenshot UI → code | Turns a UI screenshot into production-ready, responsive, accessible code |
+| 📊 **drawio** | Diagrams (draw.io / diagrams.net) | Flowchart, BPMN, UML, ERD, network/cloud, and PMP/PMBOK (WBS, Gantt, RACI…) |
+
+**A few things worth knowing:**
+- **Frontend always talks to a real API.** The backend's OpenAPI spec is the single source of truth; types are generated from it (`openapi-typescript` + `openapi-fetch`). No mocks in the production path.
+- **`database` mutations require explicit confirmation.** Analytics are read-only; schema/data changes (DDL/DML/migrations) never run without your go-ahead.
+- **`resilience` ships a safety hook.** A non-blocking `PostToolUse` hook (`catch-guard.js`) gently flags empty `catch {}` blocks in files you just edited.
+- **`i18n` enforces "zero language hardcoding."** Agents first detect whether a project is multilingual and adapt — user-facing strings go through a translation layer (next-intl / react-i18next / i18next), never inline.
+
+---
+
+## Command reference
+
+Every command below is a slash command. `<…>` marks your input.
+
+### `/goal` — universal router
+| Command | What it does |
+| --- | --- |
+| `/goal <goal>` | Turns any goal into tasks and routes it to the right sub-agent, then runs the full cycle to done. |
+
+### 🔵 architect — architecture
+| Command | What it does |
+| --- | --- |
+| `/architect:goal <goal>` | Goal → tasks → cycle, scoped to architecture. |
+| `/architect:analyze <context>` | Analyze requirements and the task's context. |
+| `/architect:design <problem>` | Design the solution architecture (system, DB, API). |
+| `/architect:review <target>` | Review an existing architecture. |
+
+### 🟢 backend — server (Node/TS, Postgres, Redis)
+| Command | What it does |
+| --- | --- |
+| `/backend:goal <goal>` | Goal → tasks → cycle for backend work. |
+| `/backend:create-api <endpoint>` | Generate an API endpoint on the modular architecture, fully covered by OpenAPI. |
+| `/backend:refactor <target>` | Refactor code without changing behavior. |
+| `/backend:optimize <target>` | Performance optimization. |
+| `/backend:test <target>` | Generate tests for the code. |
+
+### 🟣 frontend — React / Next.js
+| Command | What it does |
+| --- | --- |
+| `/frontend:goal <goal>` | Goal → tasks → cycle for frontend work. |
+| `/frontend:create-component <spec>` | Generate a UI component following the feature structure. |
+| `/frontend:refactor <target>` | Refactor UI / hooks without changing behavior. |
+| `/frontend:optimize <target>` | Optimize render / bundle / Core Web Vitals. |
+| `/frontend:test <target>` | Generate component tests. |
+
+### 🟠 analyzer — code audit (read-only)
+| Command | What it does |
+| --- | --- |
+| `/analyzer:goal <goal>` | Audit a goal via Task Master — findings become tasks. |
+| `/analyzer:audit` | Full audit: bugs, types, DB, frontend mocks, backend smells. |
+| `/analyzer:bugs` | Hunt bugs — unhandled errors, race conditions, edge cases. |
+| `/analyzer:types` | Type check — `tsc`, `any`, unsafe casts, zod↔types drift. |
+| `/analyzer:db` | Audit DB structure — schema, indexes, FKs, N+1, migrations. |
+| `/analyzer:mocks` | Find mockup / fake data on the frontend. |
+| `/analyzer:backend` | Find "bad" backend code — architecture violations, logic in controllers. |
+
+### 🟡 swagger — OpenAPI/Swagger coverage (any stack)
+| Command | What it does |
+| --- | --- |
+| `/swagger:goal <goal>` | Full-coverage goal via Task Master — audit → tasks → cover → verify. |
+| `/swagger:audit` | Read-only: find routes not fully covered by the spec. |
+| `/swagger:cover <route>` | Cover a route/module — params, responses, descriptions, security + verification. |
+
+### 🔴 firecrawl — web research
+| Command | What it does |
+| --- | --- |
+| `/firecrawl:goal <goal>` | Research goal via Task Master — collect web data to a finished result. |
+| `/firecrawl:search <query>` | Web search for sources on a question. |
+| `/firecrawl:scrape <url>` | Scrape one URL into markdown/JSON. |
+| `/firecrawl:map <url>` | Map a site's URLs. |
+| `/firecrawl:crawl <url>` | Recursively crawl a section/site. |
+| `/firecrawl:extract <url>` | Structured extraction by a JSON schema. |
+
+### 🟤 render — hosting / deploy (Render)
+| Command | What it does |
+| --- | --- |
+| `/render:goal <goal>` | Infra goal via Task Master — deploy/diagnose/configure to done. |
+| `/render:deploy <service>` | Deploy / redeploy a service. |
+| `/render:logs <service>` | Service logs and diagnostics down to root cause. |
+| `/render:status <service>` | Service status + deploy + metrics. |
+| `/render:query <sql>` | Read-only SQL against Render Postgres. |
+
+### 🟦 database — DB engineer / DBA (Postgres / MongoDB / Redis)
+| Command | What it does |
+| --- | --- |
+| `/database:goal <goal>` | Data goal via Task Master — schema/queries/migrations/cache to done. |
+| `/database:query <query>` | Read-only query / analytics. |
+| `/database:schema <target>` | Design / review schema and data integrity. |
+| `/database:migrate <change>` | Plan a safe, reversible schema/data migration. |
+| `/database:optimize <target>` | Optimize — indexes, N+1, query plans, pagination. |
+| `/database:cache <target>` | Redis — TTL, invalidation, locks, rate limiting, Streams. |
+
+### ⚪ resilience — error handling + logging
+| Command | What it does |
+| --- | --- |
+| `/resilience:goal <goal>` | Reliability goal via Task Master — cover code with try/catch + logs. |
+| `/resilience:harden <target>` | Wrap code in try/catch/finally with solid logging, no silent failures. |
+| `/resilience:logging <target>` | Add/fix structured logging — levels, context, no secrets/PII. |
+| `/resilience:audit` | Read-only: find silent failures, empty catches, logging gaps. |
+
+### 🖼️ screenshot — screenshot UI → code
+| Command | What it does |
+| --- | --- |
+| `/screenshot:goal <goal>` | A set of screens from screenshots via Task Master — breakdown → code. |
+| `/screenshot:analyze <image>` | Read-only breakdown — layout, components, tokens, states → plan. |
+| `/screenshot:convert <image> [framework]` | Generate full runnable code from a screenshot (default React + Tailwind v4). |
+| `/screenshot:tokens <image>` | Extract design tokens (OKLCH colors, typography, spacing) into Tailwind `@theme`. |
+| `/screenshot:responsive <target>` | Make the generated UI responsive — breakpoints, fluid, `clamp()`, container queries. |
+
+### 📊 drawio — diagrams (draw.io / diagrams.net)
+| Command | What it does |
+| --- | --- |
+| `/drawio:goal <goal>` | A set of diagrams via Task Master — build to done. |
+| `/drawio:create <description> [type]` | Build a diagram from a text description (valid native XML). |
+| `/drawio:pmp <type> <project>` | Build a PMP/PMBOK diagram — WBS, PERT/CPM, Gantt, RACI, risk matrix, stakeholder grid. |
+| `/drawio:convert <source> [type]` | Convert a source to a diagram — DB schema → ERD, folders → tree, code → UML, mermaid/CSV/JSON. |
+| `/drawio:refine <file>` | Refine an existing `.drawio` — layout, theme, add/remove nodes, align to grid. |
+
+---
+
+## Configuration (MCP & keys)
+
+The plugin **hosts nothing** — it has no backend or database of its own. Its MCP servers just need tokens, and **each user provides their own via environment variables**. `.mcp.json` reads them with the `${VAR:-}` form, and Claude Code takes the values from the environment it was launched in.
+
+Export the ones you actually use (for example in `~/.zshrc`):
+
+```bash
+export ANTHROPIC_API_KEY=…     # Task Master (parse_prd / expand)
+export FIRECRAWL_API_KEY=…     # firecrawl web research
+export GITHUB_TOKEN=…          # github MCP
+export PERPLEXITY_API_KEY=…    # optional: Task Master research mode
+
+# For the `database` agent — these point at YOUR project's DB, not the plugin's:
+export POSTGRES_URL=…          # postgres://user:pass@host:5432/db
+export MONGODB_URI=…           # mongodb://user:pass@host:27017/db
+export REDIS_URL=…             # redis://host:6379
+```
+
+An unset key simply means that MCP server stays quiet — everything else keeps working.
+
+The remote **vercel** and **render** servers use OAuth (authorize with `/mcp` in a browser). For Render in headless/CI you can set `RENDER_API_KEY` and switch its entry to a header form: `"headers": { "Authorization": "Bearer ${RENDER_API_KEY:-}" }`.
+
+---
+
+## Verify the install
+
+```bash
+claude plugin validate . --strict      # validate the manifest and components
+/plugin details agent-vorcl-flow       # list the loaded agents / skills / commands
+@agent-vorcl-flow:architect            # the sub-agent appears in the typeahead
+/architect:analyze billing for a SaaS  # run a slash command
+```
+
+---
+
+## GPT Codex
+
+Codex has no "plugins," so the same capabilities are expressed as **skills**, **profiles**, and an `AGENTS.md` router:
+
+| Claude Code | Codex equivalent |
+| --- | --- |
+| sub-agent `@agent-vorcl-flow:frontend` | skill persona `$frontend` + `codex --profile frontend` |
+| command `/analyzer:audit` | task skill `$analyzer-audit` |
+| command `/goal` | task skill `$goal` |
+| `.mcp.json` | `[mcp_servers.*]` in `config.toml` |
+| `SessionStart` hook | role routing in `AGENTS.md` |
+
+```bash
+codex
+> $goal  add a shopping cart to checkout
+> $backend-create-api  POST /invoices
+> $analyzer-audit
+codex --profile analyzer     # a role with higher reasoning effort
+```
+
+See [`codex/README.md`](./codex/README.md) for the full mapping.
+
+---
+
+## Project structure
+
+```text
+.claude-plugin/plugin.json      # plugin manifest
+.claude-plugin/marketplace.json # local marketplace (for install)
+agents/       11 sub-agent definitions (*.md)
+skills/       <skill>/SKILL.md            (27 skills)
+commands/     <namespace>/<command>.md    (55 commands, /namespace:command) + /goal
+hooks/        hooks.json + session-start.js + catch-guard.js (PostToolUse: empty catch)
+.mcp.json     github, filesystem, postgres, mongodb, redis, docker, firecrawl, vercel, render, task-master
+bin/          install.mjs                 (the npx installer)
+codex/        GPT Codex adapter (skills + config.toml + install.sh)
+```
+
+**How it fits together:** `agents/*.md` declare a role and, in front-matter `skills:`, attach skills → skills in `skills/*/SKILL.md` are auto-loaded by description → `commands/<agent>/*.md` provide quick `/agent:command` shortcuts that delegate to the sub-agent → `.mcp.json` gives agents their tools. A `SessionStart` hook tells Claude the agents are available.
+
+---
+
+## License
+
+Proprietary — **use only**. Everyone may install and use it freely (personal or commercial), but copying/redistribution and modification are not permitted; provided "as is", with no warranty and no liability. See [LICENSE](./LICENSE).
+
+© 2026 Christian Avis and Vorcl.
