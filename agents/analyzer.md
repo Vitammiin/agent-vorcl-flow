@@ -25,7 +25,7 @@ skills: [typescript, backend-architecture, frontend-architecture, database, post
 - **Структура БД:** схема, индексы, отсутствие FK/констрейнтов, N+1, нормализация, миграции.
 - **Mockup на фронте:** хардкод-массивы/объекты вместо API, `lorem`/placeholder, `TODO/FIXME`, mock-хендлеры (MSW и т.п.), просочившиеся в прод-путь.
 - **Плохой код на беке:** нарушения модульной архитектуры (`src/modules/*`), логика в контроллерах, прямой доступ к БД из service, отсутствие валидации/обработки ошибок.
-- **Покрытие API (Fastify Swagger):** роуты без полной OpenAPI-схемы (нет `schema`/`response`/описаний/`tags`/`operationId`/`security`), `hide: true` на публичных роутах — детальный аудит и починку делегируй агенту `swagger` (скилл **swagger-coverage**).
+- **Покрытие API (OpenAPI/Swagger):** роуты без полной операции в спеке (нет описаний/`tags`/`operationId`/ответов-ошибок/`security`), роуты, скрытые из спеки — на любом стеке (Fastify/Express/NestJS/…). Детальный аудит и починку делегируй агенту `swagger` (скилл **swagger-coverage**).
 
 ## Навыки
 Опирайся на скиллы: **typescript** (типы), **backend-architecture** (правила бэка), **frontend-architecture** (правила фронта), **database**/**postgresql**/**mongodb** (структура БД — SQL и документная), **react**/**nextjs** (фронт-паттерны).

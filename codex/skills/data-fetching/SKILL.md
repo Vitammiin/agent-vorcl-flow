@@ -1,15 +1,15 @@
 ---
 name: data-fetching
-description: Серверное состояние на TanStack Query (React Query) поверх реального API бэкенда. Источник истины — Fastify Swagger (OpenAPI): типы генерируются из спеки (openapi-typescript), запросы идут типобезопасным openapi-fetch. Ключи, кэш, инвалидация, мутации, оптимистичные обновления, RSC/Server Actions. Моков в прод-пути нет. Use при загрузке/мутации серверных данных во фронтенде.
+description: Серверное состояние на TanStack Query (React Query) поверх реального API бэкенда. Источник истины — OpenAPI-спека бэка (Fastify/NestJS/Express и др.): типы генерируются из спеки (openapi-typescript), запросы идут типобезопасным openapi-fetch. Ключи, кэш, инвалидация, мутации, оптимистичные обновления, RSC/Server Actions. Моков в прод-пути нет. Use при загрузке/мутации серверных данных во фронтенде.
 ---
 
 # Навык: Data fetching (TanStack Query + OpenAPI)
 
 Серверное состояние — на **TanStack Query** поверх **реального API бэкенда**. Клиентское UI-состояние — в Zustand (`$state-management`).
 
-## Правило №1: всегда реальный API, источник истины — Fastify Swagger
+## Правило №1: всегда реальный API, источник истины — OpenAPI-спека бэка
 - Фронт **всегда** бьёт в реальные эндпоинты бэка. Моков в прод-пути нет (MSW — только в тестах, `$react-testing`).
-- Источник правды контракта — **OpenAPI-спека Fastify Swagger** (`GET /documentation/json`); полнота спеки — забота бэка (`$swagger-coverage`).
+- Источник правды контракта — **OpenAPI-спека бэка** (эндпоинт под стек: `/documentation/json` у Fastify, `/api-json` у NestJS, `/openapi.json` и т.п.); полнота спеки — забота бэка (`$swagger-coverage`).
 - Типы клиента **генерируются из спеки**, не пишутся руками.
 
 ## Типизированный клиент (openapi-typescript + openapi-fetch)
@@ -23,7 +23,7 @@ description: Серверное состояние на TanStack Query (React Qu
   Пути/query/body/ответы проверяются на типах против спеки — рассинхрон ловит компилятор.
 
 ## Слой api фичи
-- `queryFn`/`mutationFn` вызывают `api.GET/POST/...` по эндпоинту из спеки; валидацию ответа обеспечивает сериализатор Fastify по response-схеме.
+- `queryFn`/`mutationFn` вызывают `api.GET/POST/...` по эндпоинту из спеки; валидацию ответа обеспечивает бэк (сериализация по response-схеме, напр. в Fastify).
 - Фабрику ключей держи в `features/<feature>/api`.
 
 ## Ключи запросов

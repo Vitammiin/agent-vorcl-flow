@@ -1,15 +1,15 @@
 ---
-description: Полное покрытие Fastify Swagger через Task Master — аудит непокрытых роутов → задачи → покрытие → проверка (swagger)
-argument-hint: "[модуль/область; по умолчанию весь src/modules]"
+description: Полное покрытие OpenAPI/Swagger через Task Master — аудит непокрытых роутов → задачи → покрытие → проверка (swagger)
+argument-hint: "[модуль/область/путь; по умолчанию весь код бэка]"
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob
 ---
 
-Доведи покрытие Fastify Swagger до полного через Task Master: **$ARGUMENTS**.
+Доведи покрытие OpenAPI/Swagger до полного через Task Master: **$ARGUMENTS**.
 
 1. Убедись, что Task Master инициализирован (`.taskmaster/`); если нет — `task-master init`.
-2. Аудит (**read-only**) по скиллу `swagger-coverage`: собери все роуты в `src/modules/*/routes.ts` и плагинах и найди не полностью покрытые OpenAPI (нет `schema`/`response`; нет ответов-ошибок через общий `ErrorSchema`; пустые/шаблонные `summary`/`description`; нет `tags`/`operationId`; `hide: true` на публичном роуте; защищённый роут без `security`; рассинхрон zod↔controller; «дыры» против `GET /documentation/json` / `app.swagger()`).
-3. На каждую значимую дыру — `add_task` (метод+путь роута, модуль, чего не хватает, `file:line`, severity).
-4. `next_task` → `get_task`; покрой роут по скиллу `swagger-coverage`: дополни zod-схемы в `schemas.ts` (вход + все ответы + общий `ErrorSchema`), подключи их в `routes.ts`, проставь `summary`/`description`/`tags`/`operationId`, а для защищённых — `security`. Ход фиксируй через `update_subtask`.
-5. Проверь `testStrategy`: спека собирается, `npx @redocly/cli lint` зелёный, `npx openapi-typescript` без ошибок, тесты проходят; при успехе — `set_task_status --status=done`; вернись к шагу 4, пока есть задачи.
+2. **Определи стек** (не предполагай Fastify) и источник спеки по `package.json`/импортам/файлам: Fastify/Express/NestJS/Koa/Hapi/tRPC, статическая `openapi.{yaml,json}` или не-JS (FastAPI/Spring/DRF). Аудит (**read-only**) по скиллу `swagger-coverage`: собери роуты способом под стек и найди не полностью покрытые спекой (операции нет в спеке; нет `summary`/`description`/`tags`/`operationId`; `responses` без ошибок через общий Error-компонент; защищённый роут без `security`; роут скрыт из спеки; рассинхрон схемы ответа с хендлером; «дыры» против фактической спеки — `/documentation/json` · `/api-json` · `/openapi.json` · генератор).
+3. На каждую значимую дыру — `add_task` (метод+путь роута, модуль/тег, чего не хватает, `file:line`, severity).
+4. `next_task` → `get_task`; покрой роут по скиллу `swagger-coverage` механизмом стека (Fastify `schema`+zod / Nest `@Api*` / tsoa / JSDoc / Hapi `options` / статическая спека): вход + все ответы + общий Error-компонент, `summary`/`description`/`tags`/`operationId`, `security` для защищённых. Ход фиксируй через `update_subtask`.
+5. Проверь `testStrategy`: спека собирается/валидируется (`npx @redocly/cli lint`), `npx openapi-typescript` без ошибок, тесты проходят; при успехе — `set_task_status --status=done`; вернись к шагу 4, пока есть задачи.
 
 Опирайся на навыки `swagger-coverage`, `backend-architecture`, `workflow`, `task-master`. Делегируй субагенту `swagger`.
