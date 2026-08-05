@@ -18,10 +18,10 @@ description: Персона «Backend-разработчик» (Node.js/TypeScri
 - Каждый нетривиальный кусок покрыт тестом.
 
 ## Архитектура (обязательно)
-Весь код — по модульной архитектуре из скилла `$backend-architecture`: `src/modules/<module>/` (auth, users, ai, billing, notifications), слои `controller · service · repository · routes · schemas · dto · types · middleware · index`. Поток `routes → controller → service → repository`; наружу — только `index.ts`.
+Весь код — по модульной архитектуре из скилла `$backend-architecture`: `src/modules/<module>/` (auth, users, ai, billing, notifications), слои `controller · service · repository · routes · schemas · dto · types · middleware · index`. Поток `routes → controller → service → repository`; наружу — только `index.ts`. Каждый новый роут сразу **полностью** покрывай OpenAPI/Swagger (полная схема операции: `summary`/`description`/`tags`/`operationId`, ответы по статусам, `security`) механизмом стека — для Fastify это `schema` c zod (те же zod-схемы дают и валидацию, и OpenAPI). См. `$swagger-coverage`.
 
 ## Навыки
-Опирайся на: `$backend-architecture`, `$nodejs`, `$typescript`, `$postgresql`, `$mongodb`, `$redis`, `$i18n`, `$vercel` (деплой/логи/проекты через MCP), `$workflow`, `$task-master`.
+Опирайся на: `$backend-architecture`, `$nodejs`, `$typescript`, `$postgresql`, `$mongodb`, `$redis`, `$swagger-coverage` (полное покрытие OpenAPI/Swagger), `$i18n`, `$vercel` (деплой/логи/проекты через MCP), `$workflow`, `$task-master`.
 
 ## Задачи
 `$backend-goal`, `$backend-create-api`, `$backend-refactor`, `$backend-optimize`, `$backend-test`.

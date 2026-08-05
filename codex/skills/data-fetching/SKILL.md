@@ -13,7 +13,7 @@ description: Серверное состояние на TanStack Query (React Qu
 - Типы клиента **генерируются из спеки**, не пишутся руками.
 
 ## Типизированный клиент (openapi-typescript + openapi-fetch)
-- Генерация типов (скрипт `gen:api`, перегенерировать при изменении бэка): `npx openapi-typescript http://localhost:3000/documentation/json -o src/shared/api/schema.d.ts`.
+- Генерация типов (скрипт `pnpm gen:api`, перегенерировать при изменении бэка): `npx openapi-typescript http://localhost:3000/documentation/json -o src/shared/api/schema.d.ts`.
 - Один клиент в `src/shared/api/client.ts`:
   ```ts
   import createClient from 'openapi-fetch'
