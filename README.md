@@ -20,7 +20,7 @@ One `npx` command installs them. No backend, no hosting — Claude Code runs eve
 
 ## What is this?
 
-Agent-Vorcl-Flow turns Claude Code into a **structured engineering team**. Instead of one general assistant, you get **11 focused sub-agents** (architect, backend, frontend, DB engineer, code auditor, and more), each with its own domain **skills**, quick **slash commands**, and the **MCP tools** it needs. Every non-trivial task runs through a disciplined **Task Master** loop — *goal → tasks → implement → verify → done* — so work is planned, tracked, and survives interruptions.
+Agent-Vorcl-Flow turns Claude Code into a **structured engineering team**. Instead of one general assistant, you get **12 focused sub-agents** (architect, backend, frontend, DB engineer, code auditor, and more), each with its own domain **skills**, quick **slash commands**, and the **MCP tools** it needs. Every non-trivial task runs through a disciplined **Task Master** loop — *goal → tasks → implement → verify → done* — so work is planned, tracked, and survives interruptions.
 
 - 🧩 **11 sub-agents**, 27 skills, 55+ slash commands
 - ⚡ **One-command install** for Claude Code and/or Codex — `npx`
@@ -126,6 +126,7 @@ This keeps work planned, checkpointed, and resumable — nothing is declared "do
 | ⚪ **resilience** | Reliability: errors + logging | try/catch at the right boundaries, typed errors, retries/timeouts, structured logs |
 | 🖼️ **screenshot** | Screenshot UI → code | Turns a UI screenshot into production-ready, responsive, accessible code |
 | 📊 **drawio** | Diagrams (draw.io / diagrams.net) | Flowchart, BPMN, UML, ERD, network/cloud, and PMP/PMBOK (WBS, Gantt, RACI…) |
+| 🧜 **mermaid** | Mermaid diagrams (+ real render) | flowchart, sequence, class, state, ER, gantt, gitGraph, mindmap…; validated via mcp-mermaid/`mmdc`; hands you the file (`.mmd` + SVG/PNG/PDF) |
 
 **A few things worth knowing:**
 - **Frontend always talks to a real API.** The backend's OpenAPI spec is the single source of truth; types are generated from it (`openapi-typescript` + `openapi-fetch`). No mocks in the production path.
@@ -243,6 +244,16 @@ Every command below is a slash command. `<…>` marks your input.
 | `/drawio:convert <source> [type]` | Convert a source to a diagram — DB schema → ERD, folders → tree, code → UML, mermaid/CSV/JSON. |
 | `/drawio:refine <file>` | Refine an existing `.drawio` — layout, theme, add/remove nodes, align to grid. |
 
+### 🧜 mermaid — Mermaid diagrams (+ real render)
+| Command | What it does |
+| --- | --- |
+| `/mermaid:vorcl <goal>` | A set of diagrams via Task Master — build to done (render-verified). |
+| `/mermaid:create <description> [type]` | Build a diagram from a description — valid syntax, verified by a real render; hands you the file. |
+| `/mermaid:convert <source> [type]` | Convert a source to Mermaid — DB schema → ER, code → class/sequence, folders → flowchart, `.drawio`/CSV/JSON. |
+| `/mermaid:validate <file>` | Syntax + real render-test; find and fix errors (mmdc / Maid / mcp-mermaid). |
+| `/mermaid:render <file> [format] [theme]` | Export to SVG/PNG/PDF (mermaid-cli / Kroki / Mermaid.ink). |
+| `/mermaid:refine <file>` | Refine an existing `.mmd` — direction, subgraph, classDef/styles, readability. |
+
 ---
 
 ## Configuration (MCP & keys)
@@ -309,11 +320,11 @@ See [`codex/README.md`](./codex/README.md) for the full mapping.
 ```text
 .claude-plugin/plugin.json      # plugin manifest
 .claude-plugin/marketplace.json # local marketplace (for install)
-agents/       11 sub-agent definitions (*.md)
-skills/       <skill>/SKILL.md            (27 skills)
-commands/     <namespace>/<command>.md    (55 commands, /namespace:command) + /vorcl
+agents/       12 sub-agent definitions (*.md)
+skills/       <skill>/SKILL.md            (29 skills)
+commands/     <namespace>/<command>.md    (61 commands, /namespace:command) + /vorcl
 hooks/        hooks.json + session-start.js + catch-guard.js (PostToolUse: empty catch)
-.mcp.json     github, filesystem, postgres, mongodb, redis, docker, firecrawl, vercel, render, task-master
+.mcp.json     github, filesystem, postgres, mongodb, redis, docker, firecrawl, vercel, render, task-master, mermaid
 bin/          install.mjs                 (the npx installer)
 codex/        GPT Codex adapter (skills + config.toml + install.sh)
 ```

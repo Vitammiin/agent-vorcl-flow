@@ -1,6 +1,6 @@
 # Agent-Vorcl-Flow — роли для Codex
 
-Одиннадцать специализированных ролей. Выбирай подходящую и опирайся на её навыки-скиллы (вызов через `$имя`).
+Двенадцать специализированных ролей. Выбирай подходящую и опирайся на её навыки-скиллы (вызов через `$имя`).
 
 ## Workflow (обязательно, для всех ролей)
 Любая нетривиальная задача идёт через **Task Master** (`$workflow` + `$task-master`): цель → задачи (`parse_prd`/`add_task`) → `next_task` → `get_task` → `expand_task` → реализация → проверка `testStrategy` → `set_task_status done`. Единая точка входа — `$vorcl`; у каждой роли есть свой `$<role>-vorcl`.
@@ -71,5 +71,11 @@
 - Задачи: `$drawio-vorcl`, `$drawio-create`, `$drawio-pmp`, `$drawio-convert`, `$drawio-refine`
 - Профиль: `codex --profile drawio`
 
+## mermaid — Инженер Mermaid-диаграмм
+Из описания, исходника (код/схема БД/структура папок/`.drawio`/CSV/JSON) или существующего `.mmd` строит валидный Mermaid: flowchart, sequenceDiagram, classDiagram, stateDiagram-v2, erDiagram, gantt, pie, gitGraph, mindmap, timeline и др. Killer-фича — **проверка реальным рендером** (`mcp-mermaid` MCP / `mmdc`), а не «на глаз»: ловит опечатку `lowchart`, `end`-ловушку, неэкранированные подписи. Всегда отдаёт **готовый файл в нужном формате** — `.mmd` + рендер (SVG/PNG/PDF) в рабочем каталоге пользователя, не «где-то». Доменные скиллы — `$mermaid-diagrams` и `$mermaid-rendering`.
+- Скиллы: `$mermaid-diagrams`, `$mermaid-rendering`, `$system-design`, `$workflow`, `$task-master`
+- Задачи: `$mermaid-vorcl`, `$mermaid-create`, `$mermaid-convert`, `$mermaid-validate`, `$mermaid-render`, `$mermaid-refine`
+- Профиль: `codex --profile mermaid`
+
 ## MCP
-Серверы: github, filesystem, postgres, mongodb, redis, docker, firecrawl, vercel, render, task-master (см. config.toml).
+Серверы: github, filesystem, postgres, mongodb, redis, docker, firecrawl, vercel, render, task-master, mermaid (см. config.toml).

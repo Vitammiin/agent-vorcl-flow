@@ -2,34 +2,64 @@
   "mcpServers": {
     "github": {
       "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-github"],
-      "env": { "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_TOKEN:-}" }
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-github"
+      ],
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_TOKEN:-}"
+      }
     },
     "filesystem": {
       "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-filesystem", "${CLAUDE_PROJECT_DIR}"]
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-filesystem",
+        "${CLAUDE_PROJECT_DIR}"
+      ]
     },
     "postgres": {
       "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-postgres", "${POSTGRES_URL:-}"]
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-postgres",
+        "${POSTGRES_URL:-}"
+      ]
     },
     "mongodb": {
       "command": "npx",
-      "args": ["-y", "mongodb-mcp-server@latest"],
-      "env": { "MDB_MCP_CONNECTION_STRING": "${MONGODB_URI:-}" }
+      "args": [
+        "-y",
+        "mongodb-mcp-server@latest"
+      ],
+      "env": {
+        "MDB_MCP_CONNECTION_STRING": "${MONGODB_URI:-}"
+      }
     },
     "redis": {
       "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-redis", "${REDIS_URL:-}"]
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-redis",
+        "${REDIS_URL:-}"
+      ]
     },
     "docker": {
       "command": "npx",
-      "args": ["-y", "mcp-server-docker"]
+      "args": [
+        "-y",
+        "mcp-server-docker"
+      ]
     },
     "firecrawl": {
       "command": "npx",
-      "args": ["-y", "firecrawl-mcp"],
-      "env": { "FIRECRAWL_API_KEY": "${FIRECRAWL_API_KEY:-}" }
+      "args": [
+        "-y",
+        "firecrawl-mcp"
+      ],
+      "env": {
+        "FIRECRAWL_API_KEY": "${FIRECRAWL_API_KEY:-}"
+      }
     },
     "vercel": {
       "type": "http",
@@ -41,12 +71,22 @@
     },
     "task-master": {
       "command": "npx",
-      "args": ["-y", "task-master-ai"],
+      "args": [
+        "-y",
+        "task-master-ai"
+      ],
       "env": {
         "ANTHROPIC_API_KEY": "${ANTHROPIC_API_KEY:-}",
         "PERPLEXITY_API_KEY": "${PERPLEXITY_API_KEY:-}",
         "TASK_MASTER_TOOLS": "parse_prd,get_tasks,get_task,next_task,expand_task,set_task_status,update_subtask,add_task,analyze_project_complexity"
       }
+    },
+    "mermaid": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "mcp-mermaid"
+      ]
     }
   }
 }

@@ -7,12 +7,12 @@
 codex/
 ├── skills/<name>/SKILL.md   # навыки Codex (.agents/skills): персоны ролей + доменные + задачи
 ├── config.toml              # MCP-серверы [mcp_servers.*] + профили ролей [profiles.*]
-├── AGENTS.md                # роутинг ролей (architect, backend, frontend, analyzer, swagger, firecrawl, render, database, resilience, screenshot, drawio)
+├── AGENTS.md                # роутинг ролей (architect, backend, frontend, analyzer, swagger, firecrawl, render, database, resilience, screenshot, drawio, mermaid)
 └── scripts/install.sh       # установка в ~/.agents/skills и ~/.codex
 ```
 
 ## Роли
-`$architect` · `$backend` · `$frontend` · `$analyzer` · `$swagger` · `$firecrawl` · `$render` · `$database` · `$resilience` · `$screenshot` · `$drawio`. Все работают через Task Master (`$workflow` + `$task-master`); единая точка входа — `$vorcl`, у каждой роли свой `$<role>-vorcl`. У `render` и `database` персона и доменный скилл совпадают — это `$render` и `$database`; у `resilience` доменный скилл — `$error-handling`, у `screenshot` — `$screenshot-to-code`, у `drawio` — `$drawio-diagrams` + `$pmp-diagrams`. Кросс-сквозной скилл `$i18n` (интернационализация, запрет языкового хардкода) подключён у `$frontend`, `$backend`, `$screenshot`, `$resilience`, `$architect` и `$analyzer`.
+`$architect` · `$backend` · `$frontend` · `$analyzer` · `$swagger` · `$firecrawl` · `$render` · `$database` · `$resilience` · `$screenshot` · `$drawio` · `$mermaid`. Все работают через Task Master (`$workflow` + `$task-master`); единая точка входа — `$vorcl`, у каждой роли свой `$<role>-vorcl`. У `render` и `database` персона и доменный скилл совпадают — это `$render` и `$database`; у `resilience` доменный скилл — `$error-handling`, у `screenshot` — `$screenshot-to-code`, у `drawio` — `$drawio-diagrams` + `$pmp-diagrams`, у `mermaid` — `$mermaid-diagrams` + `$mermaid-rendering`. Кросс-сквозной скилл `$i18n` (интернационализация, запрет языкового хардкода) подключён у `$frontend`, `$backend`, `$screenshot`, `$resilience`, `$architect` и `$analyzer`.
 
 ## Маппинг Claude Code → Codex
 | Claude Code | Codex |
@@ -51,6 +51,8 @@ codex
 > $drawio-create  флоу оформления заказа  flowchart  # описание → .drawio (нативный XML)
 > $drawio-pmp     wbs  проект запуска мобильного приложения   # WBS-дерево в draw.io
 > $drawio-convert ./prisma/schema.prisma  erd        # схема БД → ERD .drawio
+> $mermaid-create  флоу оформления заказа  flowchart   # описание → .mmd (проверен рендером)
+> $mermaid-convert ./prisma/schema.prisma  er          # схема БД → erDiagram .mmd
 
 codex --profile analyzer    # роль аудита с повышенным reasoning
 codex --profile render      # роль хостинга/деплоя на Render

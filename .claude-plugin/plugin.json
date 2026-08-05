@@ -2,8 +2,8 @@
   "name": "agent-vorcl-flow",
   "displayName": "Agent Vorcl Flow",
   "version": "1.6.0",
-  "description": "Специализированные субагенты (architect, backend, frontend, analyzer, swagger, firecrawl, render, database, resilience, screenshot, drawio) со скиллами, слэш-командами, единым workflow через Task Master и MCP для Claude Code.",
+  "description": "Специализированные субагенты (architect, backend, frontend, analyzer, swagger, firecrawl, render, database, resilience, screenshot, drawio, mermaid) со скиллами, слэш-командами, единым workflow через Task Master и MCP для Claude Code.",
   "author": { "name": "Avis" },
-  "keywords": ["agents", "architect", "backend", "frontend", "analyzer", "swagger", "firecrawl", "render", "database", "resilience", "error-handling", "i18n", "localization", "локализация", "интернационализация", "screenshot", "screenshot-to-code", "drawio", "diagrams", "drawio-diagrams", "pmp-diagrams", "bpmn", "uml", "wbs", "task-master", "workflow"],
+  "keywords": ["agents", "architect", "backend", "frontend", "analyzer", "swagger", "firecrawl", "render", "database", "resilience", "error-handling", "i18n", "localization", "локализация", "интернационализация", "screenshot", "screenshot-to-code", "drawio", "diagrams", "drawio-diagrams", "pmp-diagrams", "bpmn", "uml", "wbs", "mermaid", "mermaid-diagrams", "mermaid-rendering", "flowchart", "sequence-diagram", "task-master", "workflow"],
   "mcpServers": "./.mcp.json"
 }

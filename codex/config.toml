@@ -54,7 +54,12 @@ command = "npx"
 args = ["-y", "task-master-ai"]
 env = { TASK_MASTER_TOOLS = "parse_prd,get_tasks,get_task,next_task,expand_task,set_task_status,update_subtask,add_task,analyze_project_complexity" }
 
-# ===== Профили под роли (codex --profile architect | backend | frontend | analyzer | swagger | firecrawl | render | database | resilience | screenshot | drawio) =====
+# Mermaid — генерация/валидация/рендер Mermaid-диаграмм (self-hosted, без ключей).
+[mcp_servers.mermaid]
+command = "npx"
+args = ["-y", "mcp-mermaid"]
+
+# ===== Профили под роли (codex --profile architect | backend | frontend | analyzer | swagger | firecrawl | render | database | resilience | screenshot | drawio | mermaid) =====
 [profiles.architect]
 model_reasoning_effort = "high"
 # model = "gpt-5.1-codex"   # при необходимости укажите модель
@@ -87,4 +92,7 @@ model_reasoning_effort = "medium"
 model_reasoning_effort = "medium"
 
 [profiles.drawio]
+model_reasoning_effort = "medium"
+
+[profiles.mermaid]
 model_reasoning_effort = "medium"
