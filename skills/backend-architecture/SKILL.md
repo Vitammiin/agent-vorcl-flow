@@ -9,13 +9,48 @@ description: Обязательные правила модульной архи
 
 ## Структура каталогов
 ```
-src/
-└── modules/
-    ├── auth/
-    ├── users/
-    ├── ai/
-    ├── billing/
-    └── notifications/
+ src/
+├── app/
+│   ├── app.ts
+│   ├── server.ts
+│   │
+│   └── plugins/
+│       ├── swagger.plugin.ts
+│       ├── jwt.plugin.ts
+│       ├── cors.plugin.ts
+│       ├── database.plugin.ts
+│       └── index.ts
+│
+├── config/
+│   ├── env.ts
+│   └── index.ts
+│
+├── modules/
+│   ├── auth/
+│   │   ├── controller.ts
+│   │   ├── service.ts
+│   │   ├── repository.ts
+│   │   ├── routes.ts
+│   │   ├── schemas.ts
+│   │   ├── dto.ts
+│   │   ├── types.ts
+│   │   ├── middlewar
+│   │   └── index.ts
+│   │
+│   ├── users/
+│   ├── ai/
+│   ├── billing/
+│   └── notifications/
+│
+├── shared/
+│   ├── errors/
+│   ├── types/
+│   └── utils/
+│
+└── index.ts
+.env
+.env.example
+DOCS.md
 ```
 
 Внутри **каждого** модуля — фиксированный набор файлов:
@@ -30,6 +65,8 @@ src/
 ├── types.ts         # доменные типы/интерфейсы модуля
 ├── middleware.ts    # middleware, специфичный для модуля
 └── index.ts         # публичная поверхность модуля (barrel-экспорт)
+
+
 ```
 
 ## Ответственность слоёв
@@ -50,6 +87,17 @@ src/
 4. Общий код (утилиты, конфиг, БД-клиент) живёт вне модулей (`src/shared`, `src/config`); модули импортируют его, но не наоборот.
 5. Типы выводятся из `schemas` (zod `z.infer`), чтобы валидация и типы не расходились.
 
+## Дополнительные правила
+
+ Input validation: All inputs validated
+ Password hashing: bcrypt
+ JWT verification: Always verify signature and expiry
+ Rate limiting: Protect from abuse
+ HTTPS: Everywhere in production
+ CORS: Properly configured
+ Secrets: Environment variables only
+ Dependencies: Regularly audited
+
 ## Пример `index.ts` (публичная поверхность)
 ```ts
 // modules/auth/index.ts — наружу только то, что нужно другим модулям
@@ -64,7 +112,3 @@ export type { AuthUser } from "./types";
 - [ ] Бизнес-логика в `service`, БД — только в `repository`.
 - [ ] Наружу торчит только `index.ts`.
 - [ ] Зависимости идут в одну сторону.
-
-## Интернационализация (i18n)
-- Слой сообщений/переводов (i18next или каталог) — в `src/shared`, не внутри модулей; сообщения валидации (`schemas`) и ошибок — локализуемые ключи, не хардкод-строки.
-- Локаль бери из `Accept-Language`/профиля и переводи на границе ответа; письма/уведомления — по локали получателя. Подробнее — скилл **i18n**.
