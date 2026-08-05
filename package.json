@@ -17,13 +17,33 @@
     "codex/",
     "README.md"
   ],
+  "keywords": [
+    "claude",
+    "claude-code",
+    "codex",
+    "plugin",
+    "agents",
+    "subagents",
+    "skills",
+    "mcp",
+    "task-master",
+    "installer"
+  ],
   "engines": {
     "node": ">=18"
   },
+  "os": ["darwin", "linux", "win32"],
   "license": "MIT",
   "author": "Avis",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Vitammiin/agent-vorcl-flow.git"
+    "url": "git+https://github.com/Vitammiin/agent-vorcl-flow.git"
+  },
+  "homepage": "https://github.com/Vitammiin/agent-vorcl-flow#readme",
+  "bugs": {
+    "url": "https://github.com/Vitammiin/agent-vorcl-flow/issues"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }
