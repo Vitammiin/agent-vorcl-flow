@@ -51,6 +51,12 @@ codex/        # адаптер под GPT Codex (skills + config.toml + install.
 
 ## Установка
 ```bash
+# Одной командой — в Claude Code И/ИЛИ Codex (ставит в то, что найдёт в PATH):
+npx github:Vitammiin/agent-vorcl-flow      # без публикации в npm; флаги: --claude | --codex
+#   Claude → регистрирует репо как marketplace и включает плагин (CLI, фолбэк — settings.json)
+#   Codex  → skills + config.toml + AGENTS.md вмёрживаются в ~/.codex / ~/.agents
+# Ключи не трогает — задаёшь свои через env (см. «MCP и секреты»).
+
 # Быстрый способ — на текущую сессию:
 claude --plugin-dir /путь/к/agent-vorcl-flow
 

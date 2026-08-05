@@ -1,0 +1,29 @@
+{
+  "name": "agent-vorcl-flow",
+  "version": "1.6.0",
+  "description": "Установщик: плагин Agent-Vorcl-Flow для Claude Code + адаптер для Codex (skills + MCP + AGENTS.md). Сам плагин ничего не хостит.",
+  "bin": {
+    "agent-vorcl-flow": "bin/install.mjs"
+  },
+  "files": [
+    "bin/",
+    "agents/",
+    "skills/",
+    "commands/",
+    "hooks/",
+    "scripts/",
+    ".mcp.json",
+    ".claude-plugin/",
+    "codex/",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "license": "MIT",
+  "author": "Avis",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Vitammiin/agent-vorcl-flow.git"
+  }
+}
