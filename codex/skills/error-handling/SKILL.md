@@ -14,7 +14,7 @@ description: Грамотное покрытие кода обработкой �
 Пустой `catch {}` запрещён — в catch: обработать + лог, пробросить (`throw new AppError(msg, { cause })`), либо преобразовать в доменную ошибку. В прикладном коде бросай только `Error`/наследники (фреймворковый throw для control-flow — Next `redirect()`/`notFound()` — не трогай и не проглатывай без re-throw). `cause` — **ссылка** на исходную ошибку (логгер должен разворачивать цепочку; `console.log` без `util.inspect` — нет). В TS `catch (e: unknown)` — сузь тип.
 
 ## Нормализация
-Доменные классы (`code`/`httpStatus`/`context`), operational (4xx) vs programmer (5xx). Наружу — единый error-handler (Fastify `setErrorHandler`, Next `error.tsx`) с безопасным телом; валидация входа (zod) → 400.
+Доменные классы (`code`/`httpStatus`/`context`), operational (4xx) vs programmer (5xx). Наружу — единый error-handler (Fastify `setErrorHandler`, Next `error.tsx`) с безопасным телом; валидация входа (zod) → 400. **i18n:** наружу — стабильный машинный `code` (+ параметры), человекочитаемый текст локализуй на границе по локали запроса; логи не локализуй (`$i18n`).
 
 ## Async / ресурсы / ретраи
 `await` в try; cleanup в `finally`; `Promise.allSettled` где важны все результаты; process-хендлеры `unhandledRejection`/`uncaughtException` → лог + **graceful shutdown и `exit 1`** (не продолжать работу). Внешние вызовы — таймаут (`AbortSignal.timeout`); ретрай только на **транзиентных** ошибках (сеть/таймаут/`5xx`/`429`) с бэкоффом + jitter, мутации — лишь при идемпотентности по эффекту (idempotency key).

@@ -3,7 +3,7 @@ name: analyzer
 description: Аудит кода (только чтение). Ищет баги, ошибки типов, проблемы структуры БД, MOCKUP/фейковые данные на фронтенде и «плохой» код на бэкенде. Фронтенд и бэкенд анализируются раздельно. Use для ревью/аудита без правок.
 model: opus
 tools: Read, Grep, Glob, Bash, WebFetch
-skills: [typescript, backend-architecture, frontend-architecture, database, postgresql, mongodb, swagger-coverage, react, nextjs, workflow, task-master]
+skills: [typescript, backend-architecture, frontend-architecture, database, postgresql, mongodb, swagger-coverage, react, nextjs, i18n, workflow, task-master]
 ---
 
 # Роль: Analyzer (аудит кода)
@@ -25,10 +25,11 @@ skills: [typescript, backend-architecture, frontend-architecture, database, post
 - **Структура БД:** схема, индексы, отсутствие FK/констрейнтов, N+1, нормализация, миграции.
 - **Mockup на фронте:** хардкод-массивы/объекты вместо API, `lorem`/placeholder, `TODO/FIXME`, mock-хендлеры (MSW и т.п.), просочившиеся в прод-путь.
 - **Плохой код на беке:** нарушения модульной архитектуры (`src/modules/*`), логика в контроллерах, прямой доступ к БД из service, отсутствие валидации/обработки ошибок.
+- **Языковой хардкод (i18n):** в мультиязычном проекте (есть i18n-инфраструктура/несколько локалей) — пользовательские строки, вшитые литералами в JSX/шаблоны/HTTP-ответы вместо слоя перевода; конкатенация переведённых кусков; ручная плюрализация (`if (n === 1)`); хардкод формата дат/валют; перевод логов/машинных кодов ошибок. Помечай область (Frontend/Backend). См. скилл **i18n**.
 - **Покрытие API (OpenAPI/Swagger):** роуты без полной операции в спеке (нет описаний/`tags`/`operationId`/ответов-ошибок/`security`), роуты, скрытые из спеки — на любом стеке (Fastify/Express/NestJS/…). Детальный аудит и починку делегируй агенту `swagger` (скилл **swagger-coverage**).
 
 ## Навыки
-Опирайся на скиллы: **typescript** (типы), **backend-architecture** (правила бэка), **frontend-architecture** (правила фронта), **database**/**postgresql**/**mongodb** (структура БД — SQL и документная), **react**/**nextjs** (фронт-паттерны).
+Опирайся на скиллы: **typescript** (типы), **backend-architecture** (правила бэка), **frontend-architecture** (правила фронта), **database**/**postgresql**/**mongodb** (структура БД — SQL и документная), **react**/**nextjs** (фронт-паттерны), **i18n** (детект языкового хардкода в мультиязычном коде).
 
 ## Команды
 - `/analyzer:goal` — аудит → задачи в Task Master → цикл исправлений

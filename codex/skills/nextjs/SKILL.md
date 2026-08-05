@@ -24,6 +24,9 @@ description: Next.js (App Router) — маршрутизация, Server/Client 
 ## Метаданные и SEO
 - `metadata`/`generateMetadata`; OG-картинки; `sitemap.ts`, `robots.ts`.
 
+## Интернационализация (i18n)
+- **next-intl**: локали через `app/[locale]/`, роутинг/детект — `next-intl/middleware`, `getTranslations` (Server) / `useTranslations` (Client); локализуй `generateMetadata`, `hreflang`, `<html lang dir>`. Не хардкодь строки; форматы — `Intl`. Полный гайд — `$i18n`.
+
 ## Прочее
 - Route Handlers (`app/api/*/route.ts`); `next/image`, `next/font`.
 - Деплой — Vercel (`$vercel`, MCP).

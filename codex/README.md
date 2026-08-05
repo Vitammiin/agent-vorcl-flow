@@ -12,7 +12,7 @@ codex/
 ```
 
 ## Роли
-`$architect` · `$backend` · `$frontend` · `$analyzer` · `$swagger` · `$firecrawl` · `$render` · `$database` · `$resilience` · `$screenshot` · `$drawio`. Все работают через Task Master (`$workflow` + `$task-master`); единая точка входа — `$goal`, у каждой роли свой `$<role>-goal`. У `render` и `database` персона и доменный скилл совпадают — это `$render` и `$database`; у `resilience` доменный скилл — `$error-handling`, у `screenshot` — `$screenshot-to-code`, у `drawio` — `$drawio-diagrams` + `$pmp-diagrams`.
+`$architect` · `$backend` · `$frontend` · `$analyzer` · `$swagger` · `$firecrawl` · `$render` · `$database` · `$resilience` · `$screenshot` · `$drawio`. Все работают через Task Master (`$workflow` + `$task-master`); единая точка входа — `$goal`, у каждой роли свой `$<role>-goal`. У `render` и `database` персона и доменный скилл совпадают — это `$render` и `$database`; у `resilience` доменный скилл — `$error-handling`, у `screenshot` — `$screenshot-to-code`, у `drawio` — `$drawio-diagrams` + `$pmp-diagrams`. Кросс-сквозной скилл `$i18n` (интернационализация, запрет языкового хардкода) подключён у `$frontend`, `$backend`, `$screenshot`, `$resilience`, `$architect` и `$analyzer`.
 
 ## Маппинг Claude Code → Codex
 | Claude Code | Codex |

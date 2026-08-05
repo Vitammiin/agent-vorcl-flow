@@ -27,6 +27,10 @@ version: 1.0.0
 ## Метаданные и SEO
 - `metadata`/`generateMetadata`; Open Graph и `opengraph-image`; `sitemap.ts`, `robots.ts`.
 
+## Интернационализация (i18n)
+- **next-intl**: локали через `app/[locale]/`, роутинг/детект — `next-intl/middleware`, серверные переводы `getTranslations` (Server Components) и `useTranslations` (Client); локализуй `generateMetadata`, добавляй `hreflang` и выставляй `<html lang dir>`.
+- Не хардкодь пользовательские строки; даты/числа/валюты — через `Intl`. Полный гайд — скилл **i18n**.
+
 ## Прочее
 - Route Handlers (`app/api/*/route.ts`) для API на стороне Next при необходимости.
 - `next/image`, `next/font` — оптимизация картинок и шрифтов.

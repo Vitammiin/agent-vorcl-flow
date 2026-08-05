@@ -5,16 +5,16 @@
 ## Агенты
 | Агент | Роль | Навыки | Команды |
 |---|---|---|---|
-| 🔵 **architect** | Архитектор систем | system-design, database, api-design, vercel, render, workflow, task-master | `/architect:goal` `/architect:analyze` `/architect:design` `/architect:review` |
-| 🟢 **backend** | Backend-разработчик | backend-architecture, nodejs, typescript, postgresql, mongodb, redis, vercel, render, workflow, task-master | `/backend:goal` `/backend:create-api` `/backend:refactor` `/backend:optimize` `/backend:test` |
-| 🟣 **frontend** | Frontend (React/Next.js) | frontend-architecture, react, nextjs, typescript, tailwind, state-management, data-fetching, react-testing, vercel, workflow, task-master | `/frontend:goal` `/frontend:create-component` `/frontend:refactor` `/frontend:optimize` `/frontend:test` |
-| 🟠 **analyzer** | Аудит кода (read-only) | typescript, backend-architecture, frontend-architecture, database, postgresql, mongodb, swagger-coverage, react, nextjs, workflow, task-master | `/analyzer:goal` `/analyzer:audit` `/analyzer:bugs` `/analyzer:types` `/analyzer:db` `/analyzer:mocks` `/analyzer:backend` |
+| 🔵 **architect** | Архитектор систем | system-design, database, api-design, i18n, vercel, render, workflow, task-master | `/architect:goal` `/architect:analyze` `/architect:design` `/architect:review` |
+| 🟢 **backend** | Backend-разработчик | backend-architecture, nodejs, typescript, postgresql, mongodb, redis, i18n, vercel, render, workflow, task-master | `/backend:goal` `/backend:create-api` `/backend:refactor` `/backend:optimize` `/backend:test` |
+| 🟣 **frontend** | Frontend (React/Next.js) | frontend-architecture, react, nextjs, typescript, tailwind, state-management, data-fetching, i18n, react-testing, vercel, workflow, task-master | `/frontend:goal` `/frontend:create-component` `/frontend:refactor` `/frontend:optimize` `/frontend:test` |
+| 🟠 **analyzer** | Аудит кода (read-only) | typescript, backend-architecture, frontend-architecture, database, postgresql, mongodb, swagger-coverage, react, nextjs, i18n, workflow, task-master | `/analyzer:goal` `/analyzer:audit` `/analyzer:bugs` `/analyzer:types` `/analyzer:db` `/analyzer:mocks` `/analyzer:backend` |
 | 🟡 **swagger** | Покрытие OpenAPI/Swagger (любой стек) | swagger-coverage, backend-architecture, api-design, typescript, nodejs, workflow, task-master | `/swagger:goal` `/swagger:audit` `/swagger:cover` |
 | 🔴 **firecrawl** | Веб-исследователь (Firecrawl) | web-scraping, workflow, task-master | `/firecrawl:goal` `/firecrawl:search` `/firecrawl:scrape` `/firecrawl:map` `/firecrawl:crawl` `/firecrawl:extract` |
 | 🟤 **render** | Хостинг/деплой (Render) | render, postgresql, redis, backend-architecture, workflow, task-master | `/render:goal` `/render:deploy` `/render:logs` `/render:status` `/render:query` |
 | 🟦 **database** | Инженер БД / DBA | database, postgresql, mongodb, redis, backend-architecture, workflow, task-master | `/database:goal` `/database:query` `/database:schema` `/database:migrate` `/database:optimize` `/database:cache` |
-| ⚪ **resilience** | Надёжность: ошибки + логи | error-handling, backend-architecture, nodejs, typescript, react, workflow, task-master | `/resilience:goal` `/resilience:harden` `/resilience:logging` `/resilience:audit` |
-| 🖼️ **screenshot** | Скриншот UI → код | screenshot-to-code, react, nextjs, typescript, tailwind, frontend-architecture, workflow, task-master | `/screenshot:goal` `/screenshot:analyze` `/screenshot:convert` `/screenshot:tokens` `/screenshot:responsive` |
+| ⚪ **resilience** | Надёжность: ошибки + логи | error-handling, backend-architecture, nodejs, typescript, react, i18n, workflow, task-master | `/resilience:goal` `/resilience:harden` `/resilience:logging` `/resilience:audit` |
+| 🖼️ **screenshot** | Скриншот UI → код | screenshot-to-code, react, nextjs, typescript, tailwind, frontend-architecture, i18n, workflow, task-master | `/screenshot:goal` `/screenshot:analyze` `/screenshot:convert` `/screenshot:tokens` `/screenshot:responsive` |
 | 📊 **drawio** | Диаграммы draw.io / diagrams.net | drawio-diagrams, pmp-diagrams, system-design, workflow, task-master | `/drawio:goal` `/drawio:create` `/drawio:pmp` `/drawio:convert` `/drawio:refine` |
 
 Агент `render` понимает Docker- и native-рантайм, помнит про доступ к БД по **IP-allowlist** (outbound-IP сервиса → allowlist базы; для Render Postgres — internal URL) и ведёт диагностику по логам до первопричины. Скилл `render` (операции через MCP) подключён также у `architect` и `backend`.
@@ -29,6 +29,8 @@
 
 Фронт всегда подключается к **реальному** API: источник истины — OpenAPI-спека бэка (Fastify/NestJS/Express и др.), типы генерируются из неё (`openapi-typescript` + `openapi-fetch`). Бэк держит спеку полной (агент `swagger`, скилл `swagger-coverage`), фронт из неё берёт контракт (скилл `data-fetching`); моков в прод-пути нет.
 
+Скилл `i18n` задаёт правило **«ноль языкового хардкода»**: агенты сначала определяют, мультиязычен ли проект (i18n-инфраструктура, несколько локалей), и адаптируются — при мультиязычности пользовательские строки идут только через слой перевода (**next-intl** / **react-i18next** / **i18next**), плюрализация/род — через ICU, даты/числа/валюты — через `Intl`, RTL — через логические CSS-свойства; логи и машинные коды ошибок не локализуются. Скилл подключён у `frontend`, `backend`, `screenshot`, `resilience`, `architect`, а `analyzer` ловит языковой хардкод как отдельную находку аудита.
+
 ## Workflow (Task Master)
 Все агенты работают через **Task Master** (`task-master-ai`, MCP-сервер `task-master`): любая нетривиальная задача идёт по циклу **цель → задачи (`parse_prd`/`add_task`) → `next_task` → `get_task` → `expand_task` → реализация → проверка `testStrategy` → `set_task_status done`**. Дисциплину задаёт скилл `workflow`, справочник команд — скилл `task-master`.
 
@@ -39,7 +41,7 @@
 .claude-plugin/plugin.json     # манифест плагина
 .claude-plugin/marketplace.json# локальный маркетплейс (для установки)
 agents/       architect.md backend.md frontend.md analyzer.md swagger.md firecrawl.md render.md database.md resilience.md screenshot.md drawio.md
-skills/       <навык>/SKILL.md        (26 скиллов)
+skills/       <навык>/SKILL.md        (27 скиллов)
 commands/     <namespace>/<команда>.md (55 команд, namespace /namespace:команда) + /goal
 hooks/        hooks.json + scripts/session-start.js + scripts/catch-guard.js (PostToolUse: пустые catch)
 .mcp.json     # github, filesystem, postgres, mongodb, redis, docker, firecrawl, vercel, render, task-master

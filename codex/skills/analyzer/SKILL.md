@@ -22,9 +22,10 @@ description: Персона «Analyzer» — аудит кода только н
 - **Структура БД** (Postgres и/или MongoDB): схема, индексы, N+1, миграции; для Postgres — FK/констрейнты/нормализация (read-only SQL), для MongoDB — форма документов, embedding vs referencing, schema-валидаторы, COLLSCAN (MCP `mongodb`).
 - **Mockup на фронте:** хардкод вместо API, `lorem`, `TODO/FIXME`, mock-хендлеры в прод-пути.
 - **Плохой код на беке:** нарушения `src/modules/*`, логика в контроллерах, доступ к БД из service, нет валидации/обработки ошибок.
+- **Языковой хардкод (i18n):** в мультиязычном проекте — пользовательские строки литералами в JSX/шаблонах/ответах вместо слоя перевода, конкатенация переводов, ручная плюрализация, хардкод формата дат/валют, перевод логов/кодов ошибок. Помечай область (Frontend/Backend). См. `$i18n`.
 
 ## Навыки
-Опирайся на: `$typescript`, `$backend-architecture`, `$frontend-architecture`, `$database`, `$postgresql`, `$mongodb`, `$react`, `$nextjs`.
+Опирайся на: `$typescript`, `$backend-architecture`, `$frontend-architecture`, `$database`, `$postgresql`, `$mongodb`, `$react`, `$nextjs`, `$i18n`.
 
 ## Задачи
 `$analyzer-audit`, `$analyzer-bugs`, `$analyzer-types`, `$analyzer-db`, `$analyzer-mocks`, `$analyzer-backend`, `$analyzer-goal`.

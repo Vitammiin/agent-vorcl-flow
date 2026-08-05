@@ -28,6 +28,7 @@ description: Серверное состояние на TanStack Query (React Qu
 
 ## Ключи запросов
 - Иерархические ключи-массивы: `['orders']`, `['orders', id]`, `['orders', { status }]`.
+- **Локаль в ключах:** если ответ зависит от языка, включай локаль в `queryKey` (`['orders', { locale }]`) и шли `Accept-Language`, чтобы кэш не смешивал языки (`$i18n`).
 
 ## Запросы
 - `useQuery({ queryKey, queryFn })`; состояния `isLoading/isError/data` обрабатывай явно.

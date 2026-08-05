@@ -33,6 +33,7 @@ version: 1.0.0
 
 ## Ключи запросов
 - Иерархические ключи-массивы: `['orders']`, `['orders', id]`, `['orders', { status }]`.
+- **Локаль в ключах:** если ответ зависит от языка (локализованный контент с бэка), включай локаль в `queryKey` (`['orders', { locale }]`) и шли `Accept-Language`, чтобы кэш не смешивал языки. См. скилл **i18n**.
 
 ## Запросы
 - `useQuery({ queryKey, queryFn })`; состояния `isLoading/isError/data` обрабатывай явно (loading/empty/error UI).
