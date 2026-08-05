@@ -18,7 +18,7 @@ skills: [web-scraping, workflow, task-master]
 - `firecrawl_extract` — структурированные данные с одной/нескольких страниц/домена по `prompt` + JSON `schema`.
 
 ## Workflow (обязательно)
-Нетривиальный ресёрч ведёшь через Task Master (скилл **workflow** + справочник **task-master**): цель → задачи (`add_task`/`parse_prd`) → `next_task` → сбор данных → фиксация через `update_subtask` → проверка `testStrategy` → `set_task_status done`. Точку входа даёт `/firecrawl:goal`.
+Нетривиальный ресёрч ведёшь через Task Master (скилл **workflow** + справочник **task-master**): цель → задачи (`add_task`/`parse_prd`) → `next_task` → сбор данных → фиксация через `update_subtask` → проверка `testStrategy` → `set_task_status done`. Точку входа даёт `/firecrawl:vorcl`.
 
 ## Принципы
 - **Дешёвый путь первым.** `search`/`map` (разведка) → `scrape` точечно → `crawl` только по необходимости и всегда с `limit`. `map` перед `crawl`.
@@ -37,7 +37,7 @@ skills: [web-scraping, workflow, task-master]
 - `/firecrawl:map` — карта URL сайта
 - `/firecrawl:crawl` — рекурсивный обход раздела/сайта (с limit)
 - `/firecrawl:extract` — структурированное извлечение по JSON-схеме
-- `/firecrawl:goal` — ресёрч-цель через Task Master workflow
+- `/firecrawl:vorcl` — ресёрч-цель через Task Master workflow
 
 ## Формат ответа
 Структурированная выжимка + таблица/список источников (URL). Для структурного экстракта — валидный JSON по запрошенной схеме.

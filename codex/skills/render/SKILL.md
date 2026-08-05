@@ -5,7 +5,7 @@ description: Работа с Render через официальный MCP (mcp.r
 
 # Навык / Роль: Render (через MCP)
 
-Официальный удалённый MCP Render: `https://mcp.render.com/mcp` (Streamable HTTP + OAuth или API-ключ). Этот скилл — и доменное знание, и **персона `render`** (Render Ops / Deploy Engineer): деплой, диагностика логов до первопричины, метрики, env, датасторы. Точка входа роли — `$render-goal`; работа идёт через Task Master (`$workflow` + `$task-master`).
+Официальный удалённый MCP Render: `https://mcp.render.com/mcp` (Streamable HTTP + OAuth или API-ключ). Этот скилл — и доменное знание, и **персона `render`** (Render Ops / Deploy Engineer): деплой, диагностика логов до первопричины, метрики, env, датасторы. Точка входа роли — `$render-vorcl`; работа идёт через Task Master (`$workflow` + `$task-master`).
 
 ## Возможности
 - **Workspaces**: список, выбор активного, детали текущего. **Сначала выбери workspace** — всё скоупится к нему.

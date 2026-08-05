@@ -8,7 +8,7 @@
     {
       "name": "agent-vorcl-flow",
       "source": "./",
-      "description": "Субагенты architect, backend, frontend и analyzer со скиллами, командами, единым Task Master workflow (/goal) и MCP."
+      "description": "Субагенты architect, backend, frontend и analyzer со скиллами, командами, единым Task Master workflow (/vorcl) и MCP."
     }
   ]
 }

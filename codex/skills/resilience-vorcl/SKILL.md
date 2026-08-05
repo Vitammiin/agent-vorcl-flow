@@ -1,5 +1,5 @@
 ---
-name: resilience-goal
+name: resilience-vorcl
 description: Точка входа в Task Master workflow для цели по надёжности (роль resilience). Use когда нужно покрыть код обработкой ошибок и логами и довести это через задачи до готового.
 ---
 

@@ -1,5 +1,5 @@
 ---
-name: drawio-goal
+name: drawio-vorcl
 description: Точка входа в Task Master workflow для цели по построению диаграмм draw.io (роль drawio). Use когда нужно построить набор диаграмм и довести через задачи до готового.
 ---
 

@@ -1,5 +1,5 @@
 ---
-name: analyzer-goal
+name: analyzer-vorcl
 description: Аудит цели через Task Master workflow — находки → задачи → цикл (роль analyzer). Use когда нужно не только найти проблемы, но и оформить их в задачи.
 ---
 

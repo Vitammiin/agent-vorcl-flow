@@ -1,5 +1,5 @@
 ---
-name: backend-goal
+name: backend-vorcl
 description: Точка входа в Task Master workflow для цели (роль backend). Use когда дана серверная цель и нужно довести её через задачи.
 ---
 

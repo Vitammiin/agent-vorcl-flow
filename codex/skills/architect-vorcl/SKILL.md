@@ -1,5 +1,5 @@
 ---
-name: architect-goal
+name: architect-vorcl
 description: Точка входа в Task Master workflow для цели (роль architect). Use когда дана архитектурная цель и нужно довести её через задачи.
 ---
 

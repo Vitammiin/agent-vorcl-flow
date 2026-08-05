@@ -1,6 +1,6 @@
 ---
 name: workflow
-description: Обязательная дисциплина работы — любая нетривиальная задача проходит через Task Master (цель → задачи → next → реализация → set-status). Use ВСЕГДА и всеми ролями перед реализацией; определяет цикл Orchestrator/Executor/Checker, как вызывать ($goal и $<role>-goal), последовательность MCP-инструментов task-master и шпаргалку команд.
+description: Обязательная дисциплина работы — любая нетривиальная задача проходит через Task Master (цель → задачи → next → реализация → set-status). Use ВСЕГДА и всеми ролями перед реализацией; определяет цикл Orchestrator/Executor/Checker, как вызывать ($vorcl и $<role>-vorcl), последовательность MCP-инструментов task-master и шпаргалку команд.
 ---
 
 # Навык: Workflow (Task Master)
@@ -10,15 +10,15 @@ description: Обязательная дисциплина работы — лю
 ## Как вызывать (точки входа)
 
 ### 1. Скилл-задачей — обычный путь
-- **`$goal <цель>`** — универсальный вход: при необходимости инициализирует Task Master, раскладывает цель на задачи и ведёт весь цикл, роутя к профильной роли.
-- **`$<role>-goal <цель>`** — если область известна заранее, входи сразу в неё:
-  `$architect-goal` · `$backend-goal` · `$frontend-goal` · `$analyzer-goal` · `$swagger-goal` · `$firecrawl-goal` · `$render-goal` · `$database-goal` · `$resilience-goal` · `$screenshot-goal` · `$drawio-goal`
+- **`$vorcl <цель>`** — универсальный вход: при необходимости инициализирует Task Master, раскладывает цель на задачи и ведёт весь цикл, роутя к профильной роли.
+- **`$<role>-vorcl <цель>`** — если область известна заранее, входи сразу в неё:
+  `$architect-vorcl` · `$backend-vorcl` · `$frontend-vorcl` · `$analyzer-vorcl` · `$swagger-vorcl` · `$firecrawl-vorcl` · `$render-vorcl` · `$database-vorcl` · `$resilience-vorcl` · `$screenshot-vorcl` · `$drawio-vorcl`
 
 Примеры:
 ```
-$goal          собрать биллинг для SaaS (API + экран + БД)
-$backend-goal  добавить эндпоинт POST /invoices с валидацией и тестами
-$drawio-goal   схема архитектуры сервиса + ERD базы
+$vorcl          собрать биллинг для SaaS (API + экран + БД)
+$backend-vorcl  добавить эндпоинт POST /invoices с валидацией и тестами
+$drawio-vorcl   схема архитектуры сервиса + ERD базы
 ```
 
 ### 2. Напрямую инструментами task-master
@@ -49,8 +49,8 @@ set_task_status --id=<id> --status=done
 ## Шпаргалка команд (хуки)
 | Триггер | Что делает |
 |---|---|
-| `$goal <цель>` | Универсальный вход; роутит к профильной роли и ведёт цикл |
-| `$<role>-goal <цель>` | Вход сразу в область роли (backend/frontend/…/drawio) |
+| `$vorcl <цель>` | Универсальный вход; роутит к профильной роли и ведёт цикл |
+| `$<role>-vorcl <цель>` | Вход сразу в область роли (backend/frontend/…/drawio) |
 | `task-master init` | Создать `.taskmaster/` (один раз) |
 | `add_task "<описание>"` | Точечная задача |
 | `parse_prd` | PRD → набор задач |

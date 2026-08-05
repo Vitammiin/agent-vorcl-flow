@@ -1,5 +1,5 @@
 ---
-name: database-goal
+name: database-vorcl
 description: Точка входа в Task Master workflow для цели по данным (роль database). Use когда дана задача по БД (схема/запросы/индексы/миграции/кэш) и нужно довести её через задачи до готового.
 ---
 

@@ -12,7 +12,7 @@ codex/
 ```
 
 ## Роли
-`$architect` · `$backend` · `$frontend` · `$analyzer` · `$swagger` · `$firecrawl` · `$render` · `$database` · `$resilience` · `$screenshot` · `$drawio`. Все работают через Task Master (`$workflow` + `$task-master`); единая точка входа — `$goal`, у каждой роли свой `$<role>-goal`. У `render` и `database` персона и доменный скилл совпадают — это `$render` и `$database`; у `resilience` доменный скилл — `$error-handling`, у `screenshot` — `$screenshot-to-code`, у `drawio` — `$drawio-diagrams` + `$pmp-diagrams`. Кросс-сквозной скилл `$i18n` (интернационализация, запрет языкового хардкода) подключён у `$frontend`, `$backend`, `$screenshot`, `$resilience`, `$architect` и `$analyzer`.
+`$architect` · `$backend` · `$frontend` · `$analyzer` · `$swagger` · `$firecrawl` · `$render` · `$database` · `$resilience` · `$screenshot` · `$drawio`. Все работают через Task Master (`$workflow` + `$task-master`); единая точка входа — `$vorcl`, у каждой роли свой `$<role>-vorcl`. У `render` и `database` персона и доменный скилл совпадают — это `$render` и `$database`; у `resilience` доменный скилл — `$error-handling`, у `screenshot` — `$screenshot-to-code`, у `drawio` — `$drawio-diagrams` + `$pmp-diagrams`. Кросс-сквозной скилл `$i18n` (интернационализация, запрет языкового хардкода) подключён у `$frontend`, `$backend`, `$screenshot`, `$resilience`, `$architect` и `$analyzer`.
 
 ## Маппинг Claude Code → Codex
 | Claude Code | Codex |
@@ -20,7 +20,7 @@ codex/
 | субагент `@…:frontend` | скилл-персона `$frontend` + `codex --profile frontend` |
 | скилл `frontend-architecture` | скилл `$frontend-architecture` |
 | команда `/analyzer:audit` | скилл-задача `$analyzer-audit` |
-| команда `/goal` | скилл-задача `$goal` |
+| команда `/vorcl` | скилл-задача `$vorcl` |
 | `.mcp.json` (task-master) | `[mcp_servers.task-master]` в `config.toml` |
 | хук SessionStart | роутинг ролей в `AGENTS.md` |
 
@@ -36,14 +36,14 @@ bash codex/scripts/install.sh
 ## Использование
 ```
 codex
-> $goal  добавить корзину в чекаут          # цель → задачи → цикл (роутит к роли)
+> $vorcl  добавить корзину в чекаут          # цель → задачи → цикл (роутит к роли)
 > $architect  спроектируй биллинг для SaaS
 > $backend-create-api  POST /invoices
 > $frontend-create-component  список заказов с пагинацией
-> $frontend-goal  экран профиля пользователя
+> $frontend-vorcl  экран профиля пользователя
 > $analyzer-audit                            # полный read-only аудит
 > $analyzer-mocks  src/features              # mockup-данные на фронте
-> $render-goal  подними api-сервис и дай ему доступ к БД   # инфра-цель → задачи → цикл
+> $render-vorcl  подними api-сервис и дай ему доступ к БД   # инфра-цель → задачи → цикл
 > $render-deploy  api  --clear-cache        # деплой на Render (сначала выбери workspace)
 > $render-logs  api                         # диагностика логов до первопричины (build vs runtime)
 > $screenshot-convert  ./mock/dashboard.png  react   # скриншот UI → компонент (React + Tailwind v4)

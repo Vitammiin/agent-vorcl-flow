@@ -1,5 +1,5 @@
 ---
-name: frontend-goal
+name: frontend-vorcl
 description: Точка входа в Task Master workflow для цели (роль frontend). Use когда дана фронтенд-цель и нужно довести её через задачи.
 ---
 

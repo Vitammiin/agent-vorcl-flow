@@ -80,9 +80,9 @@ There are **three ways** to invoke the team. Pick whichever fits.
 
 ### 1. Universal entry point — just state a goal
 ```text
-/goal add a shopping cart to checkout
+/vorcl add a shopping cart to checkout
 ```
-`/goal` figures out which sub-agent should own the work and drives the full Task Master cycle.
+`/vorcl` figures out which sub-agent should own the work and drives the full Task Master cycle.
 
 ### 2. Talk to a specific sub-agent
 ```text
@@ -97,7 +97,7 @@ There are **three ways** to invoke the team. Pick whichever fits.
 /screenshot:convert   ./mockups/dashboard.png  react
 ```
 
-Every agent also has its own `/<agent>:goal` entry point that runs the Task Master loop scoped to that agent.
+Every agent also has its own `/<agent>:vorcl` entry point that runs the Task Master loop scoped to that agent.
 
 ### The Task Master loop
 Every non-trivial task flows through **Task Master** (`task-master-ai`):
@@ -139,15 +139,15 @@ This keeps work planned, checkpointed, and resumable — nothing is declared "do
 
 Every command below is a slash command. `<…>` marks your input.
 
-### `/goal` — universal router
+### `/vorcl` — universal router
 | Command | What it does |
 | --- | --- |
-| `/goal <goal>` | Turns any goal into tasks and routes it to the right sub-agent, then runs the full cycle to done. |
+| `/vorcl <goal>` | Turns any goal into tasks and routes it to the right sub-agent, then runs the full cycle to done. |
 
 ### 🔵 architect — architecture
 | Command | What it does |
 | --- | --- |
-| `/architect:goal <goal>` | Goal → tasks → cycle, scoped to architecture. |
+| `/architect:vorcl <goal>` | Goal → tasks → cycle, scoped to architecture. |
 | `/architect:analyze <context>` | Analyze requirements and the task's context. |
 | `/architect:design <problem>` | Design the solution architecture (system, DB, API). |
 | `/architect:review <target>` | Review an existing architecture. |
@@ -155,7 +155,7 @@ Every command below is a slash command. `<…>` marks your input.
 ### 🟢 backend — server (Node/TS, Postgres, Redis)
 | Command | What it does |
 | --- | --- |
-| `/backend:goal <goal>` | Goal → tasks → cycle for backend work. |
+| `/backend:vorcl <goal>` | Goal → tasks → cycle for backend work. |
 | `/backend:create-api <endpoint>` | Generate an API endpoint on the modular architecture, fully covered by OpenAPI. |
 | `/backend:refactor <target>` | Refactor code without changing behavior. |
 | `/backend:optimize <target>` | Performance optimization. |
@@ -164,7 +164,7 @@ Every command below is a slash command. `<…>` marks your input.
 ### 🟣 frontend — React / Next.js
 | Command | What it does |
 | --- | --- |
-| `/frontend:goal <goal>` | Goal → tasks → cycle for frontend work. |
+| `/frontend:vorcl <goal>` | Goal → tasks → cycle for frontend work. |
 | `/frontend:create-component <spec>` | Generate a UI component following the feature structure. |
 | `/frontend:refactor <target>` | Refactor UI / hooks without changing behavior. |
 | `/frontend:optimize <target>` | Optimize render / bundle / Core Web Vitals. |
@@ -173,7 +173,7 @@ Every command below is a slash command. `<…>` marks your input.
 ### 🟠 analyzer — code audit (read-only)
 | Command | What it does |
 | --- | --- |
-| `/analyzer:goal <goal>` | Audit a goal via Task Master — findings become tasks. |
+| `/analyzer:vorcl <goal>` | Audit a goal via Task Master — findings become tasks. |
 | `/analyzer:audit` | Full audit: bugs, types, DB, frontend mocks, backend smells. |
 | `/analyzer:bugs` | Hunt bugs — unhandled errors, race conditions, edge cases. |
 | `/analyzer:types` | Type check — `tsc`, `any`, unsafe casts, zod↔types drift. |
@@ -184,14 +184,14 @@ Every command below is a slash command. `<…>` marks your input.
 ### 🟡 swagger — OpenAPI/Swagger coverage (any stack)
 | Command | What it does |
 | --- | --- |
-| `/swagger:goal <goal>` | Full-coverage goal via Task Master — audit → tasks → cover → verify. |
+| `/swagger:vorcl <goal>` | Full-coverage goal via Task Master — audit → tasks → cover → verify. |
 | `/swagger:audit` | Read-only: find routes not fully covered by the spec. |
 | `/swagger:cover <route>` | Cover a route/module — params, responses, descriptions, security + verification. |
 
 ### 🔴 firecrawl — web research
 | Command | What it does |
 | --- | --- |
-| `/firecrawl:goal <goal>` | Research goal via Task Master — collect web data to a finished result. |
+| `/firecrawl:vorcl <goal>` | Research goal via Task Master — collect web data to a finished result. |
 | `/firecrawl:search <query>` | Web search for sources on a question. |
 | `/firecrawl:scrape <url>` | Scrape one URL into markdown/JSON. |
 | `/firecrawl:map <url>` | Map a site's URLs. |
@@ -201,7 +201,7 @@ Every command below is a slash command. `<…>` marks your input.
 ### 🟤 render — hosting / deploy (Render)
 | Command | What it does |
 | --- | --- |
-| `/render:goal <goal>` | Infra goal via Task Master — deploy/diagnose/configure to done. |
+| `/render:vorcl <goal>` | Infra goal via Task Master — deploy/diagnose/configure to done. |
 | `/render:deploy <service>` | Deploy / redeploy a service. |
 | `/render:logs <service>` | Service logs and diagnostics down to root cause. |
 | `/render:status <service>` | Service status + deploy + metrics. |
@@ -210,7 +210,7 @@ Every command below is a slash command. `<…>` marks your input.
 ### 🟦 database — DB engineer / DBA (Postgres / MongoDB / Redis)
 | Command | What it does |
 | --- | --- |
-| `/database:goal <goal>` | Data goal via Task Master — schema/queries/migrations/cache to done. |
+| `/database:vorcl <goal>` | Data goal via Task Master — schema/queries/migrations/cache to done. |
 | `/database:query <query>` | Read-only query / analytics. |
 | `/database:schema <target>` | Design / review schema and data integrity. |
 | `/database:migrate <change>` | Plan a safe, reversible schema/data migration. |
@@ -220,7 +220,7 @@ Every command below is a slash command. `<…>` marks your input.
 ### ⚪ resilience — error handling + logging
 | Command | What it does |
 | --- | --- |
-| `/resilience:goal <goal>` | Reliability goal via Task Master — cover code with try/catch + logs. |
+| `/resilience:vorcl <goal>` | Reliability goal via Task Master — cover code with try/catch + logs. |
 | `/resilience:harden <target>` | Wrap code in try/catch/finally with solid logging, no silent failures. |
 | `/resilience:logging <target>` | Add/fix structured logging — levels, context, no secrets/PII. |
 | `/resilience:audit` | Read-only: find silent failures, empty catches, logging gaps. |
@@ -228,7 +228,7 @@ Every command below is a slash command. `<…>` marks your input.
 ### 🖼️ screenshot — screenshot UI → code
 | Command | What it does |
 | --- | --- |
-| `/screenshot:goal <goal>` | A set of screens from screenshots via Task Master — breakdown → code. |
+| `/screenshot:vorcl <goal>` | A set of screens from screenshots via Task Master — breakdown → code. |
 | `/screenshot:analyze <image>` | Read-only breakdown — layout, components, tokens, states → plan. |
 | `/screenshot:convert <image> [framework]` | Generate full runnable code from a screenshot (default React + Tailwind v4). |
 | `/screenshot:tokens <image>` | Extract design tokens (OKLCH colors, typography, spacing) into Tailwind `@theme`. |
@@ -237,7 +237,7 @@ Every command below is a slash command. `<…>` marks your input.
 ### 📊 drawio — diagrams (draw.io / diagrams.net)
 | Command | What it does |
 | --- | --- |
-| `/drawio:goal <goal>` | A set of diagrams via Task Master — build to done. |
+| `/drawio:vorcl <goal>` | A set of diagrams via Task Master — build to done. |
 | `/drawio:create <description> [type]` | Build a diagram from a text description (valid native XML). |
 | `/drawio:pmp <type> <project>` | Build a PMP/PMBOK diagram — WBS, PERT/CPM, Gantt, RACI, risk matrix, stakeholder grid. |
 | `/drawio:convert <source> [type]` | Convert a source to a diagram — DB schema → ERD, folders → tree, code → UML, mermaid/CSV/JSON. |
@@ -288,13 +288,13 @@ Codex has no "plugins," so the same capabilities are expressed as **skills**, **
 | --- | --- |
 | sub-agent `@agent-vorcl-flow:frontend` | skill persona `$frontend` + `codex --profile frontend` |
 | command `/analyzer:audit` | task skill `$analyzer-audit` |
-| command `/goal` | task skill `$goal` |
+| command `/vorcl` | task skill `$vorcl` |
 | `.mcp.json` | `[mcp_servers.*]` in `config.toml` |
 | `SessionStart` hook | role routing in `AGENTS.md` |
 
 ```bash
 codex
-> $goal  add a shopping cart to checkout
+> $vorcl  add a shopping cart to checkout
 > $backend-create-api  POST /invoices
 > $analyzer-audit
 codex --profile analyzer     # a role with higher reasoning effort
@@ -311,7 +311,7 @@ See [`codex/README.md`](./codex/README.md) for the full mapping.
 .claude-plugin/marketplace.json # local marketplace (for install)
 agents/       11 sub-agent definitions (*.md)
 skills/       <skill>/SKILL.md            (27 skills)
-commands/     <namespace>/<command>.md    (55 commands, /namespace:command) + /goal
+commands/     <namespace>/<command>.md    (55 commands, /namespace:command) + /vorcl
 hooks/        hooks.json + session-start.js + catch-guard.js (PostToolUse: empty catch)
 .mcp.json     github, filesystem, postgres, mongodb, redis, docker, firecrawl, vercel, render, task-master
 bin/          install.mjs                 (the npx installer)

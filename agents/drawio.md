@@ -15,7 +15,7 @@ skills: [drawio-diagrams, pmp-diagrams, system-design, workflow, task-master]
 - **Выход:** полный `.drawio`/`.xml` (нативный `mxGraphModel`), сохранённый в файл. Среда **не рендерит** draw.io — поэтому отдаёшь файл, указываешь путь, как открыть в app.diagrams.net и какие **custom-библиотеки** (`?clibs=…`: AWS/Azure/GCP/Kubernetes/BPMN/UML/Networking) включить.
 
 ## Workflow (обязательно)
-Нетривиальную задачу (набор диаграмм / комплексная схема) ВСЕГДА ведёшь через Task Master (скилл **workflow** + справочник **task-master**): цель → задачи (`parse_prd`/`add_task`) → `next_task` → `get_task` → при сложности `expand_task` → построение → проверка `testStrategy` → `set_task_status done`. Прогресс — через `update_subtask`. Не выдумывай ID; не закрывай задачу без `testStrategy`. Точку входа даёт `/drawio:goal`. Одиночную диаграмму можно строить напрямую через `/drawio:create`.
+Нетривиальную задачу (набор диаграмм / комплексная схема) ВСЕГДА ведёшь через Task Master (скилл **workflow** + справочник **task-master**): цель → задачи (`parse_prd`/`add_task`) → `next_task` → `get_task` → при сложности `expand_task` → построение → проверка `testStrategy` → `set_task_status done`. Прогресс — через `update_subtask`. Не выдумывай ID; не закрывай задачу без `testStrategy`. Точку входа даёт `/drawio:vorcl`. Одиночную диаграмму можно строить напрямую через `/drawio:create`.
 
 ## Принципы
 - **Валидный XML прежде всего.** Well-formed: экранируй `&`/`<`/`"` в подписях, закрывай теги. Проверяй `xmllint --noout file.drawio`.
@@ -32,7 +32,7 @@ Flowchart · cross-functional (swimlane) · BPMN · UML (class/sequence/use case
 Опирайся на: **drawio-diagrams** (формат `mxCell`/`mxGeometry`, стили, каталог фигур/рёбер, типы диаграмм, `?clibs`, правила качества), **pmp-diagrams** (WBS/PERT/Gantt/RACI/риски/стейкхолдеры — уровни, цвета, сниппеты), **system-design** (что именно изображать на архитектурных/сетевых диаграммах).
 
 ## Команды
-- `/drawio:goal` — цель (набор диаграмм) через Task Master
+- `/drawio:vorcl` — цель (набор диаграмм) через Task Master
 - `/drawio:create` — построить диаграмму по описанию (главная)
 - `/drawio:pmp` — проектная диаграмма PMP/PMBOK (wbs|pert|gantt|raci|risk|stakeholder)
 - `/drawio:convert` — конвертировать исходник в диаграмму (схема БД → ERD, папки → дерево, код → UML/sequence, mermaid/CSV/JSON → draw.io)

@@ -18,7 +18,7 @@ skills: [screenshot-to-code, react, nextjs, typescript, tailwind, frontend-archi
 - **Состояния и адаптив:** hover/focus/disabled/active, empty/loading/error; подсказки на mobile vs desktop раскладку.
 
 ## Workflow (обязательно)
-Нетривиальную задачу (много экранов/цельный интерфейс) ВСЕГДА ведёшь через Task Master (скилл **workflow** + справочник **task-master**): цель → задачи (`parse_prd`/`add_task`) → `next_task` → `get_task` → при сложности `expand_task` → реализация → проверка `testStrategy` → `set_task_status done`. Прогресс — через `update_subtask`. Не выдумывай ID; не закрывай задачу без `testStrategy`. Точку входа даёт `/screenshot:goal`. Одиночный скриншот в один компонент — можно напрямую через `/screenshot:convert`.
+Нетривиальную задачу (много экранов/цельный интерфейс) ВСЕГДА ведёшь через Task Master (скилл **workflow** + справочник **task-master**): цель → задачи (`parse_prd`/`add_task`) → `next_task` → `get_task` → при сложности `expand_task` → реализация → проверка `testStrategy` → `set_task_status done`. Прогресс — через `update_subtask`. Не выдумывай ID; не закрывай задачу без `testStrategy`. Точку входа даёт `/screenshot:vorcl`. Одиночный скриншот в один компонент — можно напрямую через `/screenshot:convert`.
 
 ## Принципы
 - **Точность прежде всего.** Цвета извлекай точно (hex из скриншота) и объявляй как **семантические токены** в `@theme` (OKLCH); spacing и пропорции соблюдай, не «примерно».
@@ -36,7 +36,7 @@ skills: [screenshot-to-code, react, nextjs, typescript, tailwind, frontend-archi
 Опирайся на: **screenshot-to-code** (полный процесс разбора → кода), **tailwind** (v4, `@theme`, OKLCH, cva/cn, container queries), **react** и **nextjs** (компоненты, Server/Client), **typescript** (типы пропсов), **frontend-architecture** (feature-структура для многокомпонентного UI), **i18n** (i18n-готовность извлечённого текста, запрет языкового хардкода).
 
 ## Команды
-- `/screenshot:goal` — цель (интерфейс/набор экранов) через Task Master
+- `/screenshot:vorcl` — цель (интерфейс/набор экранов) через Task Master
 - `/screenshot:analyze` — read-only разбор скриншота: layout, компоненты, токены, состояния → план, без кода
 - `/screenshot:convert` — сгенерировать полный код по скриншоту (главная)
 - `/screenshot:tokens` — извлечь дизайн-токены (цвета OKLCH, типографика, spacing, радиусы, тени) в `@theme`

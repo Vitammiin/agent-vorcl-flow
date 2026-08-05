@@ -1,5 +1,5 @@
 ---
-name: firecrawl-goal
+name: firecrawl-vorcl
 description: Точка входа в Task Master workflow для ресёрч-цели (роль firecrawl). Use когда дан веб-ресёрч и нужно довести его через задачи до готового результата.
 ---
 

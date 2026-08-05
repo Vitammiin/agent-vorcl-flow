@@ -13,7 +13,7 @@ skills: [swagger-coverage, backend-architecture, api-design, typescript, nodejs,
 **Сначала детект стека.** Не предполагай Fastify: по `package.json`/импортам/файлам определи, чем объявлены роуты и откуда берётся спека, и уже под стек выбирай эвристики поиска и механизм документации (см. скилл `swagger-coverage`).
 
 ## Workflow (обязательно)
-Ты ВСЕГДА работаешь через Task Master (скилл **workflow** + справочник **task-master**). Цикл: аудит покрытия → на каждую дыру `add_task` (роут, модуль, чего не хватает, `file:line`) → `next_task` → `get_task` → покрытие роута → проверка (`testStrategy`: спека собирается, `@redocly/cli lint` зелёный, `openapi-typescript` без ошибок, тесты) → `set_task_status done` → следующая задача. Прогресс — через `update_subtask`. Не выдумывай ID задач; не закрывай задачу без прохождения `testStrategy`. Точку входа даёт команда `/swagger:goal`.
+Ты ВСЕГДА работаешь через Task Master (скилл **workflow** + справочник **task-master**). Цикл: аудит покрытия → на каждую дыру `add_task` (роут, модуль, чего не хватает, `file:line`) → `next_task` → `get_task` → покрытие роута → проверка (`testStrategy`: спека собирается, `@redocly/cli lint` зелёный, `openapi-typescript` без ошибок, тесты) → `set_task_status done` → следующая задача. Прогресс — через `update_subtask`. Не выдумывай ID задач; не закрывай задачу без прохождения `testStrategy`. Точку входа даёт команда `/swagger:vorcl`.
 
 ## Что значит «полностью покрыт»
 Универсальный чек-лист операции (независимо от стека): операция присутствует в спеке; `summary`; осмысленный `description`; `tags`; `operationId` (стабильный camelCase); параметры `path`/`query`/`header`; `requestBody` для write; `responses` по **каждому** статусу (успех + ошибки `400/401/403/404/409/422/500` через общий Error-компонент); `security` на защищённых роутах; при уместности `examples`/`deprecated`. Полный чек-лист, таблица детекта стеков и эвристики аудита — в скилле **swagger-coverage**.
@@ -29,7 +29,7 @@ skills: [swagger-coverage, backend-architecture, api-design, typescript, nodejs,
 Опирайся на скиллы: **swagger-coverage** (домен покрытия), **backend-architecture** (слои `routes.ts`/`schemas.ts`), **api-design** (контракты), **typescript** (типы из zod), **nodejs**, **workflow**, **task-master**.
 
 ## Команды
-- `/swagger:goal` — цель через Task Master: аудит покрытия → задачи → покрытие → проверка
+- `/swagger:vorcl` — цель через Task Master: аудит покрытия → задачи → покрытие → проверка
 - `/swagger:audit` — read-only аудит: найти роуты, не полностью покрытые Swagger → `add_task`
 - `/swagger:cover` — покрыть роут/модуль схемами и описаниями + проверка
 

@@ -1,5 +1,5 @@
 ---
-name: swagger-goal
+name: swagger-vorcl
 description: Точка входа в Task Master workflow для полного покрытия OpenAPI/Swagger на любом стеке (роль swagger). Use когда нужно довести документацию API до полноты: детект стека → аудит → задачи → покрытие → проверка.
 ---
 

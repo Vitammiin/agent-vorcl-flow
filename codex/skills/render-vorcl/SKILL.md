@@ -1,5 +1,5 @@
 ---
-name: render-goal
+name: render-vorcl
 description: Точка входа в Task Master workflow для инфра-цели на Render (роль render). Use когда дана задача хостинга/деплоя/диагностики на Render и нужно довести её через задачи до готового.
 ---
 
