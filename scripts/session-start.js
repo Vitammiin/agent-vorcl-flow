@@ -13,6 +13,7 @@ const note = [
   "- database (БД через MCP — Postgres/MongoDB/Redis): /database:goal, /database:query, /database:schema, /database:migrate, /database:optimize, /database:cache",
   "- resilience (обработка ошибок + логи): /resilience:goal, /resilience:harden, /resilience:logging, /resilience:audit",
   "- screenshot (скриншот UI → код): /screenshot:goal, /screenshot:analyze, /screenshot:convert, /screenshot:tokens, /screenshot:responsive",
+  "- drawio (диаграммы draw.io/diagrams.net): /drawio:goal, /drawio:create, /drawio:pmp, /drawio:convert, /drawio:refine",
   "Правило: любая нетривиальная задача идёт через Task Master (скиллы workflow + task-master). Единая точка входа — /goal <цель>; у каждого агента есть свой /<agent>:goal.",
 ].join("\n");
 

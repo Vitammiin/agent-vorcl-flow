@@ -1,65 +1,9 @@
 {
   "name": "agent-vorcl-flow",
   "displayName": "Agent Vorcl Flow",
-  "version": "1.5.0",
-  "description": "Специализированные субагенты (architect, backend, frontend, analyzer, swagger, firecrawl, render, database, resilience, screenshot) со скиллами, слэш-командами, единым workflow через Task Master и MCP для Claude Code.",
+  "version": "1.6.0",
+  "description": "Специализированные субагенты (architect, backend, frontend, analyzer, swagger, firecrawl, render, database, resilience, screenshot, drawio) со скиллами, слэш-командами, единым workflow через Task Master и MCP для Claude Code.",
   "author": { "name": "Avis" },
-  "keywords": ["agents", "architect", "backend", "frontend", "analyzer", "swagger", "firecrawl", "render", "database", "resilience", "error-handling", "screenshot", "screenshot-to-code", "task-master", "workflow"],
-  "mcpServers": "./.mcp.json",
-  "userConfig": {
-    "github_token": {
-      "type": "string",
-      "title": "GitHub Token",
-      "description": "Personal Access Token для MCP-сервера github",
-      "sensitive": true,
-      "required": false
-    },
-    "postgres_url": {
-      "type": "string",
-      "title": "Postgres URL",
-      "description": "postgres://user:pass@host:5432/db для MCP postgres",
-      "required": false
-    },
-    "redis_url": {
-      "type": "string",
-      "title": "Redis URL",
-      "description": "redis://host:6379 для MCP redis",
-      "required": false
-    },
-    "firecrawl_api_key": {
-      "type": "string",
-      "title": "Firecrawl API Key",
-      "description": "API-ключ Firecrawl (fc-...) для MCP-сервера firecrawl (scrape/crawl/map/search/extract).",
-      "sensitive": true,
-      "required": false
-    },
-    "mongodb_uri": {
-      "type": "string",
-      "title": "MongoDB URI",
-      "description": "mongodb://user:pass@host:27017/db для MCP mongodb",
-      "sensitive": true,
-      "required": false
-    },
-    "render_api_key": {
-      "type": "string",
-      "title": "Render API Key",
-      "description": "Опционально: API-ключ Render для headless/CI. По умолчанию используется OAuth (/mcp).",
-      "sensitive": true,
-      "required": false
-    },
-    "anthropic_api_key": {
-      "type": "string",
-      "title": "Anthropic API Key",
-      "description": "Ключ Anthropic для MCP task-master (parse-prd, expand). Без него Task Master пробует авторизацию среды.",
-      "sensitive": true,
-      "required": false
-    },
-    "perplexity_api_key": {
-      "type": "string",
-      "title": "Perplexity API Key",
-      "description": "Опционально: ключ Perplexity для research-режима Task Master (expand --research).",
-      "sensitive": true,
-      "required": false
-    }
-  }
+  "keywords": ["agents", "architect", "backend", "frontend", "analyzer", "swagger", "firecrawl", "render", "database", "resilience", "error-handling", "screenshot", "screenshot-to-code", "drawio", "diagrams", "drawio-diagrams", "pmp-diagrams", "bpmn", "uml", "wbs", "task-master", "workflow"],
+  "mcpServers": "./.mcp.json"
 }

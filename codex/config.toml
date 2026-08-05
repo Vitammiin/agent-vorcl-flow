@@ -53,7 +53,7 @@ command = "npx"
 args = ["-y", "task-master-ai"]
 env = { ANTHROPIC_API_KEY = "", PERPLEXITY_API_KEY = "", TASK_MASTER_TOOLS = "parse_prd,get_tasks,get_task,next_task,expand_task,set_task_status,update_subtask,add_task,analyze_project_complexity" }
 
-# ===== Профили под роли (codex --profile architect | backend | frontend | analyzer | swagger | firecrawl | render | database | resilience | screenshot) =====
+# ===== Профили под роли (codex --profile architect | backend | frontend | analyzer | swagger | firecrawl | render | database | resilience | screenshot | drawio) =====
 [profiles.architect]
 model_reasoning_effort = "high"
 # model = "gpt-5.1-codex"   # при необходимости укажите модель
@@ -83,4 +83,7 @@ model_reasoning_effort = "high"
 model_reasoning_effort = "medium"
 
 [profiles.screenshot]
+model_reasoning_effort = "medium"
+
+[profiles.drawio]
 model_reasoning_effort = "medium"

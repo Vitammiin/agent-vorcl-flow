@@ -15,6 +15,7 @@
 | 🟦 **database** | Инженер БД / DBA | database, postgresql, mongodb, redis, backend-architecture, workflow, task-master | `/database:goal` `/database:query` `/database:schema` `/database:migrate` `/database:optimize` `/database:cache` |
 | ⚪ **resilience** | Надёжность: ошибки + логи | error-handling, backend-architecture, nodejs, typescript, react, workflow, task-master | `/resilience:goal` `/resilience:harden` `/resilience:logging` `/resilience:audit` |
 | 🖼️ **screenshot** | Скриншот UI → код | screenshot-to-code, react, nextjs, typescript, tailwind, frontend-architecture, workflow, task-master | `/screenshot:goal` `/screenshot:analyze` `/screenshot:convert` `/screenshot:tokens` `/screenshot:responsive` |
+| 📊 **drawio** | Диаграммы draw.io / diagrams.net | drawio-diagrams, pmp-diagrams, system-design, workflow, task-master | `/drawio:goal` `/drawio:create` `/drawio:pmp` `/drawio:convert` `/drawio:refine` |
 
 Агент `render` понимает Docker- и native-рантайм, помнит про доступ к БД по **IP-allowlist** (outbound-IP сервиса → allowlist базы; для Render Postgres — internal URL) и ведёт диагностику по логам до первопричины. Скилл `render` (операции через MCP) подключён также у `architect` и `backend`.
 
@@ -23,6 +24,8 @@
 Агент `resilience` (скилл `error-handling`) грамотно покрывает код обработкой ошибок (`try/catch/finally`) и структурным логированием без «тихих» падений: try/catch на границах, нормализация ошибок (`cause`/`stack`), ретраи/таймауты, логи с уровнями и контекстом без секретов/PII. Хук `PostToolUse` (`catch-guard.js`) после каждого Edit/Write мягко (не блокируя) подсвечивает пустые `catch {}` в изменённом JS/TS-файле.
 
 Агент `screenshot` (скилл `screenshot-to-code`) превращает **скриншот UI в production-ready код**: читает изображение (инструмент Read показывает картинку), разбирает layout/компоненты/состояния, извлекает точные цвета в семантические OKLCH-токены `@theme` и выдаёт полный запускаемый код — семантический HTML, точные spacing/пропорции, адаптивность (`clamp()`, брейкпоинты, container queries) и a11y. По умолчанию React + Tailwind v4; по запросу Vue / Next.js / чистый HTML/CSS. Отдельно умеет вытащить дизайн-токены (`/screenshot:tokens`) и довести вёрстку до адаптивности (`/screenshot:responsive`).
+
+Агент `drawio` (скиллы `drawio-diagrams` + `pmp-diagrams`) строит диаграммы в **нативном XML draw.io / diagrams.net**: по описанию, из исходника (схема БД → ERD, структура папок → дерево, код → UML/sequence, mermaid/CSV/JSON) или правя существующий `.drawio`. Умеет flowchart, cross-functional (swimlane), BPMN, UML, network/cloud (AWS/Azure/GCP/Kubernetes), ERD, org chart, mind map, а также PMP/PMBOK — WBS, PERT/CPM (с подсветкой critical path), Gantt, RACI, risk matrix 5×5, stakeholder power-interest grid. Отдаёт готовый `.drawio` с аккуратной раскладкой (сетка, ортогональные рёбра), семантическими цветами и валидным XML и подсказывает, какие custom-библиотеки (`?clibs=…`) включить. Среда не рендерит draw.io — результат открывается в app.diagrams.net.
 
 Фронт всегда подключается к **реальному** API: источник истины — OpenAPI-спека бэка (Fastify/NestJS/Express и др.), типы генерируются из неё (`openapi-typescript` + `openapi-fetch`). Бэк держит спеку полной (агент `swagger`, скилл `swagger-coverage`), фронт из неё берёт контракт (скилл `data-fetching`); моков в прод-пути нет.
 
@@ -35,9 +38,9 @@
 ```
 .claude-plugin/plugin.json     # манифест плагина
 .claude-plugin/marketplace.json# локальный маркетплейс (для установки)
-agents/       architect.md backend.md frontend.md analyzer.md swagger.md firecrawl.md render.md database.md resilience.md screenshot.md
-skills/       <навык>/SKILL.md        (24 скилла)
-commands/     <namespace>/<команда>.md (50 команд, namespace /namespace:команда) + /goal
+agents/       architect.md backend.md frontend.md analyzer.md swagger.md firecrawl.md render.md database.md resilience.md screenshot.md drawio.md
+skills/       <навык>/SKILL.md        (26 скиллов)
+commands/     <namespace>/<команда>.md (55 команд, namespace /namespace:команда) + /goal
 hooks/        hooks.json + scripts/session-start.js + scripts/catch-guard.js (PostToolUse: пустые catch)
 .mcp.json     # github, filesystem, postgres, mongodb, redis, docker, firecrawl, vercel, render, task-master
 codex/        # адаптер под GPT Codex (skills + config.toml + install.sh)

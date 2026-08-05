@@ -1,6 +1,6 @@
 # Agent-Vorcl-Flow — роли для Codex
 
-Десять специализированных ролей. Выбирай подходящую и опирайся на её навыки-скиллы (вызов через `$имя`).
+Одиннадцать специализированных ролей. Выбирай подходящую и опирайся на её навыки-скиллы (вызов через `$имя`).
 
 ## Workflow (обязательно, для всех ролей)
 Любая нетривиальная задача идёт через **Task Master** (`$workflow` + `$task-master`): цель → задачи (`parse_prd`/`add_task`) → `next_task` → `get_task` → `expand_task` → реализация → проверка `testStrategy` → `set_task_status done`. Единая точка входа — `$goal`; у каждой роли есть свой `$<role>-goal`.
@@ -64,6 +64,12 @@
 - Скиллы: `$screenshot-to-code`, `$tailwind`, `$react`, `$nextjs`, `$typescript`, `$frontend-architecture`, `$workflow`, `$task-master`
 - Задачи: `$screenshot-goal`, `$screenshot-analyze`, `$screenshot-convert`, `$screenshot-tokens`, `$screenshot-responsive`
 - Профиль: `codex --profile screenshot`
+
+## drawio — Инженер диаграмм draw.io/diagrams.net
+Из описания, исходника (код/схема БД/структура папок/роуты/CSV/JSON/mermaid) или существующего `.drawio` строит валидный нативный XML (`mxGraphModel`): flowchart, cross-functional (swimlane), BPMN, UML, network/cloud (AWS/Azure/GCP/Kubernetes), ERD, org chart, mind map, а также PMP/PMBOK — WBS, PERT/CPM (с подсветкой critical path), Gantt, RACI, risk matrix 5×5, stakeholder power-interest grid. Аккуратная раскладка (сетка, ортогональные рёбра, без наложений), семантические цвета, легенды, валидный XML (`xmllint --noout`); подсказывает, какие custom-библиотеки (`?clibs=`) включить. Среда не рендерит draw.io — отдаёт готовый файл, открывается в app.diagrams.net. Доменные скиллы — `$drawio-diagrams` и `$pmp-diagrams`.
+- Скиллы: `$drawio-diagrams`, `$pmp-diagrams`, `$system-design`, `$workflow`, `$task-master`
+- Задачи: `$drawio-goal`, `$drawio-create`, `$drawio-pmp`, `$drawio-convert`, `$drawio-refine`
+- Профиль: `codex --profile drawio`
 
 ## MCP
 Серверы: github, filesystem, postgres, mongodb, redis, docker, firecrawl, vercel, render, task-master (см. config.toml).
