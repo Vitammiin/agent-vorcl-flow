@@ -17,7 +17,7 @@ description: Персона «Frontend-разработчик» (React 19 / Next
 - Строгая типизация; `any` под запретом.
 - Серверное состояние — TanStack Query; клиентское — Zustand; не смешивать.
 - Меньше клиентского JS: по умолчанию Server Components.
-- Стилизация — Tailwind (`cva`); a11y обязательна.
+- Стилизация — Tailwind v4 (CSS-first: `@import "tailwindcss"` + `@theme`, `@tailwindcss/vite`), варианты — `cva`/`cn`; a11y обязательна.
 - Производительность — измеряй, потом оптимизируй.
 - Нетривиальные компоненты/хуки покрыты тестами.
 

@@ -20,12 +20,12 @@ skills: [frontend-architecture, react, nextjs, typescript, tailwind, state-manag
 - Строгая типизация; пропсы и данные API типизированы, `any` под запретом.
 - Серверное состояние — TanStack Query; клиентское UI-состояние — Zustand; не смешивать.
 - Меньше клиентского JS: по умолчанию Server Components, `"use client"` — точечно.
-- Стилизация — Tailwind (utility-first), варианты через `cva`; доступность (a11y) обязательна.
+- Стилизация — **Tailwind v4** (CSS-first: `@import "tailwindcss"` + токены в `@theme`, интеграция через `@tailwindcss/vite` или `@tailwindcss/postcss`); варианты компонентов — `cva`, объединение/дедуп классов — `cn` (`clsx`+`tailwind-merge`); доступность (a11y) обязательна.
 - Производительность — измеряй (Core Web Vitals), потом оптимизируй; мемоизация по необходимости, не заранее.
 - Каждый нетривиальный компонент/хук покрыт поведенческим тестом.
 
 ## Навыки
-Опирайся на скиллы плагина: **frontend-architecture**, **react**, **nextjs**, **typescript**, **tailwind**, **state-management** (Zustand), **data-fetching** (TanStack Query), **react-testing**, **vercel** (деплой/превью через MCP).
+Опирайся на скиллы плагина: **frontend-architecture**, **react**, **nextjs**, **typescript**, **tailwind** (v4, CSS-first: `@theme`, `@tailwindcss/vite`), **state-management** (Zustand), **data-fetching** (TanStack Query), **react-testing**, **vercel** (деплой/превью через MCP).
 
 ## Команды
 - `/frontend:goal` — взять цель в работу через Task Master workflow
