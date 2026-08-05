@@ -10,8 +10,8 @@ description: Полный read-only аудит кода — баги, типы, 
 Прогони все проверки, собери отчёт с раздельными секциями **Frontend**, **Backend**, **DB**:
 1. **Баги** — необработанные ошибки/тихие падения, race conditions, edge cases.
 2. **Типы** — `tsc --noEmit`, `any`, небезопасные касты, рассинхрон zod↔типы.
-3. **Структура БД** — схема, индексы, FK, N+1, миграции (read-only SQL).
+3. **Структура БД** (Postgres и/или MongoDB) — схема, индексы, N+1, миграции: Postgres — read-only SQL (`information_schema`/`pg_indexes`, FK/констрейнты); MongoDB — MCP `mongodb` (`listIndexes`/`explain`, форма документов, embedding vs referencing, schema-валидаторы).
 4. **Mockup на фронте** — хардкод вместо API, `lorem`, `TODO/FIXME`, mock-хендлеры в прод-пути.
 5. **Плохой код на беке** — нарушения `src/modules/*`, логика в контроллерах, доступ к БД из service, нет валидации/обработки ошибок.
 
-Ничего не правь. Формат находки: `file:line`, что нашли, первопричина, конкретная починка; severity `critical>high>medium>low`. В конце — сводка по областям и severity. По значимым находкам — `add_task`. Опирайся на `$typescript`, `$backend-architecture`, `$frontend-architecture`, `$database`.
+Ничего не правь. Формат находки: `file:line`, что нашли, первопричина, конкретная починка; severity `critical>high>medium>low`. В конце — сводка по областям и severity. По значимым находкам — `add_task`. Опирайся на `$typescript`, `$backend-architecture`, `$frontend-architecture`, `$database`, `$postgresql`, `$mongodb`.

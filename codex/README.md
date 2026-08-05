@@ -5,14 +5,14 @@
 ## Что внутри
 ```
 codex/
-├── skills/<name>/SKILL.md   # навыки Codex (.agents/skills): 4 персоны + 19 доменных + 26 задач
+├── skills/<name>/SKILL.md   # навыки Codex (.agents/skills): персоны ролей + доменные + задачи
 ├── config.toml              # MCP-серверы [mcp_servers.*] + профили ролей [profiles.*]
-├── AGENTS.md                # роутинг ролей (architect, backend, frontend, analyzer)
+├── AGENTS.md                # роутинг ролей (architect, backend, frontend, analyzer, swagger, firecrawl, render)
 └── scripts/install.sh       # установка в ~/.agents/skills и ~/.codex
 ```
 
 ## Роли
-`$architect` · `$backend` · `$frontend` · `$analyzer`. Все работают через Task Master (`$workflow` + `$task-master`); единая точка входа — `$goal`, у каждой роли свой `$<role>-goal`.
+`$architect` · `$backend` · `$frontend` · `$analyzer` · `$swagger` · `$firecrawl` · `$render`. Все работают через Task Master (`$workflow` + `$task-master`); единая точка входа — `$goal`, у каждой роли свой `$<role>-goal`. У `render` персона и доменный скилл совпадают — это `$render`.
 
 ## Маппинг Claude Code → Codex
 | Claude Code | Codex |
@@ -43,7 +43,10 @@ codex
 > $frontend-goal  экран профиля пользователя
 > $analyzer-audit                            # полный read-only аудит
 > $analyzer-mocks  src/features              # mockup-данные на фронте
+> $render-goal  подними api-сервис и дай ему доступ к БД   # инфра-цель → задачи → цикл
 > $render-deploy  api  --clear-cache        # деплой на Render (сначала выбери workspace)
+> $render-logs  api                         # диагностика логов до первопричины (build vs runtime)
 
 codex --profile analyzer    # роль аудита с повышенным reasoning
+codex --profile render      # роль хостинга/деплоя на Render
 ```

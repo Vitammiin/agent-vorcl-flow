@@ -1,6 +1,6 @@
 ---
 name: render-status
-description: Статус сервиса Render + деплой + метрики (роль backend). Use когда нужна короткая сводка здоровья сервиса на Render.
+description: Статус сервиса Render + деплой + метрики (роль render). Use когда нужна короткая сводка здоровья сервиса на Render.
 ---
 
 # Задача: статус сервиса Render
