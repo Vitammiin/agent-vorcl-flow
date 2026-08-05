@@ -24,7 +24,7 @@ description: Персона «Analyzer» — аудит кода только н
 - **Плохой код на беке:** нарушения `src/modules/*`, логика в контроллерах, доступ к БД из service, нет валидации/обработки ошибок.
 
 ## Навыки
-Опирайся на: `$typescript`, `$backend-architecture`, `$frontend-architecture`, `$database`, `$postgresql`, `$react`, `$nextjs`.
+Опирайся на: `$typescript`, `$backend-architecture`, `$frontend-architecture`, `$database`, `$postgresql`, `$mongodb`, `$react`, `$nextjs`.
 
 ## Задачи
 `$analyzer-audit`, `$analyzer-bugs`, `$analyzer-types`, `$analyzer-db`, `$analyzer-mocks`, `$analyzer-backend`, `$analyzer-goal`.

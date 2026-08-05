@@ -7,13 +7,13 @@
 
 ## architect — Архитектор систем
 Проектирование архитектуры, анализ требований, выбор технологий, ревью.
-- Скиллы: `$system-design`, `$database`, `$api-design`, `$vercel`, `$render`, `$workflow`, `$task-master`
+- Скиллы: `$system-design`, `$database`, `$api-design`, `$web-scraping`, `$vercel`, `$render`, `$workflow`, `$task-master`
 - Задачи: `$architect-goal`, `$architect-analyze`, `$architect-design`, `$architect-review`
 - Профиль: `codex --profile architect`
 
 ## backend — Backend-разработчик (Node.js/TypeScript)
 Разработка API, работа с БД и кэшем, оптимизация, тесты. Весь код — по модульной архитектуре `src/modules/*` (см. `$backend-architecture`).
-- Скиллы: `$backend-architecture`, `$nodejs`, `$typescript`, `$postgresql`, `$redis`, `$vercel`, `$render`, `$workflow`, `$task-master`
+- Скиллы: `$backend-architecture`, `$nodejs`, `$typescript`, `$postgresql`, `$mongodb`, `$redis`, `$swagger-coverage`, `$vercel`, `$render`, `$workflow`, `$task-master`
 - Задачи: `$backend-goal`, `$backend-create-api`, `$backend-refactor`, `$backend-optimize`, `$backend-test`, `$render-deploy`, `$render-logs`, `$render-status`, `$render-query`
 - Профиль: `codex --profile backend`
 
@@ -25,9 +25,21 @@
 
 ## analyzer — Аудит кода (только чтение)
 Баги, ошибки типов, структура БД, mockup на фронте, «плохой» код на беке — фронт и бек раздельно. Ничего не правит; находки оформляет в задачи (`add_task`).
-- Скиллы: `$typescript`, `$backend-architecture`, `$frontend-architecture`, `$database`, `$postgresql`, `$react`, `$nextjs`, `$workflow`, `$task-master`
+- Скиллы: `$typescript`, `$backend-architecture`, `$frontend-architecture`, `$database`, `$postgresql`, `$mongodb`, `$swagger-coverage`, `$react`, `$nextjs`, `$workflow`, `$task-master`
 - Задачи: `$analyzer-goal`, `$analyzer-audit`, `$analyzer-bugs`, `$analyzer-types`, `$analyzer-db`, `$analyzer-mocks`, `$analyzer-backend`
 - Профиль: `codex --profile analyzer`
 
+## swagger — Инженер покрытия Fastify Swagger (OpenAPI)
+Изучает backend-код, находит роуты, не полностью покрытые Fastify Swagger, и корректно, с описаниями, покрывает их через zod-схемы как единый источник и валидации, и OpenAPI. Спека — источник истины для фронт-клиента (`$data-fetching`). Аудит — только чтение; покрытие — правки.
+- Скиллы: `$swagger-coverage`, `$backend-architecture`, `$api-design`, `$typescript`, `$nodejs`, `$workflow`, `$task-master`
+- Задачи: `$swagger-goal`, `$swagger-audit`, `$swagger-cover`
+- Профиль: `codex --profile swagger`
+
+## firecrawl — Веб-исследователь (Firecrawl)
+Ищет, скрейпит, краулит и извлекает структурированные данные из веба (scrape/map/crawl/search/extract) в LLM-ready markdown/JSON, доказательно с цитированием URL. Дешёвый путь первым (`search`/`map` → `scrape` → `crawl` с limit); структура — по JSON-схеме.
+- Скиллы: `$web-scraping`, `$workflow`, `$task-master`
+- Задачи: `$firecrawl-goal`, `$firecrawl-search`, `$firecrawl-scrape`, `$firecrawl-map`, `$firecrawl-crawl`, `$firecrawl-extract`
+- Профиль: `codex --profile firecrawl`
+
 ## MCP
-Серверы: github, filesystem, postgres, redis, docker, vercel, render, task-master (см. config.toml).
+Серверы: github, filesystem, postgres, mongodb, redis, docker, firecrawl, vercel, render, task-master (см. config.toml).

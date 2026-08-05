@@ -13,6 +13,11 @@
       "command": "npx",
       "args": ["-y", "@modelcontextprotocol/server-postgres", "${user_config.postgres_url}"]
     },
+    "mongodb": {
+      "command": "npx",
+      "args": ["-y", "mongodb-mcp-server@latest"],
+      "env": { "MDB_MCP_CONNECTION_STRING": "${user_config.mongodb_uri}" }
+    },
     "redis": {
       "command": "npx",
       "args": ["-y", "@modelcontextprotocol/server-redis", "${user_config.redis_url}"]
@@ -20,6 +25,11 @@
     "docker": {
       "command": "npx",
       "args": ["-y", "mcp-server-docker"]
+    },
+    "firecrawl": {
+      "command": "npx",
+      "args": ["-y", "firecrawl-mcp"],
+      "env": { "FIRECRAWL_API_KEY": "${user_config.firecrawl_api_key}" }
     },
     "vercel": {
       "type": "http",

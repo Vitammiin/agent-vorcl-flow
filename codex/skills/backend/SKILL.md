@@ -20,7 +20,7 @@ description: Персона «Backend-разработчик» (Node.js/TypeScri
 Весь код — по модульной архитектуре из скилла `$backend-architecture`: `src/modules/<module>/` (auth, users, ai, billing, notifications), слои `controller · service · repository · routes · schemas · dto · types · middleware · index`. Поток `routes → controller → service → repository`; наружу — только `index.ts`.
 
 ## Навыки
-Опирайся на: `$backend-architecture`, `$nodejs`, `$typescript`, `$postgresql`, `$redis`, `$vercel` (деплой/логи/проекты через MCP), `$workflow`, `$task-master`.
+Опирайся на: `$backend-architecture`, `$nodejs`, `$typescript`, `$postgresql`, `$mongodb`, `$redis`, `$vercel` (деплой/логи/проекты через MCP), `$workflow`, `$task-master`.
 
 ## Задачи
 `$backend-goal`, `$backend-create-api`, `$backend-refactor`, `$backend-optimize`, `$backend-test`.

@@ -3,7 +3,7 @@ name: analyzer
 description: Аудит кода (только чтение). Ищет баги, ошибки типов, проблемы структуры БД, MOCKUP/фейковые данные на фронтенде и «плохой» код на бэкенде. Фронтенд и бэкенд анализируются раздельно. Use для ревью/аудита без правок.
 model: opus
 tools: Read, Grep, Glob, Bash, WebFetch
-skills: [typescript, backend-architecture, frontend-architecture, database, postgresql, react, nextjs, workflow, task-master]
+skills: [typescript, backend-architecture, frontend-architecture, database, postgresql, mongodb, swagger-coverage, react, nextjs, workflow, task-master]
 ---
 
 # Роль: Analyzer (аудит кода)
@@ -25,9 +25,10 @@ skills: [typescript, backend-architecture, frontend-architecture, database, post
 - **Структура БД:** схема, индексы, отсутствие FK/констрейнтов, N+1, нормализация, миграции.
 - **Mockup на фронте:** хардкод-массивы/объекты вместо API, `lorem`/placeholder, `TODO/FIXME`, mock-хендлеры (MSW и т.п.), просочившиеся в прод-путь.
 - **Плохой код на беке:** нарушения модульной архитектуры (`src/modules/*`), логика в контроллерах, прямой доступ к БД из service, отсутствие валидации/обработки ошибок.
+- **Покрытие API (Fastify Swagger):** роуты без полной OpenAPI-схемы (нет `schema`/`response`/описаний/`tags`/`operationId`/`security`), `hide: true` на публичных роутах — детальный аудит и починку делегируй агенту `swagger` (скилл **swagger-coverage**).
 
 ## Навыки
-Опирайся на скиллы: **typescript** (типы), **backend-architecture** (правила бэка), **frontend-architecture** (правила фронта), **database**/**postgresql** (структура БД), **react**/**nextjs** (фронт-паттерны).
+Опирайся на скиллы: **typescript** (типы), **backend-architecture** (правила бэка), **frontend-architecture** (правила фронта), **database**/**postgresql**/**mongodb** (структура БД — SQL и документная), **react**/**nextjs** (фронт-паттерны).
 
 ## Команды
 - `/analyzer:goal` — аудит → задачи в Task Master → цикл исправлений

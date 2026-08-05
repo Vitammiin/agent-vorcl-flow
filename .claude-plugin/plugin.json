@@ -2,9 +2,9 @@
   "name": "agent-vorcl-flow",
   "displayName": "Agent Vorcl Flow",
   "version": "1.1.0",
-  "description": "Специализированные субагенты (architect, backend, frontend, analyzer) со скиллами, слэш-командами, единым workflow через Task Master и MCP для Claude Code.",
+  "description": "Специализированные субагенты (architect, backend, frontend, analyzer, swagger, firecrawl) со скиллами, слэш-командами, единым workflow через Task Master и MCP для Claude Code.",
   "author": { "name": "Avis" },
-  "keywords": ["agents", "architect", "backend", "frontend", "analyzer", "task-master", "workflow"],
+  "keywords": ["agents", "architect", "backend", "frontend", "analyzer", "swagger", "firecrawl", "task-master", "workflow"],
   "mcpServers": "./.mcp.json",
   "userConfig": {
     "github_token": {
@@ -24,6 +24,20 @@
       "type": "string",
       "title": "Redis URL",
       "description": "redis://host:6379 для MCP redis",
+      "required": false
+    },
+    "firecrawl_api_key": {
+      "type": "string",
+      "title": "Firecrawl API Key",
+      "description": "API-ключ Firecrawl (fc-...) для MCP-сервера firecrawl (scrape/crawl/map/search/extract).",
+      "sensitive": true,
+      "required": false
+    },
+    "mongodb_uri": {
+      "type": "string",
+      "title": "MongoDB URI",
+      "description": "mongodb://user:pass@host:27017/db для MCP mongodb",
+      "sensitive": true,
       "required": false
     },
     "render_api_key": {
