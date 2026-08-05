@@ -1,11 +1,36 @@
 ---
 name: workflow
-description: Обязательная дисциплина работы — любая нетривиальная задача проходит через Task Master (цель → задачи → next → реализация → set-status). Use ВСЕГДА и всеми ролями перед реализацией; определяет цикл Orchestrator/Executor/Checker и точку входа $goal.
+description: Обязательная дисциплина работы — любая нетривиальная задача проходит через Task Master (цель → задачи → next → реализация → set-status). Use ВСЕГДА и всеми ролями перед реализацией; определяет цикл Orchestrator/Executor/Checker, как вызывать ($goal и $<role>-goal), последовательность MCP-инструментов task-master и шпаргалку команд.
 ---
 
 # Навык: Workflow (Task Master)
 
-**Правило: любая нетривиальная задача проходит через Task Master. Без исключений.** Справочник команд — `$task-master`.
+**Правило: любая нетривиальная задача проходит через Task Master. Без исключений.** Справочник инструментов — `$task-master`.
+
+## Как вызывать (точки входа)
+
+### 1. Скилл-задачей — обычный путь
+- **`$goal <цель>`** — универсальный вход: при необходимости инициализирует Task Master, раскладывает цель на задачи и ведёт весь цикл, роутя к профильной роли.
+- **`$<role>-goal <цель>`** — если область известна заранее, входи сразу в неё:
+  `$architect-goal` · `$backend-goal` · `$frontend-goal` · `$analyzer-goal` · `$swagger-goal` · `$firecrawl-goal` · `$render-goal` · `$database-goal` · `$resilience-goal` · `$screenshot-goal` · `$drawio-goal`
+
+Примеры:
+```
+$goal          собрать биллинг для SaaS (API + экран + БД)
+$backend-goal  добавить эндпоинт POST /invoices с валидацией и тестами
+$drawio-goal   схема архитектуры сервиса + ERD базы
+```
+
+### 2. Напрямую инструментами task-master
+```
+task-master init                       # один раз, если нет .taskmaster/
+add_task "добавить POST /invoices"     # точечная (крупная фича — parse_prd)
+next_task                              # → id
+get_task <id>                          # детали + testStrategy
+expand_task <id>                       # при сложности
+# … реализация … update_subtask <id> "<что сделано>"
+set_task_status --id=<id> --status=done
+```
 
 ## Три роли цикла
 - **Orchestrator** — выбирает следующую задачу: `next_task` / `get_tasks`.
@@ -17,12 +42,26 @@ description: Обязательная дисциплина работы — лю
 2. `next_task` — следующая актуальная задача.
 3. `get_task <id>` — детали и `testStrategy`.
 4. `expand_task <id>` — при высокой сложности (после `analyze_project_complexity`).
-5. **Реализация** — текущая задача профильной ролью (architect/backend/frontend/analyzer).
+5. **Реализация** — текущая задача профильной ролью (architect/backend/frontend/analyzer/…/drawio).
 6. **Проверка** — `testStrategy`; при провале — не закрывать.
 7. `set_task_status --status=done` — и назад к шагу 2.
 
-## Точка входа
-Задача-скилл `$goal` (и доменные `$<role>-goal`) запускают этот цикл.
+## Шпаргалка команд (хуки)
+| Триггер | Что делает |
+|---|---|
+| `$goal <цель>` | Универсальный вход; роутит к профильной роли и ведёт цикл |
+| `$<role>-goal <цель>` | Вход сразу в область роли (backend/frontend/…/drawio) |
+| `task-master init` | Создать `.taskmaster/` (один раз) |
+| `add_task "<описание>"` | Точечная задача |
+| `parse_prd` | PRD → набор задач |
+| `next_task` | Следующая задача |
+| `get_task <id>` | Детали + `testStrategy` |
+| `analyze_project_complexity` | Оценка сложности 1–10 |
+| `expand_task <id>` | Разбить на подзадачи |
+| `update_subtask <id> "<лог>"` | Зафиксировать прогресс |
+| `set_task_status --id=<id> --status=done` | Закрыть (после `testStrategy`) |
+
+CLI-эквиваленты и статусы задач — в `$task-master`.
 
 ## Когда можно пропустить
 Только тривиальное: правка 1–3 строки, ответ на вопрос, мелкий фикс. Всё остальное — через цикл.
