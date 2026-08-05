@@ -5,7 +5,8 @@
 //
 // Гарантии: не блокирует (только additionalContext), не падает (любой сбой → тихий exit 0),
 // работает ЛИНЕЙНО по времени без regex-backtracking, молчит если проблем нет.
-// Документированный no-op `catch { /* почему */ }` намеренно НЕ флагуется.
+// Не флагуется: задокументированный no-op `catch { /* почему */ }` и строка с маркером
+// подавления `catch-guard-ignore`.
 
 const fs = require("fs");
 function quiet() {
@@ -29,13 +30,21 @@ try {
 const fp = data?.tool_input?.file_path || data?.tool_input?.path;
 if (!fp || !/\.(?:[cm]?jsx?|[cm]?tsx?)$/.test(fp)) quiet();
 
+// только обычный файл разумного размера (не FIFO/сокет/каталог; не гигантский бандл)
+let stat;
+try {
+  stat = fs.statSync(fp);
+} catch {
+  quiet();
+}
+if (!stat.isFile() || stat.size > 1_000_000) quiet();
+
 let src = "";
 try {
   src = fs.readFileSync(fp, "utf8");
 } catch {
   quiet();
 }
-if (src.length > 1_000_000) quiet(); // очень большие файлы не сканируем
 
 // Один линейный проход: содержимое строк/шаблонов/комментариев → пробелы (длина и \n сохранены),
 // чтобы не ловить catch/скобки внутри них и не давать поводов для backtracking.
@@ -70,6 +79,20 @@ function strip(s) {
   return out.join("");
 }
 
+// Смещения переводов строк — один проход; номер строки и текст строки за O(log n)/O(1).
+const nlOffsets = [];
+for (let i = 0; i < src.length; i++) if (src[i] === "\n") nlOffsets.push(i);
+function lineAt(pos) {
+  let lo = 0, hi = nlOffsets.length;
+  while (lo < hi) { const mid = (lo + hi) >> 1; if (nlOffsets[mid] < pos) lo = mid + 1; else hi = mid; }
+  return lo + 1;
+}
+function lineText(line) {
+  const start = line > 1 ? nlOffsets[line - 2] + 1 : 0;
+  const end = line - 1 < nlOffsets.length ? nlOffsets[line - 1] : src.length;
+  return src.slice(start, end);
+}
+
 const code = strip(src);
 const re = /(^|[^.\w$])catch\b/g; // 'catch' как ключевое слово, не `.catch(...)` и не часть идентификатора
 const hits = [];
@@ -93,7 +116,9 @@ while ((m = re.exec(code)) !== null && hits.length < 20) {
   while (p < code.length && /\s/.test(code[p])) p++;
   if (code[p] !== "}") continue; // тело не пустое (есть код) → пропускаем
   if (src.slice(j + 1, p).trim() !== "") continue; // в оригинале есть комментарий → задокументировано
-  hits.push(src.slice(0, catchPos).split("\n").length);
+  const line = lineAt(catchPos);
+  if (lineText(line).includes("catch-guard-ignore")) continue; // явное подавление
+  hits.push(line);
 }
 
 if (hits.length === 0) quiet();
@@ -106,8 +131,8 @@ process.stdout.write(
       additionalContext:
         `⚠️ resilience-guard: пустой catch {} без обработки/проброса/лога:\n${list}\n` +
         `Сделай одно: обработай + залогируй, пробрось (throw new AppError(msg, { cause: error })) ` +
-        `или преобразуй в доменную ошибку. Задокументированный no-op (catch { /* почему */ }) не флагуется. ` +
-        `Помощь: /resilience:harden ${fp}`,
+        `или преобразуй в доменную ошибку. Задокументированный no-op (catch { /* почему */ }) не флагуется; ` +
+        `для намеренного пустого — маркер catch-guard-ignore в строке. Помощь: /resilience:harden ${fp}`,
     },
   }),
 );
