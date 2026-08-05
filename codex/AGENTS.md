@@ -1,6 +1,6 @@
 # Agent-Vorcl-Flow — роли для Codex
 
-Четыре специализированные роли. Выбирай подходящую и опирайся на её навыки-скиллы (вызов через `$имя`).
+Десять специализированных ролей. Выбирай подходящую и опирайся на её навыки-скиллы (вызов через `$имя`).
 
 ## Workflow (обязательно, для всех ролей)
 Любая нетривиальная задача идёт через **Task Master** (`$workflow` + `$task-master`): цель → задачи (`parse_prd`/`add_task`) → `next_task` → `get_task` → `expand_task` → реализация → проверка `testStrategy` → `set_task_status done`. Единая точка входа — `$goal`; у каждой роли есть свой `$<role>-goal`.
@@ -29,8 +29,8 @@
 - Задачи: `$analyzer-goal`, `$analyzer-audit`, `$analyzer-bugs`, `$analyzer-types`, `$analyzer-db`, `$analyzer-mocks`, `$analyzer-backend`
 - Профиль: `codex --profile analyzer`
 
-## swagger — Инженер покрытия Fastify Swagger (OpenAPI)
-Изучает backend-код, находит роуты, не полностью покрытые Fastify Swagger, и корректно, с описаниями, покрывает их через zod-схемы как единый источник и валидации, и OpenAPI. Спека — источник истины для фронт-клиента (`$data-fetching`). Аудит — только чтение; покрытие — правки.
+## swagger — Инженер покрытия OpenAPI/Swagger (любой стек)
+Определяет стек (Fastify/Express/NestJS/Koa/Hapi/tRPC, статические спеки, не-JS), находит роуты, не полностью покрытые спекой, и корректно, с описаниями, покрывает их механизмом стека (для Fastify — zod как единый источник валидации и OpenAPI). Спека — источник истины для фронт-клиента (`$data-fetching`). Аудит — только чтение; покрытие — правки.
 - Скиллы: `$swagger-coverage`, `$backend-architecture`, `$api-design`, `$typescript`, `$nodejs`, `$workflow`, `$task-master`
 - Задачи: `$swagger-goal`, `$swagger-audit`, `$swagger-cover`
 - Профиль: `codex --profile swagger`
@@ -40,6 +40,30 @@
 - Скиллы: `$web-scraping`, `$workflow`, `$task-master`
 - Задачи: `$firecrawl-goal`, `$firecrawl-search`, `$firecrawl-scrape`, `$firecrawl-map`, `$firecrawl-crawl`, `$firecrawl-extract`
 - Профиль: `codex --profile firecrawl`
+
+## render — Инженер хостинга/деплоя на Render (через MCP)
+Деплой/редеплой сервисов (web/static/cron, native- и Docker-рантайм), диагностика упавших сборок и рантайм-логов до первопричины, метрики, env-переменные, Render Postgres/Key Value, read-only SQL. Понимает Docker/не-Docker (`get_service` + `Dockerfile`/`render.yaml`), помнит про доступ к БД по IP-allowlist (outbound-IP сервиса → allowlist базы; internal URL для Render Postgres; правится через Dashboard/REST, не через MCP). Мутации — только с явным подтверждением человека. Домен и персона совпадают — это скилл `$render`.
+- Скиллы: `$render`, `$postgresql`, `$redis`, `$backend-architecture`, `$workflow`, `$task-master`
+- Задачи: `$render-goal`, `$render-deploy`, `$render-logs`, `$render-status`, `$render-query`
+- Профиль: `codex --profile render`
+
+## database — Инженер баз данных / DBA (через MCP)
+Прямая работа с данными: реляционная PostgreSQL (`postgres`), документная MongoDB (`mongodb`), key-value Redis (`redis`). Схема и целостность, запросы и планы (`EXPLAIN`/`explain`, отлов COLLSCAN), индексы (составные/частичные/TTL), устранение N+1, keyset-пагинация, безопасные обратимые миграции (expand→backfill→contract), кэш (cache-aside, TTL, инвалидация, stampede, distributed lock, rate limiting, Streams). Аналитика — read-only; мутации (DDL/DML/миграции/FLUSH) — только с явным подтверждением человека. Домен и персона совпадают — это скилл `$database`.
+- Скиллы: `$database`, `$postgresql`, `$mongodb`, `$redis`, `$backend-architecture`, `$workflow`, `$task-master`
+- Задачи: `$database-goal`, `$database-query`, `$database-schema`, `$database-migrate`, `$database-optimize`, `$database-cache`
+- Профиль: `codex --profile database`
+
+## resilience — Инженер надёжности (error handling + логирование)
+Грамотно покрывает код обработкой ошибок (`try/catch/finally`) и структурным логированием без «тихих» падений: try/catch на границах (I/O, внешние вызовы, парсинг, транзакции), нормализация ошибок (typed errors, `cause`, `stack`, `unknown` в catch), ретраи/таймауты для транзиентного, единый error-handler наружу; логи — уровни, контекст/`requestId`, лог один раз на границе, без секретов/PII. Бэк (Node/Fastify) и фронт (React). Доменный скилл — `$error-handling`.
+- Скиллы: `$error-handling`, `$backend-architecture`, `$nodejs`, `$typescript`, `$react`, `$workflow`, `$task-master`
+- Задачи: `$resilience-goal`, `$resilience-harden`, `$resilience-logging`, `$resilience-audit`
+- Профиль: `codex --profile resilience`
+
+## screenshot — Инженер Screenshot-to-Code
+Превращает скриншот UI в production-ready код: читает изображение, разбирает layout/компоненты/визуальные детали/состояния, выбирает фреймворк (по умолчанию React + Tailwind v4; Vue/чистый HTML/Next.js по запросу) и выдаёт полный запускаемый код — семантика, точные цвета (hex→OKLCH-токены `@theme`), spacing/пропорции, адаптив (`clamp()`/брейкпоинты/container queries), a11y. Полнота поставки: весь код, структура файлов, как запустить, заметки о допущениях. Доменный скилл — `$screenshot-to-code`.
+- Скиллы: `$screenshot-to-code`, `$tailwind`, `$react`, `$nextjs`, `$typescript`, `$frontend-architecture`, `$workflow`, `$task-master`
+- Задачи: `$screenshot-goal`, `$screenshot-analyze`, `$screenshot-convert`, `$screenshot-tokens`, `$screenshot-responsive`
+- Профиль: `codex --profile screenshot`
 
 ## MCP
 Серверы: github, filesystem, postgres, mongodb, redis, docker, firecrawl, vercel, render, task-master (см. config.toml).

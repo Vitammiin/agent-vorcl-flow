@@ -1,10 +1,10 @@
 {
   "name": "agent-vorcl-flow",
   "displayName": "Agent Vorcl Flow",
-  "version": "1.1.0",
-  "description": "Специализированные субагенты (architect, backend, frontend, analyzer, swagger, firecrawl) со скиллами, слэш-командами, единым workflow через Task Master и MCP для Claude Code.",
+  "version": "1.5.0",
+  "description": "Специализированные субагенты (architect, backend, frontend, analyzer, swagger, firecrawl, render, database, resilience, screenshot) со скиллами, слэш-командами, единым workflow через Task Master и MCP для Claude Code.",
   "author": { "name": "Avis" },
-  "keywords": ["agents", "architect", "backend", "frontend", "analyzer", "swagger", "firecrawl", "task-master", "workflow"],
+  "keywords": ["agents", "architect", "backend", "frontend", "analyzer", "swagger", "firecrawl", "render", "database", "resilience", "error-handling", "screenshot", "screenshot-to-code", "task-master", "workflow"],
   "mcpServers": "./.mcp.json",
   "userConfig": {
     "github_token": {
