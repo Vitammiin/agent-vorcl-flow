@@ -32,7 +32,7 @@
 ## Workflow (Task Master)
 Все агенты работают через **Task Master** (`task-master-ai`, MCP-сервер `task-master`): любая нетривиальная задача идёт по циклу **цель → задачи (`parse_prd`/`add_task`) → `next_task` → `get_task` → `expand_task` → реализация → проверка `testStrategy` → `set_task_status done`**. Дисциплину задаёт скилл `workflow`, справочник команд — скилл `task-master`.
 
-Единая точка входа — **`/goal <цель>`** (сам роутит к нужному субагенту); у каждого агента есть свой `/<agent>:goal`. Ключи Task Master задаются через userConfig (`anthropic_api_key`, опц. `perplexity_api_key`).
+Единая точка входа — **`/goal <цель>`** (сам роутит к нужному субагенту); у каждого агента есть свой `/<agent>:goal`. Ключи Task Master задаются через env (`ANTHROPIC_API_KEY`, опц. `PERPLEXITY_API_KEY`).
 
 ## Структура (формат плагина Claude Code)
 ```
@@ -68,6 +68,6 @@ claude plugin validate . --strict      # валидация манифеста �
 ```
 
 ## MCP и секреты
-MCP-серверам нужны токены — задаются через userConfig плагина (`github_token`, `postgres_url`, `mongodb_uri`, `redis_url`, `firecrawl_api_key`, `anthropic_api_key`, `perplexity_api_key`). Серверы без креды просто не поднимутся, остальное работает. Для `task-master` ключи опциональны: без `anthropic_api_key` он пробует авторизацию среды, `perplexity_api_key` нужен только для research-режима.
+Плагин ничего не хостит — своего бэкенда и базы у него нет. MCP-серверам нужны токены, и каждый пользователь задаёт **свои** через переменные окружения: `.mcp.json` подставляет их формой `${VAR:-}`, а Claude Code берёт значения из окружения, в котором запущен. Экспортируй нужные (например в `~/.zshrc`): `GITHUB_TOKEN`, `FIRECRAWL_API_KEY`, `ANTHROPIC_API_KEY`, опц. `PERPLEXITY_API_KEY`; для агента `database` — `POSTGRES_URL` / `MONGODB_URI` / `REDIS_URL` (это подключение к БД **твоего** проекта, не плагина). Незаданный ключ = соответствующий MCP-сервер молчит, остальное работает.
 
-Удалённые серверы **vercel** и **render** используют OAuth: подключены в `.mcp.json`, авторизация командой `/mcp` (браузер). Для Render в headless/CI можно вместо OAuth задать `render_api_key` (userConfig) и заменить запись `render` на header-форму: `"headers": { "Authorization": "Bearer ${user_config.render_api_key}" }`.
+Удалённые серверы **vercel** и **render** используют OAuth: подключены в `.mcp.json`, авторизация командой `/mcp` (браузер). Для Render в headless/CI можно вместо OAuth задать env `RENDER_API_KEY` и заменить запись `render` на header-форму: `"headers": { "Authorization": "Bearer ${RENDER_API_KEY:-}" }`.
