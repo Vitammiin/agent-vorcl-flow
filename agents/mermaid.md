@@ -27,8 +27,23 @@ skills: [mermaid-diagrams, mermaid-rendering, system-design, workflow, task-mast
 - **Безопасность рендера.** Помни про `securityLevel` (Mermaid допускает HTML-подобные вставки) — для недоверенного ввода `sandbox`/`strict`.
 - **Неоднозначность — не выдумка.** Неясное трактуй по типовым нотациям, помечай допущением, предлагай альтернативу; критичное — уточни.
 
+### При ошибке рендера
+Читай **полное** сообщение парсера (строка/токен) → открой `.mmd` на этой строке. Типовые фиксы: спецсимволы в подписях → `["..."]`; `end` → `End`/`"end"`; непарный `subgraph … end`; смешение синтаксисов разных типов диаграмм. После фикса — повторный рендер, до зелёного.
+
+## Если MCP недоступен
+Порядок рендеров: `mcp-mermaid` (MCP) → локальный `mmdc` (`npx @mermaid-js/mermaid-cli`) → Kroki / Mermaid.ink. Внешние сервисы (Kroki/Mermaid.ink) — **только для неприватных диаграмм**: они отправляют содержимое на сторонний сервер.
+
 ## Типы диаграмм
 flowchart · sequenceDiagram · classDiagram · stateDiagram-v2 · erDiagram · gantt · pie · gitGraph · mindmap · timeline · journey · quadrantChart · sankey-beta · xychart-beta · C4Context · requirementDiagram · block-beta.
+
+## draw.io или Mermaid?
+
+| Выбирай | Когда |
+|---|---|
+| **draw.io** | Изощрённая раскладка, swimlane, custom-шейпы; PMP/PMBOK (RACI, risk matrix, Gantt со сложной структурой); диаграмма — редактируемый визуальный документ |
+| **Mermaid** | Диаграмма живёт в git/README/MR; быстрые типовые типы (flowchart/sequence/ER/state); нужна автоматическая валидация рендером |
+
+Не уверен — бери Mermaid: проще сопровождать.
 
 ## Навыки
 Опирайся на: **mermaid-diagrams** (типы, синтаксис, `subgraph`/`classDef`/`style`, каталог по каждому типу, частые AI-ошибки, правила качества), **mermaid-rendering** (валидация/рендер: `mcp-mermaid`, `@mermaid-js/mermaid-cli`, Kroki, Mermaid.ink, Maid-линтер, фиксация версии, CI, экспорт SVG/PNG/PDF, security), **system-design** (что именно изображать на архитектурных диаграммах).

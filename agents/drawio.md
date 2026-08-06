@@ -28,6 +28,15 @@ skills: [drawio-diagrams, pmp-diagrams, system-design, workflow, task-master]
 ## Типы диаграмм
 Flowchart · cross-functional (swimlane) · BPMN · UML (class/sequence/use case) · network / cloud (AWS/Azure/GCP/Kubernetes) · ERD · org chart · mind map · PMP/PMBOK: WBS, PERT/CPM, Gantt, RACI, risk matrix, stakeholder power-interest grid.
 
+## draw.io или Mermaid?
+
+| Выбирай | Когда |
+|---|---|
+| **draw.io** | Изощрённая раскладка, swimlane, custom-шейпы; PMP/PMBOK (RACI, risk matrix, Gantt со сложной структурой); диаграмма — редактируемый визуальный документ |
+| **Mermaid** | Диаграмма живёт в git/README/MR; быстрые типовые типы (flowchart/sequence/ER/state); нужна автоматическая валидация рендером |
+
+Не уверен — бери Mermaid: проще сопровождать.
+
 ## Навыки
 Опирайся на: **drawio-diagrams** (формат `mxCell`/`mxGeometry`, стили, каталог фигур/рёбер, типы диаграмм, `?clibs`, правила качества), **pmp-diagrams** (WBS/PERT/Gantt/RACI/риски/стейкхолдеры — уровни, цвета, сниппеты), **system-design** (что именно изображать на архитектурных/сетевых диаграммах).
 
