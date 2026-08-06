@@ -1,66 +1,21 @@
-Agent-Vorcl-Flow License (Proprietary — Use Only)
+MIT License
 
-Copyright (c) 2026 Christian Avis and Vorcl. All rights reserved.
+Copyright (c) 2026 Christian Avis (Vorcl)
 
-This is a proprietary license. It is NOT an open-source license. Please read it
-before installing or using the Software.
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
 
-1. Definitions.
-   "Software" means the Agent-Vorcl-Flow package and every file distributed with
-   it (agents, skills, commands, hooks, configuration, installer, and docs).
-   "You" means any individual or entity that obtains, installs, runs, or uses the
-   Software. "Authors" means the copyright holders named above.
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
 
-2. Grant of Use.
-   Subject to Your compliance with this license, the Authors grant You a
-   worldwide, royalty-free, non-exclusive, non-transferable, non-sublicensable
-   right to download, install, run, and use the Software, free of charge, for any
-   lawful purpose — personal or commercial. This right expressly includes the
-   incidental, automatic copies that a package manager or version-control tool
-   (for example npm, npx, yarn, pnpm, or git) creates solely to download, install,
-   cache, and run the Software for Your own use.
-
-3. Restrictions.
-   Except only to the extent strictly necessary to exercise the right of use
-   granted in Section 2, You may NOT, in whole or in part:
-   (a) copy, reproduce, republish, redistribute, mirror, host, sublicense, rent,
-       lend, sell, or otherwise make the Software available to any third party as
-       a standalone work or as part of another product or service;
-   (b) modify, adapt, translate, decompile, disassemble, reverse engineer, or
-       create derivative works of the Software, or incorporate it into other
-       software;
-   (c) remove, alter, or obscure any copyright, authorship, trademark, or license
-       notice contained in or accompanying the Software.
-
-4. Reservation of Rights.
-   All rights not expressly granted in Section 2 are reserved by the Authors. No
-   ownership, and no license under any patent, trademark, or other intellectual
-   property right, is transferred to You. The Software is licensed, not sold.
-
-5. No Warranty.
-   THE SOFTWARE IS PROVIDED "AS IS" AND "AS AVAILABLE", WITHOUT WARRANTY OF ANY
-   KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-   MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, TITLE, AND NON-INFRINGEMENT.
-   THE AUTHORS DO NOT WARRANT THAT THE SOFTWARE WILL BE UNINTERRUPTED, ERROR-FREE,
-   OR FREE OF HARMFUL COMPONENTS, OR THAT ANY RESULT OR OUTPUT WILL BE CORRECT.
-
-6. Limitation of Liability.
-   TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, IN NO EVENT SHALL THE AUTHORS
-   OR COPYRIGHT HOLDERS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
-   EXEMPLARY, OR CONSEQUENTIAL DAMAGES, OR FOR ANY CLAIM, LOSS OF DATA, LOSS OF
-   PROFITS, OR BUSINESS INTERRUPTION, HOWEVER CAUSED AND ON ANY THEORY OF
-   LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
-   NEGLIGENCE), ARISING IN ANY WAY OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
-   USE OR OTHER DEALINGS IN THE SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
-   SUCH DAMAGE. YOU USE THE SOFTWARE ENTIRELY AT YOUR OWN RISK.
-
-7. Termination.
-   Any breach of Section 3 automatically and immediately terminates the rights
-   granted to You under this license, without notice. Upon termination You must
-   cease all use of the Software and delete all copies within Your control, except
-   those retained by automated caches beyond Your reasonable control.
-
-8. Acceptance.
-   By downloading, installing, running, or using the Software, You acknowledge
-   that You have read this license and agree to be bound by its terms. If You do
-   not agree, do not install or use the Software.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.

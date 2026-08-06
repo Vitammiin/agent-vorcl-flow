@@ -10,7 +10,7 @@ One `npx` command installs them. No backend, no hosting — Claude Code runs eve
 ![Node](https://img.shields.io/badge/node-%E2%89%A518-339933?logo=node.js&logoColor=white)
 ![Agents](https://img.shields.io/badge/agents-13-blue)
 ![Commands](https://img.shields.io/badge/commands-67-blue)
-![License](https://img.shields.io/badge/license-proprietary-important)
+![License](https://img.shields.io/badge/license-MIT-green)
 
 🌐 [Русская версия](./README.ru.md)
 
@@ -24,7 +24,7 @@ Agent-Vorcl-Flow turns Claude Code into a **structured engineering team**. Inste
 
 - 🧩 **13 sub-agents**, 30 skills, 67 slash commands
 - ⚡ **One-command install** for Claude Code and/or Codex — `npx`
-- 🔌 **10 MCP servers** wired in (GitHub, Postgres, MongoDB, Redis, Docker, Firecrawl, Vercel, Render, filesystem, Task Master)
+- 🔌 **11 MCP servers** wired in (GitHub, Postgres, MongoDB, Redis, Docker, Firecrawl, Vercel, Render, filesystem, Task Master, Mermaid)
 - 🔑 **Bring your own keys** via environment variables — the plugin hosts nothing
 - 🤝 **Runs on Claude Code and GPT Codex** from the same source
 
@@ -272,10 +272,12 @@ Every command below is a slash command. `<…>` marks your input.
 
 The plugin **hosts nothing** — it has no backend or database of its own. Its MCP servers just need tokens, and **each user provides their own via environment variables**. `.mcp.json` reads them with the `${VAR:-}` form, and Claude Code takes the values from the environment it was launched in.
 
+> ⚠️ **Required for the core loop:** `ANTHROPIC_API_KEY`. The Task Master MCP server (goal → tasks, `parse_prd`, `add_task`, `expand_task`) silently does nothing without it — agents will still work, but `/vorcl` won't be able to turn goals into tracked tasks.
+
 Export the ones you actually use (for example in `~/.zshrc`):
 
 ```bash
-export ANTHROPIC_API_KEY=…     # Task Master (parse_prd / expand)
+export ANTHROPIC_API_KEY=…     # REQUIRED: Task Master (parse_prd / expand)
 export FIRECRAWL_API_KEY=…     # firecrawl web research
 export GITHUB_TOKEN=…          # github MCP
 export PERPLEXITY_API_KEY=…    # optional: Task Master research mode
@@ -347,6 +349,6 @@ codex/        GPT Codex adapter (skills + config.toml + install.sh)
 
 ## License
 
-Proprietary — **use only**. Everyone may install and use it freely (personal or commercial), but copying/redistribution and modification are not permitted; provided "as is", with no warranty and no liability. See [LICENSE](./LICENSE).
+MIT — free to use, copy, modify, and distribute; provided "as is", with no warranty and no liability. See [LICENSE](./LICENSE).
 
-© 2026 Christian Avis and Vorcl.
+© 2026 Christian Avis (Vorcl).
