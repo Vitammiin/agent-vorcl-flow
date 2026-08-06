@@ -8,8 +8,8 @@ One `npx` command installs them. No backend, no hosting — Claude Code runs eve
 ![Claude Code](https://img.shields.io/badge/Claude%20Code-plugin-6C5CE7)
 ![GPT Codex](https://img.shields.io/badge/GPT%20Codex-adapter-1abc9c)
 ![Node](https://img.shields.io/badge/node-%E2%89%A518-339933?logo=node.js&logoColor=white)
-![Agents](https://img.shields.io/badge/agents-13-blue)
-![Commands](https://img.shields.io/badge/commands-67-blue)
+![Agents](https://img.shields.io/badge/agents-18-blue)
+![Commands](https://img.shields.io/badge/commands-99-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
 🌐 [Русская версия](./README.ru.md)
@@ -20,9 +20,9 @@ One `npx` command installs them. No backend, no hosting — Claude Code runs eve
 
 ## What is this?
 
-Agent-Vorcl-Flow turns Claude Code into a **structured engineering team**. Instead of one general assistant, you get **13 focused sub-agents** (architect, backend, frontend, DB engineer, code auditor, and more), each with its own domain **skills**, quick **slash commands**, and the **MCP tools** it needs. Every non-trivial task runs through a disciplined **Task Master** loop — *goal → tasks → implement → verify → done* — so work is planned, tracked, and survives interruptions.
+Agent-Vorcl-Flow turns Claude Code into a **structured engineering team**. Instead of one general assistant, you get **18 focused sub-agents** (architect, backend, frontend, DB engineer, code auditor, test engineer, and more), each with its own domain **skills**, quick **slash commands**, and the **MCP tools** it needs. Every non-trivial task runs through a disciplined **Task Master** loop — *goal → tasks → implement → verify → done* — so work is planned, tracked, and survives interruptions.
 
-- 🧩 **13 sub-agents**, 30 skills, 67 slash commands
+- 🧩 **18 sub-agents**, 38 skills, 99 slash commands
 - ⚡ **One-command install** for Claude Code and/or Codex — `npx`
 - 🔌 **11 MCP servers** wired in (GitHub, Postgres, MongoDB, Redis, Docker, Firecrawl, Vercel, Render, filesystem, Task Master, Mermaid)
 - 🔑 **Bring your own keys** via environment variables — the plugin hosts nothing
@@ -128,6 +128,11 @@ This keeps work planned, checkpointed, and resumable — nothing is declared "do
 | 🎯 **pinpoint** | Screenshot → place in an existing project (read-only) | Grounds a running-app screenshot in the real codebase — component, `file:line`, route/page, the exact control, and the logic behind it; creates nothing, delegates the edit |
 | 📊 **drawio** | Diagrams (draw.io / diagrams.net) | Flowchart, BPMN, UML, ERD, network/cloud, and PMP/PMBOK (WBS, Gantt, RACI…) |
 | 🧜 **mermaid** | Mermaid diagrams (+ real render) | flowchart, sequence, class, state, ER, gantt, gitGraph, mindmap…; validated via mcp-mermaid/`mmdc`; hands you the file (`.mmd` + SVG/PNG/PDF) |
+| 🧪 **testing** | Test & verification engineer | Unit (Vitest/Jest), integration (Supertest), E2E (Playwright), coverage, flaky-test hunting; executes each task's `testStrategy` — nothing is "done" without a green run |
+| 🌿 **gitflow** | Git workflow & releases | Conventional Commits, by-name commits (never `git add .`), PRs, Keep-a-Changelog, semver releases; push only with explicit confirmation |
+| 🛡️ **security** | Security auditor (read-only) | Secrets in tree & git history, OWASP Top 10, dependency CVEs, PII; findings become tasks — fixes are delegated |
+| 📝 **docs** | Documentation engineer | README (multi-language parity), API docs from OpenAPI, ARCHITECTURE, CONTRIBUTING, release notes; every example verified against the code |
+| 🐳 **devops** | Containers & CI/CD | Multistage Dockerfiles, docker-compose for local dev, GitHub Actions pipelines, env/secrets hygiene, monitoring |
 
 **A few things worth knowing:**
 - **Frontend always talks to a real API.** The backend's OpenAPI spec is the single source of truth; types are generated from it (`openapi-typescript` + `openapi-fetch`). No mocks in the production path.
@@ -266,6 +271,58 @@ Every command below is a slash command. `<…>` marks your input.
 | `/mermaid:render <file> [format] [theme]` | Export to SVG/PNG/PDF (mermaid-cli / Kroki / Mermaid.ink). |
 | `/mermaid:refine <file>` | Refine an existing `.mmd` — direction, subgraph, classDef/styles, readability. |
 
+### 🧪 testing — tests & verification
+| Command | What it does |
+| --- | --- |
+| `/testing:vorcl <goal>` | A testing/verification goal via Task Master — unit + integration + e2e to done. |
+| `/testing:unit <file\|module>` | Unit tests (Vitest/Jest) — happy path, boundaries, errors; runs them and shows the output. |
+| `/testing:integration <endpoint\|module>` | Integration tests (Supertest/inject, real DB or testcontainers). |
+| `/testing:e2e <scenario>` | Playwright E2E for a critical user path — role selectors, fixtures, trace on failure. |
+| `/testing:verify <task\|testStrategy>` | Executes a task's `testStrategy` and returns a READY / NOT READY verdict with real output. |
+| `/testing:coverage [path]` | Coverage report with findings — what critical code is untested; creates tasks. |
+| `/testing:flaky <test>` | Diagnoses an unstable test (race, timing, shared state, mocks) and fixes it for good. |
+
+### 🌿 gitflow — git workflow & releases
+| Command | What it does |
+| --- | --- |
+| `/gitflow:vorcl <goal>` | A git/release goal via Task Master (prepare a release, clean up history, feature branch). |
+| `/gitflow:commit <files\|scope>` | A by-name commit (never `git add .`) with a Conventional Commits message; stops on unknown WIP. |
+| `/gitflow:pr <base> <title>` | Branch → commits → pull request (gh / GitHub MCP) with what/why/how-verified. |
+| `/gitflow:changelog [version]` | CHANGELOG.md (Keep a Changelog) generated from commits between tags. |
+| `/gitflow:release <version\|auto>` | Semver from commits → sync manifest versions → tag → GitHub release. Push only after explicit confirmation. |
+| `/gitflow:audit [branch]` | Read-only history audit: convention violations, dump commits, big blobs, orphan branches. |
+
+### 🛡️ security — security audit (read-only)
+| Command | What it does |
+| --- | --- |
+| `/security:vorcl <goal>` | A security goal via Task Master — audit → findings → tasks → delegated fixes. |
+| `/security:secrets [path\|branch]` | Secrets in the working tree AND git history (all branches); `${VAR:-}` placeholders are not secrets. |
+| `/security:owasp [path]` | OWASP Top 10 in the code: injections, XSS, auth, data exposure, CORS/cookies — with file:line proof. |
+| `/security:deps` | Dependency CVEs via npm audit / lockfiles — severity, breaking-change flags. |
+| `/security:pii [path]` | PII/GDPR risks: emails, phones, cards in code and logs; developer's private paths. |
+| `/security:pre-push [branch]` | Fast combined check of changed files before a push: secrets + injections + PII; green/red verdict. |
+
+### 📝 docs — documentation
+| Command | What it does |
+| --- | --- |
+| `/docs:vorcl <goal>` | A documentation goal via Task Master. |
+| `/docs:readme [path]` | Create/update README — what/quickstart/usage/config/troubleshooting; examples verified; language versions synced. |
+| `/docs:api [spec]` | API docs generated from the OpenAPI spec (endpoints, params, curl examples); suggests `/swagger:audit` if no spec. |
+| `/docs:architecture` | ARCHITECTURE.md — modules, boundaries, data flow; diagrams delegated to `mermaid`/`drawio`. |
+| `/docs:contributing` | CONTRIBUTING.md — setup, structure, tests, commit conventions (aligned with `gitflow`), PR process. |
+| `/docs:release-notes <version>` | Release notes for a version from CHANGELOG/history. |
+| `/docs:audit` | Read-only docs↔code drift check: broken links, stale examples/counters, unsynced translations. |
+
+### 🐳 devops — containers & CI/CD
+| Command | What it does |
+| --- | --- |
+| `/devops:vorcl <goal>` | An infrastructure goal via Task Master. |
+| `/devops:dockerfile [app-type]` | Write/review a Dockerfile — multistage, slim base, non-root, HEALTHCHECK; verified by a real `docker build`. |
+| `/devops:compose` | docker-compose.yml for local dev (app + DBs); env changes need `--force-recreate`, waits for healthy. |
+| `/devops:ci [type]` | GitHub Actions — PR workflow (lint+typecheck+test, npm cache), deploy workflow, minimal permissions. |
+| `/devops:env` | Env-variable inventory: where read, what's required, `.env.example` template; secrets never in images. |
+| `/devops:monitoring` | Structured logs (pino/JSON), health endpoint, what to alert on; Render metrics via the `render` agent. |
+
 ---
 
 ## Configuration (MCP & keys)
@@ -334,9 +391,9 @@ See [`codex/README.md`](./codex/README.md) for the full mapping.
 ```text
 .claude-plugin/plugin.json      # plugin manifest
 .claude-plugin/marketplace.json # local marketplace (for install)
-agents/       13 sub-agent definitions (*.md)
-skills/       <skill>/SKILL.md            (30 skills)
-commands/     <namespace>/<command>.md    (67 commands, /namespace:command) + /vorcl
+agents/       18 sub-agent definitions (*.md)
+skills/       <skill>/SKILL.md            (38 skills)
+commands/     <namespace>/<command>.md    (99 commands, /namespace:command) + /vorcl
 hooks/        hooks.json + session-start.js + catch-guard.js (PostToolUse: empty catch)
 .mcp.json     github, filesystem, postgres, mongodb, redis, docker, firecrawl, vercel, render, task-master, mermaid
 bin/          install.mjs                 (the npx installer)

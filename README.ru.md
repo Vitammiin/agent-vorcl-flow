@@ -13,9 +13,9 @@
 
 ## Что это
 
-Agent-Vorcl-Flow превращает Claude Code в **структурированную инженерную команду**. Вместо одного универсального ассистента ты получаешь **13 узкопрофильных субагентов** (архитектор, бэкенд, фронтенд, инженер БД, аудитор кода и другие) — у каждого свои доменные **скиллы**, быстрые **слэш-команды** и нужные ему **MCP-инструменты**. Любая нетривиальная задача идёт через дисциплинированный цикл **Task Master** — *цель → задачи → реализация → проверка → готово* — работа спланирована, отслеживается и переживает прерывания.
+Agent-Vorcl-Flow превращает Claude Code в **структурированную инженерную команду**. Вместо одного универсального ассистента ты получаешь **18 узкопрофильных субагентов** (архитектор, бэкенд, фронтенд, инженер БД, аудитор кода, тест-инженер и другие) — у каждого свои доменные **скиллы**, быстрые **слэш-команды** и нужные ему **MCP-инструменты**. Любая нетривиальная задача идёт через дисциплинированный цикл **Task Master** — *цель → задачи → реализация → проверка → готово* — работа спланирована, отслеживается и переживает прерывания.
 
-- 🧩 **13 субагентов**, 30 скиллов, 67 слэш-команд
+- 🧩 **18 субагентов**, 38 скиллов, 99 слэш-команд
 - ⚡ **Установка одной командой** в Claude Code и/или Codex — `npx`
 - 🔌 **11 MCP-серверов** из коробки (GitHub, Postgres, MongoDB, Redis, Docker, Firecrawl, Vercel, Render, filesystem, Task Master, Mermaid)
 - 🔑 **Свои ключи** через переменные окружения — плагин ничего не хостит
@@ -121,6 +121,11 @@ claude --plugin-dir /путь/к/agent-vorcl-flow
 | 🎯 **pinpoint** | Скриншот → место в существующем проекте (read-only) | Привязывает скриншот работающего приложения к реальному коду — компонент, `file:line`, маршрут/страница, конкретный контрол и логика за ним; ничего не создаёт, правку делегирует |
 | 📊 **drawio** | Диаграммы (draw.io / diagrams.net) | Flowchart, BPMN, UML, ERD, network/cloud и PMP/PMBOK (WBS, Gantt, RACI…) |
 | 🧜 **mermaid** | Mermaid-диаграммы (+ реальный рендер) | flowchart, sequence, class, state, ER, gantt, gitGraph, mindmap…; валидация через mcp-mermaid/`mmdc`; отдаёт готовый файл (`.mmd` + SVG/PNG/PDF) |
+| 🧪 **testing** | Инженер тестов и верификации | Unit (Vitest/Jest), интеграционные (Supertest), E2E (Playwright), покрытие, ловля flaky; исполняет `testStrategy` задач — ничто не «готово» без зелёного прогона |
+| 🌿 **gitflow** | Git-workflow и релизы | Conventional Commits, поимённые коммиты (никогда `git add .`), PR, Keep a Changelog, semver-релизы; push только с явного подтверждения |
+| 🛡️ **security** | Аудитор безопасности (read-only) | Секреты в дереве и git-истории, OWASP Top 10, CVE зависимостей, PII; находки становятся задачами — фиксы делегируются |
+| 📝 **docs** | Инженер документации | README (паритет языков), API-доки из OpenAPI, ARCHITECTURE, CONTRIBUTING, release notes; каждый пример сверен с кодом |
+| 🐳 **devops** | Контейнеры и CI/CD | Multistage Dockerfile, docker-compose для локалки, GitHub Actions, гигиена env/секретов, мониторинг |
 
 **Что стоит знать:**
 - **Фронт всегда ходит в реальный API.** Источник истины — OpenAPI-спека бэка; типы генерируются из неё (`openapi-typescript` + `openapi-fetch`). Моков в прод-пути нет.
@@ -261,6 +266,58 @@ claude --plugin-dir /путь/к/agent-vorcl-flow
 | `/mermaid:render <файл> [формат] [тема]` | Экспорт в SVG/PNG/PDF (mermaid-cli / Kroki / Mermaid.ink). |
 | `/mermaid:refine <файл>` | Доработка существующего `.mmd` — направление, subgraph, classDef/стили, читаемость. |
 
+### 🧪 testing — тесты и верификация
+| Команда | Что делает |
+| --- | --- |
+| `/testing:vorcl <цель>` | Цель по тестированию через Task Master — unit + integration + e2e до готового. |
+| `/testing:unit <файл\|модуль>` | Unit-тесты (Vitest/Jest) — happy path, границы, ошибки; прогоняет и показывает вывод. |
+| `/testing:integration <эндпоинт\|модуль>` | Интеграционные тесты (Supertest/inject, реальная БД или testcontainers). |
+| `/testing:e2e <сценарий>` | Playwright E2E критического пути — селекторы по ролям, fixtures, trace при падении. |
+| `/testing:verify <задача\|testStrategy>` | Исполняет `testStrategy` задачи и выносит вердикт ГОТОВО / НЕ ГОТОВО с реальным выводом. |
+| `/testing:coverage [путь]` | Отчёт покрытия с находками — что критичное не покрыто; создаёт задачи. |
+| `/testing:flaky <тест>` | Диагностика нестабильного теста (race, timing, shared state, моки) и починка насовсем. |
+
+### 🌿 gitflow — git-workflow и релизы
+| Команда | Что делает |
+| --- | --- |
+| `/gitflow:vorcl <цель>` | Git/релизная цель через Task Master (подготовить релиз, вычистить историю, фиче-ветка). |
+| `/gitflow:commit <файлы\|scope>` | Поимённый коммит (никогда `git add .`) с Conventional Commits-сообщением; стоп при чужом WIP. |
+| `/gitflow:pr <base> <заголовок>` | Ветка → коммиты → pull request (gh / GitHub MCP) с что/зачем/как-проверено. |
+| `/gitflow:changelog [версия]` | CHANGELOG.md (Keep a Changelog) из коммитов между тегами. |
+| `/gitflow:release <версия\|auto>` | Semver по коммитам → синхронизация версий манифестов → tag → GitHub release. Push только после явного подтверждения. |
+| `/gitflow:audit [ветка]` | Read-only аудит истории: нарушения конвенции, коммиты-свалки, большие блобы, ветки-сироты. |
+
+### 🛡️ security — аудит безопасности (read-only)
+| Команда | Что делает |
+| --- | --- |
+| `/security:vorcl <цель>` | Security-цель через Task Master — аудит → находки → задачи → делегированные фиксы. |
+| `/security:secrets [путь\|ветка]` | Секреты в рабочем дереве И git-истории (все ветки); плейсхолдеры `${VAR:-}` — не секреты. |
+| `/security:owasp [путь]` | OWASP Top 10 в коде: инъекции, XSS, auth, утечки данных, CORS/cookies — с доказательством file:line. |
+| `/security:deps` | CVE зависимостей через npm audit / lock-файлы — severity, флаги ломающих обновлений. |
+| `/security:pii [путь]` | PII/GDPR-риски: email, телефоны, карты в коде и логах; личные пути разработчика. |
+| `/security:pre-push [ветка]` | Быстрый комплексный чек изменённых файлов перед пушем: секреты + инъекции + PII; зелёный/красный вердикт. |
+
+### 📝 docs — документация
+| Команда | Что делает |
+| --- | --- |
+| `/docs:vorcl <цель>` | Документационная цель через Task Master. |
+| `/docs:readme [путь]` | Создать/обновить README — what/quickstart/usage/config/troubleshooting; примеры проверены; языковые версии синхронны. |
+| `/docs:api [спека]` | API-доки из OpenAPI-спеки (эндпоинты, параметры, curl-примеры); если спеки нет — предложит `/swagger:audit`. |
+| `/docs:architecture` | ARCHITECTURE.md — модули, границы, data flow; диаграммы делегирует `mermaid`/`drawio`. |
+| `/docs:contributing` | CONTRIBUTING.md — setup, структура, тесты, конвенции коммитов (согласовано с `gitflow`), PR-процесс. |
+| `/docs:release-notes <версия>` | Release notes версии из CHANGELOG/истории. |
+| `/docs:audit` | Read-only проверка дрейфа docs↔код: битые ссылки, устаревшие примеры/счётчики, несинхронные переводы. |
+
+### 🐳 devops — контейнеры и CI/CD
+| Команда | Что делает |
+| --- | --- |
+| `/devops:vorcl <цель>` | Инфраструктурная цель через Task Master. |
+| `/devops:dockerfile [тип]` | Написать/отревьюить Dockerfile — multistage, slim-база, non-root, HEALTHCHECK; проверка реальным `docker build`. |
+| `/devops:compose` | docker-compose.yml для локалки (приложение + БД); изменения env требуют `--force-recreate`, ждёт healthy. |
+| `/devops:ci [тип]` | GitHub Actions — PR-workflow (lint+typecheck+test, кэш npm), deploy-workflow, минимальные permissions. |
+| `/devops:env` | Инвентаризация env-переменных: где читаются, что обязательно, шаблон `.env.example`; секреты никогда в образах. |
+| `/devops:monitoring` | Структурные логи (pino/JSON), health-эндпоинт, что алертить; метрики Render — через агента `render`. |
+
 ---
 
 ## MCP и секреты
@@ -329,9 +386,9 @@ codex --profile analyzer     # роль с повышенным reasoning effort
 ```text
 .claude-plugin/plugin.json      # манифест плагина
 .claude-plugin/marketplace.json # локальный маркетплейс (для установки)
-agents/       13 определений субагентов (*.md)
-skills/       <скилл>/SKILL.md            (30 скиллов)
-commands/     <namespace>/<команда>.md    (67 команд, /namespace:команда) + /vorcl
+agents/       18 определений субагентов (*.md)
+skills/       <скилл>/SKILL.md            (38 скиллов)
+commands/     <namespace>/<команда>.md    (99 команд, /namespace:команда) + /vorcl
 hooks/        hooks.json + session-start.js + catch-guard.js (PostToolUse: пустые catch)
 .mcp.json     github, filesystem, postgres, mongodb, redis, docker, firecrawl, vercel, render, task-master, mermaid
 bin/          install.mjs                 (npx-инсталлер)

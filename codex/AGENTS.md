@@ -1,6 +1,6 @@
 # Agent-Vorcl-Flow — роли для Codex
 
-Тринадцать специализированных ролей. Выбирай подходящую и опирайся на её навыки-скиллы (вызов через `$имя`).
+Восемнадцать специализированных ролей. Выбирай подходящую и опирайся на её навыки-скиллы (вызов через `$имя`).
 
 ## Workflow (обязательно, для всех ролей)
 Любая нетривиальная задача идёт через **Task Master** (`$workflow` + `$task-master`): цель → задачи (`parse_prd`/`add_task`) → `next_task` → `get_task` → `expand_task` → реализация → проверка `testStrategy` → `set_task_status done`. Единая точка входа — `$vorcl`; у каждой роли есть свой `$<role>-vorcl`.
@@ -82,6 +82,36 @@
 - Скиллы: `$mermaid-diagrams`, `$mermaid-rendering`, `$system-design`, `$workflow`, `$task-master`
 - Задачи: `$mermaid-vorcl`, `$mermaid-create`, `$mermaid-convert`, `$mermaid-validate`, `$mermaid-render`, `$mermaid-refine`
 - Профиль: `codex --profile mermaid`
+
+## testing — Инженер тестов и верификации
+Unit (Vitest/Jest), интеграционные (Supertest/inject, testcontainers), E2E (Playwright), покрытие, диагностика flaky. Ключевая роль в системе: исполняет `testStrategy` задач Task Master — выносит вердикт ГОТОВО/НЕ ГОТОВО с реальным выводом прогона; ничто не закрывается без зелёного прогона. Уважает тест-раннер проекта (по `package.json`), мокает границы (I/O), а не домен. Доменные скиллы — `$testing-strategy` и `$e2e-playwright`.
+- Скиллы: `$testing-strategy`, `$e2e-playwright`, `$react-testing`, `$error-handling`, `$typescript`, `$nodejs`, `$workflow`, `$task-master`
+- Задачи: `$testing-vorcl`, `$testing-unit`, `$testing-integration`, `$testing-e2e`, `$testing-verify`, `$testing-coverage`, `$testing-flaky`
+- Профиль: `codex --profile testing`
+
+## gitflow — Инженер git-workflow и релизов
+Git-гигиена: поимённые коммиты (запрет `git add .` / `git add -A` — не захватывать чужой WIP), Conventional Commits, PR (gh CLI / GitHub MCP), CHANGELOG по Keep a Changelog, semver-релизы (версия из коммитов → синхронизация манифестов → tag → GitHub release). Знает ловушку squash-merge долгоживущей ветки (`merge-base --is-ancestor`, рецепт `merge -s ours`). Push/публикация и деструктивные операции — только с явного подтверждения; «ок» — не авторизация. Доменный скилл — `$git-workflow`.
+- Скиллы: `$git-workflow`, `$workflow`, `$task-master`
+- Задачи: `$gitflow-vorcl`, `$gitflow-commit`, `$gitflow-pr`, `$gitflow-changelog`, `$gitflow-release`, `$gitflow-audit`
+- Профиль: `codex --profile gitflow`
+
+## security — Аудитор безопасности (только чтение)
+Секреты в рабочем дереве И git-истории (все ветки; `${VAR:-}`-плейсхолдеры — не секреты), OWASP Top 10 в коде (инъекции, XSS, auth, утечки данных, CORS/cookies), CVE зависимостей (npm audit / lock-файлы), PII/GDPR-риски, быстрый pre-push чек изменённых файлов. Ничего не правит: каждый finding — с доказательством (file:line/коммит) и severity, оформляется задачей и делегируется `$backend`/`$frontend`/`$gitflow`. Найденный секрет = скомпрометирован (ротация обязательна). Доменные скиллы — `$security-audit` и `$secrets-detection`.
+- Скиллы: `$security-audit`, `$secrets-detection`, `$error-handling`, `$backend-architecture`, `$frontend-architecture`, `$workflow`, `$task-master`
+- Задачи: `$security-vorcl`, `$security-secrets`, `$security-owasp`, `$security-deps`, `$security-pii`, `$security-pre-push`
+- Профиль: `codex --profile security`
+
+## docs — Инженер документации
+README (what/quickstart/usage/config/troubleshooting, паритет языковых версий), API-доки из OpenAPI-спеки (созданной `$swagger-cover`), ARCHITECTURE.md (диаграммы делегирует роли mermaid/drawio), CONTRIBUTING.md (конвенции — согласованы с ролью gitflow), release notes, read-only аудит дрейфа docs↔код. Принцип: врущая документация хуже отсутствующей — каждый пример проверяется запуском/грепом, счётчики и версии берутся из реальных файлов. Доменный скилл — `$technical-writing`.
+- Скиллы: `$technical-writing`, `$api-design`, `$swagger-coverage`, `$system-design`, `$workflow`, `$task-master`
+- Задачи: `$docs-vorcl`, `$docs-readme`, `$docs-api`, `$docs-architecture`, `$docs-contributing`, `$docs-release-notes`, `$docs-audit`
+- Профиль: `codex --profile docs`
+
+## devops — Инженер контейнеризации и CI/CD
+Dockerfile (multistage, slim-база, `npm ci --omit=dev`, non-root, HEALTHCHECK, .dockerignore), docker-compose для локальной разработки (изменения env требуют `up -d --force-recreate` — `restart` не перечитывает env; ждать healthy, ловить ECONNREFUSED/циклы перезапуска), GitHub Actions (PR: lint+typecheck+test с кэшем; deploy; минимальные permissions), гигиена env/секретов (`.env.example` без значений, секреты никогда в образах), мониторинг (структурные логи, health-эндпоинт). Деплой-операции на Render делегирует роли render. Доказательство — реальный `docker build`/`compose ps`, не «должно работать». Доменные скиллы — `$docker` и `$ci-cd`.
+- Скиллы: `$docker`, `$ci-cd`, `$nodejs`, `$render`, `$backend-architecture`, `$workflow`, `$task-master`
+- Задачи: `$devops-vorcl`, `$devops-dockerfile`, `$devops-compose`, `$devops-ci`, `$devops-env`, `$devops-monitoring`
+- Профиль: `codex --profile devops`
 
 ## MCP
 Серверы: github, filesystem, postgres, mongodb, redis, docker, firecrawl, vercel, render, task-master, mermaid (см. config.toml).
