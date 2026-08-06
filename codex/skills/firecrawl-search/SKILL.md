@@ -1,6 +1,6 @@
 ---
 name: firecrawl-search
-description: Веб-поиск источников по вопросу через Firecrawl (роль firecrawl). Use когда URL неизвестен и нужно найти релевантные источники.
+description: Веб-поиск источников по вопросу через Firecrawl (роль firecrawl). Use when URL неизвестен и нужно найти источники по вопросу; известная страница → $firecrawl-scrape, обход сайта → $firecrawl-crawl.
 ---
 
 # Задача: веб-поиск (firecrawl)

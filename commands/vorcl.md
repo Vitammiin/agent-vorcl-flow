@@ -29,5 +29,10 @@ allowed-tools: Read, Write, Edit, Bash, Grep, Glob
 | Скриншот → место в существующем коде (read-only) | `pinpoint` |
 | Диаграммы draw.io (сложная раскладка, PMP/PMBOK) | `drawio` |
 | Диаграммы Mermaid (в git/README, с рендер-проверкой) | `mermaid` |
+| Тесты (unit/integration/e2e), верификация testStrategy | `testing` |
+| Коммиты, PR, changelog, релизы, git-гигиена | `gitflow` |
+| Аудит безопасности: секреты, OWASP, CVE, PII (read-only) | `security` |
+| Документация: README, API-доки, ARCHITECTURE | `docs` |
+| Docker, docker-compose, CI/CD (GitHub Actions) | `devops` |
 
-Задача может пройти через нескольких субагентов (например, `architect` → `backend` → `swagger`). Если домен неочевиден — начни с `architect` (анализ), а не гадай.
+Задача может пройти через нескольких субагентов (например, `architect` → `backend` → `swagger` → `testing` → `gitflow`). Если домен неочевиден — начни с `architect` (анализ), а не гадай.

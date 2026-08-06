@@ -1,6 +1,6 @@
 ---
 name: firecrawl-map
-description: Карта URL сайта через Firecrawl (роль firecrawl). Use для разведки структуры сайта перед crawl.
+description: Карта URL сайта через Firecrawl (роль firecrawl). Use when нужен быстрый и дешёвый список URL сайта (разведка перед crawl) без содержимого страниц; контент страниц → $firecrawl-scrape или $firecrawl-crawl.
 ---
 
 # Задача: карта сайта (firecrawl)

@@ -21,6 +21,9 @@ description: Работа с Render через официальный MCP (mcp.r
 - **Claude Code**: сервер в `.mcp.json`; авторизация командой `/mcp` (OAuth).
 - Доступ MCP = доступ твоего аккаунта Render.
 
+## Если MCP недоступен
+MCP `mcp.render.com` не отвечает или не авторизован → честно сообщи и остановись. Предложи владельцу: пройти OAuth (`codex mcp add render --url https://mcp.render.com/mcp --oauth-client-id codex`; в Claude Code — `/mcp`) либо для headless/CI переключить запись MCP на header-форму с `RENDER_API_KEY` (`http_headers = { Authorization = "Bearer <ключ>" }`). Не выдумывай статусы сервисов, деплоев и строки логов — без MCP у тебя нет данных.
+
 ## Как использовать
 - Сначала выбери нужный workspace (`get_selected_workspace`/`select_workspace`).
 - **Деплой/редеплой**: найди сервис → `trigger_deploy` (± clear cache) → следи за статусом до `live`.

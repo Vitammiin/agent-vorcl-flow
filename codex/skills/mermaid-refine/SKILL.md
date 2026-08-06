@@ -1,6 +1,6 @@
 ---
 name: mermaid-refine
-description: Доработать существующий .mmd — направление, subgraph, classDef/стили, читаемость; с повторным рендер-тестом (роль mermaid). Use когда нужно улучшить готовую диаграмму.
+description: Доработать существующий .mmd — направление, subgraph, classDef/стили, читаемость; с повторным рендер-тестом (роль mermaid). Use when .mmd уже есть и нужны содержательные/стилевые правки; только проверка на ошибки → $mermaid-validate, только экспорт → $mermaid-render, с нуля → $mermaid-create.
 ---
 
 # Задача: доработать Mermaid

@@ -1,6 +1,6 @@
 ---
 name: screenshot-tokens
-description: Извлечь дизайн-токены из скриншота (цвета OKLCH, типографика, spacing, радиусы, тени) в Tailwind @theme (роль screenshot). Use для восстановления дизайн-системы из макета.
+description: Извлечь дизайн-токены из скриншота (цвета OKLCH, типографика, spacing, радиусы, тени) в Tailwind @theme (роль screenshot). Use when нужны только токены без вёрстки; полный код экрана → $screenshot-convert.
 ---
 
 # Задача: извлечь дизайн-токены из скриншота (screenshot)

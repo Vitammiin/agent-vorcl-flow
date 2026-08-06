@@ -1,6 +1,6 @@
 ---
 name: swagger-audit
-description: Read-only аудит покрытия OpenAPI/Swagger — найти роуты, не полностью покрытые спекой, на любом стеке (роль swagger). Use для ревью документации API без правок.
+description: Read-only аудит покрытия OpenAPI/Swagger — найти роуты, не полностью покрытые спекой, на любом стеке (роль swagger). Use when нужно только НАЙТИ дыры покрытия без правок; покрывать найденное — $swagger-cover.
 ---
 
 # Задача: аудит покрытия OpenAPI/Swagger

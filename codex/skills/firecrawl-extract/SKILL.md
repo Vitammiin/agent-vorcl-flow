@@ -1,6 +1,6 @@
 ---
 name: firecrawl-extract
-description: Структурированное извлечение по JSON-схеме через Firecrawl (роль firecrawl). Use когда нужны структурированные данные с одной/нескольких страниц или домена.
+description: Структурированное извлечение по JSON-схеме через Firecrawl (роль firecrawl). Use when нужен типизированный JSON строго по схеме с одного или многих URL/домена; сырой markdown одной страницы → $firecrawl-scrape.
 ---
 
 # Задача: структурированный extract (firecrawl)

@@ -1,11 +1,11 @@
 ---
 name: architect-vorcl
-description: Точка входа в Task Master workflow для цели (роль architect). Use когда дана архитектурная цель и нужно довести её через задачи.
+description: Точка входа в Task Master workflow для цели (роль architect). Use when нужно провести крупную архитектурную цель — анализ, проектирование, ревью — через цикл задач Task Master до готового результата.
 ---
 
 # Задача: цель через workflow (architect)
 
-Возьми цель в работу через Task Master.
+Возьми цель в работу через Task Master. Если цель не указана — спроси её одной фразой, не запускай init вслепую.
 
 1. Инициализация при необходимости (`task-master init`).
 2. Цель → задачи: PRD + `parse_prd` (крупное) или `add_task` (точечное).

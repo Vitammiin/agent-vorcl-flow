@@ -26,13 +26,12 @@ task-master init            # .taskmaster/, tasks.json, .taskmaster/docs/prd.txt
 | `analyze_project_complexity` | Оценка сложности + рекомендации |
 
 ## CLI-эквиваленты
-`init` · `parse-prd <file>` · `list [--status=<s>]` · `show <id>` · `next` · `expand --id=<id> [--research]` · `set-status --id=<id> --status=<s>` · `analyze-complexity` · `add-task`.
+`init` · `parse-prd <file>` · `list [--status=<s>]` · `show <id>` · `next` · `expand --id=<id> [--research]` · `set-status --id=<id> --status=<s>` · `update-subtask --id=<id> --prompt="<лог>"` · `analyze-complexity` · `add-task`.
 
 ## Статусы
 `pending → in-progress → done`; плюс `deferred`, `cancelled`, `review`.
 
-## Дисциплина
-- Перед реализацией — всегда `get_task`.
-- `done` только после `testStrategy`.
+## Дисциплина и конфигурация
+- Дисциплину цикла (роли Orchestrator/Executor/Checker, канонический порядок, когда можно пропустить, запреты) задаёт `$workflow` — этот скилл только справочник инструментов.
 - `--research` (Perplexity) — актуальные практики при `expand`, если задан ключ.
 - Ключи задаются в `config.toml` (`env` сервера `task-master`); без них Task Master пробует авторизацию среды.

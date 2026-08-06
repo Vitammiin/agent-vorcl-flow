@@ -1,6 +1,6 @@
 ---
 name: drawio-vorcl
-description: Точка входа в Task Master workflow для цели по построению диаграмм draw.io (роль drawio). Use когда нужно построить набор диаграмм и довести через задачи до готового.
+description: Точка входа в Task Master workflow для цели по построению диаграмм draw.io (роль drawio). Use when диаграмм несколько или схема крупная; одиночная по описанию → $drawio-create, из исходника → $drawio-convert, Mermaid-формат → $mermaid-vorcl.
 ---
 
 # Задача: цель по диаграммам через workflow (drawio)

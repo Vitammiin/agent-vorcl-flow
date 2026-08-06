@@ -1,6 +1,6 @@
 ---
 name: screenshot-analyze
-description: Read-only разбор скриншота — layout, компоненты, токены, состояния → план воплощения, без генерации кода (роль screenshot). Use для планирования до генерации.
+description: Read-only разбор скриншота — layout, компоненты, токены, состояния → план воплощения, без генерации кода (роль screenshot). Use when нужен план/разбор ПЕРЕД кодом; готовый код → $screenshot-convert, только токены → $screenshot-tokens.
 ---
 
 # Задача: разбор скриншота (screenshot)

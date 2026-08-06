@@ -1,6 +1,6 @@
 ---
 name: mermaid-render
-description: Экспорт Mermaid в SVG/PNG/PDF — mermaid-cli / Kroki / Mermaid.ink, с темой и фоном (роль mermaid). Use когда нужно получить изображение из .mmd.
+description: Экспорт Mermaid в SVG/PNG/PDF — mermaid-cli / Kroki / Mermaid.ink, с темой и фоном (роль mermaid). Use when .mmd валиден и нужен файл-изображение; проверить/починить синтаксис → $mermaid-validate, изменить содержание → $mermaid-refine.
 ---
 
 # Задача: рендер Mermaid в изображение

@@ -1,6 +1,6 @@
 ---
 name: swagger-vorcl
-description: Точка входа в Task Master workflow для полного покрытия OpenAPI/Swagger на любом стеке (роль swagger). Use когда нужно довести документацию API до полноты: детект стека → аудит → задачи → покрытие → проверка.
+description: Точка входа в Task Master workflow для полного покрытия OpenAPI/Swagger на любом стеке (роль swagger). Use when доводим покрытие спеки до полного по многим роутам циклом задач; один роут — $swagger-cover, только найти дыры — $swagger-audit.
 ---
 
 # Задача: полное покрытие OpenAPI/Swagger через workflow

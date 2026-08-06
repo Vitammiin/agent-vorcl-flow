@@ -1,6 +1,6 @@
 ---
 name: resilience-vorcl
-description: Точка входа в Task Master workflow для цели по надёжности (роль resilience). Use когда нужно покрыть код обработкой ошибок и логами и довести это через задачи до готового.
+description: Точка входа в Task Master workflow для цели по надёжности (роль resilience). Use when надёжность нужна по целому модулю/сервису циклом задач; точечно обернуть — $resilience-harden, только логи — $resilience-logging, найти дыры — $resilience-audit.
 ---
 
 # Задача: цель по надёжности через workflow (resilience)

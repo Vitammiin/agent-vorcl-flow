@@ -1,6 +1,6 @@
 ---
 name: drawio-pmp
-description: Построить проектную диаграмму PMP/PMBOK в draw.io — wbs|pert|gantt|raci|risk|stakeholder (роль drawio). Use для проектных/PM-диаграмм.
+description: Построить проектную диаграмму PMP/PMBOK в draw.io — wbs|pert|gantt|raci|risk|stakeholder (роль drawio). Use when нужен именно проектный артефакт со строгой семантикой метода; обычная диаграмма (flowchart/UML/ERD…) → $drawio-create.
 ---
 
 # Задача: проектная диаграмма PMP/PMBOK (drawio)
@@ -14,4 +14,4 @@ description: Построить проектную диаграмму PMP/PMBOK 
 - risk — сетка 5×5 probability×impact (green/yellow/orange/red).
 - stakeholder — power-interest 2×2.
 
-Валидный `mxGraphModel`, уникальные id, ортогональные рёбра, сетка, семантические цвета + обязательная легенда. Соблюдай семантику метода. Сохрани в `.drawio`, проверь `xmllint --noout`, дай путь + как открыть. Опирайся на `$pmp-diagrams`, `$drawio-diagrams`.
+Валидный `mxGraphModel`, уникальные id, ортогональные рёбра, сетка, семантические цвета + обязательная легенда. Соблюдай семантику метода. **Материализуй** результат как `.drawio`-файл в рабочем каталоге пользователя и провалидируй `xmllint --noout` (**только валидный артефакт = готово**); дай путь + как открыть. Опирайся на `$pmp-diagrams`, `$drawio-diagrams`.

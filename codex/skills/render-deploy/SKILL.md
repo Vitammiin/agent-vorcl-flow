@@ -1,10 +1,14 @@
 ---
 name: render-deploy
-description: Деплой/редеплой сервиса на Render (роль render). Use когда нужно задеплоить или пересобрать сервис на Render, опционально с очисткой build-кэша.
+description: Деплой/редеплой сервиса на Render (роль render). Use when нужно выкатить сервис или применить env-правки (мутация, требует явного подтверждения); только посмотреть состояние → $render-status, разобрать ошибки → $render-logs.
 ---
 
 # Задача: деплой/редеплой на Render
 
 Задеплой/редеплой сервис на Render (см. `$render`).
 
-Сначала выбери workspace (`get_selected_workspace`/`select_workspace`). Определи режим — native или Docker (`get_service` + `Dockerfile`/`render.yaml`): MCP не создаёт image-backed сервисы, env делится на build-time `ARG` и runtime `env`. Найди сервис (`list_services`/`get_service`), триггерни деплой (`trigger_deploy`; при необходимости — с очисткой кэша), следи за статусом (`get_deploy`/`list_deploys`) до `live`. Если менял env (`update_environment_variables`) — значения подхватятся только после редеплоя. **Деплой и правка env — необратимые мутации: спрашивай явное подтверждение человека.**
+Сначала выбери workspace (`get_selected_workspace`/`select_workspace`). Определи режим — native или Docker (`get_service` + `Dockerfile`/`render.yaml`): MCP не создаёт image-backed сервисы, env делится на build-time `ARG` и runtime `env`.
+
+**Guardrail — до запуска.** Деплой и правка env — необратимые мутации. Перед `trigger_deploy`/`update_environment_variables` покажи план: какой сервис (имя/id), какая ветка/коммит поедет, какие env-переменные меняются (имена, без значений секретов), будет ли очистка build-кэша — и **дождись явного подтверждения человека**. Неоднозначные «ок/давай» prod не авторизуют.
+
+**После запуска — доказательство, не «готово» на слово.** Дождись финального статуса деплоя (`get_deploy`/`list_deploys`) до `live` и покажи его + хвост свежих runtime-логов (`list_logs`) как подтверждение здоровья; при ошибке сборки — покажи ошибку и первопричину. Если менял env — значения подхватятся только после редеплоя. Строки подключения и секреты из env/логов сборки наружу не выводи.

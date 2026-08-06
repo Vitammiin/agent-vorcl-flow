@@ -1,6 +1,6 @@
 ---
 name: database-vorcl
-description: Точка входа в Task Master workflow для цели по данным (роль database). Use когда дана задача по БД (схема/запросы/индексы/миграции/кэш) и нужно довести её через задачи до готового.
+description: Точка входа в Task Master workflow для цели по данным (роль database). Use when цель по данным многошаговая и нужен цикл задач до готового; точечное — $database-query/$database-schema/$database-migrate/$database-optimize/$database-cache.
 ---
 
 # Задача: цель по данным через workflow (database)

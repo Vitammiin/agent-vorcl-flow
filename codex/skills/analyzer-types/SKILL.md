@@ -1,6 +1,6 @@
 ---
 name: analyzer-types
-description: Проверка типов — tsc, any, небезопасные касты, рассинхрон zod↔типы (роль analyzer, read-only). Use для аудита типобезопасности.
+description: Проверка типов — tsc, any, небезопасные касты, рассинхрон zod↔типы (роль analyzer, read-only). Use when вопрос к типобезопасности, а не к логике; баги поведения — $analyzer-bugs.
 ---
 
 # Задача: проверка типов
