@@ -1,6 +1,6 @@
 ---
 name: resilience-audit
-description: Read-only аудит обработки ошибок и логов — «тихие» падения, пустые catch, дыры в логах (роль resilience). Use для ревью надёжности без правок.
+description: Read-only аудит обработки ошибок и логов — «тихие» падения, пустые catch, дыры в логах (роль resilience). Use when нужно НАЙТИ дыры без правок кода; чинить найденное — $resilience-harden.
 ---
 
 # Задача: аудит обработки ошибок и логов (resilience)

@@ -1,5 +1,5 @@
 ---
-description: Инфра-цель на Render через Task Master workflow — деплой/диагностика/настройка до готового (render)
+description: Инфра-цель на Render через Task Master workflow — деплой/диагностика/настройка до готового (render). Use when цель многошаговая (деплой + диагностика + env + БД); разовое действие → /render:deploy|logs|status|query
 argument-hint: "<инфра-цель на Render>"
 allowed-tools: Read, Edit, Write, Bash, Grep, Glob, WebFetch
 ---

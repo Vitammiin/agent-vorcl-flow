@@ -1,6 +1,6 @@
 ---
 name: firecrawl-scrape
-description: Скрейп одного URL в markdown/JSON через Firecrawl (роль firecrawl). Use когда известен конкретный URL.
+description: Скрейп одного URL в markdown/JSON через Firecrawl (роль firecrawl). Use when URL известен и нужна ОДНА страница; много страниц раздела → $firecrawl-crawl, только список URL → $firecrawl-map, типизированный JSON с многих URL → $firecrawl-extract.
 ---
 
 # Задача: скрейп страницы (firecrawl)

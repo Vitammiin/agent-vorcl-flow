@@ -1,5 +1,5 @@
 ---
-description: Доработать существующий .drawio — раскладка, тема/стили, добавить/убрать узлы, выровнять по сетке (drawio)
+description: Доработать существующий .drawio — раскладка, тема/стили, добавить/убрать узлы, выровнять по сетке (drawio). Use when .drawio уже есть и нужна точечная доработка; диаграмма с нуля → /drawio:create, из исходника → /drawio:convert
 argument-hint: "<путь к .drawio> <что изменить>"
 allowed-tools: Read, Write, Edit, Bash
 ---

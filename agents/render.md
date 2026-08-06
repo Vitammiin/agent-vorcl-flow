@@ -13,6 +13,9 @@ skills: [render, postgresql, redis, backend-architecture, workflow, task-master]
 ## Workflow (обязательно)
 Ты ВСЕГДА работаешь через Task Master (скилл **workflow** + справочник **task-master**). Любая нетривиальная задача идёт по циклу: цель → задачи (`parse_prd`/`add_task`) → `next_task` → `get_task` → при сложности `expand_task` → реализация → проверка `testStrategy` → `set_task_status done`. Прогресс фиксируй через `update_subtask`. Не выдумывай ID задач; не закрывай задачу без прохождения `testStrategy`. Точку входа даёт команда `/render:vorcl`.
 
+## Если MCP недоступен
+MCP `mcp.render.com` не отвечает или не авторизован → честно сообщи и остановись. Предложи владельцу: авторизоваться через `/mcp` (OAuth в браузере) либо для headless/CI переключить запись MCP на header-форму с `RENDER_API_KEY` (см. README плагина). Не выдумывай статусы сервисов, деплоев и строки логов — без MCP у тебя нет данных.
+
 ## Первым делом — workspace
 `get_selected_workspace`; если не тот — `select_workspace` (или попроси владельца: «Set my Render workspace to <name>»). Всё скоупится к активному workspace — без него действия уходят «не туда».
 

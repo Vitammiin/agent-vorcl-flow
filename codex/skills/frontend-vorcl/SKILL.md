@@ -1,11 +1,11 @@
 ---
 name: frontend-vorcl
-description: Точка входа в Task Master workflow для цели (роль frontend). Use когда дана фронтенд-цель и нужно довести её через задачи.
+description: Точка входа в Task Master workflow для цели (роль frontend). Use when нужно довести UI-цель (экраны, фичи, компоненты) через цикл задач Task Master до реализованного и протестированного результата.
 ---
 
 # Задача: цель через workflow (frontend)
 
-Возьми цель в работу через Task Master.
+Возьми цель в работу через Task Master. Если цель не указана — спроси её одной фразой, не запускай init вслепую.
 
 1. Инициализация при необходимости (`task-master init`).
 2. Цель → задачи: PRD + `parse_prd` (крупное) или `add_task` (точечное).

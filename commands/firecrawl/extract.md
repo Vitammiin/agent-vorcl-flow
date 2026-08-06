@@ -1,5 +1,5 @@
 ---
-description: Структурированное извлечение по JSON-схеме через Firecrawl (firecrawl)
+description: Структурированное извлечение по JSON-схеме через Firecrawl (firecrawl). Use when нужен типизированный JSON строго по схеме с одного или многих URL/домена; сырой markdown одной страницы → /firecrawl:scrape
 argument-hint: "<URL(ы)/домен> — какие поля извлечь"
 allowed-tools: Read, Write, Bash, Grep, Glob, WebFetch
 ---

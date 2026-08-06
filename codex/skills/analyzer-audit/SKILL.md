@@ -1,6 +1,6 @@
 ---
 name: analyzer-audit
-description: Полный read-only аудит кода — баги, типы, БД, mockup на фронте, плохой код на беке (роль analyzer). Use для комплексного ревью без правок.
+description: Полный read-only аудит кода — баги, типы, БД, mockup на фронте, плохой код на беке (роль analyzer). Use when нужен полный проход по всем областям сразу; точечная проверка одной области — $analyzer-bugs/$analyzer-types/$analyzer-db/$analyzer-mocks/$analyzer-backend.
 ---
 
 # Задача: полный аудит кода

@@ -1,5 +1,5 @@
 ---
-description: Доработать существующий .mmd — направление, subgraph, classDef/стили, читаемость; с повторным рендер-тестом (mermaid)
+description: Доработать существующий .mmd — направление, subgraph, classDef/стили, читаемость; с повторным рендер-тестом (mermaid). Use when .mmd уже есть и нужны содержательные/стилевые правки; только проверка на ошибки → /mermaid:validate, только экспорт → /mermaid:render, с нуля → /mermaid:create
 argument-hint: "<путь к .mmd> <что изменить>"
 allowed-tools: Read, Write, Edit, Bash
 ---

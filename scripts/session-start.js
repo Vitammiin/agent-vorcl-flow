@@ -16,6 +16,11 @@ const note = [
   "- pinpoint (скриншот → место в существующем проекте, read-only): /pinpoint:vorcl, /pinpoint:locate, /pinpoint:route, /pinpoint:control, /pinpoint:trace, /pinpoint:handoff",
   "- drawio (диаграммы draw.io/diagrams.net): /drawio:vorcl, /drawio:create, /drawio:pmp, /drawio:convert, /drawio:refine",
   "- mermaid (Mermaid-диаграммы + валидация/рендер через mcp-mermaid): /mermaid:vorcl, /mermaid:create, /mermaid:convert, /mermaid:validate, /mermaid:render, /mermaid:refine",
+  "- testing (тесты + верификация testStrategy): /testing:vorcl, /testing:unit, /testing:integration, /testing:e2e, /testing:verify, /testing:coverage, /testing:flaky",
+  "- gitflow (git-гигиена: коммиты, PR, changelog, релизы): /gitflow:vorcl, /gitflow:commit, /gitflow:pr, /gitflow:changelog, /gitflow:release, /gitflow:audit",
+  "- security (аудит безопасности, read-only): /security:vorcl, /security:secrets, /security:owasp, /security:deps, /security:pii, /security:pre-push",
+  "- docs (документация: README, API-docs, архитектура): /docs:vorcl, /docs:readme, /docs:api, /docs:architecture, /docs:contributing, /docs:release-notes, /docs:audit",
+  "- devops (Docker + CI/CD): /devops:vorcl, /devops:dockerfile, /devops:compose, /devops:ci, /devops:env, /devops:monitoring",
   "Правило: любая нетривиальная задача идёт через Task Master (скиллы workflow + task-master). Единая точка входа — /vorcl <цель>; у каждого агента есть свой /<agent>:vorcl.",
 ].join("\n");
 

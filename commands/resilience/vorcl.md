@@ -1,5 +1,5 @@
 ---
-description: Цель по надёжности через Task Master — покрыть код try/catch и логами без «тихих» падений (resilience)
+description: Цель по надёжности через Task Master — покрыть код try/catch и логами без «тихих» падений. Use when надёжность нужна по целому модулю/сервису циклом задач; точечно обернуть — harden, только логи — logging, найти дыры — audit (resilience)
 argument-hint: "<цель: модуль/фича/область>"
 allowed-tools: Read, Edit, Write, Bash, Grep, Glob
 ---

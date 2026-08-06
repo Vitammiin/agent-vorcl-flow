@@ -1,6 +1,6 @@
 ---
 name: render-logs
-description: Логи сервиса Render и диагностика (роль render). Use когда упала сборка/рантайм на Render и нужно найти первопричину по логам.
+description: Логи сервиса Render и диагностика (роль render). Use when сервис падает/ошибки и нужна первопричина по логам (read-only); общая сводка здоровья → $render-status, перевыкат → $render-deploy.
 ---
 
 # Задача: логи и диагностика Render

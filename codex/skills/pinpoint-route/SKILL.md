@@ -1,6 +1,6 @@
 ---
 name: pinpoint-route
-description: Определить маршрут/страницу, на которой открыт экран со скриншота — Next.js App/Pages Router, React Router (роль pinpoint). Use для привязки экрана к маршруту/URL.
+description: Шаг 2 конвейера pinpoint (read-only) — определить маршрут/страницу, на которой открыт экран со скриншота (Next.js App/Pages Router, React Router) (роль pinpoint). Use when вопрос «какая это страница/URL?»; сам файл компонента → $pinpoint-locate, элемент на странице → $pinpoint-control.
 ---
 
 # Задача: определить маршрут экрана (pinpoint)

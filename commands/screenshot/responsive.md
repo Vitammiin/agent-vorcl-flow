@@ -1,5 +1,5 @@
 ---
-description: Довести сгенерированный по скриншоту UI до адаптивности — брейкпоинты, fluid, clamp, container queries (screenshot)
+description: Довести сгенерированный по скриншоту UI до адаптивности — брейкпоинты, fluid, clamp, container queries (screenshot). Use when код уже есть и нужен только адаптив; генерация с нуля → /screenshot:convert
 argument-hint: "<компонент/файл> [+ скриншоты брейкпоинтов mobile/tablet/desktop]"
 allowed-tools: Read, Edit, Write, Bash
 ---

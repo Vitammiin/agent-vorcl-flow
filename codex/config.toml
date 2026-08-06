@@ -59,7 +59,7 @@ env = { TASK_MASTER_TOOLS = "parse_prd,get_tasks,get_task,next_task,expand_task,
 command = "npx"
 args = ["-y", "mcp-mermaid"]
 
-# ===== Профили под роли (codex --profile architect | backend | frontend | analyzer | swagger | firecrawl | render | database | resilience | screenshot | pinpoint | drawio | mermaid) =====
+# ===== Профили под роли (codex --profile architect | backend | frontend | analyzer | swagger | firecrawl | render | database | resilience | screenshot | pinpoint | drawio | mermaid | testing | gitflow | security | docs | devops) =====
 [profiles.architect]
 model_reasoning_effort = "high"
 # model = "gpt-5.1-codex"   # при необходимости укажите модель
@@ -98,4 +98,19 @@ model_reasoning_effort = "high"
 model_reasoning_effort = "medium"
 
 [profiles.mermaid]
+model_reasoning_effort = "medium"
+
+[profiles.testing]
+model_reasoning_effort = "medium"
+
+[profiles.gitflow]
+model_reasoning_effort = "medium"
+
+[profiles.security]
+model_reasoning_effort = "high"
+
+[profiles.docs]
+model_reasoning_effort = "medium"
+
+[profiles.devops]
 model_reasoning_effort = "medium"

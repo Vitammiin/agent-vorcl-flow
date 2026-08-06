@@ -1,6 +1,6 @@
 ---
 name: analyzer-bugs
-description: Поиск багов — необработанные ошибки, race conditions, edge cases (роль analyzer, read-only). Use для аудита логических дефектов.
+description: Поиск багов — необработанные ошибки, race conditions, edge cases (роль analyzer, read-only). Use when нужны ошибки поведения и конкурентности; ошибки типов — $analyzer-types, нарушения архитектуры бэка — $analyzer-backend.
 ---
 
 # Задача: поиск багов

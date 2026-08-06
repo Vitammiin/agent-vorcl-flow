@@ -1,6 +1,6 @@
 ---
 name: mermaid-vorcl
-description: Цель (набор Mermaid-диаграмм) через Task Master — построение до готового с рендер-проверкой (роль mermaid). Use когда дана цель по диаграммам и нужно довести её через задачи.
+description: Цель (набор Mermaid-диаграмм) через Task Master — построение до готового с рендер-проверкой (роль mermaid). Use when диаграмм несколько или схема комплексная; одиночная по описанию → $mermaid-create, из исходника → $mermaid-convert, формат draw.io → $drawio-vorcl.
 ---
 
 # Задача: цель по Mermaid через Task Master workflow

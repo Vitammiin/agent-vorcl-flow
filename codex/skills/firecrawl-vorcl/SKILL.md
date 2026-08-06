@@ -1,6 +1,6 @@
 ---
 name: firecrawl-vorcl
-description: Точка входа в Task Master workflow для ресёрч-цели (роль firecrawl). Use когда дан веб-ресёрч и нужно довести его через задачи до готового результата.
+description: Точка входа в Task Master workflow для ресёрч-цели (роль firecrawl). Use when цель многошаговая — несколько источников/этапов/форм результата; разовый поиск → $firecrawl-search, одна страница → $firecrawl-scrape.
 ---
 
 # Задача: ресёрч-цель через workflow (firecrawl)

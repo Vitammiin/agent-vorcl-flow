@@ -1,6 +1,6 @@
 ---
 name: screenshot-vorcl
-description: Точка входа в Task Master workflow для цели по конвертации скриншота(ов) в код (роль screenshot). Use когда нужно воспроизвести интерфейс/набор экранов из скриншотов и довести это через задачи до готового.
+description: Точка входа в Task Master workflow для цели по конвертации скриншота(ов) в код (роль screenshot). Use when экранов несколько или цель комплексная; один экран → $screenshot-convert, существующий UI в кодовой базе → $pinpoint-vorcl.
 ---
 
 # Задача: цель по конвертации скриншота через workflow (screenshot)

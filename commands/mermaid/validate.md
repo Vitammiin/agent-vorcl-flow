@@ -1,5 +1,5 @@
 ---
-description: Проверить Mermaid — синтаксис + реальный рендер-тест, найти и устранить ошибки (mmdc / Maid / mcp-mermaid) (mermaid)
+description: Проверить Mermaid — синтаксис + реальный рендер-тест, найти и устранить ошибки (mmdc / Maid / mcp-mermaid) (mermaid). Use when нужен ответ «валиден ли .mmd» и починка ошибок (артефакт — валидный .mmd); нужен файл-изображение SVG/PNG/PDF → /mermaid:render, содержательные правки → /mermaid:refine
 argument-hint: "<путь к .mmd или markdown с mermaid-блоками>"
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob
 ---

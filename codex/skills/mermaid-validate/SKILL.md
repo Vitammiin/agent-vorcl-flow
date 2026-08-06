@@ -1,6 +1,6 @@
 ---
 name: mermaid-validate
-description: Проверить Mermaid — синтаксис + реальный рендер-тест, найти и устранить ошибки (mmdc / Maid / mcp-mermaid) (роль mermaid). Use когда нужно убедиться, что диаграмма валидна и рендерится.
+description: Проверить Mermaid — синтаксис + реальный рендер-тест, найти и устранить ошибки (mmdc / Maid / mcp-mermaid) (роль mermaid). Use when нужен ответ «валиден ли .mmd» и починка ошибок (артефакт — валидный .mmd); нужен файл-изображение SVG/PNG/PDF → $mermaid-render, содержательные правки → $mermaid-refine.
 ---
 
 # Задача: валидация Mermaid

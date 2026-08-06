@@ -1,6 +1,6 @@
 ---
 name: workflow
-description: Обязательная дисциплина работы — любая нетривиальная задача проходит через Task Master (цель → задачи → next → реализация → set-status). Use ВСЕГДА и всеми ролями перед реализацией; определяет цикл Orchestrator/Executor/Checker, как вызывать ($vorcl и $<role>-vorcl), последовательность MCP-инструментов task-master и шпаргалку команд.
+description: Обязательная дисциплина работы — любая нетривиальная задача проходит через Task Master (цель → задачи → next → реализация → set-status). Use ВСЕГДА и всеми ролями перед реализацией; определяет цикл Orchestrator/Executor/Checker, как вызывать ($vorcl и $<role>-vorcl) и последовательность цикла. Справочник команд/инструментов — $task-master.
 ---
 
 # Навык: Workflow (Task Master)
@@ -12,7 +12,7 @@ description: Обязательная дисциплина работы — лю
 ### 1. Скилл-задачей — обычный путь
 - **`$vorcl <цель>`** — универсальный вход: при необходимости инициализирует Task Master, раскладывает цель на задачи и ведёт весь цикл, роутя к профильной роли.
 - **`$<role>-vorcl <цель>`** — если область известна заранее, входи сразу в неё:
-  `$architect-vorcl` · `$backend-vorcl` · `$frontend-vorcl` · `$analyzer-vorcl` · `$swagger-vorcl` · `$firecrawl-vorcl` · `$render-vorcl` · `$database-vorcl` · `$resilience-vorcl` · `$screenshot-vorcl` · `$drawio-vorcl`
+  `$architect-vorcl` · `$backend-vorcl` · `$frontend-vorcl` · `$analyzer-vorcl` · `$swagger-vorcl` · `$firecrawl-vorcl` · `$render-vorcl` · `$database-vorcl` · `$resilience-vorcl` · `$screenshot-vorcl` · `$pinpoint-vorcl` · `$drawio-vorcl` · `$mermaid-vorcl`
 
 Примеры:
 ```
@@ -21,16 +21,8 @@ $backend-vorcl  добавить эндпоинт POST /invoices с валида
 $drawio-vorcl   схема архитектуры сервиса + ERD базы
 ```
 
-### 2. Напрямую инструментами task-master
-```
-task-master init                       # один раз, если нет .taskmaster/
-add_task "добавить POST /invoices"     # точечная (крупная фича — parse_prd)
-next_task                              # → id
-get_task <id>                          # детали + testStrategy
-expand_task <id>                       # при сложности
-# … реализация … update_subtask <id> "<что сделано>"
-set_task_status --id=<id> --status=done
-```
+### 2. Напрямую инструментами task-master — если работаешь без скилл-задачи
+Последовательность та же, что в каноническом цикле ниже: `task-master init` (один раз, если нет `.taskmaster/`) → далее по циклу. Синтаксис MCP-инструментов, CLI-эквиваленты и статусы — в `$task-master`.
 
 ## Три роли цикла
 - **Orchestrator** — выбирает следующую задачу: `next_task` / `get_tasks`.
@@ -42,26 +34,11 @@ set_task_status --id=<id> --status=done
 2. `next_task` — следующая актуальная задача.
 3. `get_task <id>` — детали и `testStrategy`.
 4. `expand_task <id>` — при высокой сложности (после `analyze_project_complexity`).
-5. **Реализация** — текущая задача профильной ролью (architect/backend/frontend/analyzer/…/drawio).
+5. **Реализация** — текущая задача профильной ролью (architect/backend/frontend/analyzer/…/drawio/mermaid).
 6. **Проверка** — `testStrategy`; при провале — не закрывать.
 7. `set_task_status --status=done` — и назад к шагу 2.
 
-## Шпаргалка команд (хуки)
-| Триггер | Что делает |
-|---|---|
-| `$vorcl <цель>` | Универсальный вход; роутит к профильной роли и ведёт цикл |
-| `$<role>-vorcl <цель>` | Вход сразу в область роли (backend/frontend/…/drawio) |
-| `task-master init` | Создать `.taskmaster/` (один раз) |
-| `add_task "<описание>"` | Точечная задача |
-| `parse_prd` | PRD → набор задач |
-| `next_task` | Следующая задача |
-| `get_task <id>` | Детали + `testStrategy` |
-| `analyze_project_complexity` | Оценка сложности 1–10 |
-| `expand_task <id>` | Разбить на подзадачи |
-| `update_subtask <id> "<лог>"` | Зафиксировать прогресс |
-| `set_task_status --id=<id> --status=done` | Закрыть (после `testStrategy`) |
-
-CLI-эквиваленты и статусы задач — в `$task-master`.
+Полный справочник команд (MCP-инструменты, CLI-эквиваленты, статусы, конфигурация) — в `$task-master`.
 
 ## Когда можно пропустить
 Только тривиальное: правка 1–3 строки, ответ на вопрос, мелкий фикс. Всё остальное — через цикл.

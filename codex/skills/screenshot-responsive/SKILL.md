@@ -1,6 +1,6 @@
 ---
 name: screenshot-responsive
-description: Довести сгенерированный по скриншоту UI до адаптивности — брейкпоинты, fluid, clamp, container queries (роль screenshot). Use когда компонент нужно сделать адаптивным.
+description: Довести сгенерированный по скриншоту UI до адаптивности — брейкпоинты, fluid, clamp, container queries (роль screenshot). Use when код уже есть и нужен только адаптив; генерация с нуля → $screenshot-convert.
 ---
 
 # Задача: адаптивность UI по скриншоту (screenshot)

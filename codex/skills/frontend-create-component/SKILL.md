@@ -1,10 +1,19 @@
 ---
 name: frontend-create-component
-description: Генерация UI-компонента по feature-структуре (роль frontend). Use когда нужно создать React/Next.js компонент с типами, состоянием, данными и тестом.
+description: Генерация UI-компонента по feature-структуре (роль frontend). Use when нужно создать НОВЫЙ React-компонент/фичу с нуля; для правки или ускорения существующего UI бери $frontend-refactor/$frontend-optimize.
 ---
 
 # Задача: создание UI-компонента
 
 Сгенерируй компонент по спецификации, которую дал пользователь.
 
-Размести код по feature-based архитектуре из `$frontend-architecture`: фича `src/features/<feature>/`, слои `types → api (TanStack Query) → stores (Zustand, если нужно) → components`, экспорт через `index.ts`. Общие примитивы — из `src/components/ui`. Реши Server vs Client Component (`"use client"` только при интерактивности). Стилизуй Tailwind v4 (токены из `@theme`; варианты — `cva`/`cn`), типизируй пропсы, обеспечь a11y и состояния loading/empty/error. Дай пример теста (Testing Library). Опирайся на `$react`, `$nextjs`, `$typescript`, `$tailwind`.
+Размести код по feature-based архитектуре из `$frontend-architecture`: фича `src/features/<feature>/`, слои `types → api (TanStack Query) → stores (Zustand, если нужно) → components`, экспорт через `index.ts`. Общие примитивы — из `src/components/ui`. Реши Server vs Client Component (`"use client"` только при интерактивности). Стилизуй Tailwind v4 (токены из `@theme`; варианты — `cva`/`cn`), типизируй пропсы, обеспечь a11y и состояния loading/empty/error. Напиши тест компонента (Testing Library).
+
+Два обязательных требования к результату:
+
+1. **Материализация.** Компонент и связанные файлы сохраняй в рабочем каталоге проекта по его конвенциям (реальные пути, а не сниппеты в ответе); в конце перечисли все созданные/изменённые пути.
+2. **Валидация перед выдачей.** Типизация (`tsc --noEmit`) и линт без ошибок; тест компонента прогнан и зелёный — либо компонент реально отрендерен в dev-сборке без ошибок в консоли. Только зелёный результат = готово; «должно отображаться» не принимается.
+
+Если спецификация не указана — спроси, что за компонент: назначение, данные, состояния, где используется. Если проект не React/Next.js — скажи честно и адаптируй структуру под фактический фреймворк.
+
+Опирайся на `$react`, `$nextjs`, `$typescript`, `$tailwind`, `$frontend-architecture`.

@@ -17,6 +17,13 @@ import fs from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
 
+// Node >= 18: fs.cpSync и синтаксис ||= старее не работают.
+const nodeMajor = Number(process.versions.node.split('.')[0])
+if (nodeMajor < 18) {
+  console.error(`✖ Требуется Node.js >= 18, найден ${process.versions.node}. Обнови Node и запусти установку снова.`)
+  process.exit(1)
+}
+
 const PKG_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const REPO = process.env.AVF_REPO || 'Vitammiin/agent-vorcl-flow'
 const MARKET = 'agent-vorcl-flow' // .claude-plugin/marketplace.json → name
@@ -32,7 +39,7 @@ const both = !wantClaude && !wantCodex // без флагов — оба
 
 const log = (m) => console.log(m)
 const ok = (m) => console.log(`  ✔ ${m}`)
-const warn = (m) => console.log(`  ⚠ ${m}`)
+const warn = (m) => console.error(`  ⚠ ${m}`) // предупреждения и ошибки — в stderr
 
 function hasCmd(cmd) {
   const r = spawnSync(cmd, ['--version'], { stdio: 'ignore' })
@@ -69,7 +76,7 @@ function writeClaudeSettings() {
     try {
       s = JSON.parse(fs.readFileSync(file, 'utf8'))
     } catch {
-      warn(`не удалось разобрать ${file} — Claude пропущен, поправь JSON и запусти снова`)
+      warn(`битый JSON в ${file} — правка settings.json пропущена, остальная установка продолжается; поправь файл и запусти снова`)
       return
     }
   }
@@ -117,13 +124,28 @@ function mergeBlock(file, content, label) {
 }
 
 // ---------- run ----------
+// Шаги независимы: сбой Claude-части не должен блокировать Codex-часть (и наоборот).
+let hadError = false
+function runStep(name, fn) {
+  try {
+    fn()
+  } catch (e) {
+    hadError = true
+    console.error(`  ✖ ${name}: ${e.message}`)
+  }
+}
+
 log('Agent-Vorcl-Flow — установщик')
-if (both || wantClaude) installClaude()
-if (both || wantCodex) installCodex()
+if (both || wantClaude) runStep('Claude Code', installClaude)
+if (both || wantCodex) runStep('Codex', installCodex)
 
 log('\n▸ Ключи (каждый задаёт свои через окружение — плагин ничего не хостит):')
 log('    export ANTHROPIC_API_KEY=…    # task-master')
 log('    export FIRECRAWL_API_KEY=…    # firecrawl')
 log('    export GITHUB_TOKEN=…         # github')
 log('    # агент database: POSTGRES_URL / MONGODB_URI / REDIS_URL — подключение к БД твоего проекта')
+if (hadError) {
+  console.error('\nЗавершено с ошибками — см. ✖ выше. Установленные части рабочие, сбойные перезапусти после исправления.')
+  process.exit(1)
+}
 log('\nГотово.')

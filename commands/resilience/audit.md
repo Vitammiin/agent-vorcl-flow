@@ -1,5 +1,5 @@
 ---
-description: Read-only аудит обработки ошибок и логов — «тихие» падения, пустые catch, дыры в логах (resilience)
+description: Read-only аудит обработки ошибок и логов — «тихие» падения, пустые catch, дыры в логах. Use when нужно НАЙТИ дыры без правок кода; чинить найденное — /resilience:harden (resilience)
 argument-hint: "[путь/область; по умолчанию весь репозиторий]"
 allowed-tools: Read, Grep, Glob, Bash
 ---
