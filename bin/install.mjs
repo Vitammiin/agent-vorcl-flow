@@ -123,6 +123,47 @@ function mergeBlock(file, content, label) {
   ok(`${label} → ${file}`)
 }
 
+// ---------- banner ----------
+// Цветное приветствие. Только для живого терминала: в CI/пайпах и при NO_COLOR — простой текст.
+function banner() {
+  const readCount = (fn) => { try { return fn() } catch { return null } }
+  const version = readCount(() => JSON.parse(fs.readFileSync(path.join(PKG_ROOT, 'package.json'), 'utf8')).version) || ''
+  const agents = readCount(() => fs.readdirSync(path.join(PKG_ROOT, 'agents')).filter((f) => f.endsWith('.md')).length)
+  const skills = readCount(() => fs.readdirSync(path.join(PKG_ROOT, 'skills'), { withFileTypes: true }).filter((d) => d.isDirectory()).length)
+  const commands = readCount(() => {
+    const root = path.join(PKG_ROOT, 'commands')
+    return fs.readdirSync(root, { withFileTypes: true }).filter((d) => d.isDirectory())
+      .reduce((n, d) => n + fs.readdirSync(path.join(root, d.name)).filter((f) => f.endsWith('.md')).length, 0)
+  })
+  const stats = agents ? `${agents} агентов · ${skills} скиллов · ${commands} команд` : ''
+  const useColor = !process.env.NO_COLOR && process.env.TERM !== 'dumb' && (process.stdout.isTTY || process.env.FORCE_COLOR)
+
+  if (!useColor) {
+    log(`Agent-Vorcl-Flow${version ? ` v${version}` : ''} — установщик${stats ? ` (${stats})` : ''}`)
+    return
+  }
+
+  const art = [
+    '██╗   ██╗ ██████╗ ██████╗  ██████╗██╗',
+    '██║   ██║██╔═══██╗██╔══██╗██╔════╝██║',
+    '██║   ██║██║   ██║██████╔╝██║     ██║',
+    '╚██╗ ██╔╝██║   ██║██╔══██╗██║     ██║',
+    ' ╚████╔╝ ╚██████╔╝██║  ██║╚██████╗███████╗',
+    '  ╚═══╝   ╚═════╝ ╚═╝  ╚═╝ ╚═════╝╚══════╝',
+  ]
+  const gradient = [51, 45, 39, 99, 135, 141] // 256-color: cyan → purple
+  const c = (code, s) => `\x1b[38;5;${code}m${s}\x1b[0m`
+  const dim = (s) => `\x1b[2m${s}\x1b[0m`
+  const bold = (s) => `\x1b[1m${s}\x1b[0m`
+
+  log('')
+  art.forEach((line, i) => log('  ' + c(gradient[i], line)))
+  log('')
+  log('  ' + bold(c(45, 'AGENT VORCL FLOW')) + (version ? ' ' + c(141, `v${version}`) : '') + (stats ? dim(`  —  ${stats}`) : ''))
+  log('  ' + dim('Команда специализированных AI-субагентов для Claude Code + адаптер GPT Codex'))
+  log('')
+}
+
 // ---------- run ----------
 // Шаги независимы: сбой Claude-части не должен блокировать Codex-часть (и наоборот).
 let hadError = false
@@ -135,7 +176,8 @@ function runStep(name, fn) {
   }
 }
 
-log('Agent-Vorcl-Flow — установщик')
+banner()
+if (argv.includes('--banner-only')) process.exit(0) // предпросмотр приветствия без установки
 if (both || wantClaude) runStep('Claude Code', installClaude)
 if (both || wantCodex) runStep('Codex', installCodex)
 
