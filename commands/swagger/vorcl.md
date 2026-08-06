@@ -1,5 +1,5 @@
 ---
-description: Полное покрытие OpenAPI/Swagger через Task Master — аудит непокрытых роутов → задачи → покрытие → проверка (swagger)
+description: Полное покрытие OpenAPI/Swagger через Task Master — аудит непокрытых роутов → задачи → покрытие → проверка. Use when доводим покрытие спеки до полного по многим роутам циклом задач; один роут — /swagger:cover, только найти дыры — /swagger:audit (swagger)
 argument-hint: "[модуль/область/путь; по умолчанию весь код бэка]"
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob
 ---

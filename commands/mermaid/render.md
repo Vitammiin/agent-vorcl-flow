@@ -1,5 +1,5 @@
 ---
-description: Экспорт Mermaid в SVG/PNG/PDF — mermaid-cli / Kroki / Mermaid.ink, с темой и фоном (mermaid)
+description: Экспорт Mermaid в SVG/PNG/PDF — mermaid-cli / Kroki / Mermaid.ink, с темой и фоном (mermaid). Use when .mmd валиден и нужен файл-изображение; проверить/починить синтаксис → /mermaid:validate, изменить содержание → /mermaid:refine
 argument-hint: "<путь к .mmd> [формат: svg|png|pdf] [тема: default|dark|neutral|forest]"
 allowed-tools: Read, Write, Edit, Bash
 ---

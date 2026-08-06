@@ -1,10 +1,10 @@
 ---
-description: Точка входа в Task Master workflow для цели (backend)
+description: Точка входа в Task Master workflow для цели (backend). Use when нужно довести серверную цель (API, модули, интеграции) через цикл задач Task Master до реализованного и протестированного результата.
 argument-hint: "<цель / objective>"
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob
 ---
 
-Возьми цель в работу через Task Master: **$ARGUMENTS**.
+Возьми цель в работу через Task Master: **$ARGUMENTS**. Если `$ARGUMENTS` пуст — спроси цель одной фразой, не запускай init вслепую.
 
 1. Убедись, что Task Master инициализирован (`.taskmaster/`); если нет — `task-master init`.
 2. Преврати цель в задачи: крупная фича — оформи/дополни PRD в `.taskmaster/docs/prd.txt` и запусти `parse_prd`; точечная — `add_task`.

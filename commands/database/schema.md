@@ -1,5 +1,5 @@
 ---
-description: Проектирование/ревью схемы и целостности данных (database)
+description: Проектирование/ревью схемы и целостности данных. Use when проектируем новую сущность или ревьюим форму существующей; менять готовую схему — /database:migrate (database)
 argument-hint: "<сущность/таблица/коллекция или задача>"
 allowed-tools: Read, Edit, Write, Bash, Grep, Glob
 ---

@@ -1,5 +1,5 @@
 ---
-description: Цель (набор диаграмм) через Task Master — построение draw.io/diagrams.net до готового (drawio)
+description: Цель (набор диаграмм) через Task Master — построение draw.io/diagrams.net до готового (drawio). Use when диаграмм несколько или схема крупная; одиночная по описанию → /drawio:create, из исходника → /drawio:convert, Mermaid-формат → /mermaid:vorcl
 argument-hint: "<цель: какие диаграммы построить + контекст/исходники>"
 allowed-tools: Read, Edit, Write, Bash, Grep, Glob
 ---

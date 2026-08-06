@@ -1,5 +1,5 @@
 ---
-description: Веб-поиск источников по вопросу через Firecrawl (firecrawl)
+description: Веб-поиск источников по вопросу через Firecrawl (firecrawl). Use when URL неизвестен и нужно найти источники по вопросу; известная страница → /firecrawl:scrape, обход сайта → /firecrawl:crawl
 argument-hint: "<поисковый запрос / вопрос>"
 allowed-tools: Read, Write, Bash, Grep, Glob, WebFetch
 ---

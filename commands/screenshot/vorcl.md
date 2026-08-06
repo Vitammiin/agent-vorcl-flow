@@ -1,5 +1,5 @@
 ---
-description: Цель (интерфейс/набор экранов из скриншотов) через Task Master — разбор → код до готового (screenshot)
+description: Цель (интерфейс/набор экранов из скриншотов) через Task Master — разбор → код до готового (screenshot). Use when экранов несколько или цель комплексная; один экран → /screenshot:convert, существующий UI в кодовой базе → /pinpoint:vorcl
 argument-hint: "<цель: экран/набор экранов + путь(и) к скриншоту(ам)>"
 allowed-tools: Read, Edit, Write, Bash, Grep, Glob
 ---

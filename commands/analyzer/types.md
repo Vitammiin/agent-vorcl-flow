@@ -1,5 +1,5 @@
 ---
-description: Проверка типов — tsc, any, небезопасные касты, рассинхрон zod↔типы (analyzer)
+description: Проверка типов — tsc, any, небезопасные касты, рассинхрон zod↔типы. Use when вопрос к типобезопасности, а не к логике; баги поведения — /analyzer:bugs (analyzer)
 argument-hint: "[путь/область; по умолчанию весь проект]"
 allowed-tools: Read, Grep, Glob, Bash
 ---

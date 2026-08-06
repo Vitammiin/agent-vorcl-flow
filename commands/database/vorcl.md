@@ -1,5 +1,5 @@
 ---
-description: Цель по данным через Task Master workflow — схема/запросы/миграции/кэш до готового (database)
+description: Цель по данным через Task Master workflow — схема/запросы/миграции/кэш до готового. Use when цель по данным многошаговая и нужен цикл задач; точечное — query/schema/migrate/optimize/cache (database)
 argument-hint: "<цель по БД>"
 allowed-tools: Read, Edit, Write, Bash, Grep, Glob
 ---

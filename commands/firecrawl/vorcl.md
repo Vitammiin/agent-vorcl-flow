@@ -1,5 +1,5 @@
 ---
-description: Ресёрч-цель через Task Master workflow — сбор данных из веба до готового результата (firecrawl)
+description: Ресёрч-цель через Task Master workflow — сбор данных из веба до готового результата (firecrawl). Use when цель многошаговая — несколько источников/этапов/форм результата; разовый поиск → /firecrawl:search, одна страница → /firecrawl:scrape
 argument-hint: "<цель ресёрча / вопрос>"
 allowed-tools: Read, Write, Bash, Grep, Glob, WebFetch
 ---

@@ -1,5 +1,5 @@
 ---
-description: Логи сервиса Render и диагностика (render)
+description: Логи сервиса Render и диагностика (render). Use when сервис падает/ошибки и нужна первопричина по логам (read-only); общая сводка здоровья → /render:status, перевыкат → /render:deploy
 argument-hint: "<service> [фильтр/уровень]"
 allowed-tools: Read, Edit, Write, Bash, Grep, Glob, WebFetch
 ---

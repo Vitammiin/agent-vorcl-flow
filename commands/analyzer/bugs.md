@@ -1,5 +1,5 @@
 ---
-description: Поиск багов — необработанные ошибки, race conditions, edge cases (analyzer)
+description: Поиск багов — необработанные ошибки, race conditions, edge cases. Use when нужны ошибки поведения и конкурентности; ошибки типов — /analyzer:types, нарушения архитектуры бэка — /analyzer:backend (analyzer)
 argument-hint: "[путь/область; по умолчанию весь репозиторий]"
 allowed-tools: Read, Grep, Glob, Bash
 ---

@@ -1,5 +1,5 @@
 ---
-description: Полный аудит кода: баги, типы, БД, mockup на фронте, плохой код на беке (analyzer)
+description: Полный аудит кода — баги, типы, БД, mockup на фронте, плохой код на беке. Use when нужен полный проход по всем областям сразу; точечная проверка одной области — bugs/types/db/mocks/backend (analyzer)
 argument-hint: "[путь/область; по умолчанию весь репозиторий]"
 allowed-tools: Read, Grep, Glob, Bash
 ---

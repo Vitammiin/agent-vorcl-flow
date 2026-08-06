@@ -1,5 +1,5 @@
 ---
-description: Конвертировать исходник в Mermaid — схема БД → ERD, код → class/sequence, папки → flowchart, .drawio/CSV/JSON → mermaid (mermaid)
+description: Конвертировать исходник в Mermaid — схема БД → ERD, код → class/sequence, папки → flowchart, .drawio/CSV/JSON → mermaid (mermaid). Use when вход — существующий артефакт (код/схема/файл); описание словами → /mermaid:create, целевой формат draw.io → /drawio:convert
 argument-hint: "<путь к исходнику> [тип: er|class|sequence|flowchart]"
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob
 ---
@@ -10,4 +10,4 @@ allowed-tools: Read, Write, Edit, Bash, Grep, Glob
 
 Требования: валидный синтаксис под выбранный тип; подписи со спецсимволами — в кавычки; связи ERD с корректной кардинальностью (`||--o{` и т.п.). **Обязательно** прогони результат через реальный рендер (`mcp-mermaid` или `mmdc`) и устрани ошибки до выдачи.
 
-Сохрани в `.mmd` + рендер. Отдай: путь + результат рендер-теста + как посмотреть + что было выведено из исходника и что помечено допущением. Опирайся на навыки `mermaid-diagrams`, `mermaid-rendering`, `system-design`. Делегируй субагенту `mermaid`.
+**Материализуй** результат как `.mmd`-файл (+ рендер SVG/PNG по запросу) в рабочем каталоге пользователя — не только текстом в ответе; **только прошедший рендер артефакт = готово**. Отдай: пути к файлам + результат рендер-теста + как посмотреть + что было выведено из исходника и что помечено допущением. Опирайся на навыки `mermaid-diagrams`, `mermaid-rendering`, `system-design`. Делегируй субагенту `mermaid`.

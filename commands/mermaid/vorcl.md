@@ -1,5 +1,5 @@
 ---
-description: Цель (набор диаграмм) через Task Master — построение Mermaid до готового, с рендер-проверкой (mermaid)
+description: Цель (набор диаграмм) через Task Master — построение Mermaid до готового, с рендер-проверкой (mermaid). Use when диаграмм несколько или схема комплексная; одиночная по описанию → /mermaid:create, из исходника → /mermaid:convert, формат draw.io → /drawio:vorcl
 argument-hint: "<цель / objective>"
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob
 ---

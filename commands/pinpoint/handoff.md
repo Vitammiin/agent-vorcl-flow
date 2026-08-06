@@ -1,5 +1,5 @@
 ---
-description: Собрать точную заявку на правку существующего кода (без новых элементов) и делегировать frontend/backend (pinpoint)
+description: Шаг 5 конвейера pinpoint (сам read-only) — собрать точную заявку на правку существующего кода (без новых элементов) и делегировать frontend/backend (pinpoint). Use when картирование сделано и нужна правка чужими руками; сначала найти/понять → /pinpoint:locate|trace
 argument-hint: "<что изменить + путь к скриншоту/локация>"
 allowed-tools: Read, Grep, Glob, Bash
 ---

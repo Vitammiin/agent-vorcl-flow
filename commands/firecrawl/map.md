@@ -1,5 +1,5 @@
 ---
-description: Карта URL сайта через Firecrawl (firecrawl)
+description: Карта URL сайта через Firecrawl (firecrawl). Use when нужен быстрый и дешёвый список URL сайта (разведка перед crawl) без содержимого страниц; контент страниц → /firecrawl:scrape или /firecrawl:crawl
 argument-hint: "<URL сайта> [фильтр/подраздел]"
 allowed-tools: Read, Write, Bash, Grep, Glob, WebFetch
 ---

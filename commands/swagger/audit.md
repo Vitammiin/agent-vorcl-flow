@@ -1,5 +1,5 @@
 ---
-description: Read-only аудит покрытия OpenAPI/Swagger — найти роуты, не полностью покрытые спекой (swagger)
+description: Read-only аудит покрытия OpenAPI/Swagger — найти роуты, не полностью покрытые спекой. Use when нужно только НАЙТИ дыры покрытия без правок; покрывать найденное — /swagger:cover (swagger)
 argument-hint: "[модуль/область/путь; по умолчанию весь код бэка]"
 allowed-tools: Read, Grep, Glob, Bash
 ---
