@@ -1,6 +1,6 @@
 # Agent-Vorcl-Flow — роли для Codex
 
-Двенадцать специализированных ролей. Выбирай подходящую и опирайся на её навыки-скиллы (вызов через `$имя`).
+Тринадцать специализированных ролей. Выбирай подходящую и опирайся на её навыки-скиллы (вызов через `$имя`).
 
 ## Workflow (обязательно, для всех ролей)
 Любая нетривиальная задача идёт через **Task Master** (`$workflow` + `$task-master`): цель → задачи (`parse_prd`/`add_task`) → `next_task` → `get_task` → `expand_task` → реализация → проверка `testStrategy` → `set_task_status done`. Единая точка входа — `$vorcl`; у каждой роли есть свой `$<role>-vorcl`.
@@ -64,6 +64,12 @@
 - Скиллы: `$screenshot-to-code`, `$tailwind`, `$react`, `$nextjs`, `$typescript`, `$frontend-architecture`, `$i18n`, `$workflow`, `$task-master`
 - Задачи: `$screenshot-vorcl`, `$screenshot-analyze`, `$screenshot-convert`, `$screenshot-tokens`, `$screenshot-responsive`
 - Профиль: `codex --profile screenshot`
+
+## pinpoint — Скриншот → место в существующем проекте (read-only)
+Привязывает скриншот работающего интерфейса к УЖЕ существующему коду проекта: находит компонент и `file:line`, определяет маршрут/страницу (Next.js App/Pages Router, React Router), вычисляет конкретный контрол (кнопку/поле) и его обработчик, прослеживает логику (состояние/стор → data-fetch → API). Сначала решает «существующий проект или новый» (новый → `$screenshot-convert`). Ничего не создаёт и не правит — отдаёт карту «скриншот → исходники» и делегирует правку `$frontend`/`$backend`. Обратная задача к `$screenshot-to-code`; доменный скилл — `$ui-source-mapping`.
+- Скиллы: `$ui-source-mapping`, `$screenshot-to-code`, `$frontend-architecture`, `$react`, `$nextjs`, `$typescript`, `$i18n`, `$data-fetching`, `$state-management`, `$workflow`, `$task-master`
+- Задачи: `$pinpoint-vorcl`, `$pinpoint-locate`, `$pinpoint-route`, `$pinpoint-control`, `$pinpoint-trace`, `$pinpoint-handoff`
+- Профиль: `codex --profile pinpoint`
 
 ## drawio — Инженер диаграмм draw.io/diagrams.net
 Из описания, исходника (код/схема БД/структура папок/роуты/CSV/JSON/mermaid) или существующего `.drawio` строит валидный нативный XML (`mxGraphModel`): flowchart, cross-functional (swimlane), BPMN, UML, network/cloud (AWS/Azure/GCP/Kubernetes), ERD, org chart, mind map, а также PMP/PMBOK — WBS, PERT/CPM (с подсветкой critical path), Gantt, RACI, risk matrix 5×5, stakeholder power-interest grid. Аккуратная раскладка (сетка, ортогональные рёбра, без наложений), семантические цвета, легенды, валидный XML (`xmllint --noout`); подсказывает, какие custom-библиотеки (`?clibs=`) включить. Среда не рендерит draw.io — отдаёт готовый файл, открывается в app.diagrams.net. Доменные скиллы — `$drawio-diagrams` и `$pmp-diagrams`.

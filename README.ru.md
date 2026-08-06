@@ -17,6 +17,7 @@
 | 🟦 **database** | Инженер БД / DBA | database, postgresql, mongodb, redis, backend-architecture, workflow, task-master | `/database:vorcl` `/database:query` `/database:schema` `/database:migrate` `/database:optimize` `/database:cache` |
 | ⚪ **resilience** | Надёжность: ошибки + логи | error-handling, backend-architecture, nodejs, typescript, react, i18n, workflow, task-master | `/resilience:vorcl` `/resilience:harden` `/resilience:logging` `/resilience:audit` |
 | 🖼️ **screenshot** | Скриншот UI → код | screenshot-to-code, react, nextjs, typescript, tailwind, frontend-architecture, i18n, workflow, task-master | `/screenshot:vorcl` `/screenshot:analyze` `/screenshot:convert` `/screenshot:tokens` `/screenshot:responsive` |
+| 🎯 **pinpoint** | Скриншот → место в существующем проекте (read-only) | ui-source-mapping, screenshot-to-code, frontend-architecture, react, nextjs, typescript, i18n, data-fetching, state-management, workflow, task-master | `/pinpoint:vorcl` `/pinpoint:locate` `/pinpoint:route` `/pinpoint:control` `/pinpoint:trace` `/pinpoint:handoff` |
 | 📊 **drawio** | Диаграммы draw.io / diagrams.net | drawio-diagrams, pmp-diagrams, system-design, workflow, task-master | `/drawio:vorcl` `/drawio:create` `/drawio:pmp` `/drawio:convert` `/drawio:refine` |
 | 🧜 **mermaid** | Mermaid-диаграммы (+ реальный рендер) | mermaid-diagrams, mermaid-rendering, system-design, workflow, task-master | `/mermaid:vorcl` `/mermaid:create` `/mermaid:convert` `/mermaid:validate` `/mermaid:render` `/mermaid:refine` |
 
@@ -28,13 +29,15 @@
 
 Агент `screenshot` (скилл `screenshot-to-code`) превращает **скриншот UI в production-ready код**: читает изображение (инструмент Read показывает картинку), разбирает layout/компоненты/состояния, извлекает точные цвета в семантические OKLCH-токены `@theme` и выдаёт полный запускаемый код — семантический HTML, точные spacing/пропорции, адаптивность (`clamp()`, брейкпоинты, container queries) и a11y. По умолчанию React + Tailwind v4; по запросу Vue / Next.js / чистый HTML/CSS. Отдельно умеет вытащить дизайн-токены (`/screenshot:tokens`) и довести вёрстку до адаптивности (`/screenshot:responsive`).
 
+Агент `pinpoint` (скилл `ui-source-mapping`) решает **обратную** к `screenshot` задачу: привязывает скриншот работающего интерфейса к **уже существующему** коду проекта (только чтение). По изображению находит реальные компонент и `file:line`, определяет маршрут/страницу, на которой открыт экран (Next.js App/Pages Router, React Router), вычисляет конкретный контрол (кнопку/поле), с которым ты работаешь, и прослеживает логику за ним (обработчик → состояние/стор → data-fetch → API). Ничего не создаёт и не правит сам — отдаёт карту «скриншот → исходники» и делегирует точечную правку `frontend`/`backend`. Сначала определяет: существующий проект (его режим) или новый (тогда → `screenshot`); в мультиязычном проекте помнит, что текст на экране — это **значение перевода**, а в коде лежит **ключ** (`t('...')`), и грепает и по значению в локали, и по ключу в компонентах.
+
 Агент `drawio` (скиллы `drawio-diagrams` + `pmp-diagrams`) строит диаграммы в **нативном XML draw.io / diagrams.net**: по описанию, из исходника (схема БД → ERD, структура папок → дерево, код → UML/sequence, mermaid/CSV/JSON) или правя существующий `.drawio`. Умеет flowchart, cross-functional (swimlane), BPMN, UML, network/cloud (AWS/Azure/GCP/Kubernetes), ERD, org chart, mind map, а также PMP/PMBOK — WBS, PERT/CPM (с подсветкой critical path), Gantt, RACI, risk matrix 5×5, stakeholder power-interest grid. Отдаёт готовый `.drawio` с аккуратной раскладкой (сетка, ортогональные рёбра), семантическими цветами и валидным XML и подсказывает, какие custom-библиотеки (`?clibs=…`) включить. Среда не рендерит draw.io — результат открывается в app.diagrams.net.
 
 Агент `mermaid` (скиллы `mermaid-diagrams` + `mermaid-rendering`) строит диаграммы на языке **Mermaid**: flowchart, sequenceDiagram, classDiagram, stateDiagram-v2, erDiagram, gantt, pie, gitGraph, mindmap, timeline и др. — по описанию, из исходника (схема БД → erDiagram, код → class/sequence, папки → flowchart, `.drawio`/CSV/JSON) или правя `.mmd`. Killer-фича — **проверка реальным рендером** (`mcp-mermaid` / `mmdc`), а не «на глаз»: ловит опечатку `lowchart`, `end`-ловушку, неэкранированные подписи. Всегда **отдаёт готовый файл в нужном формате** — `.mmd` + рендер (SVG/PNG/PDF) в твоём рабочем каталоге, не «где-то».
 
 Фронт всегда подключается к **реальному** API: источник истины — OpenAPI-спека бэка (Fastify/NestJS/Express и др.), типы генерируются из неё (`openapi-typescript` + `openapi-fetch`). Бэк держит спеку полной (агент `swagger`, скилл `swagger-coverage`), фронт из неё берёт контракт (скилл `data-fetching`); моков в прод-пути нет.
 
-Скилл `i18n` задаёт правило **«ноль языкового хардкода»**: агенты сначала определяют, мультиязычен ли проект (i18n-инфраструктура, несколько локалей), и адаптируются — при мультиязычности пользовательские строки идут только через слой перевода (**next-intl** / **react-i18next** / **i18next**), плюрализация/род — через ICU, даты/числа/валюты — через `Intl`, RTL — через логические CSS-свойства; логи и машинные коды ошибок не локализуются. Скилл подключён у `frontend`, `backend`, `screenshot`, `resilience`, `architect`, а `analyzer` ловит языковой хардкод как отдельную находку аудита.
+Скилл `i18n` задаёт правило **«ноль языкового хардкода»**: агенты сначала определяют, мультиязычен ли проект (i18n-инфраструктура, несколько локалей), и адаптируются — при мультиязычности пользовательские строки идут только через слой перевода (**next-intl** / **react-i18next** / **i18next**), плюрализация/род — через ICU, даты/числа/валюты — через `Intl`, RTL — через логические CSS-свойства; логи и машинные коды ошибок не локализуются. Скилл подключён у `frontend`, `backend`, `screenshot`, `pinpoint`, `resilience`, `architect`, а `analyzer` ловит языковой хардкод как отдельную находку аудита.
 
 ## Workflow (Task Master)
 Все агенты работают через **Task Master** (`task-master-ai`, MCP-сервер `task-master`): любая нетривиальная задача идёт по циклу **цель → задачи (`parse_prd`/`add_task`) → `next_task` → `get_task` → `expand_task` → реализация → проверка `testStrategy` → `set_task_status done`**. Дисциплину задаёт скилл `workflow`, справочник команд — скилл `task-master`.
@@ -45,9 +48,9 @@
 ```
 .claude-plugin/plugin.json     # манифест плагина
 .claude-plugin/marketplace.json# локальный маркетплейс (для установки)
-agents/       architect.md backend.md frontend.md analyzer.md swagger.md firecrawl.md render.md database.md resilience.md screenshot.md drawio.md mermaid.md
-skills/       <навык>/SKILL.md        (29 скиллов)
-commands/     <namespace>/<команда>.md (61 команда, namespace /namespace:команда) + /vorcl
+agents/       architect.md backend.md frontend.md analyzer.md swagger.md firecrawl.md render.md database.md resilience.md screenshot.md pinpoint.md drawio.md mermaid.md
+skills/       <навык>/SKILL.md        (30 скиллов)
+commands/     <namespace>/<команда>.md (67 команд, namespace /namespace:команда) + /vorcl
 hooks/        hooks.json + scripts/session-start.js + scripts/catch-guard.js (PostToolUse: пустые catch)
 .mcp.json     # github, filesystem, postgres, mongodb, redis, docker, firecrawl, vercel, render, task-master, mermaid
 codex/        # адаптер под GPT Codex (skills + config.toml + install.sh)

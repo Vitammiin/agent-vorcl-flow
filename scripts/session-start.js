@@ -13,6 +13,7 @@ const note = [
   "- database (БД через MCP — Postgres/MongoDB/Redis): /database:vorcl, /database:query, /database:schema, /database:migrate, /database:optimize, /database:cache",
   "- resilience (обработка ошибок + логи): /resilience:vorcl, /resilience:harden, /resilience:logging, /resilience:audit",
   "- screenshot (скриншот UI → код): /screenshot:vorcl, /screenshot:analyze, /screenshot:convert, /screenshot:tokens, /screenshot:responsive",
+  "- pinpoint (скриншот → место в существующем проекте, read-only): /pinpoint:vorcl, /pinpoint:locate, /pinpoint:route, /pinpoint:control, /pinpoint:trace, /pinpoint:handoff",
   "- drawio (диаграммы draw.io/diagrams.net): /drawio:vorcl, /drawio:create, /drawio:pmp, /drawio:convert, /drawio:refine",
   "- mermaid (Mermaid-диаграммы + валидация/рендер через mcp-mermaid): /mermaid:vorcl, /mermaid:create, /mermaid:convert, /mermaid:validate, /mermaid:render, /mermaid:refine",
   "Правило: любая нетривиальная задача идёт через Task Master (скиллы workflow + task-master). Единая точка входа — /vorcl <цель>; у каждого агента есть свой /<agent>:vorcl.",

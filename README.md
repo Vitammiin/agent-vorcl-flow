@@ -8,8 +8,8 @@ One `npx` command installs them. No backend, no hosting — Claude Code runs eve
 ![Claude Code](https://img.shields.io/badge/Claude%20Code-plugin-6C5CE7)
 ![GPT Codex](https://img.shields.io/badge/GPT%20Codex-adapter-1abc9c)
 ![Node](https://img.shields.io/badge/node-%E2%89%A518-339933?logo=node.js&logoColor=white)
-![Agents](https://img.shields.io/badge/agents-11-blue)
-![Commands](https://img.shields.io/badge/commands-55%2B-blue)
+![Agents](https://img.shields.io/badge/agents-13-blue)
+![Commands](https://img.shields.io/badge/commands-67-blue)
 ![License](https://img.shields.io/badge/license-proprietary-important)
 
 🌐 [Русская версия](./README.ru.md)
@@ -20,9 +20,9 @@ One `npx` command installs them. No backend, no hosting — Claude Code runs eve
 
 ## What is this?
 
-Agent-Vorcl-Flow turns Claude Code into a **structured engineering team**. Instead of one general assistant, you get **12 focused sub-agents** (architect, backend, frontend, DB engineer, code auditor, and more), each with its own domain **skills**, quick **slash commands**, and the **MCP tools** it needs. Every non-trivial task runs through a disciplined **Task Master** loop — *goal → tasks → implement → verify → done* — so work is planned, tracked, and survives interruptions.
+Agent-Vorcl-Flow turns Claude Code into a **structured engineering team**. Instead of one general assistant, you get **13 focused sub-agents** (architect, backend, frontend, DB engineer, code auditor, and more), each with its own domain **skills**, quick **slash commands**, and the **MCP tools** it needs. Every non-trivial task runs through a disciplined **Task Master** loop — *goal → tasks → implement → verify → done* — so work is planned, tracked, and survives interruptions.
 
-- 🧩 **11 sub-agents**, 27 skills, 55+ slash commands
+- 🧩 **13 sub-agents**, 30 skills, 67 slash commands
 - ⚡ **One-command install** for Claude Code and/or Codex — `npx`
 - 🔌 **10 MCP servers** wired in (GitHub, Postgres, MongoDB, Redis, Docker, Firecrawl, Vercel, Render, filesystem, Task Master)
 - 🔑 **Bring your own keys** via environment variables — the plugin hosts nothing
@@ -125,6 +125,7 @@ This keeps work planned, checkpointed, and resumable — nothing is declared "do
 | 🟦 **database** | DB engineer / DBA | Schema, queries & plans, indexes, N+1, safe reversible migrations, cache |
 | ⚪ **resilience** | Reliability: errors + logging | try/catch at the right boundaries, typed errors, retries/timeouts, structured logs |
 | 🖼️ **screenshot** | Screenshot UI → code | Turns a UI screenshot into production-ready, responsive, accessible code |
+| 🎯 **pinpoint** | Screenshot → place in an existing project (read-only) | Grounds a running-app screenshot in the real codebase — component, `file:line`, route/page, the exact control, and the logic behind it; creates nothing, delegates the edit |
 | 📊 **drawio** | Diagrams (draw.io / diagrams.net) | Flowchart, BPMN, UML, ERD, network/cloud, and PMP/PMBOK (WBS, Gantt, RACI…) |
 | 🧜 **mermaid** | Mermaid diagrams (+ real render) | flowchart, sequence, class, state, ER, gantt, gitGraph, mindmap…; validated via mcp-mermaid/`mmdc`; hands you the file (`.mmd` + SVG/PNG/PDF) |
 
@@ -132,6 +133,7 @@ This keeps work planned, checkpointed, and resumable — nothing is declared "do
 - **Frontend always talks to a real API.** The backend's OpenAPI spec is the single source of truth; types are generated from it (`openapi-typescript` + `openapi-fetch`). No mocks in the production path.
 - **`database` mutations require explicit confirmation.** Analytics are read-only; schema/data changes (DDL/DML/migrations) never run without your go-ahead.
 - **`resilience` ships a safety hook.** A non-blocking `PostToolUse` hook (`catch-guard.js`) gently flags empty `catch {}` blocks in files you just edited.
+- **`pinpoint` finds, never creates.** Given a screenshot of a running app, it maps the screen to the real code — component, route, the exact control and the logic behind it — and hands the edit to `frontend`/`backend`. It works on what already exists (the inverse of `screenshot`).
 - **`i18n` enforces "zero language hardcoding."** Agents first detect whether a project is multilingual and adapt — user-facing strings go through a translation layer (next-intl / react-i18next / i18next), never inline.
 
 ---
@@ -235,6 +237,16 @@ Every command below is a slash command. `<…>` marks your input.
 | `/screenshot:tokens <image>` | Extract design tokens (OKLCH colors, typography, spacing) into Tailwind `@theme`. |
 | `/screenshot:responsive <target>` | Make the generated UI responsive — breakpoints, fluid, `clamp()`, container queries. |
 
+### 🎯 pinpoint — screenshot → place in an existing project (read-only)
+| Command | What it does |
+| --- | --- |
+| `/pinpoint:vorcl <goal>` | Find/understand/change existing UI from a screenshot via Task Master — map → tasks → delegate. |
+| `/pinpoint:locate <image>` | Locate the existing component/file(s) from a screenshot — `file:line`, no new code. |
+| `/pinpoint:route <image>` | Identify the route/page the screen is on (Next.js App/Pages Router, React Router). |
+| `/pinpoint:control <image>` | Pinpoint the exact control (button/field) and its handler in the code. |
+| `/pinpoint:trace <target>` | Trace the logic behind an element — handler → state → data-fetch → API. |
+| `/pinpoint:handoff <change>` | Build a precise edit request against existing code and delegate to `frontend`/`backend`. |
+
 ### 📊 drawio — diagrams (draw.io / diagrams.net)
 | Command | What it does |
 | --- | --- |
@@ -320,9 +332,9 @@ See [`codex/README.md`](./codex/README.md) for the full mapping.
 ```text
 .claude-plugin/plugin.json      # plugin manifest
 .claude-plugin/marketplace.json # local marketplace (for install)
-agents/       12 sub-agent definitions (*.md)
-skills/       <skill>/SKILL.md            (29 skills)
-commands/     <namespace>/<command>.md    (61 commands, /namespace:command) + /vorcl
+agents/       13 sub-agent definitions (*.md)
+skills/       <skill>/SKILL.md            (30 skills)
+commands/     <namespace>/<command>.md    (67 commands, /namespace:command) + /vorcl
 hooks/        hooks.json + session-start.js + catch-guard.js (PostToolUse: empty catch)
 .mcp.json     github, filesystem, postgres, mongodb, redis, docker, firecrawl, vercel, render, task-master, mermaid
 bin/          install.mjs                 (the npx installer)
