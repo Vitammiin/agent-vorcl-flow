@@ -12,12 +12,25 @@ description: Обязательные правила модульной архи
 ## Структура каталогов
 ```
 src/
-└── modules/
-    ├── auth/
-    ├── users/
-    ├── ai/
-    ├── billing/
-    └── notifications/
+├── app/
+│   ├── app.ts
+│   ├── server.ts
+│   └── plugins/            # swagger, jwt, cors, database + index.ts
+├── config/
+│   ├── env.ts
+│   └── index.ts
+├── modules/
+│   ├── auth/               # controller, service, repository, routes,
+│   ├── users/              # schemas, dto, types, middleware, index.ts
+│   ├── ai/
+│   ├── billing/
+│   └── notifications/
+├── shared/
+│   ├── errors/
+│   ├── types/
+│   └── utils/
+└── index.ts
+.env / .env.example / DOCS.md   # в корне проекта
 ```
 
 Внутри **каждого** модуля — фиксированный набор файлов:
@@ -73,7 +86,3 @@ export type { AuthUser } from "./types";
 - [ ] Бизнес-логика в `service`, БД — только в `repository`.
 - [ ] Наружу торчит только `index.ts`.
 - [ ] Зависимости идут в одну сторону.
-
-## Интернационализация (i18n)
-- Слой сообщений/переводов — в `src/shared`, не внутри модулей; сообщения валидации (`schemas`) и ошибок — локализуемые ключи, не хардкод-строки.
-- Локаль из `Accept-Language`/профиля, перевод на границе ответа; письма/уведомления — по локали получателя. Подробнее — `$i18n`.
