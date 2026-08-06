@@ -1,6 +1,6 @@
 {
   "name": "agent-vorcl-flow",
-  "version": "1.8.0",
+  "version": "2.0.0",
   "description": "Установщик: плагин Agent-Vorcl-Flow для Claude Code + адаптер для Codex (skills + MCP + AGENTS.md). Сам плагин ничего не хостит.",
   "bin": {
     "agent-vorcl-flow": "bin/install.mjs"
