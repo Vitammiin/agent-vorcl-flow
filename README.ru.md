@@ -2,8 +2,8 @@
 
 # Agent-Vorcl-Flow
 
-**Команда специализированных AI-субагентов для [Claude Code](https://claude.com/claude-code) — со скиллами, слэш-командами и MCP-инструментами.**
-Ставится одной командой `npx`. Без бэкенда и хостинга — всё исполняет Claude Code. В комплекте адаптер под **GPT Codex**.
+**Команда специализированных AI-субагентов для [Claude Code](https://claude.com/claude-code), [GPT Codex](https://developers.openai.com/codex/cli/) и [Cursor](https://cursor.com/) — со скиллами, командами и MCP-инструментами.**
+Ставится одной командой `npx`. Без бэкенда и хостинга — всё исполняет твой coding agent локально.
 
 🌐 [English version](./README.md)
 
@@ -13,13 +13,13 @@
 
 ## Что это
 
-Agent-Vorcl-Flow превращает Claude Code в **структурированную инженерную команду**. Вместо одного универсального ассистента ты получаешь **18 узкопрофильных субагентов** (архитектор, бэкенд, фронтенд, инженер БД, аудитор кода, тест-инженер и другие) — у каждого свои доменные **скиллы**, быстрые **слэш-команды** и нужные ему **MCP-инструменты**. Любая нетривиальная задача идёт через дисциплинированный цикл **Task Master** — *цель → задачи → реализация → проверка → готово* — работа спланирована, отслеживается и переживает прерывания.
+Agent-Vorcl-Flow превращает поддерживаемый coding agent в **структурированную инженерную команду**. Вместо одного универсального ассистента ты получаешь **18 узкопрофильных субагентов** (архитектор, бэкенд, фронтенд, инженер БД, аудитор кода, тест-инженер и другие) — у каждого свои доменные **скиллы**, быстрые **слэш-команды** и нужные ему **MCP-инструменты**. Любая нетривиальная задача идёт через дисциплинированный цикл **Task Master** — *цель → задачи → реализация → проверка → готово* — работа спланирована, отслеживается и переживает прерывания.
 
-- 🧩 **18 субагентов**, 38 скиллов, 99 слэш-команд
-- ⚡ **Установка одной командой** в Claude Code и/или Codex — `npx`
+- 🧩 **19 субагентов**, 39 скиллов, 114 слэш-команд
+- ⚡ **Установка одной командой** в Claude Code, Codex и/или Cursor — `npx`
 - 🔌 **11 MCP-серверов** из коробки (GitHub, Postgres, MongoDB, Redis, Docker, Firecrawl, Vercel, Render, filesystem, Task Master, Mermaid)
 - 🔑 **Свои ключи** через переменные окружения — плагин ничего не хостит
-- 🤝 **Работает в Claude Code и GPT Codex** из одного исходника
+- 🤝 **Работает в Claude Code, GPT Codex и Cursor** из одного исходника
 
 ---
 
@@ -27,12 +27,12 @@ Agent-Vorcl-Flow превращает Claude Code в **структуриров�
 
 ### Требования
 - **Node.js ≥ 18**
-- **[Claude Code](https://claude.com/claude-code)** и/или **[GPT Codex](https://developers.openai.com/codex/cli/)** CLI установлен и доступен в `PATH`
+- **[Claude Code](https://claude.com/claude-code)**, **[GPT Codex](https://developers.openai.com/codex/cli/)** и/или **[Cursor](https://cursor.com/)**
 
 ### Установка (одна команда)
 
 ```bash
-# Ставит в Claude Code И/ИЛИ Codex — в то, что найдёт в PATH:
+# Ставит адаптеры для Claude Code, Codex и Cursor:
 npx github:Vitammiin/agent-vorcl-flow
 ```
 
@@ -41,6 +41,7 @@ npx github:Vitammiin/agent-vorcl-flow
 ```bash
 npx github:Vitammiin/agent-vorcl-flow --claude   # только Claude Code
 npx github:Vitammiin/agent-vorcl-flow --codex    # только GPT Codex
+npx github:Vitammiin/agent-vorcl-flow --cursor   # только Cursor
 ```
 
 Что делает инсталлер:
@@ -49,6 +50,7 @@ npx github:Vitammiin/agent-vorcl-flow --codex    # только GPT Codex
 | --- | --- |
 | **Claude Code** | Регистрирует репозиторий как **marketplace** плагинов и включает плагин (через `claude plugin …`, фолбэк — прямая запись в `~/.claude/settings.json`). |
 | **GPT Codex** | Вмёрживает скиллы в `~/.agents/skills`, а блоки `config.toml` + `AGENTS.md` — в `~/.codex` (идемпотентно, между маркерами). |
+| **Cursor** | Устанавливает скиллы в `~/.cursor/skills`, нативных субагентов в `~/.cursor/agents` и добавляет отсутствующие серверы в `~/.cursor/mcp.json`. |
 
 > Инсталлер не трогает секреты — ключи задаёшь сам через env (см. [MCP и секреты](#mcp-и-секреты)).
 
@@ -69,7 +71,7 @@ claude --plugin-dir /путь/к/agent-vorcl-flow
 
 ## Как пользоваться
 
-Есть **три способа** позвать команду. Выбирай любой.
+Примеры в этом разделе используют синтаксис Claude Code; нативный синтаксис смотри ниже в разделах [Cursor](#cursor) и [GPT Codex](#gpt-codex). В Claude Code есть **три способа** позвать команду.
 
 ### 1. Универсальная точка входа — просто сформулируй цель
 ```text
@@ -113,11 +115,12 @@ claude --plugin-dir /путь/к/agent-vorcl-flow
 | 🟣 **frontend** | Frontend (React 19 / Next.js App Router) | Компоненты, состояние, data-fetching, оптимизация рендера/бандла, тесты |
 | 🟠 **analyzer** | Аудитор кода (read-only) | Баги, типобезопасность, структура БД, моки на фронте, «плохой» код на бэке |
 | 🟡 **swagger** | Покрытие OpenAPI/Swagger (любой стек) | Находит недокументированные роуты и покрывает их, с проверкой |
-| 🔴 **firecrawl** | Веб-исследователь | Поиск, скрейп, карта сайта, обход, структурированное извлечение — LLM-ready |
+| 🔴 **firecrawl** | Веб-исследователь | Live CLI/MCP/REST, интеграция в приложения и готовые web-workflows |
 | 🟤 **render** | Хостинг и деплой (Render) | Деплои, диагностика по логам, метрики, env-переменные, Render Postgres |
 | 🟦 **database** | Инженер БД / DBA | Схема, запросы и планы, индексы, N+1, безопасные обратимые миграции, кэш |
 | ⚪ **resilience** | Надёжность: ошибки + логи | try/catch на нужных границах, типизированные ошибки, ретраи/таймауты, структурные логи |
 | 🖼️ **screenshot** | Скриншот UI → код | Превращает скриншот интерфейса в production-ready, адаптивный, доступный код |
+| 🔎 **visual-research** | Скриншот → проверенный ответ | Определяет сайт/страницу, находит официальную документацию, проверяет live data и отвечает с URL и уверенностью |
 | 🎯 **pinpoint** | Скриншот → место в существующем проекте (read-only) | Привязывает скриншот работающего приложения к реальному коду — компонент, `file:line`, маршрут/страница, конкретный контрол и логика за ним; ничего не создаёт, правку делегирует |
 | 📊 **drawio** | Диаграммы (draw.io / diagrams.net) | Flowchart, BPMN, UML, ERD, network/cloud и PMP/PMBOK (WBS, Gantt, RACI…) |
 | 🧜 **mermaid** | Mermaid-диаграммы (+ реальный рендер) | flowchart, sequence, class, state, ER, gantt, gitGraph, mindmap…; валидация через mcp-mermaid/`mmdc`; отдаёт готовый файл (`.mmd` + SVG/PNG/PDF) |
@@ -132,6 +135,7 @@ claude --plugin-dir /путь/к/agent-vorcl-flow
 - **Мутации `database` — только с явным подтверждением.** Аналитика read-only; изменения схемы/данных (DDL/DML/миграции) без твоего «да» не выполняются. Миграции — безопасные и обратимые (expand → backfill → contract).
 - **`resilience` ставит защитный хук.** Неблокирующий `PostToolUse`-хук (`catch-guard.js`) мягко подсвечивает пустые `catch {}` в только что отредактированных файлах.
 - **`pinpoint` находит, а не создаёт.** По скриншоту работающего приложения строит карту «скриншот → исходники» — компонент, маршрут, конкретный контрол и логика за ним — и передаёт правку `frontend`/`backend`. Работает с тем, что уже есть (обратная задача к `screenshot`). В мультиязычном проекте помнит: текст на экране — **значение перевода**, в коде лежит **ключ** (`t('...')`), — и грепает по обоим.
+- **`visual-research` проверяет, а не угадывает.** Считает скриншот доказательством, подтверждает официальный домен и документацию, сверяет текущие данные сайта и предупреждает о phishing или устаревших значениях.
 - **`render` помнит про инфраструктурные детали.** Доступ к БД по IP-allowlist (outbound-IP сервиса → allowlist базы; для Render Postgres — internal URL), диагностика по логам до первопричины.
 - **Диаграммы — как файлы-артефакты.** `mermaid` проверяет каждую диаграмму реальным рендером и отдаёт `.mmd` + SVG/PNG/PDF в твоём каталоге; `drawio` отдаёт валидный XML — открывается в app.diagrams.net.
 - **Скилл `i18n` — «ноль языкового хардкода».** Агенты сначала определяют, мультиязычен ли проект, и адаптируются — пользовательские строки идут через слой перевода (next-intl / react-i18next / i18next), не инлайном.
@@ -200,6 +204,18 @@ claude --plugin-dir /путь/к/agent-vorcl-flow
 | `/firecrawl:map <url>` | Карта URL сайта. |
 | `/firecrawl:crawl <url>` | Рекурсивный обход раздела/сайта. |
 | `/firecrawl:extract <url>` | Структурированное извлечение по JSON-схеме. |
+| `/firecrawl:setup` | Установка/проверка CLI и официальных build/workflow skills (с подтверждением). |
+| `/firecrawl:interact <url>` | Клики, навигация и формы, когда scrape недостаточно. |
+| `/firecrawl:parse <файл>` | Парсинг локального/непубличного документа в markdown/JSON. |
+| `/firecrawl:monitor <действие>` | Просмотр checks и управление мониторингом изменений. |
+| `/firecrawl:agent <цель>` | Ограниченная по стоимости длительная задача Firecrawl Agent. |
+| `/firecrawl:research <запрос>` | Поиск научных работ и GitHub-контекста. |
+| `/firecrawl:ask <jobId>` | Диагностика упавшего Firecrawl job. |
+| `/firecrawl:docs-search <вопрос>` | Поиск по актуальной официальной документации Firecrawl. |
+| `/firecrawl:integrate <функция>` | Интеграция Firecrawl в приложение через upstream build skills. |
+| `/firecrawl:deliverable <артефакт>` | Создание brief, аудита, lead list или другого workflow-артефакта. |
+
+`/firecrawl:setup` запускает официальный `firecrawl-cli init --all` только после подтверждения. Уже установленные официальные `firecrawl-*` скиллы имеют приоритет и сохраняются установщиком Codex/Cursor; AVF добавляет совместимые fallback-скиллы. Live-операции идут по маршруту CLI → MCP → REST/keyless.
 
 ### 🟤 render — хостинг / деплой (Render)
 | Команда | Что делает |
@@ -236,6 +252,15 @@ claude --plugin-dir /путь/к/agent-vorcl-flow
 | `/screenshot:convert <изображение> [фреймворк]` | Полный запускаемый код по скриншоту (по умолчанию React + Tailwind v4). |
 | `/screenshot:tokens <изображение>` | Извлечь дизайн-токены (цвета OKLCH, типографика, spacing) в Tailwind `@theme`. |
 | `/screenshot:responsive <цель>` | Довести сгенерированный UI до адаптивности — брейкпоинты, fluid, `clamp()`, container queries. |
+
+### 🔎 visual-research — скриншот → проверенный веб-ответ
+| Команда | Что делает |
+| --- | --- |
+| `/visual-research:vorcl <цель>` | Многошаговое исследование скриншотов через Task Master. |
+| `/visual-research:identify <изображение>` | Определить сайт, страницу и функцию с оценкой уверенности. |
+| `/visual-research:search <изображение> <цель>` | Найти реальную страницу или официальную документацию по визуальным признакам. |
+| `/visual-research:answer <изображение> <вопрос>` | Ответить по скриншоту, official docs и актуальным live data. |
+| `/visual-research:hints <изображение> <цель>` | Дать безопасные шаги по интерфейсу, подтверждённые документацией. |
 
 ### 🎯 pinpoint — скриншот → место в существующем проекте (read-only)
 | Команда | Что делает |
@@ -322,7 +347,7 @@ claude --plugin-dir /путь/к/agent-vorcl-flow
 
 ## MCP и секреты
 
-Плагин **ничего не хостит** — своего бэкенда и базы у него нет. MCP-серверам нужны токены, и каждый пользователь задаёт **свои** через переменные окружения: `.mcp.json` подставляет их формой `${VAR:-}`, а Claude Code берёт значения из окружения, в котором запущен.
+Пакет **ничего не хостит** — своего бэкенда и базы у него нет. MCP-серверам нужны токены, и каждый пользователь задаёт **свои** через переменные окружения. Claude Code использует `${VAR:-}` в `.mcp.json`, Cursor — `${env:VAR}` в `~/.cursor/mcp.json`.
 
 > ⚠️ **Обязательный ключ для ядра:** `ANTHROPIC_API_KEY`. Без него MCP-сервер Task Master (цель → задачи: `parse_prd`, `add_task`, `expand_task`) молча не работает — агенты останутся, но `/vorcl` не сможет превращать цели в отслеживаемые задачи.
 
@@ -353,6 +378,10 @@ claude plugin validate . --strict      # валидация манифеста �
 /plugin details agent-vorcl-flow       # список подхваченных агентов/скиллов/команд
 @agent-vorcl-flow:architect            # субагент появляется в typeahead
 /architect:analyze биллинг для SaaS    # запуск слэш-команды
+
+# Cursor: после установки открой новое окно Agent
+/vorcl добавить корзину в checkout
+/backend-create-api POST /invoices
 ```
 
 ---
@@ -381,18 +410,34 @@ codex --profile analyzer     # роль с повышенным reasoning effort
 
 ---
 
+## Cursor
+
+Cursor использует тот же открытый формат `SKILL.md`, что и Codex-адаптер, а также нативных custom subagents и глобальную MCP-конфигурацию:
+
+| Концепция Agent-Vorcl-Flow | Эквивалент в Cursor |
+| --- | --- |
+| роль `backend` | custom subagent `/avf-backend` в `~/.cursor/agents` |
+| задача `/backend:create-api` | скилл `/backend-create-api` |
+| универсальная команда `/vorcl` | скилл `/vorcl` |
+| `.mcp.json` | серверы в `~/.cursor/mcp.json` |
+
+Инсталлер преобразует определения ролей во frontmatter Cursor, добавляет субагентам префикс `avf-`, чтобы не конфликтовать со скиллами, ставит `model: inherit` и помечает агентов-аудиторов как `readonly: true`. Существующие одноимённые MCP-серверы сохраняются. Подробнее — в [`cursor/README.md`](./cursor/README.md).
+
+---
+
 ## Структура проекта
 
 ```text
 .claude-plugin/plugin.json      # манифест плагина
 .claude-plugin/marketplace.json # локальный маркетплейс (для установки)
-agents/       18 определений субагентов (*.md)
-skills/       <скилл>/SKILL.md            (38 скиллов)
-commands/     <namespace>/<команда>.md    (99 команд, /namespace:команда) + /vorcl
+agents/       19 определений субагентов (*.md)
+skills/       <скилл>/SKILL.md            (39 скиллов)
+commands/     <namespace>/<команда>.md    (114 команд, /namespace:команда) + /vorcl
 hooks/        hooks.json + session-start.js + catch-guard.js (PostToolUse: пустые catch)
 .mcp.json     github, filesystem, postgres, mongodb, redis, docker, firecrawl, vercel, render, task-master, mermaid
 bin/          install.mjs                 (npx-инсталлер)
 codex/        адаптер под GPT Codex (skills + config.toml + install.sh)
+cursor/       адаптер под Cursor (MCP-шаблон + инструкция)
 ```
 
 **Как это связано:** `agents/*.md` объявляют роль и в frontmatter `skills:` подключают навыки → скиллы из `skills/*/SKILL.md` автоподхватываются по описанию → команды `commands/<агент>/*.md` дают быстрые `/агент:команда` и делегируют субагенту → `.mcp.json` даёт агентам инструменты. Хук `SessionStart` сообщает Claude о наличии агентов.

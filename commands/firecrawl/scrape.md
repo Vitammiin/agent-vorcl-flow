@@ -6,4 +6,4 @@ allowed-tools: Read, Write, Bash, Grep, Glob, WebFetch
 
 Скрейпни страницу: **$ARGUMENTS**.
 
-Через MCP `firecrawl` выполни `firecrawl_scrape` для указанного URL. По умолчанию `formats: ["markdown"]`, `onlyMainContent: true` (без шапок/меню/футеров). Если нужна структура — используй JSON-режим (`formats: [{ type: "json", prompt, schema }]`) с JSON Schema под запрошенные поля. Для ускорения повторных скрейпов держи `maxAge` (кэш); ставь `0`, если данные должны быть строго свежими. `enhanced` proxy — только если сайт с anti-bot. Верни чистый markdown или валидный JSON + URL-источник. Опирайся на навык `web-scraping`. Делегируй субагенту `firecrawl`.
+Следуй маршруту из `web-scraping`: CLI `firecrawl scrape` после проверки `--help` → MCP scrape → REST `/v2/scrape`/официальный keyless client. По умолчанию получи основной markdown; для структуры задай JSON Schema. Кэш отключай только при требовании свежести, enhanced proxy — лишь после обычной попытки. Сохрани результат в `.firecrawl/` и верни путь и URL.

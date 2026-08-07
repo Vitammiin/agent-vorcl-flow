@@ -1,15 +1,8 @@
 ---
 name: firecrawl-vorcl
-description: Точка входа в Task Master workflow для ресёрч-цели (роль firecrawl). Use when цель многошаговая — несколько источников/этапов/форм результата; разовый поиск → $firecrawl-search, одна страница → $firecrawl-scrape.
+description: Многошаговая Firecrawl-цель через обязательный Task Master workflow.
 ---
 
-# Задача: ресёрч-цель через workflow (firecrawl)
+# Firecrawl workflow
 
-Возьми ресёрч-цель в работу через Task Master.
-
-1. Инициализация при необходимости (`task-master init`).
-2. Цель → задачи (`add_task`; крупное — PRD + `parse_prd`): что найти, какие источники/сайты, какая форма результата.
-3. `next_task` → `get_task`; собери данные дешёвым путём: `firecrawl_search`/`firecrawl_map` (разведка) → `firecrawl_scrape` точечно → `firecrawl_crawl` (с `limit`) / `firecrawl_extract` (structured). Ход — `update_subtask`.
-4. Проверь `testStrategy` (данные собраны, источники указаны, структура валидна) → `set_task_status --status=done`; повторяй.
-
-Каждый факт — с URL, ключевое сверяй по ≥2 источникам. Опирайся на `$web-scraping`, `$workflow`, `$task-master`. Веди как роль `$firecrawl`.
+Создай задачи через `$workflow` и `$task-master`, затем `next_task` → `get_task`. Собирай данные CLI → MCP → REST/keyless и дешёвым путём search/map → scrape → ограниченный crawl/extract. Фиксируй прогресс, сохраняй артефакты в `.firecrawl/`, проверяй testStrategy и только затем ставь done.

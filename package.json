@@ -1,7 +1,7 @@
 {
   "name": "agent-vorcl-flow",
   "version": "2.0.0",
-  "description": "Установщик: плагин Agent-Vorcl-Flow для Claude Code + адаптер для Codex (skills + MCP + AGENTS.md). Сам плагин ничего не хостит.",
+  "description": "Agent-Vorcl-Flow для Claude Code, GPT Codex и Cursor: роли, skills, команды и MCP. Ничего не хостит.",
   "bin": {
     "agent-vorcl-flow": "bin/install.mjs"
   },
@@ -15,12 +15,14 @@
     ".mcp.json",
     ".claude-plugin/",
     "codex/",
+    "cursor/",
     "README.md"
   ],
   "keywords": [
     "claude",
     "claude-code",
     "codex",
+    "cursor",
     "plugin",
     "agents",
     "subagents",

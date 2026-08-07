@@ -36,9 +36,9 @@
 - Профиль: `codex --profile swagger`
 
 ## firecrawl — Веб-исследователь (Firecrawl)
-Ищет, скрейпит, краулит и извлекает структурированные данные из веба (scrape/map/crawl/search/extract) в LLM-ready markdown/JSON, доказательно с цитированием URL. Дешёвый путь первым (`search`/`map` → `scrape` → `crawl` с limit); структура — по JSON-схеме.
+Работает в трёх режимах: live web data через CLI → MCP → REST/keyless, интеграция API через upstream `firecrawl-build*`, готовые артефакты через `firecrawl-workflows`. Все результаты доказательны и сохраняются в `.firecrawl/`.
 - Скиллы: `$web-scraping`, `$workflow`, `$task-master`
-- Задачи: `$firecrawl-vorcl`, `$firecrawl-search`, `$firecrawl-scrape`, `$firecrawl-map`, `$firecrawl-crawl`, `$firecrawl-extract`
+- Задачи: `$firecrawl-vorcl`, `$firecrawl-setup`, `$firecrawl-search`, `$firecrawl-scrape`, `$firecrawl-map`, `$firecrawl-crawl`, `$firecrawl-extract`, `$firecrawl-interact`, `$firecrawl-parse`, `$firecrawl-monitor`, `$firecrawl-agent`, `$firecrawl-research`, `$firecrawl-ask`, `$firecrawl-docs-search`, `$firecrawl-integrate`, `$firecrawl-deliverable`
 - Профиль: `codex --profile firecrawl`
 
 ## render — Инженер хостинга/деплоя на Render (через MCP)
@@ -64,6 +64,12 @@
 - Скиллы: `$screenshot-to-code`, `$tailwind`, `$react`, `$nextjs`, `$typescript`, `$frontend-architecture`, `$i18n`, `$workflow`, `$task-master`
 - Задачи: `$screenshot-vorcl`, `$screenshot-analyze`, `$screenshot-convert`, `$screenshot-tokens`, `$screenshot-responsive`
 - Профиль: `codex --profile screenshot`
+
+## visual-research — Аналитик скриншотов с веб-проверкой
+Определяет сайт, продукт, страницу и функцию по визуальным признакам, ищет официальную документацию и сверяет актуальные данные живого сайта через Firecrawl. Разделяет наблюдение на скриншоте, документацию, live data и вывод; указывает URL, время проверки и уровень уверенности. Проверяет phishing/typosquatting и не выполняет действия на сайте без подтверждения.
+- Скиллы: `$visual-evidence`, `$web-scraping`, `$workflow`, `$task-master`
+- Задачи: `$visual-research-vorcl`, `$visual-research-identify`, `$visual-research-search`, `$visual-research-answer`, `$visual-research-hints`
+- Профиль: `codex --profile visual-research`
 
 ## pinpoint — Скриншот → место в существующем проекте (read-only)
 Привязывает скриншот работающего интерфейса к УЖЕ существующему коду проекта: находит компонент и `file:line`, определяет маршрут/страницу (Next.js App/Pages Router, React Router), вычисляет конкретный контрол (кнопку/поле) и его обработчик, прослеживает логику (состояние/стор → data-fetch → API). Сначала решает «существующий проект или новый» (новый → `$screenshot-convert`). Ничего не создаёт и не правит — отдаёт карту «скриншот → исходники» и делегирует правку `$frontend`/`$backend`. Обратная задача к `$screenshot-to-code`; доменный скилл — `$ui-source-mapping`.

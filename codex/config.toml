@@ -91,6 +91,9 @@ model_reasoning_effort = "medium"
 [profiles.screenshot]
 model_reasoning_effort = "medium"
 
+[profiles.visual-research]
+model_reasoning_effort = "high"
+
 [profiles.pinpoint]
 model_reasoning_effort = "high"
 

@@ -1,10 +1,8 @@
 ---
 name: firecrawl-search
-description: Веб-поиск источников по вопросу через Firecrawl (роль firecrawl). Use when URL неизвестен и нужно найти источники по вопросу; известная страница → $firecrawl-scrape, обход сайта → $firecrawl-crawl.
+description: Веб-поиск источников через Firecrawl, когда URL неизвестен.
 ---
 
-# Задача: веб-поиск (firecrawl)
+# Firecrawl search
 
-Найди в вебе источники по запросу пользователя.
-
-Через MCP `firecrawl` выполни `firecrawl_search` (источники web/news/images, `limit`). Если сниппетов мало — включи скрейп результатов (`scrapeOptions.formats: ["markdown"]`, `onlyMainContent`). Отбери релевантные источники, кратко резюмируй и **укажи URL** каждого; ключевые факты сверяй по ≥2 источникам. После поиска — `firecrawl_search_feedback` с ID запроса (рефанд кредита). Опирайся на `$web-scraping`.
+Следуй `$web-scraping`: CLI search после `--help` → MCP → REST `/v2/search`. При слабых сниппетах скрейпни выбранные результаты. Сохрани отчёт в `.firecrawl/`, процитируй URL и сверь ключевые факты по двум источникам.

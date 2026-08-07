@@ -1,62 +1,35 @@
 ---
 name: web-scraping
-description: Веб-скрапинг, краулинг, поиск и извлечение структурированных данных через Firecrawl (MCP firecrawl-mcp) — превращает веб в LLM-ready markdown/JSON. Инструменты scrape/map/crawl/search/extract, когда какой, ключевые параметры, экономия кредитов, structured extract по JSON-схеме. Use для веб-ресёрча, сбора данных с сайтов, мониторинга контента.
-version: 1.0.0
+description: Маршрутизирует веб-поиск, scrape, map, crawl, extract, interact, parse, monitor, research и support через Firecrawl CLI, MCP или REST. Use для live web data, интеграции Firecrawl в приложение и повторяемых deliverables с URL-источниками.
 ---
 
-# Навык: Web scraping / research (Firecrawl)
+# Firecrawl router
 
-Firecrawl превращает веб в **LLM-ready** markdown или структурированный JSON. Через MCP-сервер `firecrawl-mcp` (ключ `FIRECRAWL_API_KEY=fc-...`) доступны инструменты: `firecrawl_scrape`, `firecrawl_map`, `firecrawl_crawl` (+ `firecrawl_check_crawl_status`), `firecrawl_search`, `firecrawl_extract`.
+Выбери один режим:
 
-## Когда какой инструмент
-- **search** — URL неизвестен: веб-поиск (источники web/news/images), опционально сразу скрейпит результаты. Точка входа ресёрча.
-- **scrape** — знаешь **один** URL → markdown (`onlyMainContent`), html, links или JSON по схеме. Синхронно, дёшево.
-- **map** — быстро получить **все** URL сайта (карта ссылок). Очень дёшево. Делай **перед** crawl, чтобы выбрать нужные страницы.
-- **crawl** — рекурсивно обойти сайт/раздел (много страниц). Асинхронно → опрашивай `firecrawl_check_crawl_status`. Всегда ограничивай `limit`.
-- **extract** — структурированные данные с одной/нескольких страниц или домена по `prompt` + JSON `schema`; `enableWebSearch`, `showSources`.
+1. **Live web work** — данные нужны агенту сейчас. Предпочитай установленный и авторизованный CLI; иначе MCP; затем REST/keyless fallback.
+2. **App integration** — Firecrawl должен работать в продукте. Передай задачу upstream-скиллам `firecrawl-build*` через `$firecrawl-integrate`.
+3. **Deliverable** — нужен готовый аудит, brief, lead list, knowledge base или другой артефакт. Передай задачу `firecrawl-workflows` через `$firecrawl-deliverable`.
 
-Правило выбора: одна известная страница со структурой → `scrape` в JSON-режиме (синхронно, дёшево), а не `extract`. Не знаешь, что где → `search`/`map` сначала.
+## Live routing
 
-## Ключевые параметры scrape
-- `formats`: `["markdown"]` (дефолт-выбор), `["links"]`, `["html"]`, либо JSON: `{ type: "json", prompt, schema }`.
-- `onlyMainContent: true` (дефолт) — выкидывает шапки/меню/футеры/сайдбары.
-- `maxAge` (дефолт ~2 дня, мс) — кэш: отдаёт свежую копию, ускоряет скрейп до ×5. Ставь `0`, если нужны строго свежие данные.
-- `includeTags`/`excludeTags` — сузить до нужных селекторов.
-- `timeout`, `blockAds` (дефолт true), `proxy` (`basic`/`enhanced`/`auto`), `parsers: ["pdf"]`.
+- Проверь `command -v firecrawl` и `firecrawl --status`. Перед использованием команды проверь её наличие через `firecrawl <command> --help`; не выдумывай синтаксис.
+- URL неизвестен: `search`; известен один URL: `scrape`; список URL: `map`; раздел/сайт: `crawl` с `limit`; браузерные действия: `interact`; локальный документ: `parse`; периодическая проверка: `monitor`; длительное исследование: `agent`/`research`.
+- Если CLI отсутствует или команда не поддерживается, используй эквивалентный MCP-инструмент. Если и его нет — REST v2 с `FIRECRAWL_API_KEY`; keyless разрешён только для официально поддерживаемых операций.
+- Для `ask` и `docs-search` сначала проверь CLI. При отсутствии используй MCP или `/v2/support/ask` и `/v2/support/docs-search` по актуальной документации.
+- Сохраняй результаты в `.firecrawl/`; у каждого факта оставляй URL. Не печатай ключи, cookies, токены и PII.
 
-## Экономия кредитов и практики
-- `map` дёшев — используй для разведки перед дорогим `crawl`.
-- `maxAge`-кэш вместо повторных скрейпов одного URL.
-- `onlyMainContent` + точечные `includeTags` — меньше мусора, дешевле обработка LLM.
-- `crawl` всегда с `limit`; `enhanced` proxy — до 5 кредитов, включай только когда `basic` не берёт (anti-bot).
-- PDF — 1 кредит/страница (`parsers: ["pdf"]`).
-- После `search` вызывай `firecrawl_search_feedback` с ID запроса — это рефандит 1 кредит и улучшает качество.
+## Стоимость и безопасность
 
-## Структурированное извлечение (schema)
-JSON-режим `scrape` (одна страница) или `extract` (несколько/домен) — задай `prompt` + JSON Schema:
-```json
-{
-  "url": "https://example.com/product",
-  "formats": [{
-    "type": "json",
-    "prompt": "Extract the product info",
-    "schema": {
-      "type": "object",
-      "properties": { "name": {"type":"string"}, "price": {"type":"number"} },
-      "required": ["name", "price"]
-    }
-  }]
-}
-```
-`extract` дополнительно: `enableWebSearch: true` (дообогащение из поиска), `showSources: true` (вернуть URL-источники).
+- Дешёвый путь: `search`/`map` → точечный `scrape` → ограниченный `crawl`.
+- Перед crawl всего сайта или `limit > 50`, запуском платного agent без лимита, созданием/изменением/удалением monitor и необратимым действием interact получи явное подтверждение.
+- Для agent/research задай предел кредита/стоимости и критерий остановки.
+- При ошибке сохраняй реальный `jobId`, статус и параметры; затем используй support/ask. Не подменяй ошибку догадкой.
 
-## Ресёрч-поток
-1. `search` по вопросу → отбери релевантные источники.
-2. `scrape`/`extract` нужных страниц (structured, если нужна форма).
-3. Для целого сайта: `map` → выбери страницы → `crawl`/`scrape` только их.
-4. Синтез с **цитированием URL** каждого утверждения; факты сверяй по ≥2 источникам.
+## Structured output
 
-## Осторожно
-- Уважай `robots.txt`, ToS сайта и правовые ограничения; не собирай персональные/чувствительные данные без основания.
-- Помечай источник (URL) каждого факта; не выдавай скрейп за проверенную истину.
-- Большие `crawl` — дорого и медленно: сначала `map` + `limit`, затем точечно.
+Для JSON задай `prompt` и JSON Schema. Одна страница — structured scrape; несколько URL/домен — extract. Проверь JSON по схеме и приложи source URLs.
+
+## Setup
+
+Установка и browser auth меняют окружение, поэтому выполняй их только после подтверждения пользователя: `npx -y firecrawl-cli@latest init --all --browser`. Затем проверь `firecrawl --status` и сделай smoke scrape в `.firecrawl/install-check.md`. Никогда не сохраняй ключ из чата без отдельного согласия.

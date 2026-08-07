@@ -2,14 +2,15 @@
 
 # Agent-Vorcl-Flow
 
-**A team of specialized AI sub-agents for [Claude Code](https://claude.com/claude-code) — with skills, slash commands, and MCP tools.**
-One `npx` command installs them. No backend, no hosting — Claude Code runs everything. A **GPT Codex** adapter is included too.
+**A team of specialized AI sub-agents for [Claude Code](https://claude.com/claude-code), [GPT Codex](https://developers.openai.com/codex/cli/), and [Cursor](https://cursor.com/) — with skills, commands, and MCP tools.**
+One `npx` command installs them. No backend and no hosting: your coding agent runs everything locally.
 
 ![Claude Code](https://img.shields.io/badge/Claude%20Code-plugin-6C5CE7)
 ![GPT Codex](https://img.shields.io/badge/GPT%20Codex-adapter-1abc9c)
+![Cursor](https://img.shields.io/badge/Cursor-native%20adapter-111111)
 ![Node](https://img.shields.io/badge/node-%E2%89%A518-339933?logo=node.js&logoColor=white)
 ![Agents](https://img.shields.io/badge/agents-18-blue)
-![Commands](https://img.shields.io/badge/commands-99-blue)
+![Commands](https://img.shields.io/badge/commands-114-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
 🌐 [Русская версия](./README.ru.md)
@@ -20,13 +21,13 @@ One `npx` command installs them. No backend, no hosting — Claude Code runs eve
 
 ## What is this?
 
-Agent-Vorcl-Flow turns Claude Code into a **structured engineering team**. Instead of one general assistant, you get **18 focused sub-agents** (architect, backend, frontend, DB engineer, code auditor, test engineer, and more), each with its own domain **skills**, quick **slash commands**, and the **MCP tools** it needs. Every non-trivial task runs through a disciplined **Task Master** loop — *goal → tasks → implement → verify → done* — so work is planned, tracked, and survives interruptions.
+Agent-Vorcl-Flow turns a supported coding agent into a **structured engineering team**. Instead of one general assistant, you get **18 focused sub-agents** (architect, backend, frontend, DB engineer, code auditor, test engineer, and more), each with its own domain **skills**, quick **slash commands**, and the **MCP tools** it needs. Every non-trivial task runs through a disciplined **Task Master** loop — *goal → tasks → implement → verify → done* — so work is planned, tracked, and survives interruptions.
 
-- 🧩 **18 sub-agents**, 38 skills, 99 slash commands
-- ⚡ **One-command install** for Claude Code and/or Codex — `npx`
+- 🧩 **19 sub-agents**, 39 skills, 114 slash commands
+- ⚡ **One-command install** for Claude Code, Codex, and/or Cursor — `npx`
 - 🔌 **11 MCP servers** wired in (GitHub, Postgres, MongoDB, Redis, Docker, Firecrawl, Vercel, Render, filesystem, Task Master, Mermaid)
 - 🔑 **Bring your own keys** via environment variables — the plugin hosts nothing
-- 🤝 **Runs on Claude Code and GPT Codex** from the same source
+- 🤝 **Runs on Claude Code, GPT Codex, and Cursor** from the same source
 
 ---
 
@@ -34,12 +35,12 @@ Agent-Vorcl-Flow turns Claude Code into a **structured engineering team**. Inste
 
 ### Requirements
 - **Node.js ≥ 18**
-- **[Claude Code](https://claude.com/claude-code)** and/or **[GPT Codex](https://developers.openai.com/codex/cli/)** CLI installed and on your `PATH`
+- **[Claude Code](https://claude.com/claude-code)**, **[GPT Codex](https://developers.openai.com/codex/cli/)**, and/or **[Cursor](https://cursor.com/)**
 
 ### Install (one command)
 
 ```bash
-# Installs into Claude Code AND/OR Codex — whichever is found on your PATH:
+# Installs adapters for Claude Code, Codex, and Cursor:
 npx github:Vitammiin/agent-vorcl-flow
 ```
 
@@ -48,6 +49,7 @@ Target a single runtime with a flag:
 ```bash
 npx github:Vitammiin/agent-vorcl-flow --claude   # Claude Code only
 npx github:Vitammiin/agent-vorcl-flow --codex    # GPT Codex only
+npx github:Vitammiin/agent-vorcl-flow --cursor   # Cursor only
 ```
 
 What the installer does:
@@ -56,6 +58,7 @@ What the installer does:
 | --- | --- |
 | **Claude Code** | Registers this repo as a plugin **marketplace** and enables the plugin (via `claude plugin …`, with a direct `~/.claude/settings.json` fallback). |
 | **GPT Codex** | Merges the skills into `~/.agents/skills` and the `config.toml` + `AGENTS.md` blocks into `~/.codex` (idempotent, between markers). |
+| **Cursor** | Installs skills into `~/.cursor/skills`, native custom subagents into `~/.cursor/agents`, and merges missing servers into `~/.cursor/mcp.json`. |
 
 > The installer never touches your secrets — you set your own keys via env (see [Configuration](#configuration-mcp--keys)).
 
@@ -76,7 +79,7 @@ After install, **restart Claude Code** (or run `/reload-plugins` in an open sess
 
 ## How to use
 
-There are **three ways** to invoke the team. Pick whichever fits.
+The examples in this section use Claude Code syntax; see the [Cursor](#cursor) and [GPT Codex](#gpt-codex) mappings below for their native syntax. In Claude Code there are **three ways** to invoke the team.
 
 ### 1. Universal entry point — just state a goal
 ```text
@@ -120,11 +123,12 @@ This keeps work planned, checkpointed, and resumable — nothing is declared "do
 | 🟣 **frontend** | Frontend (React 19 / Next.js App Router) | Components, state, data-fetching, render/bundle optimization, tests |
 | 🟠 **analyzer** | Code auditor (read-only) | Bugs, type safety, DB structure, frontend mocks, backend smells |
 | 🟡 **swagger** | OpenAPI/Swagger coverage (any stack) | Finds routes not fully documented and covers them, with verification |
-| 🔴 **firecrawl** | Web researcher | Search, scrape, map, crawl, structured extraction — LLM-ready output |
+| 🔴 **firecrawl** | Web researcher | Live CLI/MCP/REST, app integration and finished web-data workflows |
 | 🟤 **render** | Hosting & deploy (Render) | Deploys, log-driven diagnostics, metrics, env vars, Render Postgres |
 | 🟦 **database** | DB engineer / DBA | Schema, queries & plans, indexes, N+1, safe reversible migrations, cache |
 | ⚪ **resilience** | Reliability: errors + logging | try/catch at the right boundaries, typed errors, retries/timeouts, structured logs |
 | 🖼️ **screenshot** | Screenshot UI → code | Turns a UI screenshot into production-ready, responsive, accessible code |
+| 🔎 **visual-research** | Screenshot → verified answer | Identifies the site/page, finds official docs, checks live data and answers with URLs and confidence |
 | 🎯 **pinpoint** | Screenshot → place in an existing project (read-only) | Grounds a running-app screenshot in the real codebase — component, `file:line`, route/page, the exact control, and the logic behind it; creates nothing, delegates the edit |
 | 📊 **drawio** | Diagrams (draw.io / diagrams.net) | Flowchart, BPMN, UML, ERD, network/cloud, and PMP/PMBOK (WBS, Gantt, RACI…) |
 | 🧜 **mermaid** | Mermaid diagrams (+ real render) | flowchart, sequence, class, state, ER, gantt, gitGraph, mindmap…; validated via mcp-mermaid/`mmdc`; hands you the file (`.mmd` + SVG/PNG/PDF) |
@@ -139,6 +143,7 @@ This keeps work planned, checkpointed, and resumable — nothing is declared "do
 - **`database` mutations require explicit confirmation.** Analytics are read-only; schema/data changes (DDL/DML/migrations) never run without your go-ahead.
 - **`resilience` ships a safety hook.** A non-blocking `PostToolUse` hook (`catch-guard.js`) gently flags empty `catch {}` blocks in files you just edited.
 - **`pinpoint` finds, never creates.** Given a screenshot of a running app, it maps the screen to the real code — component, route, the exact control and the logic behind it — and hands the edit to `frontend`/`backend`. It works on what already exists (the inverse of `screenshot`).
+- **`visual-research` verifies instead of guessing.** It treats a screenshot as evidence, confirms the official domain and docs, checks current site data, and flags possible phishing or stale values.
 - **`i18n` enforces "zero language hardcoding."** Agents first detect whether a project is multilingual and adapt — user-facing strings go through a translation layer (next-intl / react-i18next / i18next), never inline.
 
 ---
@@ -205,6 +210,18 @@ Every command below is a slash command. `<…>` marks your input.
 | `/firecrawl:map <url>` | Map a site's URLs. |
 | `/firecrawl:crawl <url>` | Recursively crawl a section/site. |
 | `/firecrawl:extract <url>` | Structured extraction by a JSON schema. |
+| `/firecrawl:setup` | Install/verify CLI plus official build and workflow skills (with confirmation). |
+| `/firecrawl:interact <url>` | Click, navigate or fill forms when scraping is insufficient. |
+| `/firecrawl:parse <file>` | Parse a local/private document into markdown or JSON. |
+| `/firecrawl:monitor <action>` | List checks or manage recurring page-change monitors. |
+| `/firecrawl:agent <goal>` | Run a bounded long-running Firecrawl Agent task. |
+| `/firecrawl:research <query>` | Search papers and GitHub research context. |
+| `/firecrawl:ask <jobId>` | Diagnose a failed Firecrawl job. |
+| `/firecrawl:docs-search <question>` | Search current official Firecrawl documentation. |
+| `/firecrawl:integrate <feature>` | Add Firecrawl to application code via upstream build skills. |
+| `/firecrawl:deliverable <artifact>` | Produce a brief, audit, lead list or other workflow artifact. |
+
+`/firecrawl:setup` runs the official `firecrawl-cli init --all` flow only after confirmation. Existing official `firecrawl-*` skills take precedence and are preserved by the Codex/Cursor installer; AVF supplies compatible fallbacks for missing skills. Live operations route through CLI → MCP → REST/keyless.
 
 ### 🟤 render — hosting / deploy (Render)
 | Command | What it does |
@@ -241,6 +258,15 @@ Every command below is a slash command. `<…>` marks your input.
 | `/screenshot:convert <image> [framework]` | Generate full runnable code from a screenshot (default React + Tailwind v4). |
 | `/screenshot:tokens <image>` | Extract design tokens (OKLCH colors, typography, spacing) into Tailwind `@theme`. |
 | `/screenshot:responsive <target>` | Make the generated UI responsive — breakpoints, fluid, `clamp()`, container queries. |
+
+### 🔎 visual-research — screenshot → verified web answer
+| Command | What it does |
+| --- | --- |
+| `/visual-research:vorcl <goal>` | Multi-step screenshot research through Task Master. |
+| `/visual-research:identify <image>` | Identify the site, page and feature with confidence evidence. |
+| `/visual-research:search <image> <target>` | Find the real page or official documentation from visual clues. |
+| `/visual-research:answer <image> <question>` | Answer using screenshot evidence, official docs and current live data. |
+| `/visual-research:hints <image> <goal>` | Give safe, documentation-backed steps for the visible interface. |
 
 ### 🎯 pinpoint — screenshot → place in an existing project (read-only)
 | Command | What it does |
@@ -327,7 +353,7 @@ Every command below is a slash command. `<…>` marks your input.
 
 ## Configuration (MCP & keys)
 
-The plugin **hosts nothing** — it has no backend or database of its own. Its MCP servers just need tokens, and **each user provides their own via environment variables**. `.mcp.json` reads them with the `${VAR:-}` form, and Claude Code takes the values from the environment it was launched in.
+The package **hosts nothing** — it has no backend or database of its own. Its MCP servers just need tokens, and **each user provides their own via environment variables**. Claude Code uses `${VAR:-}` in `.mcp.json`; Cursor uses `${env:VAR}` in `~/.cursor/mcp.json`.
 
 > ⚠️ **Required for the core loop:** `ANTHROPIC_API_KEY`. The Task Master MCP server (goal → tasks, `parse_prd`, `add_task`, `expand_task`) silently does nothing without it — agents will still work, but `/vorcl` won't be able to turn goals into tracked tasks.
 
@@ -358,6 +384,10 @@ claude plugin validate . --strict      # validate the manifest and components
 /plugin details agent-vorcl-flow       # list the loaded agents / skills / commands
 @agent-vorcl-flow:architect            # the sub-agent appears in the typeahead
 /architect:analyze billing for a SaaS  # run a slash command
+
+# Cursor: open a new Agent window after installation
+/vorcl add a shopping cart to checkout
+/backend-create-api POST /invoices
 ```
 
 ---
@@ -386,18 +416,34 @@ See [`codex/README.md`](./codex/README.md) for the full mapping.
 
 ---
 
+## Cursor
+
+Cursor uses the same open `SKILL.md` format as the Codex adapter, plus native custom subagents and global MCP configuration:
+
+| Agent-Vorcl-Flow concept | Cursor equivalent |
+| --- | --- |
+| role `backend` | custom subagent `/avf-backend` in `~/.cursor/agents` |
+| task command `/backend:create-api` | skill `/backend-create-api` |
+| universal `/vorcl` | skill `/vorcl` |
+| `.mcp.json` | merged servers in `~/.cursor/mcp.json` |
+
+The installer converts role definitions to Cursor frontmatter, prefixes subagents with `avf-` to avoid skill-name collisions, uses `model: inherit`, and marks audit-only agents as `readonly: true`. Existing MCP server entries with the same names are preserved. See [`cursor/README.md`](./cursor/README.md).
+
+---
+
 ## Project structure
 
 ```text
 .claude-plugin/plugin.json      # plugin manifest
 .claude-plugin/marketplace.json # local marketplace (for install)
-agents/       18 sub-agent definitions (*.md)
-skills/       <skill>/SKILL.md            (38 skills)
-commands/     <namespace>/<command>.md    (99 commands, /namespace:command) + /vorcl
+agents/       19 sub-agent definitions (*.md)
+skills/       <skill>/SKILL.md            (39 skills)
+commands/     <namespace>/<command>.md    (114 commands, /namespace:command) + /vorcl
 hooks/        hooks.json + session-start.js + catch-guard.js (PostToolUse: empty catch)
 .mcp.json     github, filesystem, postgres, mongodb, redis, docker, firecrawl, vercel, render, task-master, mermaid
 bin/          install.mjs                 (the npx installer)
 codex/        GPT Codex adapter (skills + config.toml + install.sh)
+cursor/       Cursor adapter (MCP template + installation notes)
 ```
 
 **How it fits together:** `agents/*.md` declare a role and, in front-matter `skills:`, attach skills → skills in `skills/*/SKILL.md` are auto-loaded by description → `commands/<agent>/*.md` provide quick `/agent:command` shortcuts that delegate to the sub-agent → `.mcp.json` gives agents their tools. A `SessionStart` hook tells Claude the agents are available.
