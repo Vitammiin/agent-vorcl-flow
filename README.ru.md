@@ -3,7 +3,7 @@
 # Agent-Vorcl-Flow
 
 **Команда специализированных AI-субагентов для [Claude Code](https://claude.com/claude-code), [GPT Codex](https://developers.openai.com/codex/cli/) и [Cursor](https://cursor.com/) — со скиллами, командами и MCP-инструментами.**
-Ставится одной командой `npx`. Без бэкенда и хостинга — всё исполняет твой coding agent локально.
+Ставится одной командой `npx`. Без удалённого бэкенда и облачного хостинга — всё исполняется локально.
 
 🌐 [English version](./README.md)
 
@@ -13,12 +13,12 @@
 
 ## Что это
 
-Agent-Vorcl-Flow превращает поддерживаемый coding agent в **структурированную инженерную команду**. Вместо одного универсального ассистента ты получаешь **18 узкопрофильных субагентов** (архитектор, бэкенд, фронтенд, инженер БД, аудитор кода, тест-инженер и другие) — у каждого свои доменные **скиллы**, быстрые **слэш-команды** и нужные ему **MCP-инструменты**. Любая нетривиальная задача идёт через дисциплинированный цикл **Task Master** — *цель → задачи → реализация → проверка → готово* — работа спланирована, отслеживается и переживает прерывания.
+Agent-Vorcl-Flow превращает поддерживаемый coding agent в **структурированную инженерную команду**. Вместо одного универсального ассистента ты получаешь **20 узкопрофильных субагентов** (архитектор, бэкенд, фронтенд, инженер БД, оператор liveboard и другие) — у каждого свои доменные **скиллы**, быстрые **слэш-команды** и нужные ему **MCP-инструменты**. Любая нетривиальная задача идёт через дисциплинированный цикл **Task Master** — *цель → задачи → реализация → проверка → готово* — работа спланирована, отслеживается и переживает прерывания.
 
-- 🧩 **19 субагентов**, 39 скиллов, 114 слэш-команд
+- 🧩 **20 субагентов**, 40 скиллов, 118 слэш-команд
 - ⚡ **Установка одной командой** в Claude Code, Codex и/или Cursor — `npx`
 - 🔌 **11 MCP-серверов** из коробки (GitHub, Postgres, MongoDB, Redis, Docker, Firecrawl, Vercel, Render, filesystem, Task Master, Mermaid)
-- 🔑 **Свои ключи** через переменные окружения — плагин ничего не хостит
+- 🔑 **Свои ключи** через переменные окружения — удалённого сервиса AVF нет; liveboard локальный и эфемерный
 - 🤝 **Работает в Claude Code, GPT Codex и Cursor** из одного исходника
 
 ---
@@ -129,6 +129,7 @@ claude --plugin-dir /путь/к/agent-vorcl-flow
 | 🛡️ **security** | Аудитор безопасности (read-only) | Секреты в дереве и git-истории, OWASP Top 10, CVE зависимостей, PII; находки становятся задачами — фиксы делегируются |
 | 📝 **docs** | Инженер документации | README (паритет языков), API-доки из OpenAPI, ARCHITECTURE, CONTRIBUTING, release notes; каждый пример сверен с кодом |
 | 🐳 **devops** | Контейнеры и CI/CD | Multistage Dockerfile, docker-compose для локалки, GitHub Actions, гигиена env/секретов, мониторинг |
+| 📡 **liveboard** | Локальное операционное табло | Worktree, процессы агентов и задачи Task Master в реальном времени на эфемерном localhost-сервере |
 
 **Что стоит знать:**
 - **Фронт всегда ходит в реальный API.** Источник истины — OpenAPI-спека бэка; типы генерируются из неё (`openapi-typescript` + `openapi-fetch`). Моков в прод-пути нет.
@@ -343,18 +344,43 @@ claude --plugin-dir /путь/к/agent-vorcl-flow
 | `/devops:env` | Инвентаризация env-переменных: где читаются, что обязательно, шаблон `.env.example`; секреты никогда в образах. |
 | `/devops:monitoring` | Структурные логи (pino/JSON), health-эндпоинт, что алертить; метрики Render — через агента `render`. |
 
+### 📡 liveboard — эфемерное локальное табло
+| Команда | Что делает |
+| --- | --- |
+| `/liveboard:start [путь] [--port N] [--interval ms]` | Запускает красивое табло на 43 языках на свободном localhost-порту; изменения Task Master идут через SSE, полный перескан — раз в 5 минут. |
+| `/liveboard:vorcl <цель>` | Развивает или изменяет сам liveboard через обязательный Task Master workflow. |
+
+Liveboard читает Git worktree, локальные процессы Claude/Codex/Cursor и `.taskmaster/tasks/tasks.json` каждого worktree. Runtime-состояние живёт только в памяти и исчезает после остановки foreground-процесса. UI определяет язык браузера и поддерживает 43 локали, включая English, Русский, Українська, Deutsch, Français, Español, Português, Italiano, Polski, Türkçe, 中文, 日本語, العربية, Nederlands, Čeština, Slovenčina, Română, Magyar, Български, Српски, Hrvatski, Slovenščina, Ελληνικά, עברית, فارسی, हिन्दी, বাংলা, اردو, Bahasa Indonesia, Bahasa Melayu, Tiếng Việt, ไทย, 한국어, Svenska, Norsk, Dansk, Suomi, Eesti, Latviešu, Lietuvių, ქართული, Հայերեն и Azərbaycanca. Для Arabic, Hebrew, Persian и Urdu включается RTL.
+
+Прямая настройка:
+
+```bash
+node skills/liveboard/scripts/server.mjs \
+  --root /path/to/project \
+  --host 127.0.0.1 \
+  --port 0 \
+  --interval 300000
+```
+
+- `--root` — проект, в котором сканируются Git worktree и файлы Task Master.
+- `--port 0` — автоматический выбор свободного порта.
+- `--interval` — период полного перескана в миллисекундах; изменения Task Master всё равно приходят сразу через file watcher.
+- Endpoints: `/health`, `/api/snapshot`, `/api/events` (SSE), `POST /api/refresh`.
+- Оставляй `--host 127.0.0.1`, если явно не собираешься открывать сведения о проекте в локальную сеть.
+
 ---
 
 ## MCP и секреты
 
-Пакет **ничего не хостит** — своего бэкенда и базы у него нет. MCP-серверам нужны токены, и каждый пользователь задаёт **свои** через переменные окружения. Claude Code использует `${VAR:-}` в `.mcp.json`, Cursor — `${env:VAR}` в `~/.cursor/mcp.json`.
+У пакета нет **удалённого бэкенда или базы**. Опциональный liveboard — localhost-only процесс с состоянием в памяти. MCP-серверам нужны токены, и каждый пользователь задаёт **свои** через переменные окружения. Claude Code использует `${VAR:-}` в `.mcp.json`, Cursor — `${env:VAR}` в `~/.cursor/mcp.json`.
 
-> ⚠️ **Обязательный ключ для ядра:** `ANTHROPIC_API_KEY`. Без него MCP-сервер Task Master (цель → задачи: `parse_prd`, `add_task`, `expand_task`) молча не работает — агенты останутся, но `/vorcl` не сможет превращать цели в отслеживаемые задачи.
+> ⚠️ **Для AI-команд Task Master нужен хотя бы один выбранный провайдер:** `ANTHROPIC_API_KEY` для Claude, `OPENAI_API_KEY` для GPT или OAuth Codex CLI. Без авторизации для модели из `.taskmaster/config.json` команда `/vorcl` не сможет генерировать и расширять задачи.
 
 Экспортируй те, что реально используешь (например, в `~/.zshrc`):
 
 ```bash
-export ANTHROPIC_API_KEY=…     # ОБЯЗАТЕЛЬНО: Task Master (parse_prd / expand)
+export ANTHROPIC_API_KEY=…     # main-провайдер Task Master: Claude
+export OPENAI_API_KEY=…        # альтернативный main-провайдер Task Master (GPT)
 export FIRECRAWL_API_KEY=…     # веб-ресёрч firecrawl
 export GITHUB_TOKEN=…          # github MCP
 export PERPLEXITY_API_KEY=…    # опционально: research-режим Task Master
@@ -364,6 +390,16 @@ export POSTGRES_URL=…          # postgres://user:pass@host:5432/db
 export MONGODB_URI=…           # mongodb://user:pass@host:27017/db
 export REDIS_URL=…             # redis://host:6379
 ```
+
+Отдельно выбери, какой провайдер Task Master реально выполняет генерацию — само наличие ключа модель не переключает:
+
+```bash
+/task-master:provider anthropic <model-id>   # Claude через ANTHROPIC_API_KEY
+/task-master:provider openai <model-id>      # GPT через OPENAI_API_KEY
+/task-master:provider codex-cli <model-id>   # ChatGPT OAuth через `codex login`
+```
+
+Команда использует официальный `task-master models` и сохраняет в `.taskmaster/config.json` только выбор модели. `PERPLEXITY_API_KEY` опционален и нужен лишь тогда, когда Perplexity выбран как research-модель.
 
 Незаданный ключ — соответствующий MCP-сервер просто молчит, остальное работает.
 
@@ -430,9 +466,9 @@ Cursor использует тот же открытый формат `SKILL.md`
 ```text
 .claude-plugin/plugin.json      # манифест плагина
 .claude-plugin/marketplace.json # локальный маркетплейс (для установки)
-agents/       19 определений субагентов (*.md)
-skills/       <скилл>/SKILL.md            (39 скиллов)
-commands/     <namespace>/<команда>.md    (114 команд, /namespace:команда) + /vorcl
+agents/       20 определений субагентов (*.md)
+skills/       <скилл>/SKILL.md            (40 скиллов; liveboard содержит in-memory сервер и HTML)
+commands/     <namespace>/<команда>.md    (118 команд, /namespace:команда, включая /vorcl)
 hooks/        hooks.json + session-start.js + catch-guard.js (PostToolUse: пустые catch)
 .mcp.json     github, filesystem, postgres, mongodb, redis, docker, firecrawl, vercel, render, task-master, mermaid
 bin/          install.mjs                 (npx-инсталлер)

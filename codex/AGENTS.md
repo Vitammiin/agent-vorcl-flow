@@ -1,6 +1,6 @@
 # Agent-Vorcl-Flow — роли для Codex
 
-Восемнадцать специализированных ролей. Выбирай подходящую и опирайся на её навыки-скиллы (вызов через `$имя`).
+Двадцать специализированных ролей. Выбирай подходящую и опирайся на её навыки-скиллы (вызов через `$имя`).
 
 ## Workflow (обязательно, для всех ролей)
 Любая нетривиальная задача идёт через **Task Master** (`$workflow` + `$task-master`): цель → задачи (`parse_prd`/`add_task`) → `next_task` → `get_task` → `expand_task` → реализация → проверка `testStrategy` → `set_task_status done`. Единая точка входа — `$vorcl`; у каждой роли есть свой `$<role>-vorcl`.
@@ -118,6 +118,12 @@ Dockerfile (multistage, slim-база, `npm ci --omit=dev`, non-root, HEALTHCHEC
 - Скиллы: `$docker`, `$ci-cd`, `$nodejs`, `$render`, `$backend-architecture`, `$workflow`, `$task-master`
 - Задачи: `$devops-vorcl`, `$devops-dockerfile`, `$devops-compose`, `$devops-ci`, `$devops-env`, `$devops-monitoring`
 - Профиль: `codex --profile devops`
+
+## liveboard — Оператор локального live-табло
+Показывает в реальном времени Git worktree, активные процессы Claude/Codex/Cursor и задачи Task Master на красивой эфемерной HTML-странице с 43 языками и RTL для Arabic, Hebrew, Persian и Urdu. Автоматически выбирает свободный localhost-порт, обновляет данные через SSE и полный перескан раз в 5 минут; runtime существует только в памяти.
+- Скиллы: `$liveboard`, `$workflow`, `$task-master`
+- Задачи: `$liveboard-start`, `$liveboard-vorcl`
+- Профиль: `codex --profile liveboard`
 
 ## MCP
 Серверы: github, filesystem, postgres, mongodb, redis, docker, firecrawl, vercel, render, task-master, mermaid (см. config.toml).

@@ -9,9 +9,9 @@ Task Master (`task-master-ai`) — управление задачами раз�
 
 ## Инициализация
 ```
-task-master init            # создаёт .taskmaster/, tasks.json, .taskmaster/docs/prd.txt, .taskmasterconfig
+task-master init            # создаёт .taskmaster/, tasks/tasks.json, docs/prd.txt, config.json
 ```
-PRD кладётся в `.taskmaster/docs/prd.txt`; задачи — в `.taskmaster/tasks.json`; конфиг моделей — `.taskmasterconfig`.
+PRD кладётся в `.taskmaster/docs/prd.txt`; задачи — в `.taskmaster/tasks/tasks.json`; конфиг моделей — `.taskmaster/config.json`.
 
 ## MCP-инструменты
 | Инструмент | Назначение |
@@ -25,6 +25,7 @@ PRD кладётся в `.taskmaster/docs/prd.txt`; задачи — в `.taskma
 | `update_subtask` | Дописать заметки/прогресс в подзадачу |
 | `add_task` | Добавить точечную задачу (ИИ-ассист) |
 | `analyze_project_complexity` | Оценить сложность (1–10) и рекомендации по разбиению |
+| `models` | Посмотреть/выбрать main, research и fallback модель |
 
 ## CLI-эквиваленты
 | CLI | Эквивалент |
@@ -39,11 +40,15 @@ PRD кладётся в `.taskmaster/docs/prd.txt`; задачи — в `.taskma
 | `task-master update-subtask --id=<id> --prompt="<лог>"` | `update_subtask` |
 | `task-master analyze-complexity` | `analyze_project_complexity` |
 | `task-master add-task` | `add_task` |
+| `task-master models [--setup]` | показать/интерактивно выбрать модели |
+| `task-master models --set-main=<model-id>` | выбрать OpenAI/Anthropic main по известному model ID |
+| `task-master models --set-main=<model-id> --codex-cli` | выбрать Codex CLI через OAuth |
 
 ## Статусы задач
 `pending → in-progress → done`; дополнительно `deferred`, `cancelled`, `review`.
 
 ## Дисциплина и конфигурация
 - Дисциплину цикла (роли Orchestrator/Executor/Checker, канонический порядок, когда можно пропустить, запреты) задаёт скилл **workflow** — этот скилл только справочник инструментов.
-- `--research` (Perplexity) даёт актуальные практики при `expand`, если задан `PERPLEXITY_API_KEY`.
-- Ключи задаются через userConfig плагина (`anthropic_api_key`, опц. `perplexity_api_key`); при их отсутствии Task Master пытается использовать авторизацию среды.
+- Ключи: `ANTHROPIC_API_KEY` для Claude, `OPENAI_API_KEY` для GPT; `PERPLEXITY_API_KEY` нужен только при выборе Perplexity как research-модели. Хранить их в env/MCP, не в `.taskmaster/config.json`.
+- Выбор `main`/`research`/`fallback` хранится в `.taskmaster/config.json` и меняется через `task-master models` или MCP `models`. Быстрая команда плагина — `/task-master:provider`.
+- Codex CLI можно выбрать через `--codex-cli` и OAuth (`codex login`) без API-ключа.

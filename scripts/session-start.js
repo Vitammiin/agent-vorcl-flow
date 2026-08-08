@@ -22,7 +22,9 @@ const note = [
   "- security (аудит безопасности, read-only): /security:vorcl, /security:secrets, /security:owasp, /security:deps, /security:pii, /security:pre-push",
   "- docs (документация: README, API-docs, архитектура): /docs:vorcl, /docs:readme, /docs:api, /docs:architecture, /docs:contributing, /docs:release-notes, /docs:audit",
   "- devops (Docker + CI/CD): /devops:vorcl, /devops:dockerfile, /devops:compose, /devops:ci, /devops:env, /devops:monitoring",
+  "- liveboard (эфемерное live-табло на 43 языках): /liveboard:start, /liveboard:vorcl",
   "Правило: любая нетривиальная задача идёт через Task Master (скиллы workflow + task-master). Единая точка входа — /vorcl <цель>; у каждого агента есть свой /<agent>:vorcl.",
+  "Провайдер Task Master: /task-master:provider <openai|anthropic|codex-cli> [model-id]. Ключи берутся только из окружения.",
 ].join("\n");
 
 process.stdout.write(

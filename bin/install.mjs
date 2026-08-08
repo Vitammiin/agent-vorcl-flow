@@ -68,6 +68,14 @@ function copySkillsPreservingUpstream(srcSkills, skillsDir) {
   return { copied, preserved }
 }
 
+// Liveboard carries its dependency-free runtime beside the canonical skill.
+// Codex/Cursor mirrors keep prompts; installation overlays the executable assets.
+function installLiveboardRuntime(skillsDir) {
+  const source = path.join(PKG_ROOT, 'skills', 'liveboard')
+  if (!fs.existsSync(source)) return
+  fs.cpSync(source, path.join(skillsDir, 'liveboard'), { recursive: true })
+}
+
 // ---------- Claude Code ----------
 function installClaude() {
   log('\n▸ Claude Code')
@@ -126,6 +134,7 @@ function installCodex() {
     return
   }
   const copied = copySkillsPreservingUpstream(srcSkills, skillsDir)
+  installLiveboardRuntime(skillsDir)
   ok(`скиллы → ${skillsDir} (${copied.copied} скопировано${copied.preserved ? `, ${copied.preserved} upstream Firecrawl сохранено` : ''})`)
 
   fs.mkdirSync(codexHome, { recursive: true })
@@ -159,6 +168,7 @@ function installCursor() {
 
   const skillsDir = path.join(cursorHome, 'skills')
   const copied = copySkillsPreservingUpstream(srcSkills, skillsDir)
+  installLiveboardRuntime(skillsDir)
   ok(`скиллы → ${skillsDir} (${copied.copied} скопировано${copied.preserved ? `, ${copied.preserved} upstream Firecrawl сохранено` : ''})`)
 
   const agentsDir = path.join(cursorHome, 'agents')
@@ -233,8 +243,10 @@ function banner() {
   const skills = readCount(() => fs.readdirSync(path.join(PKG_ROOT, 'skills'), { withFileTypes: true }).filter((d) => d.isDirectory()).length)
   const commands = readCount(() => {
     const root = path.join(PKG_ROOT, 'commands')
-    return fs.readdirSync(root, { withFileTypes: true }).filter((d) => d.isDirectory())
-      .reduce((n, d) => n + fs.readdirSync(path.join(root, d.name)).filter((f) => f.endsWith('.md')).length, 0)
+    const entries = fs.readdirSync(root, { withFileTypes: true })
+    const topLevel = entries.filter((entry) => entry.isFile() && entry.name.endsWith('.md')).length
+    return topLevel + entries.filter((entry) => entry.isDirectory())
+      .reduce((n, entry) => n + fs.readdirSync(path.join(root, entry.name)).filter((f) => f.endsWith('.md')).length, 0)
   })
   const stats = agents ? `${agents} агентов · ${skills} скиллов · ${commands} команд` : ''
   const useColor = !process.env.NO_COLOR && process.env.TERM !== 'dumb' && (process.stdout.isTTY || process.env.FORCE_COLOR)
@@ -283,8 +295,11 @@ if (all || wantClaude) runStep('Claude Code', installClaude)
 if (all || wantCodex) runStep('Codex', installCodex)
 if (all || wantCursor) runStep('Cursor', installCursor)
 
-log('\n▸ Ключи (каждый задаёт свои через окружение — плагин ничего не хостит):')
-log('    export ANTHROPIC_API_KEY=…    # task-master')
+log('\n▸ Ключи (каждый задаёт свои через окружение — удалённых сервисов AVF нет):')
+log('    export ANTHROPIC_API_KEY=…    # Task Master: Claude (выбери один main provider)')
+log('    export OPENAI_API_KEY=…       # Task Master: GPT (альтернатива Claude)')
+log('    export PERPLEXITY_API_KEY=…   # Task Master: только optional research')
+log('    task-master models --setup    # выбрать main / research / fallback')
 log('    export FIRECRAWL_API_KEY=…    # firecrawl')
 log('    export GITHUB_TOKEN=…         # github')
 log('    # агент database: POSTGRES_URL / MONGODB_URI / REDIS_URL — подключение к БД твоего проекта')

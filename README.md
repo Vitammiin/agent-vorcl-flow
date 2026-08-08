@@ -3,14 +3,14 @@
 # Agent-Vorcl-Flow
 
 **A team of specialized AI sub-agents for [Claude Code](https://claude.com/claude-code), [GPT Codex](https://developers.openai.com/codex/cli/), and [Cursor](https://cursor.com/) — with skills, commands, and MCP tools.**
-One `npx` command installs them. No backend and no hosting: your coding agent runs everything locally.
+One `npx` command installs them. No remote backend or cloud hosting: your coding agent runs everything locally.
 
 ![Claude Code](https://img.shields.io/badge/Claude%20Code-plugin-6C5CE7)
 ![GPT Codex](https://img.shields.io/badge/GPT%20Codex-adapter-1abc9c)
 ![Cursor](https://img.shields.io/badge/Cursor-native%20adapter-111111)
 ![Node](https://img.shields.io/badge/node-%E2%89%A518-339933?logo=node.js&logoColor=white)
-![Agents](https://img.shields.io/badge/agents-18-blue)
-![Commands](https://img.shields.io/badge/commands-114-blue)
+![Agents](https://img.shields.io/badge/agents-20-blue)
+![Commands](https://img.shields.io/badge/commands-118-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
 🌐 [Русская версия](./README.ru.md)
@@ -21,12 +21,12 @@ One `npx` command installs them. No backend and no hosting: your coding agent ru
 
 ## What is this?
 
-Agent-Vorcl-Flow turns a supported coding agent into a **structured engineering team**. Instead of one general assistant, you get **18 focused sub-agents** (architect, backend, frontend, DB engineer, code auditor, test engineer, and more), each with its own domain **skills**, quick **slash commands**, and the **MCP tools** it needs. Every non-trivial task runs through a disciplined **Task Master** loop — *goal → tasks → implement → verify → done* — so work is planned, tracked, and survives interruptions.
+Agent-Vorcl-Flow turns a supported coding agent into a **structured engineering team**. Instead of one general assistant, you get **20 focused sub-agents** (architect, backend, frontend, DB engineer, liveboard operator, and more), each with its own domain **skills**, quick **slash commands**, and the **MCP tools** it needs. Every non-trivial task runs through a disciplined **Task Master** loop — *goal → tasks → implement → verify → done* — so work is planned, tracked, and survives interruptions.
 
-- 🧩 **19 sub-agents**, 39 skills, 114 slash commands
+- 🧩 **20 sub-agents**, 40 skills, 118 slash commands
 - ⚡ **One-command install** for Claude Code, Codex, and/or Cursor — `npx`
 - 🔌 **11 MCP servers** wired in (GitHub, Postgres, MongoDB, Redis, Docker, Firecrawl, Vercel, Render, filesystem, Task Master, Mermaid)
-- 🔑 **Bring your own keys** via environment variables — the plugin hosts nothing
+- 🔑 **Bring your own keys** via environment variables — no remote AVF service; liveboard is localhost-only and ephemeral
 - 🤝 **Runs on Claude Code, GPT Codex, and Cursor** from the same source
 
 ---
@@ -137,6 +137,7 @@ This keeps work planned, checkpointed, and resumable — nothing is declared "do
 | 🛡️ **security** | Security auditor (read-only) | Secrets in tree & git history, OWASP Top 10, dependency CVEs, PII; findings become tasks — fixes are delegated |
 | 📝 **docs** | Documentation engineer | README (multi-language parity), API docs from OpenAPI, ARCHITECTURE, CONTRIBUTING, release notes; every example verified against the code |
 | 🐳 **devops** | Containers & CI/CD | Multistage Dockerfiles, docker-compose for local dev, GitHub Actions pipelines, env/secrets hygiene, monitoring |
+| 📡 **liveboard** | Local operations board | Live Git worktrees, agent processes and Task Master tasks on an ephemeral localhost dashboard |
 
 **A few things worth knowing:**
 - **Frontend always talks to a real API.** The backend's OpenAPI spec is the single source of truth; types are generated from it (`openapi-typescript` + `openapi-fetch`). No mocks in the production path.
@@ -349,18 +350,43 @@ Every command below is a slash command. `<…>` marks your input.
 | `/devops:env` | Env-variable inventory: where read, what's required, `.env.example` template; secrets never in images. |
 | `/devops:monitoring` | Structured logs (pino/JSON), health endpoint, what to alert on; Render metrics via the `render` agent. |
 
+### 📡 liveboard — ephemeral local operations board
+| Command | What it does |
+| --- | --- |
+| `/liveboard:start [path] [--port N] [--interval ms]` | Start a polished 43-language dashboard on a free localhost port; Task Master changes stream through SSE and reconcile every 5 minutes. |
+| `/liveboard:vorcl <goal>` | Develop or change liveboard itself through the required Task Master workflow. |
+
+Liveboard reads Git worktrees, local Claude/Codex/Cursor processes and each worktree's `.taskmaster/tasks/tasks.json`. Runtime state stays in memory and disappears when the foreground process stops. The UI detects the browser language and offers 43 locales, including English, Russian, Ukrainian, German, French, Spanish, Portuguese, Italian, Polish, Turkish, Chinese, Japanese, Arabic, Dutch, Czech, Slovak, Romanian, Hungarian, Bulgarian, Serbian, Croatian, Slovenian, Greek, Hebrew, Persian, Hindi, Bengali, Urdu, Indonesian, Malay, Vietnamese, Thai, Korean, Swedish, Norwegian, Danish, Finnish, Estonian, Latvian, Lithuanian, Georgian, Armenian, and Azerbaijani. Arabic, Hebrew, Persian, and Urdu use RTL layout.
+
+Direct configuration:
+
+```bash
+node skills/liveboard/scripts/server.mjs \
+  --root /path/to/project \
+  --host 127.0.0.1 \
+  --port 0 \
+  --interval 300000
+```
+
+- `--root`: project whose Git worktrees and Task Master files are scanned.
+- `--port 0`: automatically select a free port.
+- `--interval`: full reconciliation interval in milliseconds; file watching still streams Task Master changes immediately.
+- Endpoints: `/health`, `/api/snapshot`, `/api/events` (SSE), and `POST /api/refresh`.
+- Keep `--host 127.0.0.1` unless you explicitly intend to expose project information to the network.
+
 ---
 
 ## Configuration (MCP & keys)
 
-The package **hosts nothing** — it has no backend or database of its own. Its MCP servers just need tokens, and **each user provides their own via environment variables**. Claude Code uses `${VAR:-}` in `.mcp.json`; Cursor uses `${env:VAR}` in `~/.cursor/mcp.json`.
+The package has **no remote backend or database**. The optional liveboard is a localhost-only in-memory process. MCP servers need tokens, and **each user provides their own via environment variables**. Claude Code uses `${VAR:-}` in `.mcp.json`; Cursor uses `${env:VAR}` in `~/.cursor/mcp.json`.
 
-> ⚠️ **Required for the core loop:** `ANTHROPIC_API_KEY`. The Task Master MCP server (goal → tasks, `parse_prd`, `add_task`, `expand_task`) silently does nothing without it — agents will still work, but `/vorcl` won't be able to turn goals into tracked tasks.
+> ⚠️ **Required for AI-powered Task Master commands:** configure at least one selected provider — `ANTHROPIC_API_KEY` for Claude, `OPENAI_API_KEY` for GPT, or Codex CLI OAuth. Without credentials for the model selected in `.taskmaster/config.json`, `/vorcl` cannot generate or expand tasks.
 
 Export the ones you actually use (for example in `~/.zshrc`):
 
 ```bash
-export ANTHROPIC_API_KEY=…     # REQUIRED: Task Master (parse_prd / expand)
+export ANTHROPIC_API_KEY=…     # Task Master main provider: Claude
+export OPENAI_API_KEY=…        # alternative Task Master main provider (GPT)
 export FIRECRAWL_API_KEY=…     # firecrawl web research
 export GITHUB_TOKEN=…          # github MCP
 export PERPLEXITY_API_KEY=…    # optional: Task Master research mode
@@ -370,6 +396,16 @@ export POSTGRES_URL=…          # postgres://user:pass@host:5432/db
 export MONGODB_URI=…           # mongodb://user:pass@host:27017/db
 export REDIS_URL=…             # redis://host:6379
 ```
+
+Choose which Task Master provider actually runs generation; keys alone do not select the model:
+
+```bash
+/task-master:provider anthropic <model-id>   # Claude via ANTHROPIC_API_KEY
+/task-master:provider openai <model-id>      # GPT via OPENAI_API_KEY
+/task-master:provider codex-cli <model-id>   # ChatGPT OAuth via `codex login`
+```
+
+The command uses the official `task-master models` flow and stores only model selection in `.taskmaster/config.json`. `PERPLEXITY_API_KEY` is optional and only needed when Perplexity is selected as the research model.
 
 An unset key simply means that MCP server stays quiet — everything else keeps working.
 
@@ -436,9 +472,9 @@ The installer converts role definitions to Cursor frontmatter, prefixes subagent
 ```text
 .claude-plugin/plugin.json      # plugin manifest
 .claude-plugin/marketplace.json # local marketplace (for install)
-agents/       19 sub-agent definitions (*.md)
-skills/       <skill>/SKILL.md            (39 skills)
-commands/     <namespace>/<command>.md    (114 commands, /namespace:command) + /vorcl
+agents/       20 sub-agent definitions (*.md)
+skills/       <skill>/SKILL.md            (40 skills; liveboard includes its in-memory server + HTML asset)
+commands/     <namespace>/<command>.md    (118 commands, /namespace:command, including /vorcl)
 hooks/        hooks.json + session-start.js + catch-guard.js (PostToolUse: empty catch)
 .mcp.json     github, filesystem, postgres, mongodb, redis, docker, firecrawl, vercel, render, task-master, mermaid
 bin/          install.mjs                 (the npx installer)

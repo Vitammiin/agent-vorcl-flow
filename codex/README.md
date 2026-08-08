@@ -7,12 +7,12 @@
 codex/
 ├── skills/<name>/SKILL.md   # навыки Codex (.agents/skills): персоны ролей + доменные + задачи
 ├── config.toml              # MCP-серверы [mcp_servers.*] + профили ролей [profiles.*]
-├── AGENTS.md                # роутинг ролей (architect, backend, frontend, analyzer, swagger, firecrawl, render, database, resilience, screenshot, pinpoint, drawio, mermaid, testing, gitflow, security, docs, devops)
+├── AGENTS.md                # роутинг ролей (architect, backend, frontend, analyzer, swagger, firecrawl, render, database, resilience, screenshot, pinpoint, drawio, mermaid, testing, gitflow, security, docs, devops, liveboard)
 └── scripts/install.sh       # установка в ~/.agents/skills и ~/.codex
 ```
 
 ## Роли
-`$architect` · `$backend` · `$frontend` · `$analyzer` · `$swagger` · `$firecrawl` · `$render` · `$database` · `$resilience` · `$screenshot` · `$pinpoint` · `$drawio` · `$mermaid` · `$testing` · `$gitflow` · `$security` · `$docs` · `$devops`. Все работают через Task Master (`$workflow` + `$task-master`); единая точка входа — `$vorcl`, у каждой роли свой `$<role>-vorcl`. У `render` и `database` персона и доменный скилл совпадают — это `$render` и `$database`; у `resilience` доменный скилл — `$error-handling`, у `screenshot` — `$screenshot-to-code`, у `pinpoint` — `$ui-source-mapping`, у `drawio` — `$drawio-diagrams` + `$pmp-diagrams`, у `mermaid` — `$mermaid-diagrams` + `$mermaid-rendering`, у `testing` — `$testing-strategy` + `$e2e-playwright`, у `gitflow` — `$git-workflow`, у `security` — `$security-audit` + `$secrets-detection`, у `docs` — `$technical-writing`, у `devops` — `$docker` + `$ci-cd`. Кросс-сквозной скилл `$i18n` (интернационализация, запрет языкового хардкода) подключён у `$frontend`, `$backend`, `$screenshot`, `$pinpoint`, `$resilience`, `$architect` и `$analyzer`.
+`$architect` · `$backend` · `$frontend` · `$analyzer` · `$swagger` · `$firecrawl` · `$render` · `$database` · `$resilience` · `$screenshot` · `$pinpoint` · `$drawio` · `$mermaid` · `$testing` · `$gitflow` · `$security` · `$docs` · `$devops` · `$liveboard`. Все работают через Task Master (`$workflow` + `$task-master`); единая точка входа — `$vorcl`, у каждой роли свой `$<role>-vorcl`. `$liveboard-start` запускает локальное in-memory табло worktree/агентов/задач на свободном порту. У `render` и `database` персона и доменный скилл совпадают; остальные доменные маршруты перечислены в `AGENTS.md`.
 
 ## Маппинг Claude Code → Codex
 | Claude Code | Codex |

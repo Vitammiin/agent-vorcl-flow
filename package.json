@@ -1,7 +1,7 @@
 {
   "name": "agent-vorcl-flow",
   "version": "2.1.0",
-  "description": "Agent-Vorcl-Flow для Claude Code, GPT Codex и Cursor: роли, skills, команды и MCP. Ничего не хостит.",
+  "description": "Agent-Vorcl-Flow для Claude Code, GPT Codex и Cursor: роли, skills, команды, MCP и эфемерное локальное live-табло.",
   "bin": {
     "agent-vorcl-flow": "bin/install.mjs"
   },

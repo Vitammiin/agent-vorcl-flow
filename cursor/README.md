@@ -3,7 +3,7 @@
 Инсталлер использует нативные механизмы Cursor:
 
 - `~/.cursor/skills/<name>/SKILL.md` — все доменные и task-скиллы; доступны автоматически и через `/name`.
-- `~/.cursor/agents/avf-<name>.md` — 19 custom subagents с `model: inherit`; read-only роли получают `readonly: true`. Префикс `avf-` не даёт именам конфликтовать со скиллами-персонами.
+- `~/.cursor/agents/avf-<name>.md` — 20 custom subagents с `model: inherit`; read-only роли получают `readonly: true`. Префикс `avf-` не даёт именам конфликтовать со скиллами-персонами.
 - `~/.cursor/mcp.json` — MCP-серверы. Существующие серверы пользователя не перезаписываются.
 
 ## Установка
