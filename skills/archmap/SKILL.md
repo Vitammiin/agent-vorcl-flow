@@ -59,6 +59,18 @@ Id детерминированы: `table:User`, `route:GET /api/users/:id`, `mo
 
 Контракт (валидирует `merge.mjs --check`): каждое `from`/`to` существует (иначе stub `inferred:true`); стабильная сортировка nodes/edges — повторный прогон байт-в-байт идентичен; циклы SCC помечаются `meta.cycle:true`.
 
+**Группы — верхний уровень карты.** Обзор из сотен одинаковых узлов нечитаем, поэтому `merge.mjs` дополнительно строит два массива (детали при этом никуда не деваются — UI разворачивает группу по клику):
+
+```jsonc
+"groups":     [{ "id":"grp:api:admin", "layer":"api", "label":"Admin API", "kind":"group",
+                 "members":["route:GET /api/admin/…"], "counts":{"route":95}, "size":95,
+                 "source":{…}, "inferred":false }],
+"groupEdges": [{ "id":"ge:grp:api:middleware->grp:api:admin", "from":…, "to":…,
+                 "kind":"guards", "count":97, "kinds":{"guards":97}, "inferred":false }]
+```
+
+Правила группировки: роуты — по домену пути (`/api/accounts/*` → Accounts API), таблицы и enum — по файлу схемы, модули — по каталогу, библиотеки — по `meta.category` (framework/database/ai/auth/payments/…), env — по префиксу имени (редкие префиксы сливаются в «Прочее»), MCP-серверы с тулами, middleware, cron и WS — каждое в свой блок. Поток между группами несёт самый частый вид связи и счётчик — на карте это подпись вида `guards ×97`.
+
 ## 3. LLM-аннотация (annotations.json)
 
 Файл той же формы `{nodes:[], edges:[]}`. Правила: добавляй только то, чего экстракторы не видят (семантические `dataflow`-рёбра, память агентов, назначение модулей); каждому элементу давай лучшее доказательство `source:{file,line}`; **merge сам проверит** — файл не существует или line вне диапазона → элемент принудительно `inferred:true`. Не дублируй существующие id — merge отдаст приоритет извлечённым данным.
@@ -67,7 +79,7 @@ Id детерминированы: `table:User`, `route:GET /api/users/:id`, `mo
 
 | Формат | Скрипт | Что внутри |
 |---|---|---|
-| `architecture.html` | `to-html.mjs` | Главный артефакт: self-contained, тёмная тема, SVG-колонки по слоям, тумблеры слоёв, чекбокс inferred, клик по узлу → панель file:line/колонки/params/рёбра, Trace up/down, поиск, pan/zoom/fit, print-CSS (Cmd+P → PDF) |
+| `architecture.html` | `to-html.mjs` | Главный артефакт: self-contained, тёмная тема. **Обзор** — крупные блоки групп с подписанными потоками (`guards ×97`), клик разворачивает группу в детали; **Детали** — полный граф. Тумблеры слоёв, чекбокс inferred, клик по узлу → панель file:line/колонки/params/рёбра, Trace up/down, поиск, pan/zoom/fit, print-CSS (Cmd+P → PDF) |
 | `architecture.drawio` | `to-drawio.mjs` | Многостраничный mxfile: Overview (слои-контейнеры) / Data ERD (shape=table, ER-стрелки по cardinality) / API / Agents; `--pages` выбирает подмножество; проверь `xmllint --noout` |
 | `architecture.mmd` | `to-mermaid.mjs` | `--view overview|data|api|modules|all`: flowchart LR с subgraph-слоями, erDiagram для данных; cap ~80 узлов с агрегацией; валидируй `/mermaid:validate` |
 | `ARCHITECTURE.md` | `to-md.mjs` | Обзор стеков + mermaid-блоки + таблицы роутов/таблиц/агентов/ENV со ссылками `file#L`; секция Inferred отдельно |

@@ -2,13 +2,14 @@
 // archmap extract-modules.mjs — фаза 1: граф модулей (logic) + пакеты монорепо + client-слой Next.
 // Использование: node extract-modules.mjs --root <target> --plan <plan.json> --out <modules.part.json>
 // Извлекает: module-узлы (file-уровень — схлопывание в директории делает merge.mjs),
-// import-рёбра module→module, pkg-узлы workspace-пакетов + depends-рёбра pkg→pkg,
-// page-узлы Next App Router (+ uses page→module). Внешние пакеты — не рёбра (их берёт extract-env).
+// import-рёбра module→module, uses-рёбра module→tech (какой файл какую библиотеку тянет),
+// pkg-узлы workspace-пакетов + depends-рёбра pkg→pkg, page-узлы Next App Router (+ uses page→module).
+// Сами tech-узлы создаёт extract-env — здесь только связи к уже объявленным зависимостям.
 
 import fs from 'node:fs'
 import path from 'node:path'
 import {
-  parseArgs, readText, lineOfIndex, makeNode, makeEdge, partFile, writeJson,
+  parseArgs, readText, readJson, lineOfIndex, makeNode, makeEdge, partFile, writeJson,
   loadPlan, findNearestPackageJson,
 } from './lib/core.mjs'
 import { loadTypeScript, parseSource, extractImportsAst, extractImportsRegex, resolveImport } from './lib/ts.mjs'
@@ -38,9 +39,47 @@ const tsInfo = plan.stacks?.parser === 'ts'
   : { ts: null, mode: 'regex' }
 const ts = tsInfo.ts
 
-// ── 1+2. Module-узлы (каждый файл plan.files.code) + import-рёбра ────────────
+// ── Объявленный техстек: только он даёт uses-рёбра ───────────────────────────
+// Набор строится по тем же правилам, что и tech-узлы в extract-env (deps + devDeps,
+// без @types/* и workspace-пакетов) — иначе merge наплодил бы stub-узлов на
+// транзитивные и неустановленные импорты.
+const workspaceNames = new Set(packages.map((pkg) => pkg.name))
+const techPackages = new Set()
+for (const file of plan.files?.packageJson ?? []) {
+  const manifest = readJson(path.join(root, file))
+  if (!manifest) continue
+  for (const section of ['dependencies', 'devDependencies']) {
+    for (const dep of Object.keys(manifest[section] ?? {})) {
+      if (dep.startsWith('@types/') || workspaceNames.has(dep)) continue
+      techPackages.add(dep)
+    }
+  }
+}
+
+// node:*-встроенные — рантайм, а не технология проекта: на карте они только шумят
+const NODE_BUILTINS = new Set([
+  'fs', 'path', 'http', 'https', 'http2', 'crypto', 'url', 'os', 'child_process', 'events',
+  'stream', 'util', 'zlib', 'buffer', 'worker_threads', 'perf_hooks', 'readline', 'net',
+  'tls', 'dns', 'assert', 'timers', 'string_decoder', 'querystring', 'v8', 'vm', 'cluster',
+  'module', 'process', 'console', 'diagnostics_channel', 'inspector', 'punycode', 'repl',
+  'tty', 'dgram', 'async_hooks', 'constants', 'wasi', 'test', 'sqlite',
+])
+
+function packageOfSpec (spec) {
+  // '@scope/name/sub/path' → '@scope/name'; 'lodash/fp' → 'lodash'; node:*/protocol → null
+  if (!spec || spec.startsWith('.') || spec.startsWith('/')) return null
+  if (/^[a-z][a-z0-9+.-]*:/i.test(spec)) return null // node:fs, bun:test, http(s)://, data:
+  const segments = spec.split('/')
+  const name = spec.startsWith('@') ? segments.slice(0, 2).join('/') : segments[0]
+  if (!name || (spec.startsWith('@') && segments.length < 2)) return null
+  if (NODE_BUILTINS.has(name)) return null
+  return name
+}
+
+// ── 1+2. Module-узлы (каждый файл plan.files.code) + import/uses-рёбра ───────
 const codeFileSet = new Set(codeFiles)
 const importByPair = new Map() // 'from->to' → {from, to, line, file}
+const usesByPair = new Map() // 'file->pkg' → {file, pkg, line} — дедуп повторных импортов в файле
 let importCount = 0
 for (const relFile of codeFiles) {
   const absolute = path.join(root, relFile)
@@ -66,7 +105,16 @@ for (const relFile of codeFiles) {
   }
   for (const { spec, line } of specs) {
     const resolved = resolveImport(root, relFile, spec, tsAliases)
-    if (!resolved || resolved === relFile) continue // внешний пакет или self — игнор
+    if (resolved === relFile) continue // self-импорт
+    if (!resolved) {
+      // внешний пакет → связь «модуль использует библиотеку» (главное, чего не хватало карте)
+      const pkgName = packageOfSpec(spec)
+      if (!pkgName || !techPackages.has(pkgName)) continue
+      const key = `${relFile}->${pkgName}`
+      const seen = usesByPair.get(key)
+      if (!seen || line < seen.line) usesByPair.set(key, { file: relFile, pkg: pkgName, line })
+      continue
+    }
     if (!codeFileSet.has(resolved)) continue // цель вне плана (не code-файл) — без болтающихся рёбер
     importCount++
     const pair = `${relFile}->${resolved}`
@@ -80,6 +128,14 @@ for (const { from, to, line } of importByPair.values()) {
     from: `module:${from}`,
     to: `module:${to}`,
     source: { file: from, line },
+  }))
+}
+for (const { file, pkg, line } of usesByPair.values()) {
+  edges.push(makeEdge({
+    kind: 'uses',
+    from: `module:${file}`,
+    to: `tech:${pkg}`,
+    source: { file, line },
   }))
 }
 
@@ -164,6 +220,7 @@ const moduleCount = nodes.filter((node) => node.kind === 'module').length
 const stats = {
   modules: moduleCount,
   imports: importByPair.size,
+  usesTech: usesByPair.size,
   packages: packages.length,
   pages: pageCount,
   parser: ts ? 'ts' : 'regex',
@@ -171,4 +228,4 @@ const stats = {
 writeJson(args.out, partFile({ part: 'modules', root, nodes, edges, stats }))
 console.log(`archmap modules: ${moduleCount} modules, ${importByPair.size} imports` +
   (importCount > importByPair.size ? ` (${importCount} raw)` : '') +
-  `, ${packages.length} packages, ${pageCount} pages → ${args.out}`)
+  `, ${usesByPair.size} uses-tech, ${packages.length} packages, ${pageCount} pages → ${args.out}`)

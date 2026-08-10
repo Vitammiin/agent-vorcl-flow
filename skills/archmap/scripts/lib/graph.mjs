@@ -298,4 +298,140 @@ export function findCycles(nodes, edges) {
   return cycles
 }
 
+/* ── Слой групп: верхний уровень карты ───────────────────────────────────────
+   Обзор из сотен одинаковых узлов нечитаем, поэтому каждый узел приписывается
+   к смысловой группе (домен API, файл схемы, каталог, категория библиотек),
+   а рёбра между группами агрегируются с счётчиком. Детали остаются в nodes —
+   UI разворачивает группу по клику. */
+
+const TITLE_WORDS = { api: 'API', mcp: 'MCP', ai: 'AI', db: 'DB', ui: 'UI', id: 'ID', sms: 'SMS', url: 'URL' }
+
+function titleize (raw) {
+  return String(raw || '')
+    .replace(/[-_./]+/g, ' ')
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean)
+    .map((word) => TITLE_WORDS[word.toLowerCase()] ?? (word[0].toUpperCase() + word.slice(1)))
+    .join(' ')
+}
+
+function routeDomain (node) {
+  const path = node.meta?.path || node.label || ''
+  const segments = String(path).split('/').filter(Boolean).filter((s) => !s.startsWith(':'))
+  if (!segments.length) return 'root'
+  return segments[0] === 'api' && segments[1] ? segments[1] : segments[0]
+}
+
+function fileStem (file) {
+  const base = String(file || '').split('/').pop() || ''
+  return base.replace(/\.[^.]+$/, '')
+}
+
+function topDir (file) {
+  const parts = String(file || '').split('/').filter(Boolean)
+  if (parts.length <= 1) return '.'
+  // src/services/x.ts → src/services; packages/a/src/y.ts → packages/a/src
+  return parts.slice(0, Math.min(parts.length - 1, parts[0] === 'src' ? 2 : 3)).join('/')
+}
+
+function groupKeyFor (node) {
+  switch (node.kind) {
+    case 'route': case 'webhook':
+      return { key: `api:${routeDomain(node)}`, label: `${titleize(routeDomain(node))} API` }
+    case 'ws': return { key: 'api:ws', label: 'WebSocket' }
+    case 'cron': return { key: 'api:cron', label: 'Scheduled jobs' }
+    case 'middleware': return { key: 'api:middleware', label: 'Middleware' }
+    case 'mcp-server': case 'mcp-tool': return { key: 'api:mcp', label: 'MCP servers' }
+    case 'table': case 'enum':
+      return { key: `data:${fileStem(node.source?.file)}`, label: `${titleize(fileStem(node.source?.file))} schema` }
+    case 'store': return { key: 'data:stores', label: 'Stores & queues' }
+    case 'agent': return { key: 'agents:agents', label: 'AI agents' }
+    case 'llm-call': return { key: 'agents:llm', label: 'LLM calls' }
+    case 'memory': return { key: 'agents:memory', label: 'Agent memory' }
+    case 'module':
+      return { key: `logic:${topDir(node.source?.file || node.label)}`, label: titleize(topDir(node.source?.file || node.label)) }
+    case 'package': return { key: 'logic:packages', label: 'Workspace packages' }
+    case 'tech': {
+      const category = node.meta?.category || 'other'
+      return { key: `infra:tech:${category}`, label: titleize(category) }
+    }
+    case 'external-service': return { key: 'infra:services', label: 'External services' }
+    case 'env': {
+      const prefix = String(node.label || '').split('_')[0]
+      return { key: `infra:env:${prefix}`, label: `${prefix} env`, weak: true }
+    }
+    case 'page': case 'component':
+      return { key: `client:${topDir(node.source?.file || '')}`, label: titleize(topDir(node.source?.file || '')) || 'Pages' }
+    default:
+      return { key: `${node.layer}:other`, label: 'Прочее' }
+  }
+}
+
+export function buildGroups (nodes, edges, options = {}) {
+  const minWeak = options.minWeakGroup ?? 3
+  const draft = new Map()
+  for (const node of nodes) {
+    const { key, label, weak } = groupKeyFor(node)
+    const id = `grp:${key}`
+    if (!draft.has(id)) {
+      draft.set(id, { id, layer: node.layer, label, kind: 'group', weak: !!weak, members: [], counts: {}, source: node.source, inferred: true })
+    }
+    const group = draft.get(id)
+    group.members.push(node.id)
+    group.counts[node.kind] = (group.counts[node.kind] ?? 0) + 1
+    if (!node.inferred) { group.inferred = false; if (group.source?.file === '') group.source = node.source }
+  }
+  // Мелкие «слабые» группы (редкие env-префиксы) сливаются в один блок на слой,
+  // иначе верхний уровень снова превращается в россыпь.
+  const groups = []
+  const spill = new Map()
+  for (const group of draft.values()) {
+    if (group.weak && group.members.length < minWeak) {
+      const id = `grp:${group.layer}:misc`
+      if (!spill.has(id)) {
+        spill.set(id, { id, layer: group.layer, label: 'Прочее', kind: 'group', members: [], counts: {}, source: group.source, inferred: group.inferred })
+      }
+      const target = spill.get(id)
+      target.members.push(...group.members)
+      for (const [kind, count] of Object.entries(group.counts)) target.counts[kind] = (target.counts[kind] ?? 0) + count
+      if (!group.inferred) target.inferred = false
+    } else {
+      groups.push(group)
+    }
+  }
+  groups.push(...spill.values())
+  for (const group of groups) {
+    delete group.weak
+    group.members.sort()
+    group.size = group.members.length
+  }
+  groups.sort((a, b) => a.id.localeCompare(b.id))
+
+  const groupOf = new Map()
+  for (const group of groups) for (const member of group.members) groupOf.set(member, group.id)
+
+  const aggregated = new Map()
+  for (const edge of edges) {
+    const from = groupOf.get(edge.from)
+    const to = groupOf.get(edge.to)
+    if (!from || !to || from === to) continue
+    const id = `ge:${from}->${to}`
+    if (!aggregated.has(id)) {
+      aggregated.set(id, { id, from, to, count: 0, kinds: {}, inferred: true })
+    }
+    const item = aggregated.get(id)
+    item.count++
+    item.kinds[edge.kind] = (item.kinds[edge.kind] ?? 0) + 1
+    if (!edge.inferred) item.inferred = false
+  }
+  const groupEdges = [...aggregated.values()]
+  for (const edge of groupEdges) {
+    // подпись потока — самый частый вид связи между группами
+    edge.kind = Object.entries(edge.kinds).sort((a, b) => b[1] - a[1])[0][0]
+  }
+  groupEdges.sort((a, b) => a.id.localeCompare(b.id))
+  return { groups, groupEdges }
+}
+
 export { makeNode, makeEdge }

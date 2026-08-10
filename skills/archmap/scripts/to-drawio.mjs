@@ -43,6 +43,10 @@ function escapeXml (value) {
     .replace(/'/g, '&#39;')
 }
 const escapeLabel = (value) => escapeXml(escapeXml(value))
+// Метка с реальной HTML-разметкой (html=1): содержимое экранируется как текст,
+// а сами теги проходят одним уровнем — иначе <b> и <br/> видны как символы.
+const richLabel = (...parts) => escapeXml(parts.join(''))
+const richText = (value) => escapeXml(value)
 
 // ── id ячеек: санированный node.id, уникальный в пределах страницы ───────────
 function idFactory (pagePrefix) {
@@ -171,7 +175,66 @@ function aggregateModules (nodes, edges) {
   return { nodes: kept.concat([...dirNodes.values()]), edges: [...edgeMap.values()] }
 }
 
+// Обзор из слоя групп: крупные блоки с составом и потоки с счётчиком —
+// то, что человек читает как архитектурную схему. Детали живут на других страницах.
+function buildGroupOverview (arch) {
+  const groups = arch.groups
+  const layers = (arch.layers ?? LAYERS).filter((layer) => groups.some((group) => group.layer === layer.id))
+  const summary = (group) => Object.entries(group.counts ?? {})
+    .sort((a, b) => b[1] - a[1]).map(([kind, count]) => `${count} ${kind}`).join(' · ')
+  const asNodes = groups.map((group) => ({ ...group, kind: 'group' }))
+  const asEdges = (arch.groupEdges ?? []).map((edge) => ({ ...edge, label: `${edge.kind} ×${edge.count}` }))
+  const positions = layoutColumns(asNodes, asEdges, layers, { nodeWidth: 240, gapX: 140, gapY: 30, heightOf: () => 60 })
+  const makeId = idFactory('ov')
+  const cellId = new Map()
+  const laneOf = new Map()
+  const cells = []
+  layers.forEach((layer, index) => {
+    const laneNodes = asNodes.filter((node) => node.layer === layer.id)
+    const bottom = Math.max(...laneNodes.map((node) => {
+      const position = positions.get(node.id)
+      return position.y + position.h
+    }))
+    const laneId = makeId(`layer-${layer.id}`)
+    laneOf.set(layer.id, laneId)
+    cells.push(vertexCell({
+      id: laneId, value: escapeLabel(layer.label), style: laneStyle(layer),
+      x: 40 + index * 340, y: 40, w: 280, h: bottom + 80,
+    }))
+  })
+  for (const group of asNodes) {
+    const position = positions.get(group.id)
+    const id = makeId(group.id)
+    cellId.set(group.id, id)
+    const color = (layers.find((layer) => layer.id === group.layer) ?? {}).color ?? '#666666'
+    let style = `rounded=1;whiteSpace=wrap;html=1;arcSize=12;fillColor=${tint(color, 0.86)};` +
+      `strokeColor=${color};strokeWidth=2;fontSize=12;verticalAlign=middle;spacing=6;`
+    if (group.inferred) style += INFERRED_SUFFIX
+    cells.push(vertexCell({
+      id,
+      value: richLabel('<b>', richText(group.label), '</b><br/>', richText(summary(group))),
+      style,
+      x: 20, y: 40 + position.y, w: 240, h: 60, parent: laneOf.get(group.layer),
+    }))
+  }
+  let edgeCount = 0
+  for (const edge of asEdges) {
+    if (!cellId.has(edge.from) || !cellId.has(edge.to)) continue
+    edgeCount++
+    const weight = Math.min(4, 1 + Math.log10(Math.max(1, edge.count)) * 1.6).toFixed(1)
+    cells.push(edgeCell({
+      id: makeId(edge.id),
+      value: escapeLabel(edge.label),
+      style: edgeStyleFor(edge, `edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;jettySize=auto;endArrow=block;endFill=1;strokeColor=#64748b;fontSize=10;strokeWidth=${weight};`),
+      source: cellId.get(edge.from),
+      target: cellId.get(edge.to),
+    }))
+  }
+  return page('overview', 'Overview', cells, asNodes.length, edgeCount)
+}
+
 function buildOverview (arch) {
+  if (Array.isArray(arch.groups) && arch.groups.length) return buildGroupOverview(arch)
   let nodes = arch.nodes
   let edges = arch.edges
   if (nodes.length > 120) {

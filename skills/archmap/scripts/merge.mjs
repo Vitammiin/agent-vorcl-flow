@@ -13,7 +13,7 @@ import {
   SCHEMA_VERSION, LAYERS, parseArgs, readJson, writeJson, sortGraph,
   fileExistsWithLine, toPosix,
 } from './lib/core.mjs'
-import { mergeParts, ensureReferentialIntegrity, validateGraph, findCycles, collapseModulesToDirs } from './lib/graph.mjs'
+import { mergeParts, ensureReferentialIntegrity, validateGraph, findCycles, collapseModulesToDirs, buildGroups } from './lib/graph.mjs'
 
 const args = parseArgs(process.argv.slice(2), {
   root: { flag: '--root', default: process.cwd() },
@@ -120,6 +120,7 @@ const architecture = {
   layers: LAYERS,
   nodes,
   edges,
+  ...buildGroups(nodes, edges),
   stats: {
     files: plan?.files?.total ?? null,
     nodes: nodes.length,
@@ -136,8 +137,12 @@ const architecture = {
   },
 }
 
+architecture.stats.groups = architecture.groups.length
+architecture.stats.groupEdges = architecture.groupEdges.length
+
 writeJson(args.out, architecture)
-console.log(`archmap merge: ${nodes.length} nodes, ${edges.length} edges ` +
+console.log(`archmap merge: ${nodes.length} nodes, ${edges.length} edges, ` +
+  `${architecture.groups.length} groups/${architecture.groupEdges.length} flows ` +
   `(${architecture.stats.inferredNodes}+${architecture.stats.inferredEdges} inferred, ` +
   `${stubs.length} stubs, ${cycles.length} cycles` +
   (args.annotate ? `, annotations: ${annotationStats.nodes}n/${annotationStats.edges}e, demoted ${annotationStats.demotedToInferred}` : '') +

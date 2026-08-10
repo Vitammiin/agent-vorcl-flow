@@ -159,6 +159,9 @@ function applyCap(nodes, edges) {
 }
 
 export function buildOverview(data) {
+  // Есть слой групп — обзор строится из него: крупные блоки вместо сотен узлов,
+  // усечение капом больше не нужно (и не врёт про полноту).
+  if (Array.isArray(data.groups) && data.groups.length) return buildGroupOverview(data)
   const capped = applyCap(data.nodes, data.edges)
   const mapId = idMapper()
   const lines = [MMD_HEADER, ...capped.notes, 'flowchart LR']
@@ -172,6 +175,45 @@ export function buildOverview(data) {
   for (const edge of capped.edges) lines.push(edgeLine(edge, mapId))
   for (const node of capped.nodes) {
     if (node.inferred) lines.push(`  style ${mapId(node.id)} stroke-dasharray: 5 5`)
+  }
+  return lines.join('\n') + '\n'
+}
+
+// quoteLabel схлопывает пробелы и экранирует < >, поэтому двухстрочную подпись
+// блока собираем сами: <br/> должен дойти до Mermaid живым.
+function inlineEscape(text) {
+  return String(text)
+    .replace(/&/g, '#amp;')
+    .replace(/"/g, '#quot;')
+    .replace(/</g, '#lt;')
+    .replace(/>/g, '#gt;')
+    .replace(/\s+/g, ' ')
+    .trim()
+}
+
+function groupSummary(group) {
+  return Object.entries(group.counts ?? {})
+    .sort((a, b) => b[1] - a[1])
+    .map(([kind, count]) => `${count} ${kind}`)
+    .join(' · ')
+}
+
+export function buildGroupOverview(data) {
+  const mapId = idMapper()
+  const lines = [MMD_HEADER, 'flowchart LR']
+  const groups = [...data.groups].sort((a, b) => (b.size ?? 0) - (a.size ?? 0) || a.id.localeCompare(b.id))
+  for (const layer of data.layers ?? LAYERS) {
+    const inLayer = groups.filter((group) => group.layer === layer.id)
+    if (!inLayer.length) continue
+    lines.push(`  subgraph layer_${layer.id}[${quoteLabel(layer.label)}]`)
+    for (const group of inLayer) {
+      lines.push(`    ${mapId(group.id)}["${inlineEscape(group.label)}<br/>${inlineEscape(groupSummary(group))}"]`)
+    }
+    lines.push('  end')
+  }
+  for (const edge of [...(data.groupEdges ?? [])].sort((a, b) => b.count - a.count)) {
+    const arrow = edge.inferred ? '-.->' : '-->'
+    lines.push(`  ${mapId(edge.from)} ${arrow}|${quoteLabel(`${edge.kind} ×${edge.count}`)}| ${mapId(edge.to)}`)
   }
   return lines.join('\n') + '\n'
 }
