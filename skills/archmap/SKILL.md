@@ -23,7 +23,10 @@ node "$S/extract-agents.mjs"  --root "$R" --plan "$O/plan.json" --out "$O/agents
 node "$S/extract-modules.mjs" --root "$R" --plan "$O/plan.json" --out "$O/modules.part.json"  #  │ параллельной пачкой
 node "$S/extract-env.mjs"     --root "$R" --plan "$O/plan.json" --out "$O/env.part.json"      #  │
 node "$S/extract-product.mjs" --root "$R" --plan "$O/plan.json" --out "$O/product.part.json"  #  │
-node "$S/extract-ops.mjs"     --root "$R" --plan "$O/plan.json" --out "$O/ops.part.json"      # ─┘
+node "$S/extract-ops.mjs"     --root "$R" --plan "$O/plan.json" --out "$O/ops.part.json"      #  │
+node "$S/extract-dataflow.mjs"    --root "$R" --plan "$O/plan.json" --out "$O/dataflow.part.json"     #  │
+node "$S/extract-integration.mjs" --root "$R" --plan "$O/plan.json" --out "$O/integration.part.json"  #  │
+node "$S/extract-journey.mjs"     --root "$R" --plan "$O/plan.json" --out "$O/journey.part.json"      # ─┘
 node "$S/merge.mjs" --root "$R" --parts "$O/*.part.json" --out "$O/architecture.json" --check
 # ── (опц.) LLM-фаза: прочитай architecture.json, напиши $O/annotations.json, затем: ──
 node "$S/merge.mjs" --root "$R" --parts "$O/*.part.json" --annotate "$O/annotations.json" --out "$O/architecture.json" --check
@@ -46,7 +49,7 @@ node "$S/to-pdf.mjs"     --in "$O/architecture.html" --out "$O/architecture.pdf"
 
 | layer | kinds |
 |---|---|
-| product | `feature` (возможность, выведенная из доменов API/каталогов), `capability` (пункт из README) |
+| product | `feature` (возможность из доменов API/каталогов), `capability` (пункт README), `journey` (путь пользователя: шаги в meta.steps) |
 | data | `table`, `enum`, `store` (meta.storeKind: redis\|queue\|vector\|s3\|cache) |
 | api | `route`, `ws`, `webhook`, `cron`, `mcp-server`, `mcp-tool`, `middleware` |
 | agents | `agent`, `llm-call`, `memory`, `skill`, `command` |
@@ -58,7 +61,7 @@ Id детерминированы: `feature:accounts`, `table:User`, `route:GET 
 
 **Колонки таблиц — в meta** (не отдельные узлы): `meta.columns: [{name, type, pk?, fk?:{table,column}, unique?, nullable?, line}]`, `meta.indexes`, `meta.orm`. **Параметры роутов — в meta**: `meta.method, meta.path, meta.params[{name,in,type,required}], meta.middleware[], meta.handler{file,line,name}, meta.auth, meta.framework`.
 
-**Edge** — `{id:"e:<kind>:<from>-><to>", kind, from, to, label?, source, inferred, meta}`. Kinds: `fk` (meta.cardinality: 1:1|1:N|N:1|N:M, meta.through для N:M), `import`, `depends` (workspace-пакеты), `handles` (route→module), `uses` (→store/table/svc), `reads-env`, `invokes` (→svc модели; meta.model, meta.provider), `member` (mcp-server→tool, agent→tool), `guards` (middleware→route), `dataflow` (семантика LLM, почти всегда inferred), `implements` (feature → роут/таблица/страница), `covers` (test-suite → module), `deploys` (container → внешняя система).
+**Edge** — `{id:"e:<kind>:<from>-><to>", kind, from, to, label?, source, inferred, meta}`. Kinds: `fk` (meta.cardinality: 1:1|1:N|N:1|N:M, meta.through для N:M), `import`, `depends` (workspace-пакеты), `handles` (route→module), `uses` (→store/table/svc), `reads-env`, `invokes` (→svc модели; meta.model, meta.provider), `member` (mcp-server→tool, agent→tool), `guards` (middleware→route), `dataflow` (семантика LLM, почти всегда inferred), `implements` (feature → роут/таблица/страница), `covers` (test-suite → module), `deploys` (container → внешняя система), `reads`/`writes` (module → table: направление работы с данными, meta.ops), `calls` (module → внешняя система, meta.operations — какие именно вызовы), `receives` (внешняя система → вебхук-роут, meta.verified — проверяется ли подпись), `step` (journey → роут/фича, meta.order).
 
 **Внешние системы.** `lib/services.mjs` — таблица известных систем (slug, человекочитаемый label, категория). Система распознаётся по префиксу env-переменной (`MONGODB_URI`, `STRIPE_*`), строке подключения в коде (`mongodb://`), зависимости в package.json или команде запуска MCP-сервера; сила доказательства `dsn > mcp > env > dep` пишется в `meta.evidence`. Отсюда рёбра `env → svc`, `module → svc`, `mcp → svc`, `agent → svc`.
 

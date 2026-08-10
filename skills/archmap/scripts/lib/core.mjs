@@ -19,7 +19,7 @@ export const LAYERS = [
 export const LAYER_IDS = LAYERS.map((layer) => layer.id)
 
 export const NODE_KINDS = {
-  product: ['feature', 'capability'],
+  product: ['feature', 'capability', 'journey'],
   data: ['table', 'enum', 'store'],
   api: ['route', 'ws', 'webhook', 'cron', 'mcp-server', 'mcp-tool', 'middleware'],
   agents: ['agent', 'llm-call', 'memory', 'skill', 'command'],
@@ -31,6 +31,9 @@ export const NODE_KINDS = {
 export const EDGE_KINDS = [
   'fk', 'import', 'depends', 'handles', 'uses', 'reads-env',
   'invokes', 'member', 'guards', 'dataflow', 'implements', 'covers', 'deploys',
+  // «что откуда идёт»: направление работы с данными, вызовы интеграций,
+  // входящие вебхуки и шаги пользовательского сценария
+  'reads', 'writes', 'calls', 'receives', 'step',
 ]
 
 export const IGNORED_DIRS = new Set([

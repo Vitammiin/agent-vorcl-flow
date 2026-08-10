@@ -248,7 +248,13 @@ function extractHttpAst(ts, file, text, framework) {
     if (ts.isCallExpression(node) && ts.isPropertyAccessExpression(node.expression)) {
       const callName = node.expression.name.text
       const receiver = node.expression.expression
-      const receiverOk = ts.isIdentifier(receiver) && /^(app|router|fastify|server|api)$/.test(receiver.text)
+      // Роуты объявляют не только на `app`/`fastify`: внутри register-колбэка
+      // это произвольное имя scope (напр. stripeScope.post('/webhooks/…')).
+      // Путь-литерал, начинающийся со слэша, — достаточно строгий признак,
+      // а `.route/.use` по-прежнему требуют канонического имени.
+      const namedReceiver = ts.isIdentifier(receiver) && /^(app|router|fastify|server|api)$/i.test(receiver.text)
+      const scopeReceiver = ts.isIdentifier(receiver) && /(app|router|fastify|server|api|scope|instance|plugin|routes?)$/i.test(receiver.text)
+      const receiverOk = namedReceiver || scopeReceiver
       const callArgs = node.arguments
       if (receiverOk && METHODS.has(callName) && callArgs.length && isStringy(callArgs[0]) && callArgs[0].text.startsWith('/')) {
         const record = {
@@ -285,7 +291,7 @@ function extractHttpAst(ts, file, text, framework) {
             framework, middleware: info.middleware, ws: info.websocket && detected.has('websocket'), handler,
           })
         }
-      } else if (receiverOk && callName === 'use' && callArgs.length && ts.isIdentifier(callArgs[0])) {
+      } else if (namedReceiver && callName === 'use' && callArgs.length && ts.isIdentifier(callArgs[0])) {
         uses.push({ name: callArgs[0].text, line: lineOf(sourceFile, node) })
       }
     }

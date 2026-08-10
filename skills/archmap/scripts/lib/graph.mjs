@@ -62,6 +62,7 @@ export function ensureReferentialIntegrity(nodes, edges) {
 
 const ID_PREFIX_KIND = {
   'feature': ['feature', 'product'], 'capability': ['capability', 'product'],
+  'journey': ['journey', 'product'],
   'skill': ['skill', 'agents'], 'command': ['command', 'agents'],
   'test': ['test-suite', 'logic'], 'ci': ['ci-pipeline', 'infra'],
   'container': ['container', 'infra'], 'hook': ['hook', 'infra'],
@@ -347,6 +348,8 @@ function groupKeyFor (node) {
       return { key: `product:${node.id.split(':').slice(1).join(':')}`, label: node.label }
     case 'capability':
       return { key: 'product:capabilities', label: 'Capabilities' }
+    case 'journey':
+      return { key: `product:journey:${node.id.split(':').slice(1).join(':')}`, label: node.label }
     case 'skill': return { key: 'agents:skills', label: 'Skills' }
     case 'command': return { key: 'agents:commands', label: 'Commands' }
     case 'test-suite': return { key: 'logic:tests', label: 'Tests' }
@@ -428,6 +431,7 @@ export function buildGroups (nodes, edges, options = {}) {
     if (group.layer === 'product' && group.members.length === 1) {
       const meta = nodeById.get(group.members[0])?.meta ?? {}
       const composition = {}
+      if (Array.isArray(meta.steps) && meta.steps.length) composition.step = meta.steps.length
       if (meta.routes) composition.route = meta.routes
       if (meta.tables) composition.table = meta.tables
       if (meta.pages) composition.page = meta.pages
