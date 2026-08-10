@@ -13,9 +13,9 @@
 
 ## Что это
 
-Agent-Vorcl-Flow превращает поддерживаемый coding agent в **структурированную инженерную команду**. Вместо одного универсального ассистента ты получаешь **20 узкопрофильных субагентов** (архитектор, бэкенд, фронтенд, инженер БД, оператор liveboard и другие) — у каждого свои доменные **скиллы**, быстрые **слэш-команды** и нужные ему **MCP-инструменты**. Любая нетривиальная задача идёт через дисциплинированный цикл **Task Master** — *цель → задачи → реализация → проверка → готово* — работа спланирована, отслеживается и переживает прерывания.
+Agent-Vorcl-Flow превращает поддерживаемый coding agent в **структурированную инженерную команду**. Вместо одного универсального ассистента ты получаешь **21 узкопрофильного субагента** (архитектор, бэкенд, фронтенд, инженер БД, картограф архитектуры, оператор liveboard и другие) — у каждого свои доменные **скиллы**, быстрые **слэш-команды** и нужные ему **MCP-инструменты**. Любая нетривиальная задача идёт через дисциплинированный цикл **Task Master** — *цель → задачи → реализация → проверка → готово* — работа спланирована, отслеживается и переживает прерывания.
 
-- 🧩 **20 субагентов**, 40 скиллов, 118 слэш-команд
+- 🧩 **21 субагент**, 41 скилл, 124 слэш-команды
 - ⚡ **Установка одной командой** в Claude Code, Codex, Cursor и/или Kimi CLI — `npx`
 - 🔌 **11 MCP-серверов** из коробки (GitHub, Postgres, MongoDB, Redis, Docker, Firecrawl, Vercel, Render, filesystem, Task Master, Mermaid)
 - 🔑 **Один файл `.env` для всех рантаймов** — ключи читает launcher, а не `~/.zshrc`, поэтому они работают даже при запуске из GUI/IDE; удалённого сервиса AVF нет; liveboard локальный и эфемерный
@@ -126,6 +126,7 @@ claude --plugin-dir /путь/к/agent-vorcl-flow
 | 🔎 **visual-research** | Скриншот → проверенный ответ | Определяет сайт/страницу, находит официальную документацию, проверяет live data и отвечает с URL и уверенностью |
 | 🎯 **pinpoint** | Скриншот → место в существующем проекте (read-only) | Привязывает скриншот работающего приложения к реальному коду — компонент, `file:line`, маршрут/страница, конкретный контрол и логика за ним; ничего не создаёт, правку делегирует |
 | 📊 **drawio** | Диаграммы (draw.io / diagrams.net) | Flowchart, BPMN, UML, ERD, network/cloud и PMP/PMBOK (WBS, Gantt, RACI…) |
+| 🗺️ **archmap** | Картограф архитектуры | Детерминированно код → `architecture.json` (каждый узел с `source:{file,line}`) → интерактивная HTML-карта, draw.io, Mermaid, ARCHITECTURE.md, PDF; недоказанное помечается `inferred` |
 | 🧜 **mermaid** | Mermaid-диаграммы (+ реальный рендер) | flowchart, sequence, class, state, ER, gantt, gitGraph, mindmap…; валидация через mcp-mermaid/`mmdc`; отдаёт готовый файл (`.mmd` + SVG/PNG/PDF) |
 | 🧪 **testing** | Инженер тестов и верификации | Unit (Vitest/Jest), интеграционные (Supertest), E2E (Playwright), покрытие, ловля flaky; исполняет `testStrategy` задач — ничто не «готово» без зелёного прогона |
 | 🌿 **gitflow** | Git-workflow и релизы | Conventional Commits, поимённые коммиты (никогда `git add .`), PR, Keep a Changelog, semver-релизы; push только с явного подтверждения |
@@ -142,6 +143,7 @@ claude --plugin-dir /путь/к/agent-vorcl-flow
 - **`visual-research` проверяет, а не угадывает.** Считает скриншот доказательством, подтверждает официальный домен и документацию, сверяет текущие данные сайта и предупреждает о phishing или устаревших значениях.
 - **`render` помнит про инфраструктурные детали.** Доступ к БД по IP-allowlist (outbound-IP сервиса → allowlist базы; для Render Postgres — internal URL), диагностика по логам до первопричины.
 - **Диаграммы — как файлы-артефакты.** `mermaid` проверяет каждую диаграмму реальным рендером и отдаёт `.mmd` + SVG/PNG/PDF в твоём каталоге; `drawio` отдаёт валидный XML — открывается в app.diagrams.net.
+- **`archmap` не рисует из головы.** Extraction и rendering жёстко разделены: zero-dependency скрипты обходят репо в `architecture.json` (базы с реальной кардинальностью FK, роуты, AI-агенты с моделями/тулами/памятью, import-граф, env), и каждая диаграмма рендерится только из этого JSON. Всё, что LLM добавила без проверяемого `file:line`, принудительно помечается `inferred:true` и рисуется пунктиром.
 - **Скилл `i18n` — «ноль языкового хардкода».** Агенты сначала определяют, мультиязычен ли проект, и адаптируются — пользовательские строки идут через слой перевода (next-intl / react-i18next / i18next), не инлайном.
 
 ---
@@ -284,6 +286,17 @@ claude --plugin-dir /путь/к/agent-vorcl-flow
 | `/drawio:pmp <тип> <проект>` | Диаграмма PMP/PMBOK — WBS, PERT/CPM, Gantt, RACI, risk matrix, stakeholder grid. |
 | `/drawio:convert <исходник> [тип]` | Конвертация исходника — схема БД → ERD, папки → дерево, код → UML, mermaid/CSV/JSON. |
 | `/drawio:refine <файл>` | Доработка существующего `.drawio` — раскладка, тема, узлы, выравнивание по сетке. |
+
+### 🗺️ archmap — карта архитектуры по коду
+
+| Команда | Что делает |
+| --- | --- |
+| `/archmap:vorcl <цель>` | Цель по картированию через Task Master — до проверенного набора артефактов. |
+| `/archmap:map [репо]` | Полный пайплайн: extraction → `architecture.json` → LLM-аннотация → все форматы (HTML, draw.io, Mermaid, ARCHITECTURE.md, PDF). |
+| `/archmap:extract [репо]` | Только extraction — машиночитаемый `architecture.json` с `source:{file,line}` у каждого узла. |
+| `/archmap:annotate [json]` | LLM-обогащение готового `architecture.json` (память агентов, dataflow-семантика); недоказанное само понижается в `inferred`. |
+| `/archmap:html [json]` | Интерактивная self-contained HTML-карта — тумблеры слоёв, trace-подсветка, панель `file:line`, поиск, print-CSS. |
+| `/archmap:diagram [json] [drawio\|mermaid]` | draw.io (многостраничный: Overview / ERD / API / Agents) и/или Mermaid-вью с валидацией. |
 
 ### 🧜 mermaid — Mermaid-диаграммы (+ реальный рендер)
 | Команда | Что делает |
@@ -496,9 +509,9 @@ kimi mcp test github   # проверить соединение и инстру
 ```text
 .claude-plugin/plugin.json      # манифест плагина
 .claude-plugin/marketplace.json # локальный маркетплейс (для установки)
-agents/       20 определений субагентов (*.md)
-skills/       <скилл>/SKILL.md            (40 скиллов; liveboard содержит in-memory сервер и HTML)
-commands/     <namespace>/<команда>.md    (118 команд, /namespace:команда, включая /vorcl)
+agents/       21 определение субагентов (*.md)
+skills/       <скилл>/SKILL.md            (41 скилл; liveboard и archmap содержат свои скрипты и HTML-ассеты)
+commands/     <namespace>/<команда>.md    (124 команды, /namespace:команда, включая /vorcl)
 hooks/        hooks.json + session-start.js + catch-guard.js (PostToolUse: пустые catch)
 .mcp.json     github, filesystem, postgres, mongodb, redis, docker, firecrawl, vercel, render, task-master, mermaid
 .env.example  шаблон единого файла ключей (→ ~/.config/agent-vorcl-flow/.env)

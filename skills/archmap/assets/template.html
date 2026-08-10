@@ -1,0 +1,817 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>__ARCHMAP_TITLE__ · archmap</title>
+<style>
+  :root{
+    color-scheme:dark;
+    --bg:#0b1120;--panel:#111a2e;--panel2:#0e1526;--line:#1e2a44;--line2:#27365a;
+    --text:#e8eefc;--muted:#8b9bb4;--faint:#5c6b85;
+    --mono:ui-monospace,'SF Mono',SFMono-Regular,Menlo,Consolas,monospace;
+    --sans:system-ui,-apple-system,'Segoe UI',sans-serif;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{margin:0;background:var(--bg);color:var(--text);font:13px/1.45 var(--sans);display:flex;flex-direction:column;overflow:hidden}
+
+  /* ── header ─────────────────────────────────────────────── */
+  header{display:flex;align-items:center;flex-wrap:wrap;gap:10px;padding:10px 16px;background:linear-gradient(180deg,#121b31,#0e1526);border-bottom:1px solid var(--line);z-index:3}
+  .brand{display:flex;flex-direction:column;margin-right:8px}
+  .eyebrow{font:700 9px/1 var(--mono);letter-spacing:.28em;color:#55e6d7;text-transform:uppercase}
+  h1{margin:2px 0 0;font:700 17px/1.1 var(--mono);letter-spacing:-.02em}
+  .counts{font:10.5px var(--mono);color:var(--muted);margin-right:auto;padding-left:12px;border-left:1px solid var(--line2);white-space:nowrap}
+  .counts b{color:var(--text)}
+  #search{background:#0a101f;border:1px solid var(--line2);border-radius:8px;color:var(--text);font:12px var(--mono);padding:7px 11px;width:220px;outline:none}
+  #search:focus{border-color:#55e6d7;box-shadow:0 0 12px #55e6d733}
+  .chips{display:flex;gap:6px;flex-wrap:wrap}
+  .chip{--c:#94a3b8;display:inline-flex;align-items:center;gap:6px;border:1px solid var(--c);color:var(--c);background:transparent;border-radius:999px;padding:5px 11px;font:700 10px var(--mono);letter-spacing:.06em;text-transform:uppercase;cursor:pointer;box-shadow:0 0 10px color-mix(in srgb,var(--c) 28%,transparent),inset 0 0 8px color-mix(in srgb,var(--c) 12%,transparent);transition:opacity .15s,box-shadow .15s}
+  .chip .dot{width:6px;height:6px;border-radius:50%;background:var(--c);box-shadow:0 0 8px var(--c)}
+  .chip.off{opacity:.32;box-shadow:none;border-color:var(--line2);filter:saturate(.3)}
+  .chip:hover{opacity:1}
+  label.inf-toggle{display:inline-flex;align-items:center;gap:6px;font:10.5px var(--mono);color:var(--muted);border:1px dashed var(--line2);border-radius:999px;padding:5px 11px;cursor:pointer;user-select:none}
+  label.inf-toggle input{accent-color:#a78bfa;margin:0}
+  .btn{border:1px solid var(--line2);background:#151f36;color:var(--text);border-radius:8px;padding:7px 13px;font:600 11px var(--mono);cursor:pointer}
+  .btn:hover{border-color:#55e6d7;box-shadow:0 0 10px #55e6d726}
+
+  /* ── main / canvas / details ────────────────────────────── */
+  main{flex:1;display:flex;min-height:0;position:relative}
+  #canvas{flex:1;min-width:0;display:block;cursor:grab;touch-action:none;background:
+    radial-gradient(1100px 550px at 25% -12%,#16233f80 0,transparent 60%),
+    radial-gradient(900px 520px at 92% 112%,#20173d80 0,transparent 55%),var(--bg)}
+  #canvas.panning{cursor:grabbing}
+  #details{width:340px;flex:none;background:var(--panel2);border-left:1px solid var(--line);overflow-y:auto;padding:16px;font-family:var(--sans)}
+  #details[hidden]{display:none}
+  #details .d-top{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px}
+  #details .kbadge{--c:#94a3b8;font:700 9px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--c);border:1px solid var(--c);border-radius:5px;padding:3px 7px;box-shadow:0 0 8px color-mix(in srgb,var(--c) 30%,transparent)}
+  #details .d-inferred{font:700 9px var(--mono);letter-spacing:.1em;color:#c4b5fd;border:1px dashed #a78bfa;border-radius:5px;padding:3px 7px}
+  #details h2{margin:2px 0 10px;font:700 15px/1.25 var(--sans);word-break:break-word}
+  #details .src{display:flex;align-items:center;gap:8px;background:#0a101f;border:1px solid var(--line);border-radius:8px;padding:7px 9px;margin-bottom:12px}
+  #details .src code{flex:1;font:10.5px var(--mono);color:#9fe8df;word-break:break-all}
+  #details .copy{border:1px solid var(--line2);background:#151f36;color:var(--muted);border-radius:6px;font:10px var(--mono);padding:4px 8px;cursor:pointer;flex:none}
+  #details .copy:hover{color:var(--text);border-color:#55e6d7}
+  #details h3{margin:16px 0 6px;font:700 9.5px var(--mono);letter-spacing:.18em;text-transform:uppercase;color:var(--faint)}
+  #details table{width:100%;border-collapse:collapse;font:10.5px var(--mono)}
+  #details td,#details th{padding:4px 6px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top;word-break:break-word}
+  #details th{color:var(--faint);font-weight:600;font-size:9px;letter-spacing:.08em;text-transform:uppercase}
+  #details td.flag{color:#f472b6;white-space:nowrap}
+  #details .kv{display:grid;grid-template-columns:auto 1fr;gap:3px 12px;font:10.5px var(--mono)}
+  #details .kv b{color:var(--faint);font-weight:600}
+  #details .kv span{color:var(--text);word-break:break-word}
+  #details .rel{list-style:none;margin:0;padding:0}
+  #details .rel li{display:flex;align-items:center;gap:7px;padding:5px 7px;border:1px solid var(--line);border-radius:7px;margin-bottom:5px;cursor:pointer;font:11px var(--sans)}
+  #details .rel li:hover{border-color:#55e6d7;background:#101a30}
+  #details .rel .ek{font:700 8.5px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted);border:1px solid var(--line2);border-radius:4px;padding:2px 5px;flex:none}
+  #details .rel .en{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  #details .rel .en small{color:var(--faint)}
+  #details .tracebar{display:flex;gap:6px;margin:12px 0 2px}
+  #details .tracebar .btn{flex:1;padding:8px 6px}
+  #details .empty{color:var(--faint);font:10.5px var(--mono)}
+
+  /* ── footer ─────────────────────────────────────────────── */
+  footer{display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:7px 16px;border-top:1px solid var(--line);background:#0d1424;font:10px var(--mono);color:var(--muted);z-index:3}
+  footer .lg{display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
+  footer .lg i{width:8px;height:8px;border-radius:2px;display:inline-block;box-shadow:0 0 6px currentColor}
+  footer .lg.dash i{background:transparent!important;border:1px dashed var(--muted);box-shadow:none}
+  footer .fcounts{margin-left:auto;color:var(--faint)}
+
+  /* ── svg graph ──────────────────────────────────────────── */
+  text{font-family:var(--mono);user-select:none}
+  .lane-bg{pointer-events:none}
+  .lane-label{font-size:10px;font-weight:700;letter-spacing:.22em;pointer-events:none}
+  .node{cursor:pointer}
+  .frame{fill:#111a2ef5;stroke-width:1.2;transition:stroke-width .12s}
+  .node.inf .frame{stroke-dasharray:5 4}
+  .thead{pointer-events:none}
+  .nlabel{fill:var(--text);font-size:11.5px;font-weight:600}
+  .nkind{font-size:7.5px;font-weight:700;letter-spacing:.1em;opacity:.85}
+  .nmut{fill:var(--muted);font-size:9px}
+  .ncol{fill:#b7c3d8;font-size:10px}
+  .ncol .cty{fill:var(--faint)}
+  .nmore{fill:var(--faint);font-size:9px;font-style:italic}
+  .nsep{stroke:var(--line2);stroke-width:1}
+  .edge{fill:none;stroke-width:1.1;opacity:.5;pointer-events:stroke}
+  .node.matched .frame{stroke-width:2.4}
+  .hidden{display:none}
+  .dimmed{opacity:.13;pointer-events:none}
+  .edge.traced{stroke-dasharray:7 4;animation:dashflow .8s linear infinite;opacity:1;stroke-width:1.7}
+  @keyframes dashflow{to{stroke-dashoffset:-22}}
+  #emptymsg{fill:var(--faint);font-size:14px}
+
+  /* ── appendix (print only) ──────────────────────────────── */
+  #appendix{display:none}
+
+  /* ── print ──────────────────────────────────────────────── */
+  @page{size:A3 landscape;margin:10mm}
+  @media print{
+    body{background:#fff;color:#0f172a;overflow:visible;display:block}
+    header .controls,header #search,#details,footer .fcounts{display:none!important}
+    header{background:#fff;border-color:#cbd5e1}
+    h1{color:#0f172a}.counts{color:#475569}.counts b{color:#0f172a}
+    main{display:block}
+    #canvas{background:#fff;width:100%;height:170mm}
+    .gridbg{fill:#ffffff}
+    .frame{fill:#ffffff}
+    .nlabel{fill:#0f172a}.ncol{fill:#334155}.nmut,.nmore{fill:#64748b}
+    .nsep{stroke:#cbd5e1}
+    #emptymsg{fill:#64748b}
+    footer{background:#fff;border-color:#cbd5e1;color:#475569}
+    #appendix{display:table;width:100%;margin-top:8mm;border-collapse:collapse;font:9px var(--mono);color:#0f172a;page-break-before:always}
+    #appendix caption{text-align:left;font:700 12px var(--mono);padding:4px 0;color:#0f172a}
+    #appendix th,#appendix td{border:1px solid #cbd5e1;padding:3px 6px;text-align:left;word-break:break-all}
+    #appendix th{background:#f1f5f9}
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="brand"><span class="eyebrow">archmap</span><h1 id="title">__ARCHMAP_TITLE__</h1></div>
+  <div class="counts" id="counts"></div>
+  <input id="search" type="search" placeholder="search: label / id / file  ⏎" spellcheck="false" autocomplete="off">
+  <div class="controls" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+    <div class="chips" id="layerChips"></div>
+    <label class="inf-toggle"><input type="checkbox" id="inferredToggle" checked> inferred</label>
+    <button class="btn" id="fitBtn">Fit</button>
+    <button class="btn" id="printBtn">Print</button>
+  </div>
+</header>
+<main>
+  <svg id="canvas" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg"></svg>
+  <aside id="details" hidden></aside>
+</main>
+<footer><div id="legend" style="display:flex;gap:14px;flex-wrap:wrap"></div><div class="fcounts" id="fcounts"></div></footer>
+<table id="appendix"></table>
+<script id="archmap-data" type="application/json">__ARCHMAP_JSON__</script>
+<script>
+'use strict'
+/* archmap interactive template — вся раскладка и интеракции на клиенте.
+   layoutColumns/trace ниже — осознанная компактная копия scripts/lib/graph.mjs:
+   браузер не может импортировать node-модули пайплайна. */
+const data = JSON.parse(document.getElementById('archmap-data').textContent)
+const FALLBACK_LAYERS = [
+  { id: 'client', label: 'Client', color: '#38bdf8' },
+  { id: 'api', label: 'API', color: '#34d399' },
+  { id: 'agents', label: 'Agents', color: '#a78bfa' },
+  { id: 'logic', label: 'Logic', color: '#fbbf24' },
+  { id: 'data', label: 'Data', color: '#f472b6' },
+  { id: 'infra', label: 'Infra', color: '#94a3b8' },
+]
+const layers = Array.isArray(data.layers) && data.layers.length ? data.layers : FALLBACK_LAYERS
+const nodes = Array.isArray(data.nodes) ? data.nodes : []
+const edges = Array.isArray(data.edges) ? data.edges : []
+const nodeById = new Map(nodes.map(n => [n.id, n]))
+const layerById = {}
+for (const l of layers) layerById[l.id] = l
+const layerColor = id => (layerById[id] || { color: '#94a3b8' }).color
+
+const METHOD_COLORS = { GET: '#34d399', POST: '#60a5fa', PUT: '#fbbf24', PATCH: '#a78bfa', DELETE: '#f87171' }
+const NODE_W = 240
+const GAP_X = 130
+const GAP_Y = 26
+const LANE_PAD = 52
+const SUB_GAP_X = 26      // зазор между подколонками внутри одного лейна
+const TARGET_H = 2400     // выше этого колонка переносится в следующую подколонку
+const SVGNS = 'http://www.w3.org/2000/svg'
+
+/* ── динамический CSS: hover/selected свечение цветом слоя ── */
+{
+  const safe = id => /^[a-z0-9-]+$/.test(id)
+  let css = ''
+  for (const l of layers) {
+    if (!safe(l.id)) continue
+    css += `.node[data-layer="${l.id}"]:hover .frame,.node[data-layer="${l.id}"].selected .frame{filter:url(#glow2-${l.id});stroke-width:2.4}\n`
+  }
+  const st = document.createElement('style')
+  st.textContent = css
+  document.head.append(st)
+}
+
+/* ── header: счётчики, чипы слоёв, легенда, appendix ──────── */
+const stats = data.stats || {}
+const inferredTotal = (stats.inferredNodes ?? nodes.filter(n => n.inferred).length) +
+  (stats.inferredEdges ?? edges.filter(e => e.inferred).length)
+function el (tag, cls, text) {
+  const node = document.createElement(tag)
+  if (cls) node.className = cls
+  if (text !== undefined) node.textContent = text
+  return node
+}
+{
+  const c = document.getElementById('counts')
+  const b1 = el('b', '', String(stats.nodes ?? nodes.length))
+  const b2 = el('b', '', String(stats.edges ?? edges.length))
+  const b3 = el('b', '', String(inferredTotal))
+  c.append(b1, ' nodes · ', b2, ' edges · ', b3, ' inferred')
+  document.getElementById('fcounts').textContent =
+    `${nodes.length} nodes · ${edges.length} edges · ${layers.length} layers` + (stats.truncated ? ' · truncated' : '')
+}
+const hiddenLayers = new Set()
+{
+  const box = document.getElementById('layerChips')
+  for (const l of layers) {
+    const chip = el('button', 'chip')
+    chip.style.setProperty('--c', l.color)
+    chip.dataset.layer = l.id
+    const count = nodes.filter(n => n.layer === l.id).length
+    chip.append(el('span', 'dot'), document.createTextNode(`${l.label} ${count}`))
+    chip.title = l.id
+    chip.addEventListener('click', () => {
+      if (hiddenLayers.has(l.id)) hiddenLayers.delete(l.id)
+      else hiddenLayers.add(l.id)
+      chip.classList.toggle('off', hiddenLayers.has(l.id))
+      applyVisibility()
+    })
+    box.append(chip)
+  }
+}
+{
+  const legend = document.getElementById('legend')
+  const kinds = new Map()
+  for (const n of nodes) if (!kinds.has(n.kind)) kinds.set(n.kind, layerColor(n.layer))
+  for (const [kind, color] of kinds) {
+    const item = el('span', 'lg', '')
+    const dot = el('i')
+    dot.style.background = color
+    dot.style.color = color
+    item.append(dot, document.createTextNode(kind))
+    legend.append(item)
+  }
+  const inf = el('span', 'lg dash')
+  inf.append(el('i'), document.createTextNode('inferred'))
+  legend.append(inf)
+}
+{
+  const table = document.getElementById('appendix')
+  const caption = el('caption', '', `Appendix — ${document.getElementById('title').textContent}: nodes`)
+  const thead = el('thead')
+  const hrow = el('tr')
+  for (const h of ['node', 'kind', 'layer', 'source']) hrow.append(el('th', '', h))
+  thead.append(hrow)
+  const tbody = el('tbody')
+  for (const n of [...nodes].sort((a, b) => a.layer.localeCompare(b.layer) || a.id.localeCompare(b.id))) {
+    const row = el('tr')
+    row.append(
+      el('td', '', n.label + (n.inferred ? ' (inferred)' : '')),
+      el('td', '', n.kind),
+      el('td', '', n.layer),
+      el('td', '', n.source && n.source.file ? `${n.source.file}:${n.source.line}` : '—'),
+    )
+    tbody.append(row)
+  }
+  table.append(caption, thead, tbody)
+}
+
+/* ── размеры узлов ────────────────────────────────────────── */
+const MAX_TABLE_ROWS = 6
+function shownColumns (n) {
+  const cols = (n.meta && Array.isArray(n.meta.columns)) ? n.meta.columns : []
+  return { shown: cols.slice(0, MAX_TABLE_ROWS), extra: Math.max(0, cols.length - MAX_TABLE_ROWS), all: cols }
+}
+function nodeHeight (n) {
+  if (n.kind === 'table') {
+    const { shown, extra } = shownColumns(n)
+    return 32 + shown.length * 17 + (extra ? 16 : 0) + 8
+  }
+  return 46
+}
+
+/* ── layoutColumns: колонки по слоям + barycenter (3 прохода) ─ */
+function layout () {
+  const cols = []
+  for (const layer of layers) {
+    const list = nodes.filter(n => n.layer === layer.id)
+    if (list.length) cols.push({ layer, list })
+  }
+  const index = new Map()
+  cols.forEach((col, ci) => {
+    col.list.sort((a, b) => a.id.localeCompare(b.id))
+    col.list.forEach((n, ri) => index.set(n.id, { ci, ri }))
+  })
+  const neigh = new Map()
+  for (const e of edges) {
+    if (!neigh.has(e.from)) neigh.set(e.from, [])
+    if (!neigh.has(e.to)) neigh.set(e.to, [])
+    neigh.get(e.from).push(e.to)
+    neigh.get(e.to).push(e.from)
+  }
+  for (let pass = 0; pass < 3; pass++) {
+    for (const col of cols) {
+      const scored = col.list.map(n => {
+        const rows = (neigh.get(n.id) || [])
+          .map(id => { const i = index.get(id); return i && i.ri })
+          .filter(r => r !== undefined && r !== false)
+        const bary = rows.length ? rows.reduce((s, r) => s + r, 0) / rows.length : index.get(n.id).ri
+        return { n, bary }
+      })
+      scored.sort((a, b) => a.bary - b.bary || a.n.id.localeCompare(b.n.id))
+      scored.forEach((s, ri) => { index.get(s.n.id).ri = ri })
+      col.list = scored.map(s => s.n)
+    }
+  }
+  // Слой с сотнями узлов вытянулся бы в нечитаемую вертикальную нить,
+  // поэтому длинная колонка переносится в несколько подколонок внутри своего лейна.
+  let maxH = 0
+  cols.forEach(col => {
+    let total = 0
+    for (const n of col.list) total += nodeHeight(n) + GAP_Y
+    total = Math.max(0, total - GAP_Y)
+    col.subCount = Math.max(1, Math.ceil(total / TARGET_H))
+    col.height = col.subCount === 1 ? total : Math.min(TARGET_H, Math.ceil(total / col.subCount) + 120)
+    col.width = col.subCount * NODE_W + (col.subCount - 1) * SUB_GAP_X
+    maxH = Math.max(maxH, col.height)
+  })
+  let laneX = 0
+  const pos = new Map()
+  cols.forEach((col, ci) => {
+    col.x = laneX
+    const limit = col.subCount === 1 ? Infinity : col.height
+    let sub = 0
+    let y = LANE_PAD + (maxH - col.height) / 2
+    const top = y
+    for (const n of col.list) {
+      const h = nodeHeight(n)
+      if (y > top && y + h - top > limit && sub < col.subCount - 1) {
+        sub++
+        y = top
+      }
+      pos.set(n.id, { x: laneX + sub * (NODE_W + SUB_GAP_X), y, w: NODE_W, h, ci, sub })
+      y += h + GAP_Y
+    }
+    laneX += col.width + GAP_X
+  })
+  return { pos, cols, maxH }
+}
+const { pos, cols, maxH } = layout()
+
+/* ── SVG сборка ───────────────────────────────────────────── */
+const svg = document.getElementById('canvas')
+function s (tag, attrs) {
+  const node = document.createElementNS(SVGNS, tag)
+  if (attrs) for (const k in attrs) node.setAttribute(k, attrs[k])
+  return node
+}
+function st (x, y, str, cls, fill, max) {
+  const t = s('text', { x, y, class: cls })
+  if (fill) t.setAttribute('fill', fill)
+  const v = String(str ?? '')
+  t.textContent = max && v.length > max ? v.slice(0, max - 1) + '…' : v
+  return t
+}
+const defs = s('defs')
+{
+  const grid = s('pattern', { id: 'grid', width: 44, height: 44, patternUnits: 'userSpaceOnUse' })
+  grid.append(s('path', { d: 'M 44 0 L 0 0 0 44', fill: 'none', stroke: '#ffffff', 'stroke-opacity': .045, 'stroke-width': 1 }))
+  defs.append(grid)
+  for (const l of layers) {
+    if (!/^[a-z0-9-]+$/.test(l.id)) continue
+    const f1 = s('filter', { id: `glow-${l.id}`, x: '-40%', y: '-40%', width: '180%', height: '180%' })
+    f1.append(s('feDropShadow', { dx: 0, dy: 0, stdDeviation: 5.5, 'flood-color': l.color, 'flood-opacity': .52 }))
+    const f2 = s('filter', { id: `glow2-${l.id}`, x: '-60%', y: '-60%', width: '220%', height: '220%' })
+    f2.append(s('feDropShadow', { dx: 0, dy: 0, stdDeviation: 9, 'flood-color': l.color, 'flood-opacity': .8 }))
+    const m = s('marker', { id: `arr-${l.id}`, markerWidth: 7, markerHeight: 7, refX: 5.6, refY: 3, orient: 'auto', markerUnits: 'userSpaceOnUse' })
+    m.append(s('path', { d: 'M0,0 L6,3 L0,6 z', fill: l.color, 'fill-opacity': .85 }))
+    defs.append(f1, f2, m)
+  }
+}
+svg.append(defs)
+const gridbg = s('rect', { class: 'gridbg', x: -20000, y: -20000, width: 60000, height: 60000, fill: 'url(#grid)' })
+svg.append(gridbg)
+const laneG = s('g', { class: 'lane-bg' })
+const edgeG = s('g')
+const nodeG = s('g')
+svg.append(laneG, edgeG, nodeG)
+
+for (const col of cols) {
+  const x = col.x
+  const lane = s('rect', {
+    x: x - 22, y: 4, rx: 14, width: col.width + 44, height: maxH + LANE_PAD + 18,
+    fill: col.layer.color, 'fill-opacity': .028, stroke: col.layer.color, 'stroke-opacity': .16,
+  })
+  const label = st(x - 6, 28, `${String(col.layer.label || col.layer.id).toUpperCase()} · ${col.list.length}`, 'lane-label', col.layer.color)
+  label.setAttribute('fill-opacity', .8)
+  laneG.append(lane, label)
+}
+
+/* узлы */
+const nodeEls = new Map()
+function renderNode (n) {
+  const p = pos.get(n.id)
+  const color = layerColor(n.layer)
+  const g = s('g', { class: 'node' + (n.inferred ? ' inf' : ''), transform: `translate(${p.x},${p.y})` })
+  g.dataset.id = n.id
+  g.dataset.layer = n.layer
+  const frame = s('rect', { class: 'frame', width: p.w, height: p.h, rx: 8, filter: `url(#glow-${n.layer})` })
+  frame.setAttribute('stroke', color)
+  g.append(frame)
+  const kindTag = st(p.w - 10, 14, (n.kind === 'store' && n.meta && n.meta.storeKind ? `${n.kind}:${n.meta.storeKind}` : n.kind).toUpperCase(), 'nkind', color)
+  kindTag.setAttribute('text-anchor', 'end')
+
+  if (n.kind === 'table') {
+    const band = s('rect', { class: 'thead', width: p.w, height: 26, rx: 8, fill: color, 'fill-opacity': .09 })
+    g.append(band, st(12, 17.5, n.label, 'nlabel', null, 26), kindTag,
+      s('line', { class: 'nsep', x1: 0, y1: 26, x2: p.w, y2: 26 }))
+    const { shown, extra } = shownColumns(n)
+    let y = 43
+    for (const col of shown) {
+      // '⚿' нет в системных шрифтах macOS (тофу) — ключ рисуем эмодзи
+      const mark = col.pk ? '🔑 ' : (col.fk ? '→ ' : '· ')
+      const row = st(14, y, mark + String(col.name ?? ''), 'ncol', col.pk ? color : null, 22)
+      const ty = st(p.w - 12, y, col.fk ? `${col.fk.table}.${col.fk.column}` : String(col.type ?? ''), 'ncol cty', '#5c6b85', 14)
+      ty.setAttribute('text-anchor', 'end')
+      g.append(row, ty)
+      y += 17
+    }
+    if (extra) g.append(st(14, y, `+${extra} ещё`, 'nmore'))
+  } else if (n.kind === 'route') {
+    const method = String((n.meta && n.meta.method) || '').toUpperCase()
+    const pathStr = (n.meta && n.meta.path) || n.label
+    const mColor = METHOD_COLORS[method] || '#94a3b8'
+    if (method) {
+      g.append(st(12, 19, method, 'nlabel', mColor, 8))
+      g.append(st(12 + (method.length + 1) * 7.4, 19, pathStr, 'nlabel', null, 26 - method.length))
+    } else {
+      g.append(st(12, 19, pathStr, 'nlabel', null, 28))
+    }
+    g.append(kindTag)
+    const extras = []
+    if (n.meta && Array.isArray(n.meta.middleware) && n.meta.middleware.length) extras.push(n.meta.middleware.join(' · '))
+    if (n.meta && n.meta.auth) extras.push(String(n.meta.auth))
+    g.append(st(12, 35, extras.join('  ·  ') || (n.meta && n.meta.framework) || '', 'nmut', null, 34))
+  } else {
+    g.append(st(12, 19, n.label, 'nlabel', null, 28), kindTag)
+    const sub = n.kind === 'enum' && n.meta && Array.isArray(n.meta.values)
+      ? n.meta.values.join(' | ')
+      : (n.source && n.source.file) || ''
+    g.append(st(12, 35, sub, 'nmut', null, 34))
+  }
+  const tip = s('title')
+  tip.textContent = n.id + (n.inferred ? ' · inferred' : '')
+  g.append(tip)
+  nodeEls.set(n.id, g)
+  nodeG.append(g)
+}
+for (const n of nodes) if (pos.has(n.id)) renderNode(n)
+if (!nodes.length) {
+  const msg = st(0, 0, 'architecture.json: нет узлов', '', null)
+  msg.setAttribute('id', 'emptymsg')
+  svg.append(msg)
+}
+
+/* рёбра: кубические Безье между колонками, боковая дуга внутри колонки */
+const edgeEls = new Map()
+function edgePath (a, b) {
+  if (a.ci === b.ci && a.sub === b.sub) {
+    const x = a.x + a.w
+    const y1 = a.y + a.h / 2
+    const y2 = b.y + b.h / 2
+    return `M ${x} ${y1} C ${x + 72} ${y1} ${x + 72} ${y2} ${x} ${y2}`
+  }
+  const forward = b.x >= a.x
+  const x1 = forward ? a.x + a.w : a.x
+  const x2 = forward ? b.x : b.x + b.w
+  const y1 = a.y + a.h / 2
+  const y2 = b.y + b.h / 2
+  const dx = Math.min(160, Math.max(40, Math.abs(b.ci - a.ci) * 40 + 40)) * (forward ? 1 : -1)
+  return `M ${x1} ${y1} C ${x1 + dx} ${y1} ${x2 - dx} ${y2} ${x2} ${y2}`
+}
+for (const e of edges) {
+  const a = pos.get(e.from)
+  const b = pos.get(e.to)
+  if (!a || !b) continue
+  const from = nodeById.get(e.from)
+  const color = layerColor(from ? from.layer : 'infra')
+  const p = s('path', { class: 'edge', d: edgePath(a, b), stroke: color, 'marker-end': `url(#arr-${from ? from.layer : 'infra'})` })
+  if (e.inferred) p.setAttribute('stroke-dasharray', '5 4')
+  p.dataset.id = e.id
+  const tip = s('title')
+  tip.textContent = `${e.kind}: ${e.from} → ${e.to}` + (e.label ? ` (${e.label})` : '') + (e.inferred ? ' · inferred' : '')
+  p.append(tip)
+  edgeEls.set(e.id, p)
+  edgeG.append(p)
+}
+
+/* смежность (для trace и панели) */
+const fwd = new Map()
+const back = new Map()
+for (const e of edges) {
+  if (!fwd.has(e.from)) fwd.set(e.from, [])
+  fwd.get(e.from).push(e)
+  if (!back.has(e.to)) back.set(e.to, [])
+  back.get(e.to).push(e)
+}
+
+/* ── видимость: слои + inferred ───────────────────────────── */
+const inferredToggle = document.getElementById('inferredToggle')
+function nodeVisible (n) {
+  return n && !hiddenLayers.has(n.layer) && (inferredToggle.checked || !n.inferred)
+}
+function applyVisibility () {
+  for (const n of nodes) {
+    const g = nodeEls.get(n.id)
+    if (g) g.classList.toggle('hidden', !nodeVisible(n))
+  }
+  for (const e of edges) {
+    const p = edgeEls.get(e.id)
+    if (!p) continue
+    const vis = nodeVisible(nodeById.get(e.from)) && nodeVisible(nodeById.get(e.to)) &&
+      (inferredToggle.checked || !e.inferred)
+    p.classList.toggle('hidden', !vis)
+  }
+}
+inferredToggle.addEventListener('change', applyVisibility)
+
+/* ── pan / zoom / fit через viewBox ───────────────────────── */
+const vb = { x: 0, y: 0, w: 1000, h: 600 }
+function updateVB () {
+  svg.setAttribute('viewBox', `${vb.x} ${vb.y} ${vb.w} ${vb.h}`)
+}
+function fit () {
+  let minX = Infinity; let minY = Infinity; let maxX = -Infinity; let maxY = -Infinity
+  for (const n of nodes) {
+    if (!nodeVisible(n)) continue
+    const p = pos.get(n.id)
+    if (!p) continue
+    minX = Math.min(minX, p.x); minY = Math.min(minY, p.y)
+    maxX = Math.max(maxX, p.x + p.w); maxY = Math.max(maxY, p.y + p.h)
+  }
+  if (minX === Infinity) { minX = 0; minY = 0; maxX = 1000; maxY = 600 }
+  minY -= LANE_PAD
+  const pad = 60
+  let w = maxX - minX + pad * 2
+  let h = maxY - minY + pad * 2
+  const r = svg.getBoundingClientRect()
+  const ar = r.width > 0 && r.height > 0 ? r.width / r.height : 16 / 9
+  if (w / h > ar) h = w / ar
+  else w = h * ar
+  vb.x = (minX + maxX) / 2 - w / 2
+  vb.y = (minY + maxY) / 2 - h / 2
+  vb.w = w
+  vb.h = h
+  updateVB()
+}
+svg.addEventListener('wheel', e => {
+  e.preventDefault()
+  const k = e.deltaY > 0 ? 1.12 : 1 / 1.12
+  const r = svg.getBoundingClientRect()
+  const mx = vb.x + (e.clientX - r.left) / r.width * vb.w
+  const my = vb.y + (e.clientY - r.top) / r.height * vb.h
+  vb.x = mx - (mx - vb.x) * k
+  vb.y = my - (my - vb.y) * k
+  vb.w *= k
+  vb.h *= k
+  updateVB()
+}, { passive: false })
+let drag = null
+let dragMoved = false
+svg.addEventListener('pointerdown', e => {
+  if (e.target.closest && e.target.closest('g.node')) return
+  drag = { sx: e.clientX, sy: e.clientY, vx: vb.x, vy: vb.y }
+  dragMoved = false
+  svg.classList.add('panning')
+  svg.setPointerCapture(e.pointerId)
+})
+svg.addEventListener('pointermove', e => {
+  if (!drag) return
+  const r = svg.getBoundingClientRect()
+  const dx = (e.clientX - drag.sx) * vb.w / r.width
+  const dy = (e.clientY - drag.sy) * vb.h / r.height
+  if (Math.abs(e.clientX - drag.sx) + Math.abs(e.clientY - drag.sy) > 3) dragMoved = true
+  vb.x = drag.vx - dx
+  vb.y = drag.vy - dy
+  updateVB()
+})
+svg.addEventListener('pointerup', () => { drag = null; svg.classList.remove('panning') })
+function centerOn (id) {
+  const p = pos.get(id)
+  if (!p) return
+  vb.x = p.x + p.w / 2 - vb.w / 2
+  vb.y = p.y + p.h / 2 - vb.h / 2
+  updateVB()
+}
+document.getElementById('fitBtn').addEventListener('click', fit)
+document.getElementById('printBtn').addEventListener('click', () => window.print())
+
+/* ── trace (BFS, циклы безопасны — visited) ───────────────── */
+let traceActive = false
+function runTrace (startId, direction) {
+  const adjacency = direction === 'down' ? fwd : back
+  const visited = new Set([startId])
+  const pathEdges = new Set()
+  const queue = [startId]
+  let qi = 0
+  while (qi < queue.length) {
+    const current = queue[qi++]
+    for (const e of adjacency.get(current) || []) {
+      pathEdges.add(e.id)
+      const next = direction === 'down' ? e.to : e.from
+      if (!visited.has(next)) {
+        visited.add(next)
+        queue.push(next)
+      }
+    }
+  }
+  traceActive = true
+  for (const n of nodes) {
+    const g = nodeEls.get(n.id)
+    if (g) g.classList.toggle('dimmed', !visited.has(n.id))
+  }
+  for (const e of edges) {
+    const p = edgeEls.get(e.id)
+    if (!p) continue
+    p.classList.toggle('traced', pathEdges.has(e.id))
+    p.classList.toggle('dimmed', !pathEdges.has(e.id))
+  }
+}
+function clearTrace () {
+  if (!traceActive) return
+  traceActive = false
+  for (const g of nodeEls.values()) g.classList.remove('dimmed')
+  for (const p of edgeEls.values()) p.classList.remove('dimmed', 'traced')
+}
+
+/* ── панель деталей ───────────────────────────────────────── */
+const details = document.getElementById('details')
+let selectedId = null
+function metaRest (n) {
+  const skip = new Set(['columns', 'indexes', 'orm', 'method', 'path', 'params', 'middleware', 'handler', 'auth', 'framework', 'values'])
+  const rest = []
+  for (const [key, value] of Object.entries(n.meta || {})) {
+    if (skip.has(key) || value === null || value === undefined) continue
+    rest.push([key, typeof value === 'object' ? JSON.stringify(value) : String(value)])
+  }
+  return rest
+}
+function relList (list, direction) {
+  const ul = el('ul', 'rel')
+  if (!list.length) {
+    const li = el('li', '', '')
+    li.append(el('span', 'empty', '—'))
+    ul.append(li)
+    return ul
+  }
+  for (const e of list) {
+    const otherId = direction === 'in' ? e.from : e.to
+    const other = nodeById.get(otherId)
+    const li = el('li')
+    li.dataset.goto = otherId
+    const name = el('span', 'en', other ? other.label : otherId)
+    const small = el('small', '', e.inferred ? ' · inferred' : '')
+    name.append(small)
+    li.append(el('span', 'ek', e.kind), name)
+    li.title = e.id
+    ul.append(li)
+  }
+  return ul
+}
+function showDetails (n) {
+  details.replaceChildren()
+  const color = layerColor(n.layer)
+  const top = el('div', 'd-top')
+  const badge = el('span', 'kbadge', n.kind)
+  badge.style.setProperty('--c', color)
+  top.append(badge)
+  if (n.inferred) top.append(el('span', 'd-inferred', 'inferred'))
+  details.append(top, el('h2', '', n.label))
+
+  const src = el('div', 'src')
+  const code = el('code', '', n.source && n.source.file ? `${n.source.file}:${n.source.line}` : 'источник неизвестен')
+  const copy = el('button', 'copy', 'copy')
+  copy.addEventListener('click', () => {
+    const value = code.textContent
+    const done = () => { copy.textContent = '✓'; setTimeout(() => { copy.textContent = 'copy' }, 900) }
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(value).then(done, done)
+    else done()
+  })
+  src.append(code, copy)
+  details.append(src)
+
+  const bar = el('div', 'tracebar')
+  const up = el('button', 'btn', '↑ Trace upstream')
+  const down = el('button', 'btn', '↓ Trace downstream')
+  const reset = el('button', 'btn', 'Reset')
+  up.addEventListener('click', () => runTrace(n.id, 'up'))
+  down.addEventListener('click', () => runTrace(n.id, 'down'))
+  reset.addEventListener('click', clearTrace)
+  bar.append(up, down, reset)
+  details.append(bar)
+
+  if (n.kind === 'table' && n.meta && Array.isArray(n.meta.columns) && n.meta.columns.length) {
+    details.append(el('h3', '', `Колонки · ${n.meta.columns.length}`))
+    const table = el('table')
+    const hr = el('tr')
+    for (const h of ['name', 'type', 'flags']) hr.append(el('th', '', h))
+    table.append(hr)
+    for (const col of n.meta.columns) {
+      const row = el('tr')
+      const flags = []
+      if (col.pk) flags.push('PK')
+      if (col.fk) flags.push(`FK→${col.fk.table}.${col.fk.column}`)
+      if (col.unique) flags.push('unique')
+      if (col.nullable) flags.push('null')
+      row.append(el('td', '', String(col.name ?? '')), el('td', '', String(col.type ?? '')), el('td', 'flag', flags.join(' ')))
+      table.append(row)
+    }
+    details.append(table)
+  }
+  if (n.kind === 'route' && n.meta) {
+    details.append(el('h3', '', 'Роут'))
+    const kv = el('div', 'kv')
+    const push = (k, v) => { kv.append(el('b', '', k), el('span', '', v)) }
+    if (n.meta.method) push('method', String(n.meta.method).toUpperCase())
+    if (n.meta.path) push('path', n.meta.path)
+    if (n.meta.auth) push('auth', String(n.meta.auth))
+    if (n.meta.framework) push('framework', String(n.meta.framework))
+    if (Array.isArray(n.meta.middleware) && n.meta.middleware.length) push('middleware', n.meta.middleware.join(', '))
+    if (n.meta.handler) push('handler', `${n.meta.handler.file || ''}:${n.meta.handler.line ?? ''} ${n.meta.handler.name || ''}`)
+    details.append(kv)
+    if (Array.isArray(n.meta.params) && n.meta.params.length) {
+      details.append(el('h3', '', 'Параметры'))
+      const table = el('table')
+      const hr = el('tr')
+      for (const h of ['name', 'in', 'type', 'req']) hr.append(el('th', '', h))
+      table.append(hr)
+      for (const p of n.meta.params) {
+        const row = el('tr')
+        row.append(el('td', '', String(p.name ?? '')), el('td', '', String(p.in ?? '')), el('td', '', String(p.type ?? '')), el('td', '', p.required ? '✓' : ''))
+        table.append(row)
+      }
+      details.append(table)
+    }
+  }
+  const rest = metaRest(n)
+  if (rest.length) {
+    details.append(el('h3', '', 'Meta'))
+    const kv = el('div', 'kv')
+    for (const [k, v] of rest) kv.append(el('b', '', k), el('span', '', v))
+    details.append(kv)
+  }
+  details.append(el('h3', '', `Входящие · ${(back.get(n.id) || []).length}`), relList(back.get(n.id) || [], 'in'))
+  details.append(el('h3', '', `Исходящие · ${(fwd.get(n.id) || []).length}`), relList(fwd.get(n.id) || [], 'out'))
+  details.hidden = false
+}
+details.addEventListener('click', e => {
+  const li = e.target.closest && e.target.closest('li[data-goto]')
+  if (!li) return
+  selectNode(li.dataset.goto)
+  centerOn(li.dataset.goto)
+})
+function selectNode (id) {
+  const n = nodeById.get(id)
+  if (!n) return
+  if (selectedId) {
+    const prev = nodeEls.get(selectedId)
+    if (prev) prev.classList.remove('selected')
+  }
+  selectedId = id
+  const g = nodeEls.get(id)
+  if (g) g.classList.add('selected')
+  showDetails(n)
+}
+function clearSelection () {
+  if (selectedId) {
+    const prev = nodeEls.get(selectedId)
+    if (prev) prev.classList.remove('selected')
+  }
+  selectedId = null
+  details.hidden = true
+  clearTrace()
+}
+svg.addEventListener('click', e => {
+  if (dragMoved) { dragMoved = false; return }
+  const g = e.target.closest && e.target.closest('g.node')
+  if (g) selectNode(g.dataset.id)
+  else clearSelection()
+})
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') clearSelection()
+})
+
+/* ── поиск ────────────────────────────────────────────────── */
+const search = document.getElementById('search')
+function matchesQuery (n, q) {
+  return n.label.toLowerCase().includes(q) || n.id.toLowerCase().includes(q) ||
+    ((n.source && n.source.file) || '').toLowerCase().includes(q)
+}
+search.addEventListener('input', () => {
+  const q = search.value.trim().toLowerCase()
+  for (const n of nodes) {
+    const g = nodeEls.get(n.id)
+    if (g) g.classList.toggle('matched', !!q && matchesQuery(n, q))
+  }
+})
+search.addEventListener('keydown', e => {
+  if (e.key !== 'Enter') return
+  const q = search.value.trim().toLowerCase()
+  if (!q) return
+  const first = nodes.find(n => nodeVisible(n) && matchesQuery(n, q))
+  if (first) centerOn(first.id)
+})
+
+/* ── старт ────────────────────────────────────────────────── */
+applyVisibility()
+fit()
+window.addEventListener('resize', () => { if (!traceActive) fit() })
+</script>
+</body>
+</html>

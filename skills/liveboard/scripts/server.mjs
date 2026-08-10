@@ -11,7 +11,7 @@ const DASHBOARD_FILE = path.join(SKILL_ROOT, 'assets', 'dashboard.html')
 const ROLE_NAMES = [
   'architect', 'backend', 'frontend', 'analyzer', 'swagger', 'firecrawl',
   'render', 'database', 'resilience', 'screenshot', 'visual-research',
-  'pinpoint', 'drawio', 'mermaid', 'testing', 'gitflow', 'security',
+  'pinpoint', 'drawio', 'mermaid', 'archmap', 'testing', 'gitflow', 'security',
   'docs', 'devops', 'liveboard',
 ]
 
@@ -125,7 +125,7 @@ function processCwds(pids) {
   const result = new Map()
   if (process.platform === 'linux') {
     for (const pid of pids) {
-      try { result.set(String(pid), fs.readlinkSync(`/proc/${pid}/cwd`)) } catch {}
+      try { result.set(String(pid), fs.readlinkSync(`/proc/${pid}/cwd`)) } catch { /* процесс умер или нет прав — пропускаем pid */ }
     }
   } else if (process.platform === 'darwin' && pids.length) {
     const output = command('lsof', ['-a', '-d', 'cwd', '-p', pids.join(','), '-Fpn'], { timeout: 2_000 })
@@ -307,7 +307,7 @@ function installWatchers() {
         timer = setTimeout(refresh, 150)
       })
       watchers.push(watcher)
-    } catch {}
+    } catch { /* каталог не наблюдаем (нет прав/удалён) — табло живёт на polling */ }
   }
 }
 

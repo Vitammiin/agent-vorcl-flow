@@ -10,8 +10,8 @@ One `npx` command installs them. No remote backend or cloud hosting: your coding
 ![Cursor](https://img.shields.io/badge/Cursor-native%20adapter-111111)
 ![Kimi CLI](https://img.shields.io/badge/Kimi%20CLI-adapter-000000)
 ![Node](https://img.shields.io/badge/node-%E2%89%A518-339933?logo=node.js&logoColor=white)
-![Agents](https://img.shields.io/badge/agents-20-blue)
-![Commands](https://img.shields.io/badge/commands-118-blue)
+![Agents](https://img.shields.io/badge/agents-21-blue)
+![Commands](https://img.shields.io/badge/commands-124-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
 🌐 [Русская версия](./README.ru.md)
@@ -22,9 +22,9 @@ One `npx` command installs them. No remote backend or cloud hosting: your coding
 
 ## What is this?
 
-Agent-Vorcl-Flow turns a supported coding agent into a **structured engineering team**. Instead of one general assistant, you get **20 focused sub-agents** (architect, backend, frontend, DB engineer, liveboard operator, and more), each with its own domain **skills**, quick **slash commands**, and the **MCP tools** it needs. Every non-trivial task runs through a disciplined **Task Master** loop — *goal → tasks → implement → verify → done* — so work is planned, tracked, and survives interruptions.
+Agent-Vorcl-Flow turns a supported coding agent into a **structured engineering team**. Instead of one general assistant, you get **21 focused sub-agents** (architect, backend, frontend, DB engineer, architecture cartographer, liveboard operator, and more), each with its own domain **skills**, quick **slash commands**, and the **MCP tools** it needs. Every non-trivial task runs through a disciplined **Task Master** loop — *goal → tasks → implement → verify → done* — so work is planned, tracked, and survives interruptions.
 
-- 🧩 **20 sub-agents**, 40 skills, 118 slash commands
+- 🧩 **21 sub-agents**, 41 skills, 124 slash commands
 - ⚡ **One-command install** for Claude Code, Codex, Cursor, and/or Kimi CLI — `npx`
 - 🔌 **11 MCP servers** wired in (GitHub, Postgres, MongoDB, Redis, Docker, Firecrawl, Vercel, Render, filesystem, Task Master, Mermaid)
 - 🔑 **One `.env` file for all runtimes** — keys read by a launcher, not `~/.zshrc`, so they work even from GUI/IDE launches; no remote AVF service; liveboard is localhost-only and ephemeral
@@ -135,6 +135,7 @@ This keeps work planned, checkpointed, and resumable — nothing is declared "do
 | 🔎 **visual-research** | Screenshot → verified answer | Identifies the site/page, finds official docs, checks live data and answers with URLs and confidence |
 | 🎯 **pinpoint** | Screenshot → place in an existing project (read-only) | Grounds a running-app screenshot in the real codebase — component, `file:line`, route/page, the exact control, and the logic behind it; creates nothing, delegates the edit |
 | 📊 **drawio** | Diagrams (draw.io / diagrams.net) | Flowchart, BPMN, UML, ERD, network/cloud, and PMP/PMBOK (WBS, Gantt, RACI…) |
+| 🗺️ **archmap** | Architecture cartographer | Deterministic code → `architecture.json` (every node with `source:{file,line}`) → interactive HTML map, draw.io, Mermaid, ARCHITECTURE.md, PDF; unproven facts are marked `inferred` |
 | 🧜 **mermaid** | Mermaid diagrams (+ real render) | flowchart, sequence, class, state, ER, gantt, gitGraph, mindmap…; validated via mcp-mermaid/`mmdc`; hands you the file (`.mmd` + SVG/PNG/PDF) |
 | 🧪 **testing** | Test & verification engineer | Unit (Vitest/Jest), integration (Supertest), E2E (Playwright), coverage, flaky-test hunting; executes each task's `testStrategy` — nothing is "done" without a green run |
 | 🌿 **gitflow** | Git workflow & releases | Conventional Commits, by-name commits (never `git add .`), PRs, Keep-a-Changelog, semver releases; push only with explicit confirmation |
@@ -147,6 +148,7 @@ This keeps work planned, checkpointed, and resumable — nothing is declared "do
 - **Frontend always talks to a real API.** The backend's OpenAPI spec is the single source of truth; types are generated from it (`openapi-typescript` + `openapi-fetch`). No mocks in the production path.
 - **`database` mutations require explicit confirmation.** Analytics are read-only; schema/data changes (DDL/DML/migrations) never run without your go-ahead.
 - **`resilience` ships a safety hook.** A non-blocking `PostToolUse` hook (`catch-guard.js`) gently flags empty `catch {}` blocks in files you just edited.
+- **`archmap` never draws from imagination.** Extraction and rendering are strictly separated: zero-dependency scripts walk the repo into `architecture.json` (databases with real FK cardinality, API routes, AI agents with their models/tools/memory, import graph, env), and every diagram is rendered from that JSON only. Anything the LLM adds without a verifiable `file:line` is force-marked `inferred:true` and drawn dashed.
 - **`pinpoint` finds, never creates.** Given a screenshot of a running app, it maps the screen to the real code — component, route, the exact control and the logic behind it — and hands the edit to `frontend`/`backend`. It works on what already exists (the inverse of `screenshot`).
 - **`visual-research` verifies instead of guessing.** It treats a screenshot as evidence, confirms the official domain and docs, checks current site data, and flags possible phishing or stale values.
 - **`i18n` enforces "zero language hardcoding."** Agents first detect whether a project is multilingual and adapt — user-facing strings go through a translation layer (next-intl / react-i18next / i18next), never inline.
@@ -291,6 +293,17 @@ Every command below is a slash command. `<…>` marks your input.
 | `/drawio:pmp <type> <project>` | Build a PMP/PMBOK diagram — WBS, PERT/CPM, Gantt, RACI, risk matrix, stakeholder grid. |
 | `/drawio:convert <source> [type]` | Convert a source to a diagram — DB schema → ERD, folders → tree, code → UML, mermaid/CSV/JSON. |
 | `/drawio:refine <file>` | Refine an existing `.drawio` — layout, theme, add/remove nodes, align to grid. |
+
+### 🗺️ archmap — architecture map from code
+
+| Command | What it does |
+| --- | --- |
+| `/archmap:vorcl <goal>` | A mapping goal via Task Master — build to a verified artifact set. |
+| `/archmap:map [repo]` | Full pipeline: extraction → `architecture.json` → LLM annotation → all formats (HTML, draw.io, Mermaid, ARCHITECTURE.md, PDF). |
+| `/archmap:extract [repo]` | Extraction only — machine-readable `architecture.json` with `source:{file,line}` on every node. |
+| `/archmap:annotate [json]` | LLM enrichment of an existing `architecture.json` (agent memory, dataflow semantics); unproven facts auto-demoted to `inferred`. |
+| `/archmap:html [json]` | Interactive self-contained HTML map — layer toggles, trace beams, node → `file:line` panel, search, print CSS. |
+| `/archmap:diagram [json] [drawio\|mermaid]` | draw.io (multi-page: Overview / ERD / API / Agents) and/or Mermaid views, validated. |
 
 ### 🧜 mermaid — Mermaid diagrams (+ real render)
 | Command | What it does |
@@ -503,9 +516,9 @@ Kimi CLI has no `${VAR}` expansion in `mcp.json`, so keys come from the shared `
 ```text
 .claude-plugin/plugin.json      # plugin manifest
 .claude-plugin/marketplace.json # local marketplace (for install)
-agents/       20 sub-agent definitions (*.md)
-skills/       <skill>/SKILL.md            (40 skills; liveboard includes its in-memory server + HTML asset)
-commands/     <namespace>/<command>.md    (118 commands, /namespace:command, including /vorcl)
+agents/       21 sub-agent definitions (*.md)
+skills/       <skill>/SKILL.md            (41 skills; liveboard and archmap ship their own scripts + HTML assets)
+commands/     <namespace>/<command>.md    (124 commands, /namespace:command, including /vorcl)
 hooks/        hooks.json + session-start.js + catch-guard.js (PostToolUse: empty catch)
 .mcp.json     github, filesystem, postgres, mongodb, redis, docker, firecrawl, vercel, render, task-master, mermaid
 .env.example  template for ~/.config/agent-vorcl-flow/.env (single key file for all runtimes)

@@ -28,6 +28,7 @@ allowed-tools: Read, Write, Edit, Bash, Grep, Glob
 | Скриншот UI → новый код | `screenshot` |
 | Скриншот → место в существующем коде (read-only) | `pinpoint` |
 | Диаграммы draw.io (сложная раскладка, PMP/PMBOK) | `drawio` |
+| Карта архитектуры по коду (architecture.json, ERD, интерактивный HTML) | `archmap` |
 | Диаграммы Mermaid (в git/README, с рендер-проверкой) | `mermaid` |
 | Тесты (unit/integration/e2e), верификация testStrategy | `testing` |
 | Коммиты, PR, changelog, релизы, git-гигиена | `gitflow` |

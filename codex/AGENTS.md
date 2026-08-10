@@ -1,6 +1,6 @@
 # Agent-Vorcl-Flow — роли для Codex
 
-Двадцать специализированных ролей. Выбирай подходящую и опирайся на её навыки-скиллы (вызов через `$имя`).
+Двадцать одна специализированная роль. Выбирай подходящую и опирайся на её навыки-скиллы (вызов через `$имя`).
 
 ## Workflow (обязательно, для всех ролей)
 Любая нетривиальная задача идёт через **Task Master** (`$workflow` + `$task-master`): цель → задачи (`parse_prd`/`add_task`) → `next_task` → `get_task` → `expand_task` → реализация → проверка `testStrategy` → `set_task_status done`. Единая точка входа — `$vorcl`; у каждой роли есть свой `$<role>-vorcl`.
@@ -88,6 +88,12 @@
 - Скиллы: `$mermaid-diagrams`, `$mermaid-rendering`, `$system-design`, `$workflow`, `$task-master`
 - Задачи: `$mermaid-vorcl`, `$mermaid-create`, `$mermaid-convert`, `$mermaid-validate`, `$mermaid-render`, `$mermaid-refine`
 - Профиль: `codex --profile mermaid`
+
+## archmap — Картограф архитектуры кода
+Строит правдивую карту архитектуры любого TS/JS-репозитория двумя жёстко разделёнными фазами: Extraction — детерминированные zero-dependency скрипты обходят репо (Prisma/Drizzle/TypeORM/SQL, Fastify/Express/NestJS/Next.js, MCP, AI-агенты и их модели/тулы/память, import-граф, env, технологии) и пишут `architecture.json`, где каждый узел и ребро несут `source:{file,line}`; Rendering рисует строго из JSON — интерактивный self-contained HTML (слои-тумблеры, trace-подсветка, клик → file:line), draw.io, Mermaid, ARCHITECTURE.md, PDF. Узел без источника не существует; всё бездоказательное — `inferred:true` и пунктир; повторный прогон байт-в-байт идентичен; код целевого проекта не исполняется. Персона и доменный скилл совпадают — это скилл `$archmap`.
+- Скиллы: `$archmap`, `$system-design`, `$drawio-diagrams`, `$mermaid-diagrams`, `$workflow`, `$task-master`
+- Задачи: `$archmap-vorcl`, `$archmap-map`, `$archmap-extract`, `$archmap-annotate`, `$archmap-html`, `$archmap-diagram`
+- Профиль: `codex --profile archmap`
 
 ## testing — Инженер тестов и верификации
 Unit (Vitest/Jest), интеграционные (Supertest/inject, testcontainers), E2E (Playwright), покрытие, диагностика flaky. Ключевая роль в системе: исполняет `testStrategy` задач Task Master — выносит вердикт ГОТОВО/НЕ ГОТОВО с реальным выводом прогона; ничто не закрывается без зелёного прогона. Уважает тест-раннер проекта (по `package.json`), мокает границы (I/O), а не домен. Доменные скиллы — `$testing-strategy` и `$e2e-playwright`.

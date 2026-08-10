@@ -16,6 +16,7 @@ const note = [
   "- visual-research (скриншот → сайт, docs и live data): /visual-research:vorcl, /visual-research:identify, /visual-research:search, /visual-research:answer, /visual-research:hints",
   "- pinpoint (скриншот → место в существующем проекте, read-only): /pinpoint:vorcl, /pinpoint:locate, /pinpoint:route, /pinpoint:control, /pinpoint:trace, /pinpoint:handoff",
   "- drawio (диаграммы draw.io/diagrams.net): /drawio:vorcl, /drawio:create, /drawio:pmp, /drawio:convert, /drawio:refine",
+  "- archmap (карта архитектуры кода: extraction → architecture.json → HTML/drawio/mermaid/PDF): /archmap:vorcl, /archmap:map, /archmap:extract, /archmap:annotate, /archmap:html, /archmap:diagram",
   "- mermaid (Mermaid-диаграммы + валидация/рендер через mcp-mermaid): /mermaid:vorcl, /mermaid:create, /mermaid:convert, /mermaid:validate, /mermaid:render, /mermaid:refine",
   "- testing (тесты + верификация testStrategy): /testing:vorcl, /testing:unit, /testing:integration, /testing:e2e, /testing:verify, /testing:coverage, /testing:flaky",
   "- gitflow (git-гигиена: коммиты, PR, changelog, релизы): /gitflow:vorcl, /gitflow:commit, /gitflow:pr, /gitflow:changelog, /gitflow:release, /gitflow:audit",
