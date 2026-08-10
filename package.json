@@ -1,7 +1,7 @@
 {
   "name": "agent-vorcl-flow",
   "version": "2.1.1",
-  "description": "Agent-Vorcl-Flow для Claude Code, GPT Codex и Cursor: роли, skills, команды, MCP и эфемерное локальное live-табло.",
+  "description": "Agent-Vorcl-Flow для Claude Code, GPT Codex, Cursor и Kimi CLI: роли, skills, команды, MCP и эфемерное локальное live-табло.",
   "bin": {
     "agent-vorcl-flow": "bin/install.mjs"
   },
@@ -13,9 +13,11 @@
     "hooks/",
     "scripts/",
     ".mcp.json",
+    ".env.example",
     ".claude-plugin/",
     "codex/",
     "cursor/",
+    "kimi/",
     "README.md"
   ],
   "keywords": [
@@ -23,6 +25,8 @@
     "claude-code",
     "codex",
     "cursor",
+    "kimi",
+    "kimi-cli",
     "plugin",
     "agents",
     "subagents",

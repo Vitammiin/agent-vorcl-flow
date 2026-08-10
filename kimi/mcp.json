@@ -29,12 +29,12 @@
       "args": ["__AVF_LAUNCHER__", "--need=FIRECRAWL_API_KEY", "--", "npx", "-y", "firecrawl-mcp"]
     },
     "vercel": {
-      "type": "http",
-      "url": "https://mcp.vercel.com"
+      "url": "https://mcp.vercel.com",
+      "transport": "http"
     },
     "render": {
-      "type": "http",
-      "url": "https://mcp.render.com/mcp"
+      "url": "https://mcp.render.com/mcp",
+      "transport": "http"
     },
     "task-master": {
       "command": "node",

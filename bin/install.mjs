@@ -1,16 +1,19 @@
 #!/usr/bin/env node
 // Установщик Agent-Vorcl-Flow.
+//   Общий слой → launcher bin/mcp-env.mjs + единый ~/.config/agent-vorcl-flow/.env (секреты MCP).
 //   Claude Code → настоящий плагин (CLI, фолбэк — запись в ~/.claude/settings.json).
 //   Codex       → skills + config.toml + AGENTS.md, вмёрженные в ~/.codex / ~/.agents.
 //   Cursor      → skills + custom subagents + MCP, установленные в ~/.cursor.
+//   Kimi CLI    → mcpServers, вмёрженные в ~/.kimi/mcp.json.
 //
 // Запуск:
 //   npx github:Vitammiin/agent-vorcl-flow          # без публикации в npm
 //   npx agent-vorcl-flow                            # после npm publish
-//   … [--claude] [--codex] [--cursor]               # без флагов — все три адаптера
+//   … [--claude] [--codex] [--cursor] [--kimi]      # без флагов — все адаптеры
 //
-// Ключи установщик НЕ трогает: их каждый задаёт сам через env (см. вывод в конце).
-// Переопределения: AVF_REPO=<owner/repo>, CODEX_HOME=<path>, CURSOR_HOME=<path>, AVF_SKILLS_DIR=<path>.
+// Секреты установщик НЕ трогает: он лишь создаёт пустой .env из шаблона; ключи вписываешь сам.
+// Переопределения: AVF_REPO=<owner/repo>, CODEX_HOME=<path>, CURSOR_HOME=<path>, KIMI_HOME=<path>,
+//                  AVF_SKILLS_DIR=<path>, AGENT_VORCL_HOME=<path> (каталог launcher/.env).
 
 import { spawnSync } from 'node:child_process'
 import { fileURLToPath } from 'node:url'
@@ -37,7 +40,8 @@ const argv = process.argv.slice(2)
 const wantClaude = argv.includes('--claude')
 const wantCodex = argv.includes('--codex')
 const wantCursor = argv.includes('--cursor')
-const all = !wantClaude && !wantCodex && !wantCursor // без флагов — все поддерживаемые среды
+const wantKimi = argv.includes('--kimi')
+const all = !wantClaude && !wantCodex && !wantCursor && !wantKimi // без флагов — все поддерживаемые среды
 
 const log = (m) => console.log(m)
 const ok = (m) => console.log(`  ✔ ${m}`)
@@ -46,6 +50,44 @@ const warn = (m) => console.error(`  ⚠ ${m}`) // предупреждения 
 function hasCmd(cmd) {
   const r = spawnSync(cmd, ['--version'], { stdio: 'ignore' })
   return !r.error // ENOENT → r.error задан
+}
+
+// Домашний каталог AVF (совпадает с логикой bin/mcp-env.mjs).
+function avfHome() {
+  if (process.env.AGENT_VORCL_HOME) return process.env.AGENT_VORCL_HOME
+  if (process.platform === 'win32' && process.env.APPDATA) return path.join(process.env.APPDATA, 'agent-vorcl-flow')
+  const xdg = process.env.XDG_CONFIG_HOME || path.join(os.homedir(), '.config')
+  return path.join(xdg, 'agent-vorcl-flow')
+}
+
+// Абсолютный путь к стабильной копии launcher'а (posix-слэши — валидно и в JSON, и в TOML,
+// и принимается node на Windows). Заполняется installShared().
+let STABLE_LAUNCHER = ''
+const withLauncher = (content) => content.split('__AVF_LAUNCHER__').join(STABLE_LAUNCHER)
+
+// Общий слой для всех рантаймов: стабильная копия launcher'а + единый файл секретов .env.
+// Claude берёт launcher из своего плагина (${CLAUDE_PLUGIN_ROOT}), но .env общий для всех.
+function installShared() {
+  log('\n▸ Общий слой (launcher + .env)')
+  const home = avfHome()
+  const binDir = path.join(home, 'bin')
+  fs.mkdirSync(binDir, { recursive: true })
+  const dest = path.join(binDir, 'mcp-env.mjs')
+  fs.cpSync(path.join(PKG_ROOT, 'bin', 'mcp-env.mjs'), dest)
+  STABLE_LAUNCHER = dest.split(path.sep).join('/')
+  ok(`launcher → ${dest}`)
+
+  const envFile = path.join(home, '.env')
+  if (fs.existsSync(envFile)) {
+    log(`  .env уже есть — ${envFile} (не трогаю)`)
+    return
+  }
+  const example = path.join(PKG_ROOT, '.env.example')
+  if (fs.existsSync(example)) {
+    fs.copyFileSync(example, envFile)
+    try { fs.chmodSync(envFile, 0o600) } catch { /* Windows / нет прав — не критично */ }
+    ok(`создан ${envFile} — впиши сюда свои ключи`)
+  }
 }
 
 // Официальный Firecrawl installer ставит собственные firecrawl-* skills.
@@ -138,7 +180,7 @@ function installCodex() {
   ok(`скиллы → ${skillsDir} (${copied.copied} скопировано${copied.preserved ? `, ${copied.preserved} upstream Firecrawl сохранено` : ''})`)
 
   fs.mkdirSync(codexHome, { recursive: true })
-  mergeBlock(path.join(codexHome, 'config.toml'), fs.readFileSync(srcConfig, 'utf8'), 'config.toml (mcp_servers + profiles)')
+  mergeBlock(path.join(codexHome, 'config.toml'), withLauncher(fs.readFileSync(srcConfig, 'utf8')), 'config.toml (mcp_servers + profiles)')
   mergeBlock(path.join(codexHome, 'AGENTS.md'), fs.readFileSync(srcAgents, 'utf8'), 'AGENTS.md')
 }
 
@@ -214,7 +256,7 @@ function mergeCursorMcp(file, sourceFile) {
     warn(`неверная структура ${file} — MCP-конфиг Cursor пропущен; скиллы и агенты установлены`)
     return
   }
-  const incoming = JSON.parse(fs.readFileSync(sourceFile, 'utf8'))
+  const incoming = JSON.parse(withLauncher(fs.readFileSync(sourceFile, 'utf8')))
   if (current.mcpServers != null && (typeof current.mcpServers !== 'object' || Array.isArray(current.mcpServers))) {
     warn(`поле mcpServers в ${file} не является объектом — MCP-конфиг Cursor пропущен`)
     return
@@ -232,6 +274,22 @@ function mergeCursorMcp(file, sourceFile) {
   }
   fs.writeFileSync(file, JSON.stringify(current, null, 2) + '\n')
   ok(`MCP → ${file} (${added} добавлено${kept ? `, ${kept} существующих сохранено` : ''})`)
+}
+
+// ---------- Kimi CLI ----------
+// Kimi CLI (MoonshotAI/kimi-cli) читает ~/.kimi/mcp.json в той же mcpServers-схеме,
+// что Claude/Cursor. Мёржим наши серверы, не затирая пользовательские.
+function installKimi() {
+  log('\n▸ Kimi CLI')
+  const kimiHome = process.env.KIMI_HOME || path.join(os.homedir(), '.kimi')
+  const srcMcp = path.join(PKG_ROOT, 'kimi', 'mcp.json')
+  if (!fs.existsSync(srcMcp)) {
+    warn('kimi-адаптер в пакете отсутствует — пропуск')
+    return
+  }
+  fs.mkdirSync(kimiHome, { recursive: true })
+  mergeCursorMcp(path.join(kimiHome, 'mcp.json'), srcMcp)
+  log('    альтернатива: kimi mcp list  — проверить подключённые серверы')
 }
 
 // ---------- banner ----------
@@ -273,7 +331,7 @@ function banner() {
   art.forEach((line, i) => log('  ' + c(gradient[i], line)))
   log('')
   log('  ' + bold(c(45, 'AGENT VORCL FLOW')) + (version ? ' ' + c(141, `v${version}`) : '') + (stats ? dim(`  —  ${stats}`) : ''))
-  log('  ' + dim('Специализированные AI-субагенты для Claude Code, GPT Codex и Cursor'))
+  log('  ' + dim('Специализированные AI-субагенты для Claude Code, GPT Codex, Cursor и Kimi CLI'))
   log('')
 }
 
@@ -291,18 +349,24 @@ function runStep(name, fn) {
 
 banner()
 if (argv.includes('--banner-only')) process.exit(0) // предпросмотр приветствия без установки
+// Общий слой (launcher + .env) нужен всем адаптерам — ставим всегда, до них.
+runStep('Общий слой', installShared)
 if (all || wantClaude) runStep('Claude Code', installClaude)
 if (all || wantCodex) runStep('Codex', installCodex)
 if (all || wantCursor) runStep('Cursor', installCursor)
+if (all || wantKimi) runStep('Kimi CLI', installKimi)
 
-log('\n▸ Ключи (каждый задаёт свои через окружение — удалённых сервисов AVF нет):')
-log('    export ANTHROPIC_API_KEY=…    # Task Master: Claude (выбери один main provider)')
-log('    export OPENAI_API_KEY=…       # Task Master: GPT (альтернатива Claude)')
-log('    export PERPLEXITY_API_KEY=…   # Task Master: только optional research')
-log('    task-master models --setup    # выбрать main / research / fallback')
-log('    export FIRECRAWL_API_KEY=…    # firecrawl')
-log('    export GITHUB_TOKEN=…         # github')
-log('    # агент database: POSTGRES_URL / MONGODB_URI / REDIS_URL — подключение к БД твоего проекта')
+const envPath = path.join(avfHome(), '.env')
+log('\n▸ Ключи — ОДИН файл на все рантаймы (Claude / Codex / Cursor / Kimi):')
+log(`    ${envPath}`)
+log('    Открой его и впиши только нужные ключи (пустые серверы просто не поднимаются):')
+log('      ANTHROPIC_API_KEY / OPENAI_API_KEY   # Task Master (выбери main provider)')
+log('      PERPLEXITY_API_KEY                    # Task Master: optional research')
+log('      FIRECRAWL_API_KEY                     # firecrawl')
+log('      GITHUB_TOKEN                          # github')
+log('      MONGODB_URI / REDIS_URL / POSTGRES_URL # агент database')
+log('    Секреты читает launcher bin/mcp-env.mjs — ~/.zshrc для них больше не нужен.')
+log('    task-master models --setup             # выбрать main / research / fallback')
 if (hadError) {
   console.error('\nЗавершено с ошибками — см. ✖ выше. Установленные части рабочие, сбойные перезапусти после исправления.')
   process.exit(1)

@@ -1,39 +1,42 @@
 # Agent-Vorcl-Flow — конфиг для Codex CLI.
 # Вставьте в ~/.codex/config.toml или примените scripts/install.sh.
+#
+# Секреты НЕ хранятся здесь. Каждый MCP-сервер запускается через launcher
+# bin/mcp-env.mjs, который читает ключи из ~/.config/agent-vorcl-flow/.env
+# (тот же файл для Claude/Cursor/Kimi). Установщик подставляет абсолютный путь
+# launcher'а вместо __AVF_LAUNCHER__. Серверы без нужного ключа не поднимаются
+# (в логах — понятная подсказка), остальные работают.
 
 # ===== MCP-серверы =====
 [mcp_servers.github]
-command = "npx"
-args = ["-y", "@modelcontextprotocol/server-github"]
-env = { GITHUB_PERSONAL_ACCESS_TOKEN = "" }   # впишите токен
+command = "node"
+args = ["__AVF_LAUNCHER__", "--need=GITHUB_PERSONAL_ACCESS_TOKEN", "--", "npx", "-y", "@modelcontextprotocol/server-github"]
 
 [mcp_servers.filesystem]
-command = "npx"
-args = ["-y", "@modelcontextprotocol/server-filesystem", "."]
+command = "node"
+args = ["__AVF_LAUNCHER__", "--", "npx", "-y", "@modelcontextprotocol/server-filesystem", "."]
 
 [mcp_servers.postgres]
-command = "npx"
-args = ["-y", "@modelcontextprotocol/server-postgres", "postgres://user:pass@localhost:5432/db"]  # впишите URL
+command = "node"
+args = ["__AVF_LAUNCHER__", "--need=POSTGRES_URL", "--", "npx", "-y", "@modelcontextprotocol/server-postgres", "%%POSTGRES_URL%%"]
 
 # MongoDB — официальный MCP-сервер. Для аудита добавьте аргумент "--readOnly".
 [mcp_servers.mongodb]
-command = "npx"
-args = ["-y", "mongodb-mcp-server@latest"]
-env = { MDB_MCP_CONNECTION_STRING = "" }   # впишите mongodb:// URI
+command = "node"
+args = ["__AVF_LAUNCHER__", "--need=MDB_MCP_CONNECTION_STRING", "--", "npx", "-y", "mongodb-mcp-server@latest"]
 
 [mcp_servers.redis]
-command = "npx"
-args = ["-y", "@modelcontextprotocol/server-redis", "redis://localhost:6379"]
+command = "node"
+args = ["__AVF_LAUNCHER__", "--need=REDIS_URL", "--", "npx", "-y", "@modelcontextprotocol/server-redis", "%%REDIS_URL%%"]
 
 [mcp_servers.docker]
-command = "npx"
-args = ["-y", "mcp-server-docker"]
+command = "node"
+args = ["__AVF_LAUNCHER__", "--", "npx", "-y", "mcp-server-docker"]
 
 # Firecrawl — веб-скрапинг/краулинг/поиск/extract (LLM-ready markdown и структура).
 [mcp_servers.firecrawl]
-command = "npx"
-args = ["-y", "firecrawl-mcp"]
-# Ключ берётся из окружения — экспортируйте FIRECRAWL_API_KEY (или инлайн: env = { FIRECRAWL_API_KEY = "fc-..." }).
+command = "node"
+args = ["__AVF_LAUNCHER__", "--need=FIRECRAWL_API_KEY", "--", "npx", "-y", "firecrawl-mcp"]
 
 # Vercel — официальный удалённый MCP (Streamable HTTP + OAuth).
 # Codex откроет браузер для авторизации при первом вызове.
@@ -48,17 +51,16 @@ url = "https://mcp.render.com/mcp"
 # http_headers = { Authorization = "Bearer <RENDER_API_KEY>" }
 
 # Task Master — управление задачами (PRD → задачи → статусы). Ключи опциональны.
-# ANTHROPIC_API_KEY (Claude) / OPENAI_API_KEY (GPT) берутся из окружения.
-# PERPLEXITY_API_KEY нужен только при выборе Perplexity как research-модели.
+# ANTHROPIC_API_KEY / OPENAI_API_KEY / PERPLEXITY_API_KEY берутся из ~/.config/agent-vorcl-flow/.env.
 [mcp_servers.task-master]
-command = "npx"
-args = ["-y", "task-master-ai"]
+command = "node"
+args = ["__AVF_LAUNCHER__", "--", "npx", "-y", "task-master-ai"]
 env = { TASK_MASTER_TOOLS = "parse_prd,get_tasks,get_task,next_task,expand_task,set_task_status,update_subtask,add_task,analyze_project_complexity,models" }
 
 # Mermaid — генерация/валидация/рендер Mermaid-диаграмм (self-hosted, без ключей).
 [mcp_servers.mermaid]
-command = "npx"
-args = ["-y", "mcp-mermaid"]
+command = "node"
+args = ["__AVF_LAUNCHER__", "--", "npx", "-y", "mcp-mermaid"]
 
 # ===== Профили под роли (codex --profile architect | backend | frontend | analyzer | swagger | firecrawl | render | database | resilience | screenshot | pinpoint | drawio | mermaid | testing | gitflow | security | docs | devops | liveboard) =====
 [profiles.architect]

@@ -2,7 +2,7 @@
 
 # Agent-Vorcl-Flow
 
-**Команда специализированных AI-субагентов для [Claude Code](https://claude.com/claude-code), [GPT Codex](https://developers.openai.com/codex/cli/) и [Cursor](https://cursor.com/) — со скиллами, командами и MCP-инструментами.**
+**Команда специализированных AI-субагентов для [Claude Code](https://claude.com/claude-code), [GPT Codex](https://developers.openai.com/codex/cli/), [Cursor](https://cursor.com/) и [Kimi CLI](https://github.com/MoonshotAI/kimi-cli) — со скиллами, командами и MCP-инструментами.**
 Ставится одной командой `npx`. Без удалённого бэкенда и облачного хостинга — всё исполняется локально.
 
 🌐 [English version](./README.md)
@@ -16,10 +16,10 @@
 Agent-Vorcl-Flow превращает поддерживаемый coding agent в **структурированную инженерную команду**. Вместо одного универсального ассистента ты получаешь **20 узкопрофильных субагентов** (архитектор, бэкенд, фронтенд, инженер БД, оператор liveboard и другие) — у каждого свои доменные **скиллы**, быстрые **слэш-команды** и нужные ему **MCP-инструменты**. Любая нетривиальная задача идёт через дисциплинированный цикл **Task Master** — *цель → задачи → реализация → проверка → готово* — работа спланирована, отслеживается и переживает прерывания.
 
 - 🧩 **20 субагентов**, 40 скиллов, 118 слэш-команд
-- ⚡ **Установка одной командой** в Claude Code, Codex и/или Cursor — `npx`
+- ⚡ **Установка одной командой** в Claude Code, Codex, Cursor и/или Kimi CLI — `npx`
 - 🔌 **11 MCP-серверов** из коробки (GitHub, Postgres, MongoDB, Redis, Docker, Firecrawl, Vercel, Render, filesystem, Task Master, Mermaid)
-- 🔑 **Свои ключи** через переменные окружения — удалённого сервиса AVF нет; liveboard локальный и эфемерный
-- 🤝 **Работает в Claude Code, GPT Codex и Cursor** из одного исходника
+- 🔑 **Один файл `.env` для всех рантаймов** — ключи читает launcher, а не `~/.zshrc`, поэтому они работают даже при запуске из GUI/IDE; удалённого сервиса AVF нет; liveboard локальный и эфемерный
+- 🤝 **Работает в Claude Code, GPT Codex, Cursor и Kimi CLI** из одного исходника
 
 ---
 
@@ -27,12 +27,12 @@ Agent-Vorcl-Flow превращает поддерживаемый coding agent 
 
 ### Требования
 - **Node.js ≥ 18**
-- **[Claude Code](https://claude.com/claude-code)**, **[GPT Codex](https://developers.openai.com/codex/cli/)** и/или **[Cursor](https://cursor.com/)**
+- **[Claude Code](https://claude.com/claude-code)**, **[GPT Codex](https://developers.openai.com/codex/cli/)**, **[Cursor](https://cursor.com/)** и/или **[Kimi CLI](https://github.com/MoonshotAI/kimi-cli)**
 
 ### Установка (одна команда)
 
 ```bash
-# Ставит адаптеры для Claude Code, Codex и Cursor:
+# Ставит адаптеры для Claude Code, Codex, Cursor и Kimi CLI:
 npx github:Vitammiin/agent-vorcl-flow
 ```
 
@@ -42,17 +42,20 @@ npx github:Vitammiin/agent-vorcl-flow
 npx github:Vitammiin/agent-vorcl-flow --claude   # только Claude Code
 npx github:Vitammiin/agent-vorcl-flow --codex    # только GPT Codex
 npx github:Vitammiin/agent-vorcl-flow --cursor   # только Cursor
+npx github:Vitammiin/agent-vorcl-flow --kimi     # только Kimi CLI
 ```
 
 Что делает инсталлер:
 
 | Рантайм | Действие |
 | --- | --- |
+| **Общий слой** | Кладёт launcher в `~/.config/agent-vorcl-flow/bin/mcp-env.mjs` и создаёт `~/.config/agent-vorcl-flow/.env` из шаблона (один раз) — единый файл ключей для всех рантаймов. |
 | **Claude Code** | Регистрирует репозиторий как **marketplace** плагинов и включает плагин (через `claude plugin …`, фолбэк — прямая запись в `~/.claude/settings.json`). |
 | **GPT Codex** | Вмёрживает скиллы в `~/.agents/skills`, а блоки `config.toml` + `AGENTS.md` — в `~/.codex` (идемпотентно, между маркерами). |
 | **Cursor** | Устанавливает скиллы в `~/.cursor/skills`, нативных субагентов в `~/.cursor/agents` и добавляет отсутствующие серверы в `~/.cursor/mcp.json`. |
+| **Kimi CLI** | Добавляет отсутствующие серверы в `~/.kimi/mcp.json` (та же `mcpServers`-схема). |
 
-> Инсталлер не трогает секреты — ключи задаёшь сам через env (см. [MCP и секреты](#mcp-и-секреты)).
+> Инсталлер не вписывает секреты — он лишь создаёт пустой `.env` из шаблона. Ключи ты добавляешь туда сам (см. [MCP и секреты](#mcp-и-секреты)).
 
 ### Альтернативные способы (Claude Code)
 
@@ -372,24 +375,34 @@ node skills/liveboard/scripts/server.mjs \
 
 ## MCP и секреты
 
-У пакета нет **удалённого бэкенда или базы**. Опциональный liveboard — localhost-only процесс с состоянием в памяти. MCP-серверам нужны токены, и каждый пользователь задаёт **свои** через переменные окружения. Claude Code использует `${VAR:-}` в `.mcp.json`, Cursor — `${env:VAR}` в `~/.cursor/mcp.json`.
+У пакета нет **удалённого бэкенда или базы**. Опциональный liveboard — localhost-only процесс с состоянием в памяти. MCP-серверам нужны токены, и каждый пользователь задаёт **свои**. Чтобы это работало одинаково в **Claude Code, Codex, Cursor и Kimi CLI** — и при запуске из терминала, и из Dock / Spotlight / IDE — каждый stdio MCP-сервер запускается через небольшой launcher (`bin/mcp-env.mjs`), который читает ключи из **одного файла**:
 
-> ⚠️ **Для AI-команд Task Master нужен хотя бы один выбранный провайдер:** `ANTHROPIC_API_KEY` для Claude, `OPENAI_API_KEY` для GPT или OAuth Codex CLI. Без авторизации для модели из `.taskmaster/config.json` команда `/vorcl` не сможет генерировать и расширять задачи.
+```
+~/.config/agent-vorcl-flow/.env          # Windows: %APPDATA%\agent-vorcl-flow\.env
+```
 
-Экспортируй те, что реально используешь (например, в `~/.zshrc`):
+Инсталлер создаёт его из [`.env.example`](./.env.example). Открой и впиши только те ключи, которыми пользуешься:
 
-```bash
-export ANTHROPIC_API_KEY=…     # main-провайдер Task Master: Claude
-export OPENAI_API_KEY=…        # альтернативный main-провайдер Task Master (GPT)
-export FIRECRAWL_API_KEY=…     # веб-ресёрч firecrawl
-export GITHUB_TOKEN=…          # github MCP
-export PERPLEXITY_API_KEY=…    # опционально: research-режим Task Master
+```dotenv
+ANTHROPIC_API_KEY=      # main-провайдер Task Master: Claude
+OPENAI_API_KEY=         # альтернативный main-провайдер: GPT
+PERPLEXITY_API_KEY=     # опционально: research-режим Task Master
+FIRECRAWL_API_KEY=      # веб-ресёрч firecrawl
+GITHUB_TOKEN=           # github MCP
 
 # Для агента `database` — это подключение к БД ТВОЕГО проекта, не плагина:
-export POSTGRES_URL=…          # postgres://user:pass@host:5432/db
-export MONGODB_URI=…           # mongodb://user:pass@host:27017/db
-export REDIS_URL=…             # redis://host:6379
+MONGODB_URI=            # mongodb://user:pass@host:27017/db
+REDIS_URL=              # redis://host:6379
+POSTGRES_URL=           # postgres://user:pass@host:5432/db
 ```
+
+> **Почему launcher, а не `~/.zshrc`?** Подстановка env-переменных различается по рантаймам (`${VAR:-}` в Claude, `${env:VAR}` в Cursor, литералы в Codex/Kimi), и каждый рантайм видит только то окружение, в котором **его** запустили. Запуск из GUI / IDE на macOS не читает `~/.zshrc`, поэтому экспортированные ключи невидимы и серверы подключаются в никуда — классический сбой «MCP env not set». Чтение из одного `.env` убирает обе проблемы разом.
+
+**Приоритет** (позднее сильнее): общий `~/.config/agent-vorcl-flow/.env` → `./.env` в корне проекта → реальный `export` в окружении. Общие ключи держи в общем файле, переопределяй по проекту (например, другой `MONGODB_URI`) через проектный `.env`, а настоящий shell-export всё равно побеждает для CLI-запусков. Путь к файлу можно переназначить через `AGENT_VORCL_ENV_FILE=/path/.env`.
+
+Сервер, у которого нет нужного ключа, просто **не поднимается** — в MCP-логе рантайма будет однострочка `[agent-vorcl-flow] MCP «…» не настроен: не задан …`, а все остальные серверы продолжают работать. Добавь ключ в `.env` и перезапусти. (Имена `GITHUB_TOKEN`/`MONGODB_URI` можно оставить как есть — launcher сам маппит их в ожидаемые серверами `GITHUB_PERSONAL_ACCESS_TOKEN`/`MDB_MCP_CONNECTION_STRING`.)
+
+> ⚠️ **Для AI-команд Task Master нужен хотя бы один выбранный провайдер:** `ANTHROPIC_API_KEY` для Claude, `OPENAI_API_KEY` для GPT или OAuth Codex CLI. Без авторизации для модели из `.taskmaster/config.json` команда `/vorcl` не сможет генерировать и расширять задачи.
 
 Отдельно выбери, какой провайдер Task Master реально выполняет генерацию — само наличие ключа модель не переключает:
 
@@ -401,9 +414,7 @@ export REDIS_URL=…             # redis://host:6379
 
 Команда использует официальный `task-master models` и сохраняет в `.taskmaster/config.json` только выбор модели. `PERPLEXITY_API_KEY` опционален и нужен лишь тогда, когда Perplexity выбран как research-модель.
 
-Незаданный ключ — соответствующий MCP-сервер просто молчит, остальное работает.
-
-Удалённые серверы **vercel** и **render** используют OAuth (авторизация командой `/mcp` в браузере). Для Render в headless/CI можно задать `RENDER_API_KEY` и заменить его запись на header-форму: `"headers": { "Authorization": "Bearer ${RENDER_API_KEY:-}" }`.
+Удалённые серверы **vercel** и **render** используют OAuth (авторизация командой `/mcp` в браузере). Для Render в headless/CI можно задать `RENDER_API_KEY` и добавить в запись сервера Bearer-заголовок для своего рантайма.
 
 ---
 
@@ -461,6 +472,25 @@ Cursor использует тот же открытый формат `SKILL.md`
 
 ---
 
+## Kimi CLI
+
+[Kimi CLI](https://github.com/MoonshotAI/kimi-cli) (MoonshotAI) читает `~/.kimi/mcp.json` в той же `mcpServers`-схеме, что Claude и Cursor, поэтому применяются те же серверы:
+
+| Концепция Agent-Vorcl-Flow | Эквивалент в Kimi CLI |
+| --- | --- |
+| `.mcp.json` | серверы в `~/.kimi/mcp.json` |
+| файл ключей на рантайм | общий `~/.config/agent-vorcl-flow/.env` (через launcher) |
+
+```bash
+npx github:Vitammiin/agent-vorcl-flow --kimi
+kimi mcp list          # список подключённых серверов
+kimi mcp test github   # проверить соединение и инструменты сервера
+```
+
+У Kimi CLI нет подстановки `${VAR}` в `mcp.json`, поэтому ключи берутся из общего `.env` через launcher — ровно как у остальных рантаймов. Подробнее — в [`kimi/README.md`](./kimi/README.md).
+
+---
+
 ## Структура проекта
 
 ```text
@@ -471,9 +501,12 @@ skills/       <скилл>/SKILL.md            (40 скиллов; liveboard с�
 commands/     <namespace>/<команда>.md    (118 команд, /namespace:команда, включая /vorcl)
 hooks/        hooks.json + session-start.js + catch-guard.js (PostToolUse: пустые catch)
 .mcp.json     github, filesystem, postgres, mongodb, redis, docker, firecrawl, vercel, render, task-master, mermaid
+.env.example  шаблон единого файла ключей (→ ~/.config/agent-vorcl-flow/.env)
 bin/          install.mjs                 (npx-инсталлер)
+              mcp-env.mjs                 (launcher: читает .env и запускает stdio MCP-сервер)
 codex/        адаптер под GPT Codex (skills + config.toml + install.sh)
 cursor/       адаптер под Cursor (MCP-шаблон + инструкция)
+kimi/         адаптер под Kimi CLI (mcp.json + инструкция)
 ```
 
 **Как это связано:** `agents/*.md` объявляют роль и в frontmatter `skills:` подключают навыки → скиллы из `skills/*/SKILL.md` автоподхватываются по описанию → команды `commands/<агент>/*.md` дают быстрые `/агент:команда` и делегируют субагенту → `.mcp.json` даёт агентам инструменты. Хук `SessionStart` сообщает Claude о наличии агентов.

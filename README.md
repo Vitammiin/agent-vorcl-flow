@@ -24,10 +24,10 @@ One `npx` command installs them. No remote backend or cloud hosting: your coding
 Agent-Vorcl-Flow turns a supported coding agent into a **structured engineering team**. Instead of one general assistant, you get **20 focused sub-agents** (architect, backend, frontend, DB engineer, liveboard operator, and more), each with its own domain **skills**, quick **slash commands**, and the **MCP tools** it needs. Every non-trivial task runs through a disciplined **Task Master** loop — *goal → tasks → implement → verify → done* — so work is planned, tracked, and survives interruptions.
 
 - 🧩 **20 sub-agents**, 40 skills, 118 slash commands
-- ⚡ **One-command install** for Claude Code, Codex, and/or Cursor — `npx`
+- ⚡ **One-command install** for Claude Code, Codex, Cursor, and/or Kimi CLI — `npx`
 - 🔌 **11 MCP servers** wired in (GitHub, Postgres, MongoDB, Redis, Docker, Firecrawl, Vercel, Render, filesystem, Task Master, Mermaid)
-- 🔑 **Bring your own keys** via environment variables — no remote AVF service; liveboard is localhost-only and ephemeral
-- 🤝 **Runs on Claude Code, GPT Codex, and Cursor** from the same source
+- 🔑 **One `.env` file for all runtimes** — keys read by a launcher, not `~/.zshrc`, so they work even from GUI/IDE launches; no remote AVF service; liveboard is localhost-only and ephemeral
+- 🤝 **Runs on Claude Code, GPT Codex, Cursor, and Kimi CLI** from the same source
 
 ---
 
@@ -35,12 +35,12 @@ Agent-Vorcl-Flow turns a supported coding agent into a **structured engineering 
 
 ### Requirements
 - **Node.js ≥ 18**
-- **[Claude Code](https://claude.com/claude-code)**, **[GPT Codex](https://developers.openai.com/codex/cli/)**, and/or **[Cursor](https://cursor.com/)**
+- **[Claude Code](https://claude.com/claude-code)**, **[GPT Codex](https://developers.openai.com/codex/cli/)**, **[Cursor](https://cursor.com/)**, and/or **[Kimi CLI](https://github.com/MoonshotAI/kimi-cli)**
 
 ### Install (one command)
 
 ```bash
-# Installs adapters for Claude Code, Codex, and Cursor:
+# Installs adapters for Claude Code, Codex, Cursor, and Kimi CLI:
 npx github:Vitammiin/agent-vorcl-flow
 ```
 
@@ -50,17 +50,20 @@ Target a single runtime with a flag:
 npx github:Vitammiin/agent-vorcl-flow --claude   # Claude Code only
 npx github:Vitammiin/agent-vorcl-flow --codex    # GPT Codex only
 npx github:Vitammiin/agent-vorcl-flow --cursor   # Cursor only
+npx github:Vitammiin/agent-vorcl-flow --kimi     # Kimi CLI only
 ```
 
 What the installer does:
 
 | Runtime | Action |
 | --- | --- |
+| **Shared layer** | Copies the launcher to `~/.config/agent-vorcl-flow/bin/mcp-env.mjs` and creates `~/.config/agent-vorcl-flow/.env` from the template (once) — the single key file for every runtime. |
 | **Claude Code** | Registers this repo as a plugin **marketplace** and enables the plugin (via `claude plugin …`, with a direct `~/.claude/settings.json` fallback). |
 | **GPT Codex** | Merges the skills into `~/.agents/skills` and the `config.toml` + `AGENTS.md` blocks into `~/.codex` (idempotent, between markers). |
 | **Cursor** | Installs skills into `~/.cursor/skills`, native custom subagents into `~/.cursor/agents`, and merges missing servers into `~/.cursor/mcp.json`. |
+| **Kimi CLI** | Merges missing servers into `~/.kimi/mcp.json` (same `mcpServers` schema). |
 
-> The installer never touches your secrets — you set your own keys via env (see [Configuration](#configuration-mcp--keys)).
+> The installer never fills in your secrets — it only creates an empty `.env` from the template. You add keys there (see [Configuration](#configuration-mcp--keys)).
 
 ### Alternative installs (Claude Code)
 
@@ -378,24 +381,34 @@ node skills/liveboard/scripts/server.mjs \
 
 ## Configuration (MCP & keys)
 
-The package has **no remote backend or database**. The optional liveboard is a localhost-only in-memory process. MCP servers need tokens, and **each user provides their own via environment variables**. Claude Code uses `${VAR:-}` in `.mcp.json`; Cursor uses `${env:VAR}` in `~/.cursor/mcp.json`.
+The package has **no remote backend or database**. The optional liveboard is a localhost-only in-memory process. MCP servers need tokens, and **each user provides their own**. To make this work identically across **Claude Code, Codex, Cursor and Kimi CLI** — and whether you launch from a terminal or from Dock / Spotlight / an IDE — every stdio MCP server is started through a small launcher (`bin/mcp-env.mjs`) that reads your keys from **one file**:
 
-> ⚠️ **Required for AI-powered Task Master commands:** configure at least one selected provider — `ANTHROPIC_API_KEY` for Claude, `OPENAI_API_KEY` for GPT, or Codex CLI OAuth. Without credentials for the model selected in `.taskmaster/config.json`, `/vorcl` cannot generate or expand tasks.
+```
+~/.config/agent-vorcl-flow/.env          # Windows: %APPDATA%\agent-vorcl-flow\.env
+```
 
-Export the ones you actually use (for example in `~/.zshrc`):
+The installer creates it from [`.env.example`](./.env.example). Open it and fill in only the keys you use:
 
-```bash
-export ANTHROPIC_API_KEY=…     # Task Master main provider: Claude
-export OPENAI_API_KEY=…        # alternative Task Master main provider (GPT)
-export FIRECRAWL_API_KEY=…     # firecrawl web research
-export GITHUB_TOKEN=…          # github MCP
-export PERPLEXITY_API_KEY=…    # optional: Task Master research mode
+```dotenv
+ANTHROPIC_API_KEY=      # Task Master main provider: Claude
+OPENAI_API_KEY=         # alternative main provider: GPT
+PERPLEXITY_API_KEY=     # optional: Task Master research mode
+FIRECRAWL_API_KEY=      # firecrawl web research
+GITHUB_TOKEN=           # github MCP
 
 # For the `database` agent — these point at YOUR project's DB, not the plugin's:
-export POSTGRES_URL=…          # postgres://user:pass@host:5432/db
-export MONGODB_URI=…           # mongodb://user:pass@host:27017/db
-export REDIS_URL=…             # redis://host:6379
+MONGODB_URI=            # mongodb://user:pass@host:27017/db
+REDIS_URL=              # redis://host:6379
+POSTGRES_URL=           # postgres://user:pass@host:5432/db
 ```
+
+> **Why a launcher instead of `~/.zshrc`?** Env-var expansion differs per runtime (`${VAR:-}` in Claude, `${env:VAR}` in Cursor, literals in Codex/Kimi) and each runtime reads only the environment **it** was launched in. GUI / IDE launches on macOS don't source `~/.zshrc`, so exported keys are invisible and the servers connect to nothing — the classic "MCP env not set" failure. Reading from one `.env` file removes both problems at once.
+
+**Precedence** (later wins): the shared `~/.config/agent-vorcl-flow/.env` → a `./.env` in the project root → a real `export` in your shell. Keep global keys in the shared file, override per-project (e.g. a different `MONGODB_URI`) with a project `.env`, and a genuine shell export still wins for CLI runs. You can point the launcher at a different file with `AGENT_VORCL_ENV_FILE=/path/.env`.
+
+A server whose required key is missing simply **does not start** — you'll see a one-line `[agent-vorcl-flow] MCP «…» is not configured: …` in the runtime's MCP log, and every other server keeps working. Add the key to `.env` and restart. (You may keep `GITHUB_TOKEN`/`MONGODB_URI` names — the launcher maps them to the `GITHUB_PERSONAL_ACCESS_TOKEN`/`MDB_MCP_CONNECTION_STRING` the servers expect.)
+
+> ⚠️ **Required for AI-powered Task Master commands:** configure at least one selected provider — `ANTHROPIC_API_KEY` for Claude, `OPENAI_API_KEY` for GPT, or Codex CLI OAuth. Without credentials for the model selected in `.taskmaster/config.json`, `/vorcl` cannot generate or expand tasks.
 
 Choose which Task Master provider actually runs generation; keys alone do not select the model:
 
@@ -407,9 +420,7 @@ Choose which Task Master provider actually runs generation; keys alone do not se
 
 The command uses the official `task-master models` flow and stores only model selection in `.taskmaster/config.json`. `PERPLEXITY_API_KEY` is optional and only needed when Perplexity is selected as the research model.
 
-An unset key simply means that MCP server stays quiet — everything else keeps working.
-
-The remote **vercel** and **render** servers use OAuth (authorize with `/mcp` in a browser). For Render in headless/CI you can set `RENDER_API_KEY` and switch its entry to a header form: `"headers": { "Authorization": "Bearer ${RENDER_API_KEY:-}" }`.
+The remote **vercel** and **render** servers use OAuth (authorize with `/mcp` in a browser). For Render in headless/CI, set `RENDER_API_KEY` in your environment and add a Bearer header entry to that server for your runtime.
 
 ---
 
@@ -467,6 +478,25 @@ The installer converts role definitions to Cursor frontmatter, prefixes subagent
 
 ---
 
+## Kimi CLI
+
+[Kimi CLI](https://github.com/MoonshotAI/kimi-cli) (MoonshotAI) reads `~/.kimi/mcp.json` in the same `mcpServers` schema as Claude and Cursor, so the same servers apply:
+
+| Agent-Vorcl-Flow concept | Kimi CLI equivalent |
+| --- | --- |
+| `.mcp.json` | merged servers in `~/.kimi/mcp.json` |
+| per-runtime key file | the shared `~/.config/agent-vorcl-flow/.env` (via the launcher) |
+
+```bash
+npx github:Vitammiin/agent-vorcl-flow --kimi
+kimi mcp list          # verify connected servers
+kimi mcp test github   # check a server's connection and tools
+```
+
+Kimi CLI has no `${VAR}` expansion in `mcp.json`, so keys come from the shared `.env` through the launcher — exactly like the other runtimes. See [`kimi/README.md`](./kimi/README.md).
+
+---
+
 ## Project structure
 
 ```text
@@ -477,12 +507,14 @@ skills/       <skill>/SKILL.md            (40 skills; liveboard includes its in-
 commands/     <namespace>/<command>.md    (118 commands, /namespace:command, including /vorcl)
 hooks/        hooks.json + session-start.js + catch-guard.js (PostToolUse: empty catch)
 .mcp.json     github, filesystem, postgres, mongodb, redis, docker, firecrawl, vercel, render, task-master, mermaid
-bin/          install.mjs                 (the npx installer)
+.env.example  template for ~/.config/agent-vorcl-flow/.env (single key file for all runtimes)
+bin/          install.mjs (the npx installer) + mcp-env.mjs (cross-runtime MCP launcher / .env loader)
 codex/        GPT Codex adapter (skills + config.toml + install.sh)
 cursor/       Cursor adapter (MCP template + installation notes)
+kimi/         Kimi CLI adapter (mcp.json + installation notes)
 ```
 
-**How it fits together:** `agents/*.md` declare a role and, in front-matter `skills:`, attach skills → skills in `skills/*/SKILL.md` are auto-loaded by description → `commands/<agent>/*.md` provide quick `/agent:command` shortcuts that delegate to the sub-agent → `.mcp.json` gives agents their tools. A `SessionStart` hook tells Claude the agents are available.
+**How it fits together:** `agents/*.md` declare a role and, in front-matter `skills:`, attach skills → skills in `skills/*/SKILL.md` are auto-loaded by description → `commands/<agent>/*.md` provide quick `/agent:command` shortcuts that delegate to the sub-agent → `.mcp.json` gives agents their tools, each started through `bin/mcp-env.mjs` which loads secrets from the shared `.env`. A `SessionStart` hook tells Claude the agents are available.
 
 ---
 

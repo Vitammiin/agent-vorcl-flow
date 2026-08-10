@@ -29,9 +29,16 @@ codex/
 ## Установка
 ```bash
 bash codex/scripts/install.sh
-# затем впишите токены в ~/.codex/config.toml:
-#   GITHUB_PERSONAL_ACCESS_TOKEN, URL для postgres/redis
+# затем впишите ключи в общий файл ~/.config/agent-vorcl-flow/.env
+#   (тот же файл, что для Claude Code / Cursor / Kimi CLI):
+#   GITHUB_TOKEN, MONGODB_URI / REDIS_URL / POSTGRES_URL и т.д.
 ```
+
+Токены больше **не** вписываются прямо в `~/.codex/config.toml`. Установщик подставляет в
+`config.toml` абсолютный путь к launcher'у `bin/mcp-env.mjs` (вместо плейсхолдера
+`__AVF_LAUNCHER__`), и каждый stdio-сервер запускается через этот launcher, а он сам читает
+секреты из `~/.config/agent-vorcl-flow/.env`. Сервер без нужного ключа не поднимается —
+в логах будет строка `[agent-vorcl-flow] MCP «…» не настроен: не задан …`, — остальные работают.
 
 ## Использование
 ```
