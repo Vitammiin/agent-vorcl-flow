@@ -61,6 +61,10 @@ export function ensureReferentialIntegrity(nodes, edges) {
 }
 
 const ID_PREFIX_KIND = {
+  'feature': ['feature', 'product'], 'capability': ['capability', 'product'],
+  'skill': ['skill', 'agents'], 'command': ['command', 'agents'],
+  'test': ['test-suite', 'logic'], 'ci': ['ci-pipeline', 'infra'],
+  'container': ['container', 'infra'], 'hook': ['hook', 'infra'],
   'table': ['table', 'data'], 'enum': ['enum', 'data'], 'store': ['store', 'data'],
   'route': ['route', 'api'], 'ws': ['ws', 'api'], 'webhook': ['webhook', 'api'],
   'cron': ['cron', 'api'], 'mcp': ['mcp-server', 'api'], 'middleware': ['middleware', 'api'],
@@ -337,6 +341,18 @@ function topDir (file) {
 
 function groupKeyFor (node) {
   switch (node.kind) {
+    // Фича — крупная и самостоятельная, ей отдельный блок; пункты README
+    // мелкие и разнородные, поэтому собираются в один список возможностей.
+    case 'feature':
+      return { key: `product:${node.id.split(':').slice(1).join(':')}`, label: node.label }
+    case 'capability':
+      return { key: 'product:capabilities', label: 'Capabilities' }
+    case 'skill': return { key: 'agents:skills', label: 'Skills' }
+    case 'command': return { key: 'agents:commands', label: 'Commands' }
+    case 'test-suite': return { key: 'logic:tests', label: 'Tests' }
+    case 'ci-pipeline': return { key: 'infra:ci', label: 'CI / CD' }
+    case 'container': return { key: 'infra:containers', label: 'Containers' }
+    case 'hook': return { key: 'infra:hooks', label: 'Hooks' }
     case 'route': case 'webhook':
       return { key: `api:${routeDomain(node)}`, label: `${titleize(routeDomain(node))} API` }
     case 'ws': return { key: 'api:ws', label: 'WebSocket' }
@@ -402,10 +418,25 @@ export function buildGroups (nodes, edges, options = {}) {
     }
   }
   groups.push(...spill.values())
+  const nodeById = new Map(nodes.map((node) => [node.id, node]))
   for (const group of groups) {
     delete group.weak
     group.members.sort()
     group.size = group.members.length
+    // Блок одной фичи подписывается её составом («95 routes · 2 tables»),
+    // иначе на верхнем уровне стояло бы бесполезное «1 feature».
+    if (group.layer === 'product' && group.members.length === 1) {
+      const meta = nodeById.get(group.members[0])?.meta ?? {}
+      const composition = {}
+      if (meta.routes) composition.route = meta.routes
+      if (meta.tables) composition.table = meta.tables
+      if (meta.pages) composition.page = meta.pages
+      if (meta.modules) composition.module = meta.modules
+      if (Object.keys(composition).length) {
+        group.counts = composition
+        group.size = Object.values(composition).reduce((sum, value) => sum + value, 0)
+      }
+    }
   }
   groups.sort((a, b) => a.id.localeCompare(b.id))
 

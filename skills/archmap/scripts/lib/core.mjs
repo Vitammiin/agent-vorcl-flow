@@ -7,6 +7,7 @@ import path from 'node:path'
 export const SCHEMA_VERSION = 1
 
 export const LAYERS = [
+  { id: 'product', label: 'Product', color: '#f87171' },
   { id: 'client', label: 'Client', color: '#38bdf8' },
   { id: 'api', label: 'API', color: '#34d399' },
   { id: 'agents', label: 'Agents', color: '#a78bfa' },
@@ -18,17 +19,18 @@ export const LAYERS = [
 export const LAYER_IDS = LAYERS.map((layer) => layer.id)
 
 export const NODE_KINDS = {
+  product: ['feature', 'capability'],
   data: ['table', 'enum', 'store'],
   api: ['route', 'ws', 'webhook', 'cron', 'mcp-server', 'mcp-tool', 'middleware'],
-  agents: ['agent', 'llm-call', 'memory'],
-  logic: ['module', 'package'],
-  infra: ['env', 'external-service', 'tech'],
+  agents: ['agent', 'llm-call', 'memory', 'skill', 'command'],
+  logic: ['module', 'package', 'test-suite'],
+  infra: ['env', 'external-service', 'tech', 'ci-pipeline', 'container', 'hook'],
   client: ['page', 'component'],
 }
 
 export const EDGE_KINDS = [
   'fk', 'import', 'depends', 'handles', 'uses', 'reads-env',
-  'invokes', 'member', 'guards', 'dataflow',
+  'invokes', 'member', 'guards', 'dataflow', 'implements', 'covers', 'deploys',
 ]
 
 export const IGNORED_DIRS = new Set([

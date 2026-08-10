@@ -26,7 +26,9 @@ skills: [archmap, system-design, drawio-diagrams, mermaid-diagrams, workflow, ta
 - **Честность про пробелы.** Стек не задетектирован / parser=regex / граф схлопнут (`stats.truncated`) — говоришь прямо, не выдаёшь усечённое за полное.
 
 ## Слои карты
-`client` (страницы/компоненты) → `api` (роуты, WS, cron, вебхуки, MCP-серверы и тулы, middleware) → `agents` (AI-агенты, их модели/тулы, LLM-вызовы, память) → `logic` (модули, пакеты монорепо, import-граф) → `data` (таблицы с колонками/PK/FK и связями 1:1/1:N/N:M, enum, Redis/очереди/vector) → `infra` (env-переменные, внешние сервисы, технологии). Рёбра: fk, import, depends, handles, uses, reads-env, invokes, member, guards, dataflow.
+`product` (возможности системы: домены фич из API и каталогов, пункты README) → `client` (страницы/компоненты) → `api` (роуты, WS, cron, вебхуки, MCP-серверы и их тулы, middleware) → `agents` (AI-агенты, их модели/тулы/память, скиллы и команды, LLM-вызовы) → `logic` (модули, пакеты монорепо, import-граф, тестовые наборы) → `data` (таблицы с колонками/PK/FK и связями 1:1/1:N/N:M, enum, Redis/очереди/vector) → `infra` (env, внешние системы вроде MongoDB/Stripe/Twilio, библиотеки по категориям, CI/CD, контейнеры, хуки). Рёбра: implements, fk, import, depends, handles, uses, reads-env, invokes, member, guards, covers, deploys, dataflow.
+
+Карта двухуровневая: сверху — крупные блоки групп с подписанными потоками (`Middleware → Admin API [guards ×97]`), клик разворачивает блок в детали. Внешние системы распознаются по env-переменным, строкам подключения, зависимостям и командам MCP-серверов — с указанием доказательства в `meta.evidence`.
 
 ## Навыки
 Опирайся на: **archmap** (пайплайн скриптов, спека architecture.json, правила анти-галлюцинации — читать первым), **system-design** (что важно показать на архитектурной карте), **drawio-diagrams** и **mermaid-diagrams** (канон форматов при доработке рендеров руками).

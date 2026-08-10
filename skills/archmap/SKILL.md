@@ -21,7 +21,9 @@ node "$S/extract-data.mjs"    --root "$R" --plan "$O/plan.json" --out "$O/data.p
 node "$S/extract-api.mjs"     --root "$R" --plan "$O/plan.json" --out "$O/api.part.json"      #  │ независимы —
 node "$S/extract-agents.mjs"  --root "$R" --plan "$O/plan.json" --out "$O/agents.part.json"   #  │ запускай одной
 node "$S/extract-modules.mjs" --root "$R" --plan "$O/plan.json" --out "$O/modules.part.json"  #  │ параллельной пачкой
-node "$S/extract-env.mjs"     --root "$R" --plan "$O/plan.json" --out "$O/env.part.json"      # ─┘
+node "$S/extract-env.mjs"     --root "$R" --plan "$O/plan.json" --out "$O/env.part.json"      #  │
+node "$S/extract-product.mjs" --root "$R" --plan "$O/plan.json" --out "$O/product.part.json"  #  │
+node "$S/extract-ops.mjs"     --root "$R" --plan "$O/plan.json" --out "$O/ops.part.json"      # ─┘
 node "$S/merge.mjs" --root "$R" --parts "$O/*.part.json" --out "$O/architecture.json" --check
 # ── (опц.) LLM-фаза: прочитай architecture.json, напиши $O/annotations.json, затем: ──
 node "$S/merge.mjs" --root "$R" --parts "$O/*.part.json" --annotate "$O/annotations.json" --out "$O/architecture.json" --check
@@ -36,26 +38,29 @@ node "$S/to-pdf.mjs"     --in "$O/architecture.html" --out "$O/architecture.pdf"
 
 ## 2. Спека architecture.json (v1)
 
-Корень: `version, generatedAt, root, repo{name,monorepo,packages[{name,path}]}, stacks{detected[],parser,tsVersion,evidence}, layers[6], nodes[], edges[], stats`.
+Корень: `version, generatedAt, root, repo{name,monorepo,packages[{name,path}]}, stacks{detected[],parser,tsVersion,evidence}, layers[7], nodes[], edges[], groups[], groupEdges[], stats`.
 
-Слои фиксированы (порядок = колонки рендеров): `client #38bdf8 · api #34d399 · agents #a78bfa · logic #fbbf24 · data #f472b6 · infra #94a3b8`.
+Слои фиксированы (порядок = порядок в рендерах, сверху вниз): `product #f87171 · client #38bdf8 · api #34d399 · agents #a78bfa · logic #fbbf24 · data #f472b6 · infra #94a3b8`. Первый слой — продуктовый: возможности системы на языке владельца, а не файлов.
 
 **Node** — `{id, kind, layer, label, source:{file,line}, inferred, meta}`. Все поля обязательны; `source.file` относителен root (POSIX). Kinds по слоям:
 
 | layer | kinds |
 |---|---|
+| product | `feature` (возможность, выведенная из доменов API/каталогов), `capability` (пункт из README) |
 | data | `table`, `enum`, `store` (meta.storeKind: redis\|queue\|vector\|s3\|cache) |
 | api | `route`, `ws`, `webhook`, `cron`, `mcp-server`, `mcp-tool`, `middleware` |
-| agents | `agent`, `llm-call`, `memory` |
-| logic | `module`, `package` |
-| infra | `env`, `external-service`, `tech` |
+| agents | `agent`, `llm-call`, `memory`, `skill`, `command` |
+| logic | `module`, `package`, `test-suite` |
+| infra | `env`, `external-service`, `tech`, `ci-pipeline`, `container`, `hook` |
 | client | `page`, `component` |
 
-Id детерминированы: `table:User`, `route:GET /api/users/:id`, `module:src/lib/db.ts`, `pkg:@app/web`, `env:DATABASE_URL`, `agent:analyzer`, `mcp:firecrawl`, `mcp:firecrawl/tool:scrape`, `svc:stripe`, `store:redis:main`, `cron:cleanup`, `tech:fastify`.
+Id детерминированы: `feature:accounts`, `table:User`, `route:GET /api/users/:id`, `module:src/lib/db.ts`, `pkg:@app/web`, `env:DATABASE_URL`, `agent:analyzer`, `skill:drawio-diagrams`, `command:/drawio:create`, `mcp:firecrawl`, `mcp:firecrawl/tool:scrape`, `svc:stripe`, `store:redis:main`, `cron:cleanup`, `tech:fastify`, `test:src/__tests__`, `ci:pr`, `container:Dockerfile`, `hook:PostToolUse`.
 
 **Колонки таблиц — в meta** (не отдельные узлы): `meta.columns: [{name, type, pk?, fk?:{table,column}, unique?, nullable?, line}]`, `meta.indexes`, `meta.orm`. **Параметры роутов — в meta**: `meta.method, meta.path, meta.params[{name,in,type,required}], meta.middleware[], meta.handler{file,line,name}, meta.auth, meta.framework`.
 
-**Edge** — `{id:"e:<kind>:<from>-><to>", kind, from, to, label?, source, inferred, meta}`. Kinds: `fk` (meta.cardinality: 1:1|1:N|N:1|N:M, meta.through для N:M), `import`, `depends` (workspace-пакеты), `handles` (route→module), `uses` (→store/table/svc), `reads-env`, `invokes` (→svc модели; meta.model, meta.provider), `member` (mcp-server→tool, agent→tool), `guards` (middleware→route), `dataflow` (семантика LLM, почти всегда inferred).
+**Edge** — `{id:"e:<kind>:<from>-><to>", kind, from, to, label?, source, inferred, meta}`. Kinds: `fk` (meta.cardinality: 1:1|1:N|N:1|N:M, meta.through для N:M), `import`, `depends` (workspace-пакеты), `handles` (route→module), `uses` (→store/table/svc), `reads-env`, `invokes` (→svc модели; meta.model, meta.provider), `member` (mcp-server→tool, agent→tool), `guards` (middleware→route), `dataflow` (семантика LLM, почти всегда inferred), `implements` (feature → роут/таблица/страница), `covers` (test-suite → module), `deploys` (container → внешняя система).
+
+**Внешние системы.** `lib/services.mjs` — таблица известных систем (slug, человекочитаемый label, категория). Система распознаётся по префиксу env-переменной (`MONGODB_URI`, `STRIPE_*`), строке подключения в коде (`mongodb://`), зависимости в package.json или команде запуска MCP-сервера; сила доказательства `dsn > mcp > env > dep` пишется в `meta.evidence`. Отсюда рёбра `env → svc`, `module → svc`, `mcp → svc`, `agent → svc`.
 
 Контракт (валидирует `merge.mjs --check`): каждое `from`/`to` существует (иначе stub `inferred:true`); стабильная сортировка nodes/edges — повторный прогон байт-в-байт идентичен; циклы SCC помечаются `meta.cycle:true`.
 
