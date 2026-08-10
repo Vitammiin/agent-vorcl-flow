@@ -2,12 +2,13 @@
 
 # Agent-Vorcl-Flow
 
-**A team of specialized AI sub-agents for [Claude Code](https://claude.com/claude-code), [GPT Codex](https://developers.openai.com/codex/cli/), and [Cursor](https://cursor.com/) — with skills, commands, and MCP tools.**
+**A team of specialized AI sub-agents for [Claude Code](https://claude.com/claude-code), [GPT Codex](https://developers.openai.com/codex/cli/), [Cursor](https://cursor.com/), and [Kimi CLI](https://github.com/MoonshotAI/kimi-cli) — with skills, commands, and MCP tools.**
 One `npx` command installs them. No remote backend or cloud hosting: your coding agent runs everything locally.
 
 ![Claude Code](https://img.shields.io/badge/Claude%20Code-plugin-6C5CE7)
 ![GPT Codex](https://img.shields.io/badge/GPT%20Codex-adapter-1abc9c)
 ![Cursor](https://img.shields.io/badge/Cursor-native%20adapter-111111)
+![Kimi CLI](https://img.shields.io/badge/Kimi%20CLI-adapter-000000)
 ![Node](https://img.shields.io/badge/node-%E2%89%A518-339933?logo=node.js&logoColor=white)
 ![Agents](https://img.shields.io/badge/agents-20-blue)
 ![Commands](https://img.shields.io/badge/commands-118-blue)

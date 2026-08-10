@@ -28,4 +28,4 @@ npx github:Vitammiin/agent-vorcl-flow --cursor
 
 В Cursor namespaced Claude-команды представлены дефисными skills: например, `/firecrawl:interact` → `/firecrawl-interact`, `/firecrawl:integrate` → `/firecrawl-integrate`. Официальные upstream `firecrawl-*` skills не перезаписываются.
 
-Cursor подхватывает MCP-переменные в формате `${env:NAME}`. Перед запуском задайте нужные ключи в окружении (`ANTHROPIC_API_KEY`, `GITHUB_TOKEN`, `FIRECRAWL_API_KEY` и подключения БД).
+Ключи задавать в окружении/`~/.zshrc` больше не нужно: MCP-серверы стартуют через launcher `bin/mcp-env.mjs`, который читает секреты из единого `~/.config/agent-vorcl-flow/.env` (тот же файл для Claude/Codex/Cursor/Kimi). Установщик создаёт его из `.env.example` и подставляет абсолютный путь launcher'а в `~/.cursor/mcp.json`. Впиши нужные ключи (`ANTHROPIC_API_KEY`, `GITHUB_TOKEN`, `FIRECRAWL_API_KEY`, подключения БД) в этот `.env`; сервер без ключа просто не поднимается, остальные работают.
