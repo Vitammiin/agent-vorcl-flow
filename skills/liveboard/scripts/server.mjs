@@ -73,27 +73,47 @@ function taskFileFor(worktree) {
 }
 
 function readTasks(file) {
-  if (!file) return { tasks: [], error: null, tag: null }
+  if (!file) return { tasks: [], error: null, tag: null, meta: null }
   try {
     const parsed = JSON.parse(fs.readFileSync(file, 'utf8'))
     const tag = parsed.master ? 'master' : Object.keys(parsed)[0]
     const tasks = parsed[tag]?.tasks ?? parsed.tasks ?? []
-    return { tasks: Array.isArray(tasks) ? tasks : [], error: null, tag }
+    const meta = parsed[tag]?.metadata ?? parsed.metadata ?? null
+    return { tasks: Array.isArray(tasks) ? tasks : [], error: null, tag, meta }
   } catch (error) {
-    return { tasks: [], error: error.message, tag: null }
+    return { tasks: [], error: error.message, tag: null, meta: null }
   }
 }
 
+function resolveAssignedAgent(task) {
+  const explicit = task.assignee ?? task.owner
+  if (explicit) return { role: String(explicit), source: 'explicit' }
+  const inferred = inferRole(`${task.title ?? ''} ${task.details ?? ''}`)
+  return inferred ? { role: inferred, source: 'inferred' } : null
+}
+
 function flattenTasks(tasks) {
-  const view = (task, id, parentId) => ({
-    id,
-    parentId,
-    title: task.title ?? null,
-    status: task.status ?? 'unknown',
-    priority: task.priority ?? null,
-    assignee: task.assignee ?? null,
-    owner: task.owner ?? null,
-  })
+  const view = (task, id, parentId) => {
+    const subtasks = Array.isArray(task.subtasks) ? task.subtasks : []
+    return {
+      id,
+      parentId,
+      title: task.title ?? null,
+      status: task.status ?? 'unknown',
+      priority: task.priority ?? null,
+      assignee: task.assignee ?? null,
+      owner: task.owner ?? null,
+      assignedAgent: resolveAssignedAgent(task),
+      description: task.description ?? null,
+      details: task.details ?? null,
+      testStrategy: task.testStrategy ?? null,
+      dependencies: Array.isArray(task.dependencies) ? task.dependencies.map(String) : [],
+      updatedAt: task.updatedAt ?? null,
+      subtaskTotal: subtasks.length,
+      subtaskDone: subtasks.filter((subtask) => subtask.status === 'done').length,
+      agentLive: false,
+    }
+  }
   return tasks.flatMap((task) => [
     view(task, String(task.id), null),
     ...(Array.isArray(task.subtasks) ? task.subtasks.map((subtask) =>
@@ -200,6 +220,7 @@ function collect(root) {
       taskFile: file,
       taskTag: data.tag,
       taskError: data.error,
+      taskMeta: data.meta,
       tasks,
       counts: statusCounts(tasks),
     }
@@ -208,6 +229,22 @@ function collect(root) {
   const taskAgents = inferredTaskAgents(worktrees)
   const processTaskKeys = new Set(processAgents.map((agent) => `${agent.worktree}:${agent.role}`))
   const agents = [...processAgents, ...taskAgents.filter((agent) => !processTaskKeys.has(`${agent.worktree}:${agent.role}`))]
+
+  // Связать живой процесс-агент с задачей и подсветить задачи, над которыми идёт реальная работа.
+  const liveRoles = new Set(processAgents.map((agent) => `${agent.worktree}::${agent.role}`))
+  for (const worktree of worktrees) {
+    for (const task of worktree.tasks) {
+      task.agentLive = task.assignedAgent ? liveRoles.has(`${worktree.path}::${task.assignedAgent.role}`) : false
+    }
+  }
+  for (const agent of processAgents) {
+    if (agent.taskId) continue
+    const worktree = worktrees.find((item) => item.path === agent.worktree)
+    const match = worktree?.tasks.find((task) => task.status === 'in-progress' && task.assignedAgent?.role === agent.role)
+      ?? worktree?.tasks.find((task) => task.status === 'in-progress')
+    if (match) { agent.taskId = match.id; agent.taskTitle = match.title }
+  }
+
   const tasks = worktrees.flatMap((worktree) => worktree.tasks)
   return {
     generatedAt: new Date().toISOString(),
