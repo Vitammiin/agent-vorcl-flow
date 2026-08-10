@@ -1,223 +1,488 @@
 <!doctype html>
-<html lang="en">
+<html lang="ru">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>__ARCHMAP_TITLE__ · archmap</title>
 <style>
+/* ══ токены темы ══
+   Тёмная — по умолчанию, светлая — html[data-theme="light"].
+   Всё, что рисуется в SVG, тоже читает эти переменные, поэтому
+   переключение темы и печать не требуют правки узлов вручную. */
+:root{
+  color-scheme:dark;
+  --bg:#080d18;--bg-g1:#16233f7a;--bg-g2:#1e163a7a;
+  --panel:#0f1728;--panel2:#0c1322;--panel3:#0a101d;
+  --line:#1b2438;--line2:#27334c;
+  --text:#e9eefb;--muted:#94a3bd;--faint:#66748d;
+  --accent:#4fdfd2;--accent2:#a5f3eb;--accent-bg:#4fdfd21f;
+  --card-mid:#101a2e;--card-low:#0a1220;--frame:#101827f0;--plate:#0a1120ee;--exp:#080f1cf0;
+  --grid:#ffffff;--grid-op:.05;
+  --btn:#141d31;--btn2:#1b2740;
+  --shadow:0 24px 60px #000000a6;--shadow-s:0 8px 22px #0000006b;
+  --ok:#34d399;--warn:#fbbf24;--bad:#fb7185;
+  --mono:ui-monospace,'SF Mono',SFMono-Regular,Menlo,Consolas,monospace;
+  --sans:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  /* типографическая шкала */
+  --fz-hero:30px;--fz-h1:17px;--fz-h2:15px;--fz-md:12.5px;--fz-sm:11px;
+  --r1:14px;--r2:10px;--r3:7px;
+  --dur:.16s;
+}
+html[data-theme="light"]{
+  color-scheme:light;
+  --bg:#eef2f8;--bg-g1:#cfe0f524;--bg-g2:#e4dcf824;
+  --panel:#ffffff;--panel2:#f7f9fd;--panel3:#eef2f9;
+  --line:#dde4ef;--line2:#c9d4e4;
+  --text:#0e1729;--muted:#55637a;--faint:#7e8ca3;
+  --accent:#0d8f85;--accent2:#0a6f68;--accent-bg:#0d8f8514;
+  --card-mid:#ffffff;--card-low:#f4f7fc;--frame:#fffffff2;--plate:#ffffffee;--exp:#fbfdffe6;
+  --grid:#0f172a;--grid-op:.055;
+  --btn:#ffffff;--btn2:#eef3fa;
+  --shadow:0 20px 44px #17203a1f;--shadow-s:0 6px 16px #17203a14;
+  --ok:#0f9d63;--warn:#b7791f;--bad:#dc4c5f;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--text);font:var(--fz-md)/1.45 var(--sans);display:flex;flex-direction:column;overflow:hidden;-webkit-font-smoothing:antialiased}
+::selection{background:var(--accent-bg)}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}}
+
+/* ══ шапка ══ */
+header{display:flex;flex-direction:column;background:linear-gradient(180deg,var(--panel),var(--panel2));border-bottom:1px solid var(--line);z-index:5;box-shadow:var(--shadow-s)}
+.hrow{display:flex;align-items:center;gap:10px;padding:9px 14px}
+.hrow.tools{padding:0 14px 9px;gap:8px;flex-wrap:wrap;border-top:1px solid var(--line);padding-top:8px}
+.brand{display:flex;flex-direction:column;min-width:0;margin-right:2px}
+.eyebrow{font:700 8.5px/1 var(--mono);letter-spacing:.3em;color:var(--accent);text-transform:uppercase}
+h1{margin:3px 0 0;font:700 var(--fz-h1)/1.1 var(--mono);letter-spacing:-.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:280px}
+.counts{display:flex;gap:9px;align-items:center;font:10.5px var(--mono);color:var(--muted);padding-left:12px;margin-left:2px;border-left:1px solid var(--line2);white-space:nowrap}
+.counts b{color:var(--text);font-weight:700}
+.spacer{margin-left:auto}
+
+.seg{display:inline-flex;border:1px solid var(--line2);background:var(--panel3);border-radius:var(--r2);padding:2px;gap:2px}
+.seg[hidden]{display:none}
+.seg button{border:0;background:transparent;color:var(--muted);font:700 var(--fz-sm) var(--mono);letter-spacing:.04em;padding:6px 14px;border-radius:var(--r3);cursor:pointer;transition:color var(--dur),background var(--dur)}
+.seg button.on{background:var(--btn2);color:var(--accent2);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--accent) 42%,transparent)}
+html[data-theme="light"] .seg button.on{color:var(--accent2);background:var(--accent-bg)}
+.seg button:hover{color:var(--text)}
+
+.searchwrap{position:relative;display:flex;align-items:center}
+#search{background:var(--panel3);border:1px solid var(--line2);border-radius:var(--r2);color:var(--text);font:12px var(--mono);padding:7px 34px 7px 11px;width:236px;outline:none;transition:border-color var(--dur),box-shadow var(--dur)}
+#search::placeholder{color:var(--faint)}
+#search:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-bg)}
+.searchwrap kbd{position:absolute;right:8px;pointer-events:none;font:700 9px var(--mono);color:var(--faint);border:1px solid var(--line2);border-radius:5px;padding:2px 5px;background:var(--panel)}
+#search:focus + kbd{opacity:0}
+
+.iconbtn{display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;flex:none;border:1px solid var(--line2);background:var(--btn);color:var(--muted);border-radius:var(--r2);cursor:pointer;transition:color var(--dur),border-color var(--dur),background var(--dur),transform var(--dur)}
+.iconbtn:hover{color:var(--text);border-color:var(--accent);background:var(--btn2)}
+.iconbtn:active{transform:translateY(1px)}
+.iconbtn svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.iconbtn.on{color:var(--accent2);border-color:var(--accent)}
+.igroup{display:flex;gap:6px;align-items:center}
+.idiv{width:1px;height:22px;background:var(--line2);margin:0 2px}
+html[data-theme="light"] .i-moon,html:not([data-theme="light"]) .i-sun{display:none}
+
+.btn{border:1px solid var(--line2);background:var(--btn);color:var(--text);border-radius:var(--r2);padding:7px 12px;font:600 var(--fz-sm) var(--mono);cursor:pointer;transition:border-color var(--dur),background var(--dur)}
+.btn:hover{border-color:var(--accent);background:var(--btn2)}
+.btn[hidden]{display:none}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#04201e;font-weight:700}
+.btn.primary:hover{filter:brightness(1.08)}
+
+/* чипы слоёв и потоков */
+.chips{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.chip{--c:#94a3b8;display:inline-flex;align-items:center;gap:6px;border:1px solid color-mix(in srgb,var(--c) 62%,transparent);color:var(--c);background:color-mix(in srgb,var(--c) 10%,transparent);border-radius:999px;padding:5px 11px;font:700 10px var(--mono);letter-spacing:.05em;text-transform:uppercase;cursor:pointer;transition:opacity var(--dur),filter var(--dur),background var(--dur)}
+.chip .dot{width:6px;height:6px;border-radius:50%;background:var(--c)}
+.chip .num{color:color-mix(in srgb,var(--c) 70%,var(--text));font-weight:700;opacity:.85}
+.chip:hover{background:color-mix(in srgb,var(--c) 20%,transparent)}
+.chip.off{opacity:.42;border-color:var(--line2);color:var(--faint);background:transparent;filter:saturate(.25)}
+.chip.big{padding:5px 13px;font-size:10.5px}
+.chip-sep{font:700 8.5px var(--mono);letter-spacing:.18em;text-transform:uppercase;color:var(--faint);margin:0 2px 0 8px;align-self:center}
+.flowchip{--c:#7c8aa3;font-size:9.5px;padding:4px 9px;text-transform:none;letter-spacing:.02em}
+label.inf-toggle{display:inline-flex;align-items:center;gap:6px;font:10.5px var(--mono);color:var(--muted);border:1px dashed var(--line2);border-radius:999px;padding:5px 11px;cursor:pointer;user-select:none}
+label.inf-toggle input{accent-color:#a78bfa;margin:0}
+
+/* ══ сцена ══ */
+main{flex:1;display:flex;min-height:0;position:relative}
+#stage{flex:1;min-width:0;position:relative;display:flex}
+#canvas{flex:1;min-width:0;display:block;cursor:grab;touch-action:none;background:
+  radial-gradient(1200px 560px at 22% -14%,var(--bg-g1) 0,transparent 62%),
+  radial-gradient(980px 540px at 94% 114%,var(--bg-g2) 0,transparent 58%),var(--bg)}
+#canvas.panning{cursor:grabbing}
+
+/* хлебные крошки */
+#crumbbar{position:absolute;top:10px;left:12px;right:12px;display:flex;align-items:center;gap:8px;pointer-events:none;z-index:2}
+.glass{background:color-mix(in srgb,var(--panel) 88%,transparent);border:1px solid var(--line);border-radius:999px;box-shadow:var(--shadow-s);backdrop-filter:blur(9px)}
+#crumbs{display:flex;align-items:center;gap:2px;padding:5px 12px;max-width:min(70%,760px);overflow:hidden;pointer-events:auto}
+#crumbs .cr{font:600 11px var(--sans);color:var(--muted);background:none;border:0;padding:3px 6px;border-radius:6px;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:230px;transition:color var(--dur),background var(--dur)}
+#crumbs .cr:hover{color:var(--text);background:var(--btn2)}
+#crumbs .cr.last{color:var(--text);font-weight:700;cursor:default}
+#crumbs .cr.last:hover{background:none}
+#crumbs .sep{color:var(--faint);font-size:11px;padding:0 1px;user-select:none}
+#crumbs .lc{width:7px;height:7px;border-radius:2px;flex:none;margin-right:5px;display:inline-block}
+#histbar{display:flex;gap:2px;padding:4px;pointer-events:auto}
+#histbar button,#zoomer button{width:27px;height:25px;border:0;background:none;color:var(--muted);border-radius:6px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+#histbar button:hover:not(:disabled),#zoomer button:hover{color:var(--text);background:var(--btn2)}
+#histbar button:disabled{opacity:.32;cursor:default}
+#histbar svg,#zoomer svg{width:13.5px;height:13.5px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+
+/* нижняя панель канваса: зум + минимапа */
+#stagetools{position:absolute;right:12px;bottom:12px;display:flex;flex-direction:column;align-items:flex-end;gap:8px;z-index:2}
+#zoomer{display:flex;align-items:center;gap:2px;padding:4px}
+#zoomlvl{font:700 10px var(--mono);color:var(--faint);padding:0 6px;min-width:44px;text-align:center}
+#minimap{width:246px;padding:8px;border-radius:var(--r1);position:relative}
+#minimap[hidden]{display:none}
+#minimap .mmtitle{display:flex;align-items:center;justify-content:space-between;font:700 8.5px var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--faint);margin-bottom:5px;padding:0 2px}
+#minimap .mmtitle button{border:0;background:none;color:var(--faint);cursor:pointer;font:11px var(--mono);padding:0 2px;line-height:1}
+#minimap .mmtitle button:hover{color:var(--text)}
+#mmsvg{display:block;width:230px;height:150px;cursor:crosshair;border-radius:var(--r3);background:color-mix(in srgb,var(--bg) 70%,transparent)}
+#mmsvg .mmv{fill:color-mix(in srgb,var(--accent) 14%,transparent);stroke:var(--accent);stroke-width:1.4;vector-effect:non-scaling-stroke}
+
+/* пустое состояние */
+#emptystate{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;z-index:1}
+#emptystate[hidden]{display:none}
+#emptystate .box{pointer-events:auto;text-align:center;padding:26px 30px;border-radius:var(--r1);background:color-mix(in srgb,var(--panel) 92%,transparent);border:1px solid var(--line);box-shadow:var(--shadow)}
+#emptystate h4{margin:0 0 6px;font:700 14px var(--sans)}
+#emptystate p{margin:0 0 14px;font:11.5px var(--sans);color:var(--muted);max-width:320px}
+
+/* ══ панель деталей ══ */
+#details{width:404px;flex:none;background:var(--panel2);border-left:1px solid var(--line);overflow-y:auto;padding:0 0 20px;font-family:var(--sans);position:relative}
+#details[hidden]{display:none}
+#details .dhead{position:sticky;top:0;background:linear-gradient(180deg,var(--panel),var(--panel2));border-bottom:1px solid var(--line);padding:13px 16px 12px;z-index:2}
+#details .dbody{padding:0 16px}
+#details .d-top{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-bottom:7px}
+#details .kbadge{--c:#94a3b8;font:700 8.5px var(--mono);letter-spacing:.11em;text-transform:uppercase;color:var(--c);border:1px solid color-mix(in srgb,var(--c) 58%,transparent);background:color-mix(in srgb,var(--c) 12%,transparent);border-radius:5px;padding:3px 7px}
+#details .d-inferred{font:700 8.5px var(--mono);letter-spacing:.1em;color:#c4b5fd;border:1px dashed #a78bfa;border-radius:5px;padding:3px 7px}
+#details .dclose{position:absolute;top:11px;right:12px;width:26px;height:26px;border:1px solid var(--line2);background:var(--btn);color:var(--muted);border-radius:7px;cursor:pointer;font:14px/1 var(--sans)}
+#details .dclose:hover{color:var(--text);border-color:var(--accent)}
+#details h2{margin:0;font:700 var(--fz-h2)/1.3 var(--sans);word-break:break-word;padding-right:30px}
+#details .src{display:flex;align-items:center;gap:8px;background:var(--panel3);border:1px solid var(--line);border-radius:var(--r3);padding:7px 9px;margin:12px 0}
+#details .src code{flex:1;font:10.5px var(--mono);color:var(--accent2);word-break:break-all}
+html[data-theme="light"] #details .src code{color:var(--accent2)}
+#details .copy{border:1px solid var(--line2);background:var(--btn);color:var(--muted);border-radius:6px;font:10px var(--mono);padding:4px 8px;cursor:pointer;flex:none}
+#details .copy:hover{color:var(--text);border-color:var(--accent)}
+#details h3{margin:17px 0 7px;font:700 9px var(--mono);letter-spacing:.18em;text-transform:uppercase;color:var(--faint);display:flex;align-items:center;gap:7px}
+#details .twrap{overflow-x:auto;margin:0 -4px;padding:0 4px}
+#details table{width:100%;border-collapse:collapse;font:10.5px var(--mono)}
+#details td,#details th{padding:5px 6px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top;white-space:nowrap}
+#details td:first-child{max-width:190px;overflow:hidden;text-overflow:ellipsis}
+#details th{color:var(--faint);font-weight:600;font-size:9px;letter-spacing:.08em;text-transform:uppercase}
+#details td.flag{color:#f472b6;white-space:nowrap}
+html[data-theme="light"] #details td.flag{color:#c2185b}
+#details .kv{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;font:10.5px var(--mono)}
+#details .kv b{color:var(--faint);font-weight:600}
+#details .kv span{color:var(--text);word-break:break-word}
+#details .rel{list-style:none;margin:0;padding:0}
+#details .rel li{display:flex;align-items:center;gap:7px;padding:6px 8px;border:1px solid var(--line);border-radius:var(--r3);margin-bottom:5px;cursor:pointer;font:11px var(--sans);background:var(--panel3);transition:border-color var(--dur),background var(--dur),transform var(--dur)}
+#details h3::after,.sec h3::after{content:'';flex:1;height:1px;background:var(--line)}
+#details .rel li:hover{border-color:var(--accent);background:var(--btn2);transform:translateX(2px)}
+#details .rel li.nohover{cursor:default}
+#details .rel li.nohover:hover{transform:none;border-color:var(--line);background:var(--panel3)}
+#details .rel .ek{font:700 8.5px var(--mono);letter-spacing:.05em;text-transform:uppercase;color:var(--muted);border:1px solid var(--line2);border-radius:4px;padding:2px 5px;flex:none}
+#details .rel .en{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#details .rel .en small{color:var(--faint)}
+#details .rel .cnt{margin-left:auto;font:700 9.5px var(--mono);color:var(--faint);flex:none}
+#details .whyrel{list-style:none;margin:0;padding:0}
+#details .whyrel li{display:flex;gap:8px;align-items:baseline;padding:4px 0;font:11px/1.4 var(--sans);color:var(--muted)}
+#details .whyrel b{font:700 9px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--text);flex:none;min-width:74px}
+#details .tracebar{display:flex;gap:6px;margin:12px 0 2px}
+#details .tracebar .btn{flex:1;padding:8px 6px;text-align:center}
+#details .empty{color:var(--faint);font:10.5px var(--mono)}
+#details .pills{display:flex;flex-wrap:wrap;gap:6px}
+#details .pill{--c:#94a3b8;font:700 10px var(--mono);color:var(--c);border:1px solid color-mix(in srgb,var(--c) 55%,transparent);background:color-mix(in srgb,var(--c) 10%,transparent);border-radius:999px;padding:4px 9px}
+
+/* ══ подвал / легенда ══ */
+footer{display:flex;align-items:center;gap:16px;flex-wrap:wrap;padding:7px 14px;border-top:1px solid var(--line);background:var(--panel2);font:10px var(--mono);color:var(--muted);z-index:3}
+footer .lg{display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
+footer .lg i{width:9px;height:9px;border-radius:3px;display:inline-block}
+footer .lg.dash i{background:transparent!important;border:1px dashed var(--muted)}
+footer .lg.thick i{width:22px;height:0;border-radius:0;border-top:3px solid var(--muted);opacity:.8}
+footer .fdiv{width:1px;height:14px;background:var(--line2)}
+footer .fcounts{margin-left:auto;color:var(--faint)}
+footer .hint{color:var(--faint)}
+
+/* ══ SVG-граф ══ */
+text{font-family:var(--mono);user-select:none}
+.lane-bg{pointer-events:none}
+.lane-label{font-size:10px;font-weight:700;letter-spacing:.22em;pointer-events:none}
+.node{cursor:pointer}
+.gridline{fill:none;stroke:var(--grid);stroke-opacity:var(--grid-op)}
+.stop-mid{stop-color:var(--card-mid)}
+.stop-low{stop-color:var(--card-low)}
+.frame{fill:var(--frame);stroke-width:1.2;transition:stroke-width var(--dur)}
+.node.inf .frame{stroke-dasharray:5 4}
+.thead{pointer-events:none}
+.nlabel{fill:var(--text);font-size:11.5px;font-weight:600}
+.nkind{font-size:7.5px;font-weight:700;letter-spacing:.1em;opacity:.9}
+.nmut{fill:var(--muted);font-size:9px}
+.ncol{fill:color-mix(in srgb,var(--text) 78%,transparent);font-size:10px}
+.ncol .cty{fill:var(--faint)}
+.nmore{fill:var(--faint);font-size:9px;font-style:italic}
+.nsep{stroke:var(--line2);stroke-width:1}
+.edge{fill:none;stroke-width:1.1;opacity:.45;pointer-events:stroke;transition:opacity var(--dur)}
+.node.matched .frame{stroke-width:2.6}
+.hidden{display:none}
+.dimmed{opacity:.12;pointer-events:none}
+.edge.traced{stroke-dasharray:7 4;animation:dashflow .8s linear infinite;opacity:1;stroke-width:1.7}
+@keyframes dashflow{to{stroke-dashoffset:-22}}
+.node.feat .frame{stroke-width:1.8}
+#emptymsg{fill:var(--faint);font-size:14px}
+
+/* обзор: тир-полосы, блоки групп, потоки */
+.tier-band{pointer-events:none}
+.tier-title{font-size:19px;font-weight:800;letter-spacing:.2em;pointer-events:none}
+.tier-sub{font-size:11px;fill:var(--faint);letter-spacing:.06em;pointer-events:none}
+.tier-band .halo{opacity:0;transition:opacity .2s}
+.tier-band.act .halo{opacity:1}
+.gcard{cursor:pointer}
+.gframe{stroke-width:1.5;transition:stroke-width var(--dur)}
+.gcard.inf .gframe{stroke-dasharray:6 5}
+.gcard.more .gframe{stroke-dasharray:6 6;fill:var(--card-low)}
+.gtitle{font-family:var(--sans);font-size:16.5px;font-weight:700;fill:var(--text)}
+.gcard.big .gtitle{font-size:20px;font-weight:800}
+.gsub{font-size:11px;fill:var(--muted);letter-spacing:.02em}
+.gsrc{font-size:9.5px;fill:var(--faint)}
+.gitem{font-family:var(--sans);font-size:11.5px;fill:var(--muted)}
+.gnum{font-size:11px;font-weight:700;letter-spacing:.04em}
+.gbar-bg{fill:color-mix(in srgb,var(--text) 12%,transparent)}
+.gicon{fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;pointer-events:none}
+.bmono{font-size:9.5px;font-weight:800;letter-spacing:.02em;pointer-events:none}
+.ghead{pointer-events:none}
+.gplus{fill:none;stroke-width:1.3;opacity:.65;transition:opacity var(--dur)}
+.gcard:hover .gplus{opacity:1}
+.gcard.matched .gframe{stroke-width:3.4}
+.gcard.hasmatch .gframe{stroke-width:2.6;stroke-dasharray:3 3}
+.gedge{fill:none;pointer-events:stroke;opacity:.9;transition:opacity var(--dur)}
+.gedge:hover{opacity:1}
+.gedge.traced{stroke-dasharray:9 5;animation:dashflow .8s linear infinite;opacity:1}
+.gelabel{font-size:10.5px;font-weight:700;letter-spacing:.03em}
+.geplate{fill:var(--plate);stroke-width:1}
+.expframe{fill:var(--exp);stroke-width:1.6}
+.exphead{font-family:var(--sans);font-size:16px;font-weight:700;fill:var(--text)}
+.expsub{font-size:10.5px;fill:var(--muted)}
+.collapse-btn{cursor:pointer}
+.collapse-btn rect{fill:var(--btn);stroke-width:1}
+.collapse-btn text{font-size:10.5px;font-weight:700;fill:var(--muted)}
+.collapse-btn:hover rect{stroke:var(--accent)}
+.collapse-btn:hover text{fill:var(--text)}
+.hit{fill:transparent}
+
+/* ══ модальные слои ══ */
+.overlay{position:fixed;inset:0;z-index:20;display:flex;align-items:center;justify-content:center;padding:24px;background:color-mix(in srgb,var(--bg) 74%,transparent);backdrop-filter:blur(7px);animation:fade .18s ease-out}
+.overlay[hidden]{display:none}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+@keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.sheet{background:var(--panel);border:1px solid var(--line2);border-radius:18px;box-shadow:var(--shadow);max-width:1040px;width:100%;max-height:100%;overflow:auto;animation:rise .2s ease-out}
+.sheet.narrow{max-width:640px}
+.sheet .shead{display:flex;align-items:flex-start;gap:16px;padding:26px 30px 18px;border-bottom:1px solid var(--line);background:
+   radial-gradient(600px 200px at 0% 0%,var(--accent-bg) 0,transparent 70%)}
+.sheet .shead .t{flex:1;min-width:0}
+.sheet .kicker{font:700 8.5px var(--mono);letter-spacing:.3em;text-transform:uppercase;color:var(--accent)}
+.sheet h2{margin:7px 0 4px;font:800 var(--fz-hero)/1.1 var(--sans);letter-spacing:-.02em;word-break:break-word}
+.sheet .subtle{font:11.5px var(--mono);color:var(--faint)}
+.sheet .sbody{padding:20px 30px 26px}
+.sheet .sfoot{display:flex;align-items:center;gap:10px;padding:16px 30px 24px;flex-wrap:wrap}
+.sheet .sfoot .note{font:10.5px var(--mono);color:var(--faint);margin-left:auto}
+.xbtn{width:30px;height:30px;flex:none;border:1px solid var(--line2);background:var(--btn);color:var(--muted);border-radius:9px;cursor:pointer;font:15px/1 var(--sans)}
+.xbtn:hover{color:var(--text);border-color:var(--accent)}
+
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(118px,1fr));gap:9px;margin:2px 0 20px}
+.tile{background:var(--panel2);border:1px solid var(--line);border-radius:var(--r2);padding:11px 12px}
+.tile b{display:block;font:800 21px/1.05 var(--mono);letter-spacing:-.02em;color:var(--text)}
+.tile span{display:block;margin-top:3px;font:9.5px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--faint)}
+.tile.acc b{color:var(--accent)}
+.cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px 26px}
+.sec{margin-bottom:20px}
+.sec h3{margin:0 0 9px;font:700 9px var(--mono);letter-spacing:.2em;text-transform:uppercase;color:var(--faint);display:flex;align-items:center;gap:8px}
+.stacklist{display:flex;flex-wrap:wrap;gap:7px}
+.stackpill{display:inline-flex;align-items:baseline;gap:7px;border:1px solid var(--line2);background:var(--panel2);border-radius:999px;padding:6px 12px;font:700 11px var(--mono);color:var(--text)}
+.stackpill em{font-style:normal;font-weight:400;font-size:9.5px;color:var(--faint)}
+.toplist{list-style:none;margin:0;padding:0}
+.toplist li{display:flex;align-items:center;gap:10px;padding:7px 10px;border-radius:var(--r3);border:1px solid var(--line);background:var(--panel2);margin-bottom:6px;cursor:pointer;transition:border-color var(--dur),transform var(--dur)}
+.toplist li:hover{border-color:var(--accent);transform:translateX(2px)}
+.toplist .rank{font:800 11px var(--mono);color:var(--faint);width:16px;flex:none}
+.toplist .nm{flex:1;min-width:0;font:600 12px var(--sans);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.toplist .nm small{display:block;font:9.5px var(--mono);color:var(--faint);font-weight:400}
+.toplist .mt{font:700 10px var(--mono);color:var(--muted);flex:none}
+.toplist .bar{height:4px;border-radius:2px;flex:none;width:54px;background:var(--line);overflow:hidden}
+.toplist .bar i{display:block;height:100%;border-radius:2px}
+.findings{list-style:none;margin:0;padding:0}
+.findings li{display:flex;gap:9px;align-items:flex-start;padding:7px 0;font:11.5px/1.45 var(--sans);color:var(--muted);border-bottom:1px solid var(--line)}
+.findings li:last-child{border-bottom:0}
+.findings .fi{width:8px;height:8px;border-radius:50%;flex:none;margin-top:5px}
+.findings b{color:var(--text);font-weight:700}
+.keys{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:6px 22px}
+.keys div{display:flex;align-items:center;gap:10px;padding:5px 0;font:11.5px var(--sans);color:var(--muted);border-bottom:1px solid var(--line)}
+.keys kbd{font:700 10px var(--mono);color:var(--text);background:var(--panel2);border:1px solid var(--line2);border-bottom-width:2px;border-radius:6px;padding:3px 7px;min-width:24px;text-align:center;flex:none}
+
+#toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(12px);z-index:30;padding:10px 18px;border-radius:999px;background:var(--panel);border:1px solid var(--line2);box-shadow:var(--shadow);font:12px var(--sans);color:var(--text);opacity:0;pointer-events:none;transition:opacity .18s,transform .18s}
+#toast.on{opacity:1;transform:translateX(-50%)}
+
+/* ══ приложение (только печать) ══ */
+#appendix{display:none}
+
+/* ══ печать ══ */
+@page{size:A3 landscape;margin:10mm}
+@media print{
   :root{
-    color-scheme:dark;
-    --bg:#0b1120;--panel:#111a2e;--panel2:#0e1526;--line:#1e2a44;--line2:#27365a;
-    --text:#e8eefc;--muted:#8b9bb4;--faint:#5c6b85;
-    --mono:ui-monospace,'SF Mono',SFMono-Regular,Menlo,Consolas,monospace;
-    --sans:system-ui,-apple-system,'Segoe UI',sans-serif;
+    --bg:#ffffff;--bg-g1:transparent;--bg-g2:transparent;--panel:#ffffff;--panel2:#ffffff;--panel3:#ffffff;
+    --line:#cbd5e1;--line2:#cbd5e1;--text:#0f172a;--muted:#475569;--faint:#64748b;
+    --frame:#ffffff;--plate:#ffffff;--exp:#ffffff;--card-mid:#ffffff;--card-low:#ffffff;
+    --grid:#94a3b8;--grid-op:.16;
   }
-  *{box-sizing:border-box}
-  html,body{height:100%}
-  body{margin:0;background:var(--bg);color:var(--text);font:13px/1.45 var(--sans);display:flex;flex-direction:column;overflow:hidden}
-
-  /* ── header ─────────────────────────────────────────────── */
-  header{display:flex;align-items:center;flex-wrap:wrap;gap:10px;padding:10px 16px;background:linear-gradient(180deg,#121b31,#0e1526);border-bottom:1px solid var(--line);z-index:3}
-  .brand{display:flex;flex-direction:column;margin-right:8px}
-  .eyebrow{font:700 9px/1 var(--mono);letter-spacing:.28em;color:#55e6d7;text-transform:uppercase}
-  h1{margin:2px 0 0;font:700 17px/1.1 var(--mono);letter-spacing:-.02em}
-  .counts{font:10.5px var(--mono);color:var(--muted);margin-right:auto;padding-left:12px;border-left:1px solid var(--line2);white-space:nowrap}
-  .counts b{color:var(--text)}
-  #search{background:#0a101f;border:1px solid var(--line2);border-radius:8px;color:var(--text);font:12px var(--mono);padding:7px 11px;width:220px;outline:none}
-  #search:focus{border-color:#55e6d7;box-shadow:0 0 12px #55e6d733}
-  .chips{display:flex;gap:6px;flex-wrap:wrap}
-  .chip{--c:#94a3b8;display:inline-flex;align-items:center;gap:6px;border:1px solid var(--c);color:var(--c);background:transparent;border-radius:999px;padding:5px 11px;font:700 10px var(--mono);letter-spacing:.06em;text-transform:uppercase;cursor:pointer;box-shadow:0 0 10px color-mix(in srgb,var(--c) 28%,transparent),inset 0 0 8px color-mix(in srgb,var(--c) 12%,transparent);transition:opacity .15s,box-shadow .15s}
-  .chip .dot{width:6px;height:6px;border-radius:50%;background:var(--c);box-shadow:0 0 8px var(--c)}
-  .chip.off{opacity:.32;box-shadow:none;border-color:var(--line2);filter:saturate(.3)}
-  .chip:hover{opacity:1}
-  .chip-sep{font:700 9px var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--faint);margin:0 2px 0 10px;align-self:center}
-  .flowchip{--c:#64748b;font-size:9.5px;padding:3px 8px}
-  label.inf-toggle{display:inline-flex;align-items:center;gap:6px;font:10.5px var(--mono);color:var(--muted);border:1px dashed var(--line2);border-radius:999px;padding:5px 11px;cursor:pointer;user-select:none}
-  label.inf-toggle input{accent-color:#a78bfa;margin:0}
-  .btn{border:1px solid var(--line2);background:#151f36;color:var(--text);border-radius:8px;padding:7px 13px;font:600 11px var(--mono);cursor:pointer}
-  .btn:hover{border-color:#55e6d7;box-shadow:0 0 10px #55e6d726}
-  .btn[hidden]{display:none}
-  /* сегмент-контрол «Обзор | Детали» */
-  .seg{display:inline-flex;border:1px solid var(--line2);background:#0a101f;border-radius:9px;padding:2px;gap:2px}
-  .seg[hidden]{display:none}
-  .seg button{border:0;background:transparent;color:var(--muted);font:700 11px var(--mono);letter-spacing:.04em;padding:6px 14px;border-radius:7px;cursor:pointer}
-  .seg button.on{background:linear-gradient(180deg,#1c2b4a,#16223b);color:#9ff3ea;box-shadow:0 0 12px #55e6d72e,inset 0 0 0 1px #55e6d740}
-  .seg button:hover{color:var(--text)}
-
-  /* ── main / canvas / details ────────────────────────────── */
-  main{flex:1;display:flex;min-height:0;position:relative}
-  #canvas{flex:1;min-width:0;display:block;cursor:grab;touch-action:none;background:
-    radial-gradient(1100px 550px at 25% -12%,#16233f80 0,transparent 60%),
-    radial-gradient(900px 520px at 92% 112%,#20173d80 0,transparent 55%),var(--bg)}
-  #canvas.panning{cursor:grabbing}
-  #details{width:400px;flex:none;background:var(--panel2);border-left:1px solid var(--line);overflow-y:auto;padding:16px;font-family:var(--sans)}
-  #details[hidden]{display:none}
-  #details .d-top{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px}
-  #details .kbadge{--c:#94a3b8;font:700 9px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--c);border:1px solid var(--c);border-radius:5px;padding:3px 7px;box-shadow:0 0 8px color-mix(in srgb,var(--c) 30%,transparent)}
-  #details .d-inferred{font:700 9px var(--mono);letter-spacing:.1em;color:#c4b5fd;border:1px dashed #a78bfa;border-radius:5px;padding:3px 7px}
-  #details h2{margin:2px 0 10px;font:700 15px/1.25 var(--sans);word-break:break-word}
-  #details .src{display:flex;align-items:center;gap:8px;background:#0a101f;border:1px solid var(--line);border-radius:8px;padding:7px 9px;margin-bottom:12px}
-  #details .src code{flex:1;font:10.5px var(--mono);color:#9fe8df;word-break:break-all}
-  #details .copy{border:1px solid var(--line2);background:#151f36;color:var(--muted);border-radius:6px;font:10px var(--mono);padding:4px 8px;cursor:pointer;flex:none}
-  #details .copy:hover{color:var(--text);border-color:#55e6d7}
-  #details h3{margin:16px 0 6px;font:700 9.5px var(--mono);letter-spacing:.18em;text-transform:uppercase;color:var(--faint)}
-  /* длинные имена колонок и типов рвались по символам («organ izati on_id») —
-     держим их одной строкой, а таблицу прокручиваем по горизонтали */
-  #details .twrap{overflow-x:auto;margin:0 -4px;padding:0 4px}
-  #details table{width:100%;border-collapse:collapse;font:10.5px var(--mono)}
-  #details td,#details th{padding:4px 6px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top;white-space:nowrap}
-  #details td:first-child{max-width:190px;overflow:hidden;text-overflow:ellipsis}
-  #details th{color:var(--faint);font-weight:600;font-size:9px;letter-spacing:.08em;text-transform:uppercase}
-  #details td.flag{color:#f472b6;white-space:nowrap}
-  #details .kv{display:grid;grid-template-columns:auto 1fr;gap:3px 12px;font:10.5px var(--mono)}
-  #details .kv b{color:var(--faint);font-weight:600}
-  #details .kv span{color:var(--text);word-break:break-word}
-  #details .rel{list-style:none;margin:0;padding:0}
-  #details .rel li{display:flex;align-items:center;gap:7px;padding:5px 7px;border:1px solid var(--line);border-radius:7px;margin-bottom:5px;cursor:pointer;font:11px var(--sans)}
-  #details .rel li:hover{border-color:#55e6d7;background:#101a30}
-  #details .rel .ek{font:700 8.5px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted);border:1px solid var(--line2);border-radius:4px;padding:2px 5px;flex:none}
-  #details .rel .en{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-  #details .rel .en small{color:var(--faint)}
-  #details .rel .cnt{margin-left:auto;font:700 9.5px var(--mono);color:var(--faint);flex:none}
-  #details .tracebar{display:flex;gap:6px;margin:12px 0 2px}
-  #details .tracebar .btn{flex:1;padding:8px 6px}
-  #details .empty{color:var(--faint);font:10.5px var(--mono)}
-  #details .pills{display:flex;flex-wrap:wrap;gap:6px}
-  #details .pill{--c:#94a3b8;font:700 10px var(--mono);color:var(--c);border:1px solid color-mix(in srgb,var(--c) 55%,transparent);background:color-mix(in srgb,var(--c) 10%,transparent);border-radius:999px;padding:4px 9px}
-
-  /* ── footer ─────────────────────────────────────────────── */
-  footer{display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:7px 16px;border-top:1px solid var(--line);background:#0d1424;font:10px var(--mono);color:var(--muted);z-index:3}
-  footer .lg{display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
-  footer .lg i{width:8px;height:8px;border-radius:2px;display:inline-block;box-shadow:0 0 6px currentColor}
-  footer .lg.dash i{background:transparent!important;border:1px dashed var(--muted);box-shadow:none}
-  footer .fcounts{margin-left:auto;color:var(--faint)}
-  footer .hint{color:var(--faint)}
-
-  /* ── svg graph ──────────────────────────────────────────── */
-  text{font-family:var(--mono);user-select:none}
-  .lane-bg{pointer-events:none}
-  .lane-label{font-size:10px;font-weight:700;letter-spacing:.22em;pointer-events:none}
-  .node{cursor:pointer}
-  .frame{fill:#111a2ef5;stroke-width:1.2;transition:stroke-width .12s}
-  .node.inf .frame{stroke-dasharray:5 4}
-  .thead{pointer-events:none}
-  .nlabel{fill:var(--text);font-size:11.5px;font-weight:600}
-  .nkind{font-size:7.5px;font-weight:700;letter-spacing:.1em;opacity:.85}
-  .nmut{fill:var(--muted);font-size:9px}
-  .ncol{fill:#b7c3d8;font-size:10px}
-  .ncol .cty{fill:var(--faint)}
-  .nmore{fill:var(--faint);font-size:9px;font-style:italic}
-  .nsep{stroke:var(--line2);stroke-width:1}
-  .edge{fill:none;stroke-width:1.1;opacity:.5;pointer-events:stroke}
-  .node.matched .frame{stroke-width:2.4}
-  .hidden{display:none}
-  .dimmed{opacity:.13;pointer-events:none}
-  .edge.traced{stroke-dasharray:7 4;animation:dashflow .8s linear infinite;opacity:1;stroke-width:1.7}
-  @keyframes dashflow{to{stroke-dashoffset:-22}}
-  #emptymsg{fill:var(--faint);font-size:14px}
-
-  /* ── overview: тир-полосы, блоки групп, потоки ──────────── */
-  .tier-band{pointer-events:none}
-  .tier-title{font-size:19px;font-weight:800;letter-spacing:.2em;pointer-events:none}
-  .tier-sub{font-size:11px;fill:var(--faint);letter-spacing:.06em;pointer-events:none}
-  .gcard{cursor:pointer}
-  .gframe{stroke-width:1.5;transition:stroke-width .12s}
-  .gcard.inf .gframe{stroke-dasharray:6 5}
-  .gcard.more .gframe{stroke-dasharray:6 6;fill:#0d1524d9}
-  .gtitle{font-family:var(--sans);font-size:16.5px;font-weight:700;fill:var(--text)}
-  .gsub{font-size:11px;fill:var(--muted);letter-spacing:.02em}
-  .gsrc{font-size:9.5px;fill:var(--faint)}
-  .gnum{font-size:11px;font-weight:700;letter-spacing:.04em}
-  .gbar-bg{fill:#ffffff14}
-  .gicon{fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;pointer-events:none}
-  .ghead{pointer-events:none}
-  .gplus{fill:none;stroke-width:1.3;opacity:.7}
-  .gcard.matched .gframe{stroke-width:3.4}
-  .gcard.hasmatch .gframe{stroke-width:2.6;stroke-dasharray:3 3}
-  .gedge{fill:none;pointer-events:stroke;opacity:.92;transition:opacity .12s}
-  .gedge:hover{opacity:1}
-  .gedge.traced{stroke-dasharray:9 5;animation:dashflow .8s linear infinite;opacity:1}
-  .gelabel{font-size:10.5px;font-weight:700;letter-spacing:.03em}
-  .geplate{fill:#0b1120e8;stroke-width:1}
-  .expframe{fill:#0a1020ea;stroke-width:1.6}
-  .exphead{font-family:var(--sans);font-size:16px;font-weight:700;fill:var(--text)}
-  .expsub{font-size:10.5px;fill:var(--muted)}
-  .collapse-btn{cursor:pointer}
-  .collapse-btn rect{fill:#16223b;stroke-width:1}
-  .collapse-btn text{font-size:10.5px;font-weight:700;fill:var(--muted)}
-  .collapse-btn:hover rect{stroke:#55e6d7}
-  .collapse-btn:hover text{fill:var(--text)}
-  .hit{fill:transparent}
-
-  /* ── appendix (print only) ──────────────────────────────── */
-  #appendix{display:none}
-
-  /* ── print ──────────────────────────────────────────────── */
-  @page{size:A3 landscape;margin:10mm}
-  @media print{
-    body{background:#fff;color:#0f172a;overflow:visible;display:block}
-    header .controls,header #search,header .seg,#details,footer .fcounts,footer .hint{display:none!important}
-    header{background:#fff;border-color:#cbd5e1}
-    h1{color:#0f172a}.counts{color:#475569}.counts b{color:#0f172a}
-    main{display:block}
-    #canvas{background:#fff;width:100%;height:170mm}
-    .gridbg{fill:#ffffff}
-    .frame{fill:#ffffff}
-    .nlabel{fill:#0f172a}.ncol{fill:#334155}.nmut,.nmore{fill:#64748b}
-    .nsep{stroke:#cbd5e1}
-    .gframe{fill:#ffffff}
-    .gtitle,.exphead{fill:#0f172a}
-    .gsub,.expsub{fill:#475569}.gsrc{fill:#64748b}
-    .gbar-bg{fill:#e2e8f0}
-    .expframe{fill:#ffffff}
-    .geplate{fill:#ffffff;stroke:#cbd5e1}
-    .tier-sub{fill:#64748b}
-    .collapse-btn{display:none}
-    #emptymsg{fill:#64748b}
-    footer{background:#fff;border-color:#cbd5e1;color:#475569}
-    #appendix{display:table;width:100%;margin-top:8mm;border-collapse:collapse;font:9px var(--mono);color:#0f172a;page-break-before:always}
-    #appendix caption{text-align:left;font:700 12px var(--mono);padding:4px 0;color:#0f172a}
-    #appendix th,#appendix td{border:1px solid #cbd5e1;padding:3px 6px;text-align:left;word-break:break-all}
-    #appendix th{background:#f1f5f9}
-  }
+  body{background:#fff;color:#0f172a;overflow:visible;display:block}
+  header .hrow.tools,header .igroup,header #search,header .searchwrap,header .seg,#details,footer .fcounts,footer .hint,
+  #crumbbar,#stagetools,.overlay,#toast,#emptystate{display:none!important}
+  header{background:#fff;border-color:#cbd5e1;box-shadow:none}
+  h1{color:#0f172a}.counts{color:#475569}.counts b{color:#0f172a}
+  main{display:block}
+  #stage{display:block}
+  #canvas{background:#fff;width:100%;height:170mm}
+  .gbar-bg{fill:#e2e8f0}
+  .collapse-btn{display:none}
+  footer{background:#fff;border-color:#cbd5e1;color:#475569}
+  #appendix{display:table;width:100%;margin-top:8mm;border-collapse:collapse;font:9px var(--mono);color:#0f172a;page-break-before:always}
+  #appendix caption{text-align:left;font:700 12px var(--mono);padding:4px 0;color:#0f172a}
+  #appendix th,#appendix td{border:1px solid #cbd5e1;padding:3px 6px;text-align:left;word-break:break-all}
+  #appendix th{background:#f1f5f9}
+}
 </style>
+<!-- библиотека узнаваемых значков технологий: строку ниже заменяет пайплайн -->
+__ARCHMAP_BRANDS__
 </head>
 <body>
 <header>
-  <div class="brand"><span class="eyebrow">archmap</span><h1 id="title">__ARCHMAP_TITLE__</h1></div>
-  <div class="counts" id="counts"></div>
-  <div class="seg" id="modeSeg" hidden>
-    <button type="button" data-mode="overview">Обзор</button>
-    <button type="button" data-mode="details">Детали</button>
+  <div class="hrow">
+    <div class="brand"><span class="eyebrow">archmap</span><h1 id="title">__ARCHMAP_TITLE__</h1></div>
+    <div class="counts" id="counts"></div>
+    <div class="spacer"></div>
+    <div class="seg" id="modeSeg" hidden>
+      <button type="button" data-mode="overview" title="Обзор: крупные блоки групп и потоки между ними (клавиша O)">Обзор</button>
+      <button type="button" data-mode="details" title="Детали: все узлы по слоям (клавиша D)">Детали</button>
+    </div>
+    <div class="searchwrap">
+      <input id="search" type="search" placeholder="поиск: имя / id / файл" spellcheck="false" autocomplete="off" title="Поиск по узлам и группам. Enter — перейти к первому совпадению (клавиша /)">
+      <kbd>/</kbd>
+    </div>
+    <div class="igroup">
+      <button class="iconbtn" id="aboutBtn" title="О проекте: сводка репозитория, стеки, находки (клавиша I)" aria-label="О проекте">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"></circle><path d="M12 11v5"></path><path d="M12 7.6v.6"></path></svg>
+      </button>
+      <button class="iconbtn" id="keysBtn" title="Горячие клавиши (клавиша ?)" aria-label="Горячие клавиши">
+        <svg viewBox="0 0 24 24"><rect x="2.5" y="6" width="19" height="12" rx="2.4"></rect><path d="M6.5 10h.01M10 10h.01M13.5 10h.01M17 10h.01M8 14h8"></path></svg>
+      </button>
+      <button class="iconbtn" id="themeBtn" title="Светлая / тёмная тема (клавиша T)" aria-label="Сменить тему">
+        <svg class="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4.2"></circle><path d="M12 2.6v2.4M12 19v2.4M4.4 12H2M22 12h-2.4M6.3 6.3 4.6 4.6M19.4 19.4l-1.7-1.7M17.7 6.3l1.7-1.7M4.6 19.4l1.7-1.7"></path></svg>
+        <svg class="i-moon" viewBox="0 0 24 24"><path d="M20 14.4A8.4 8.4 0 1 1 9.6 4a6.9 6.9 0 0 0 10.4 10.4z"></path></svg>
+      </button>
+      <div class="idiv"></div>
+      <button class="iconbtn" id="mmBtn" title="Мини-карта (клавиша M)" aria-label="Мини-карта">
+        <svg viewBox="0 0 24 24"><path d="m2.8 6.2 6-2.4 6.4 2.4 6-2.4v14l-6 2.4-6.4-2.4-6 2.4z"></path><path d="M8.8 3.8v14M15.2 6.2v14"></path></svg>
+      </button>
+      <button class="iconbtn" id="svgBtn" title="Скачать карту как SVG (векторный файл)" aria-label="Скачать SVG">
+        <svg viewBox="0 0 24 24"><path d="M12 3.4v11"></path><path d="m7.8 10.4 4.2 4.2 4.2-4.2"></path><path d="M4 17.6v2.2h16v-2.2"></path></svg>
+      </button>
+      <button class="iconbtn" id="pngBtn" title="Скачать карту как PNG (растровая картинка)" aria-label="Скачать PNG">
+        <svg viewBox="0 0 24 24"><rect x="3" y="4.6" width="18" height="14.8" rx="2.4"></rect><circle cx="8.6" cy="9.6" r="1.5"></circle><path d="m4.4 17 5-5.2 4.2 4 2.6-2.4 3.4 3.4"></path></svg>
+      </button>
+      <button class="iconbtn" id="printBtn" title="Печать / сохранить в PDF (клавиша P)" aria-label="Печать">
+        <svg viewBox="0 0 24 24"><path d="M7 9V3.6h10V9"></path><rect x="3.4" y="9" width="17.2" height="7.6" rx="2"></rect><rect x="7" y="14" width="10" height="6.4" rx="1.4"></rect></svg>
+      </button>
+      <button class="iconbtn" id="fitBtn" title="Вписать всю карту в экран (клавиша F)" aria-label="Вписать">
+        <svg viewBox="0 0 24 24"><path d="M3.6 9V3.6H9M15 3.6h5.4V9M20.4 15v5.4H15M9 20.4H3.6V15"></path></svg>
+      </button>
+    </div>
   </div>
-  <input id="search" type="search" placeholder="search: label / id / file  ⏎" spellcheck="false" autocomplete="off">
-  <div class="controls" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+  <div class="hrow tools">
     <div class="chips" id="layerChips"></div>
-    <label class="inf-toggle"><input type="checkbox" id="inferredToggle" checked> inferred</label>
-    <button class="btn" id="collapseBtn" hidden>Свернуть всё</button>
-    <button class="btn" id="fitBtn">Fit</button>
-    <button class="btn" id="printBtn">Print</button>
+    <label class="inf-toggle" title="Показывать связи и узлы, выведенные эвристикой (рисуются пунктиром)"><input type="checkbox" id="inferredToggle" checked> inferred</label>
+    <div class="spacer"></div>
+    <button class="btn" id="collapseBtn" title="Свернуть все развёрнутые группы (клавиша C)" hidden>Свернуть всё</button>
   </div>
 </header>
 <main>
-  <svg id="canvas" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg"></svg>
+  <div id="stage">
+    <svg id="canvas" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg"></svg>
+    <div id="crumbbar">
+      <nav id="crumbs" class="glass" aria-label="Хлебные крошки"></nav>
+      <div id="histbar" class="glass">
+        <button id="histBack" title="Назад по истории выделений (Alt+←)" disabled aria-label="Назад">
+          <svg viewBox="0 0 24 24"><path d="M14.5 5.5 8 12l6.5 6.5"></path></svg>
+        </button>
+        <button id="histFwd" title="Вперёд по истории выделений (Alt+→)" disabled aria-label="Вперёд">
+          <svg viewBox="0 0 24 24"><path d="M9.5 5.5 16 12l-6.5 6.5"></path></svg>
+        </button>
+      </div>
+    </div>
+    <div id="emptystate" hidden><div class="box">
+      <h4 id="esTitle"></h4><p id="esText"></p>
+      <button class="btn" id="esBtn">Сбросить фильтры</button>
+    </div></div>
+    <div id="stagetools">
+      <div id="zoomer" class="glass">
+        <button id="zoomOut" title="Отдалить" aria-label="Отдалить"><svg viewBox="0 0 24 24"><path d="M5 12h14"></path></svg></button>
+        <span id="zoomlvl">100%</span>
+        <button id="zoomIn" title="Приблизить" aria-label="Приблизить"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"></path></svg></button>
+      </div>
+      <div id="minimap" class="glass">
+        <div class="mmtitle"><span>мини-карта</span><button id="mmClose" title="Скрыть мини-карту (клавиша M)" aria-label="Скрыть мини-карту">✕</button></div>
+        <svg id="mmsvg" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg"></svg>
+      </div>
+    </div>
+  </div>
   <aside id="details" hidden></aside>
 </main>
-<footer><div id="legend" style="display:flex;gap:14px;flex-wrap:wrap"></div><div class="hint" id="hint"></div><div class="fcounts" id="fcounts"></div></footer>
+<footer><div id="legend" style="display:flex;gap:14px;flex-wrap:wrap;align-items:center"></div><div class="hint" id="hint"></div><div class="fcounts" id="fcounts"></div></footer>
 <table id="appendix"></table>
+
+<div class="overlay" id="about" hidden>
+  <div class="sheet" role="dialog" aria-label="О проекте">
+    <div class="shead">
+      <div class="t">
+        <div class="kicker">карта архитектуры</div>
+        <h2 id="abTitle">__ARCHMAP_TITLE__</h2>
+        <div class="subtle" id="abSub"></div>
+      </div>
+      <button class="xbtn" id="abX" title="Закрыть (Esc)" aria-label="Закрыть">✕</button>
+    </div>
+    <div class="sbody" id="abBody"></div>
+    <div class="sfoot">
+      <button class="btn primary" id="abGo">Смотреть карту →</button>
+      <button class="btn" id="abKeys" title="Показать список горячих клавиш">Горячие клавиши</button>
+      <span class="note" id="abNote"></span>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="keys" hidden>
+  <div class="sheet narrow" role="dialog" aria-label="Горячие клавиши">
+    <div class="shead">
+      <div class="t"><div class="kicker">управление</div><h2>Горячие клавиши</h2></div>
+      <button class="xbtn" id="kX" title="Закрыть (Esc)" aria-label="Закрыть">✕</button>
+    </div>
+    <div class="sbody"><div class="keys" id="keysBody"></div></div>
+  </div>
+</div>
+
+<div id="toast" role="status"></div>
 <script id="archmap-data" type="application/json">__ARCHMAP_JSON__</script>
 <script>
 'use strict'
-/* archmap interactive template — вся раскладка и интеракции на клиенте.
-   Два режима:
-     ОБЗОР  — только группы (data.groups) крупными блоками + агрегированные
-              потоки (data.groupEdges); любой блок разворачивается в детальный
-              рендер своих узлов прямо на месте.
-     ДЕТАЛИ — исходная поузловая карта (все data.nodes/data.edges).
-   layoutColumns/trace ниже — осознанная компактная копия scripts/lib/graph.mjs:
-   браузер не может импортировать node-модули пайплайна. */
+/* archmap interactive template — раскладка и интеракции целиком на клиенте.
+   ОБЗОР  — блоки групп (data.groups) + агрегированные потоки (data.groupEdges);
+            любой блок разворачивается в детальный рендер своих узлов на месте.
+   ДЕТАЛИ — поузловая карта (data.nodes/data.edges).
+   Раскладка и trace — компактная копия scripts/lib/graph.mjs: браузер не может
+   импортировать node-модули пайплайна.
+   Данные попадают в DOM только через textContent/createElementNS. */
+/* если библиотека значков не подставлена, плейсхолдер остаётся текстом — убираем */
+{
+  const mark = '__ARCHMAP' + '_BRANDS__'
+  for (const node of [...document.body.childNodes]) {
+    if (node.nodeType === 3 && node.textContent.includes(mark)) node.remove()
+  }
+}
 const data = JSON.parse(document.getElementById('archmap-data').textContent)
 const FALLBACK_LAYERS = [
+  { id: 'product', label: 'Product', color: '#f87171' },
   { id: 'client', label: 'Client', color: '#38bdf8' },
   { id: 'api', label: 'API', color: '#34d399' },
   { id: 'agents', label: 'Agents', color: '#a78bfa' },
@@ -231,8 +496,10 @@ const edges = Array.isArray(data.edges) ? data.edges : []
 const nodeById = new Map(nodes.map(n => [n.id, n]))
 const layerById = {}
 for (const l of layers) layerById[l.id] = l
-const layerColor = id => (layerById[id] || { color: '#94a3b8' }).color
-const layerLabel = id => (layerById[id] || { label: id }).label
+/* Продуктовый слой — «шапка» карты: его блоки крупнее и акцентнее прочих. */
+const PRODUCT_KINDS = new Set(['feature', 'capability'])
+const productLayerIds = new Set(layers.filter(l => l.id === 'product').map(l => l.id))
+for (const n of nodes) if (PRODUCT_KINDS.has(n.kind) && layerById[n.layer]) productLayerIds.add(n.layer)
 
 const METHOD_COLORS = { GET: '#34d399', POST: '#60a5fa', PUT: '#fbbf24', PATCH: '#a78bfa', DELETE: '#f87171' }
 const NODE_W = 240
@@ -243,9 +510,10 @@ const SUB_GAP_X = 26      // зазор между подколонками вн
 const TARGET_H = 2400     // выше этого колонка переносится в следующую подколонку
 const SVGNS = 'http://www.w3.org/2000/svg'
 
-/* ── ОБЗОР: геометрия ─────────────────────────────────────── */
+/* ── ОБЗОР: геометрия ── */
 const CARD_W = 296
 const CARD_H = 118
+const CARD_H_BIG = 176      // продуктовые блоки — заметно крупнее
 const CARD_GX = 26
 const CARD_GY = 26
 const TIER_LABEL = 58       // высота шапки тир-полосы
@@ -257,6 +525,40 @@ const EXP_GX = 22
 const EXP_GY = 18
 const EXP_PAD = 22
 const EXP_HEAD = 54
+
+/* ── тема ── */
+const LS_KEY = 'archmap.theme'
+function readTheme () {
+  try { return localStorage.getItem(LS_KEY) } catch (err) { return null }
+}
+function writeTheme (v) {
+  try { localStorage.setItem(LS_KEY, v) } catch (err) { /* file:// без хранилища — молча */ }
+}
+let theme = readTheme() === 'light' ? 'light' : 'dark'
+if (theme === 'light') document.documentElement.setAttribute('data-theme', 'light')
+const isLight = () => theme === 'light'
+
+function hexToRgb (hex) {
+  const h = String(hex || '').replace('#', '')
+  const full = h.length === 3 ? h.split('').map(c => c + c).join('') : h
+  const num = parseInt(full.slice(0, 6), 16)
+  if (!Number.isFinite(num)) return { r: 148, g: 163, b: 184 }
+  return { r: (num >> 16) & 255, g: (num >> 8) & 255, b: num & 255 }
+}
+function rgbToHex (c) {
+  const to = v => Math.max(0, Math.min(255, Math.round(v))).toString(16).padStart(2, '0')
+  return '#' + to(c.r) + to(c.g) + to(c.b)
+}
+function mixHex (a, b, t) {
+  const x = hexToRgb(a); const y = hexToRgb(b)
+  return rgbToHex({ r: x.r + (y.r - x.r) * t, g: x.g + (y.g - x.g) * t, b: x.b + (y.b - x.b) * t })
+}
+/* На белом фоне неоновые цвета слоёв выглядят дёшево и плохо читаются —
+   в светлой теме притемняем их, сохраняя оттенок. */
+function themed (hex) { return isLight() ? mixHex(hex, '#0b1424', 0.34) : hex }
+const rawLayerColor = id => (layerById[id] || { color: '#94a3b8' }).color
+const layerColor = id => themed(rawLayerColor(id))
+const layerLabel = id => (layerById[id] || { label: id }).label
 
 /* ── группы (могут отсутствовать в старых architecture.json) ─ */
 const groupOf = new Map()     // nodeId -> groupId
@@ -313,7 +615,7 @@ for (const e of edges) {
   const a = groupOf.get(e.from)
   const b = groupOf.get(e.to)
   if (!a || !b) continue
-  const key = a + ' ' + b
+  const key = a + ' ' + b
   let arr = pairEdges.get(key)
   if (!arr) { arr = []; pairEdges.set(key, arr) }
   arr.push(e.id)
@@ -333,7 +635,43 @@ for (const e of edges) {
   document.head.append(st)
 }
 
-/* ── header: счётчики, чипы слоёв, легенда, appendix ──────── */
+/* ── человекочитаемые пояснения видов связей ── */
+const EDGE_WHY = {
+  import: 'импортирует — модуль подключает другой модуль',
+  uses: 'использует — код обращается к технологии или внешней системе',
+  guards: 'guards — middleware защищает роут (проверка до обработчика)',
+  handles: 'handles — обработчик отвечает за этот роут',
+  fk: 'fk — внешний ключ: строка ссылается на другую таблицу',
+  'reads-env': 'reads-env — читает переменную окружения при старте или в рантайме',
+  invokes: 'invokes — вызывает агента, команду или инструмент',
+  implements: 'implements — реализует продуктовую возможность в коде',
+  covers: 'covers — тесты покрывают этот модуль',
+  deploys: 'deploys — контейнер разворачивает и запускает систему',
+  calls: 'calls — вызывает по сети (HTTP/RPC)',
+  queries: 'queries — читает или пишет данные',
+  writes: 'writes — записывает данные',
+  reads: 'reads — читает данные',
+  emits: 'emits — публикует событие или сообщение',
+  subscribes: 'subscribes — подписан на событие или очередь',
+  renders: 'renders — отрисовывает компонент или страницу',
+  extends: 'extends — расширяет или наследует',
+  configures: 'configures — задаёт конфигурацию',
+  triggers: 'triggers — запускает по событию или расписанию',
+  flow: 'flow — агрегированный поток между блоками',
+}
+const edgeWhy = kind => EDGE_WHY[kind] || `${kind} — связь между элементами карты`
+
+const KIND_RU = {
+  feature: 'продуктовая фича', capability: 'возможность', route: 'HTTP-роут', table: 'таблица БД',
+  module: 'модуль кода', agent: 'AI-агент', skill: 'скилл', command: 'команда', hook: 'хук',
+  'test-suite': 'набор тестов', 'ci-pipeline': 'CI-пайплайн', container: 'контейнер',
+  'external-service': 'внешняя система', tech: 'технология', env: 'переменная окружения',
+  middleware: 'middleware', 'llm-call': 'вызов LLM', 'mcp-server': 'MCP-сервер', 'mcp-tool': 'MCP-инструмент',
+  webhook: 'вебхук', ws: 'websocket', enum: 'перечисление', store: 'хранилище', page: 'страница',
+  component: 'компонент', job: 'фоновая задача', queue: 'очередь',
+}
+
+/* ── header: счётчики, чипы слоёв, легенда, appendix ── */
 const stats = data.stats || {}
 const inferredTotal = (stats.inferredNodes ?? nodes.filter(n => n.inferred).length) +
   (stats.inferredEdges ?? edges.filter(e => e.inferred).length)
@@ -343,41 +681,50 @@ function el (tag, cls, text) {
   if (text !== undefined) node.textContent = text
   return node
 }
+const kindCount = new Map()
+for (const n of nodes) kindCount.set(n.kind, (kindCount.get(n.kind) || 0) + 1)
+const kc = k => kindCount.get(k) || 0
 {
   const c = document.getElementById('counts')
-  const b1 = el('b', '', String(stats.nodes ?? nodes.length))
-  const b2 = el('b', '', String(stats.edges ?? edges.length))
-  const b3 = el('b', '', String(inferredTotal))
-  c.append(b1, ' nodes · ', b2, ' edges · ', b3, ' inferred')
-  if (HAS_GROUPS) {
-    const b4 = el('b', '', String(groups.length))
-    const b5 = el('b', '', String(groupEdges.length))
-    c.append(' · ', b4, ' groups · ', b5, ' flows')
+  const put = (value, label) => {
+    const wrap = el('span')
+    wrap.append(el('b', '', String(value)), document.createTextNode(' ' + label))
+    c.append(wrap)
   }
+  put(stats.nodes ?? nodes.length, 'узлов')
+  put(stats.edges ?? edges.length, 'связей')
+  if (HAS_GROUPS) put(groups.length, 'блоков')
+  c.title = `${nodes.length} узлов · ${edges.length} связей` + (HAS_GROUPS ? ` · ${groups.length} блоков · ${groupEdges.length} потоков` : '')
   document.getElementById('fcounts').textContent =
     `${nodes.length} nodes · ${edges.length} edges · ${layers.length} layers` + (stats.truncated ? ' · truncated' : '')
   document.getElementById('hint').textContent = HAS_GROUPS
-    ? 'клик по блоку — развернуть · клик по заголовку блока — детали · двойной клик — развернуть и приблизить'
+    ? 'клик по блоку — развернуть · клик по заголовку — детали · двойной клик — приблизить'
     : ''
 }
 const hiddenLayers = new Set()
+const layerChipEls = new Map()
 {
   const box = document.getElementById('layerChips')
-  for (const l of layers) {
-    const chip = el('button', 'chip')
-    chip.style.setProperty('--c', l.color)
+  layers.forEach((l, i) => {
+    const chip = el('button', 'chip' + (productLayerIds.has(l.id) ? ' big' : ''))
+    chip.style.setProperty('--c', layerColor(l.id))
     chip.dataset.layer = l.id
     const count = nodes.filter(n => n.layer === l.id).length
-    chip.append(el('span', 'dot'), document.createTextNode(`${l.label} ${count}`))
-    chip.title = l.id
-    chip.addEventListener('click', () => {
-      if (hiddenLayers.has(l.id)) hiddenLayers.delete(l.id)
-      else hiddenLayers.add(l.id)
-      chip.classList.toggle('off', hiddenLayers.has(l.id))
-      if (mode === 'overview') { renderOverview(); applyQuery() } else applyVisibility()
-    })
+    chip.append(el('span', 'dot'), document.createTextNode(l.label + ' '), el('span', 'num', String(count)))
+    chip.title = `слой «${l.label}» (${l.id}) — ${count} узлов · клавиша ${i + 1} · клик выключает слой`
+    chip.addEventListener('click', () => toggleLayer(l.id))
+    layerChipEls.set(l.id, chip)
     box.append(chip)
-  }
+  })
+}
+function toggleLayer (id) {
+  const chip = layerChipEls.get(id)
+  if (!chip) return
+  if (hiddenLayers.has(id)) hiddenLayers.delete(id)
+  else hiddenLayers.add(id)
+  chip.classList.toggle('off', hiddenLayers.has(id))
+  if (mode === 'overview') { renderOverview(); applyQuery() } else applyVisibility()
+  afterViewChange()
 }
 // Фильтр видов потоков. Связи конфигурации (reads-env) и импорты идут от каждого
 // модуля к каждой переменной — на обзоре это сплошная сетка линий, поэтому
@@ -388,40 +735,46 @@ const hiddenFlowKinds = new Set(['reads-env'])
   const counts = new Map()
   for (const ge of groupEdges) counts.set(ge.kind, (counts.get(ge.kind) || 0) + 1)
   if (counts.size > 1) {
-    const sep = el('span', 'chip-sep', 'потоки')
-    box.append(sep)
+    box.append(el('span', 'chip-sep', 'потоки'))
     for (const [kind, count] of [...counts.entries()].sort((a, b) => b[1] - a[1])) {
       const chip = el('button', 'chip flowchip')
       chip.dataset.flow = kind
-      chip.append(document.createTextNode(`${kind} ${count}`))
-      chip.title = `потоки вида ${kind}`
+      chip.append(document.createTextNode(kind + ' '), el('span', 'num', String(count)))
+      chip.title = edgeWhy(kind) + ` · ${count} потоков · клик включает/выключает`
       chip.classList.toggle('off', hiddenFlowKinds.has(kind))
       chip.addEventListener('click', () => {
         if (hiddenFlowKinds.has(kind)) hiddenFlowKinds.delete(kind)
         else hiddenFlowKinds.add(kind)
         chip.classList.toggle('off', hiddenFlowKinds.has(kind))
         if (mode === 'overview') { renderOverview(); applyQuery() }
+        afterViewChange()
       })
       box.append(chip)
     }
   }
 }
-{
+function buildLegend () {
   const legend = document.getElementById('legend')
-  const kinds = new Map()
-  for (const n of nodes) if (!kinds.has(n.kind)) kinds.set(n.kind, layerColor(n.layer))
-  for (const [kind, color] of kinds) {
-    const item = el('span', 'lg', '')
+  legend.replaceChildren()
+  for (const l of layers) {
+    if (!nodes.some(n => n.layer === l.id)) continue
+    const item = el('span', 'lg')
+    item.title = `${l.label}: ${nodes.filter(n => n.layer === l.id).length} узлов`
     const dot = el('i')
-    dot.style.background = color
-    dot.style.color = color
-    item.append(dot, document.createTextNode(kind))
+    dot.style.background = layerColor(l.id)
+    item.append(dot, document.createTextNode(l.label.toLowerCase()))
     legend.append(item)
   }
+  legend.append(el('span', 'fdiv'))
   const inf = el('span', 'lg dash')
-  inf.append(el('i'), document.createTextNode('inferred'))
-  legend.append(inf)
+  inf.title = 'пунктир — элемент выведен эвристикой (inferred), а не найден в коде явно'
+  inf.append(el('i'), document.createTextNode('пунктир — inferred'))
+  const thick = el('span', 'lg thick')
+  thick.title = 'толщина линии пропорциональна числу связей внутри потока'
+  thick.append(el('i'), document.createTextNode('толщина — объём потока'))
+  legend.append(inf, thick)
 }
+buildLegend()
 {
   const table = document.getElementById('appendix')
   const caption = el('caption', '', `Appendix — ${document.getElementById('title').textContent}: nodes`)
@@ -443,7 +796,7 @@ const hiddenFlowKinds = new Set(['reads-env'])
   table.append(caption, thead, tbody)
 }
 
-/* ── размеры узлов ────────────────────────────────────────── */
+/* ── размеры узлов ── */
 const MAX_TABLE_ROWS = 6
 function shownColumns (n) {
   const cols = (n.meta && Array.isArray(n.meta.columns)) ? n.meta.columns : []
@@ -454,10 +807,11 @@ function nodeHeight (n) {
     const { shown, extra } = shownColumns(n)
     return 32 + shown.length * 17 + (extra ? 16 : 0) + 8
   }
+  if (PRODUCT_KINDS.has(n.kind)) return 60
   return 46
 }
 
-/* ── SVG базис ────────────────────────────────────────────── */
+/* ── SVG базис ── */
 const svg = document.getElementById('canvas')
 function s (tag, attrs) {
   const node = document.createElementNS(SVGNS, tag)
@@ -471,46 +825,136 @@ function st (x, y, str, cls, fill, max) {
   t.textContent = max && v.length > max ? v.slice(0, max - 1) + '…' : v
   return t
 }
-const defs = s('defs')
-{
+let defs = s('defs')
+svg.append(defs)
+function buildDefs () {
+  const next = s('defs')
   const grid = s('pattern', { id: 'grid', width: 44, height: 44, patternUnits: 'userSpaceOnUse' })
-  grid.append(s('path', { d: 'M 44 0 L 0 0 0 44', fill: 'none', stroke: '#ffffff', 'stroke-opacity': .045, 'stroke-width': 1 }))
-  defs.append(grid)
+  grid.append(s('path', { class: 'gridline', d: 'M 44 0 L 0 0 0 44', 'stroke-width': 1 }))
+  next.append(grid)
+  const g1 = isLight() ? 0.16 : 0.52
+  const g2 = isLight() ? 0.3 : 0.8
+  const g3 = isLight() ? 0.14 : 0.38
   for (const l of layers) {
     if (!/^[a-z0-9-]+$/.test(l.id)) continue
+    const color = layerColor(l.id)
     const f1 = s('filter', { id: `glow-${l.id}`, x: '-40%', y: '-40%', width: '180%', height: '180%' })
-    f1.append(s('feDropShadow', { dx: 0, dy: 0, stdDeviation: 5.5, 'flood-color': l.color, 'flood-opacity': .52 }))
+    f1.append(s('feDropShadow', { dx: 0, dy: 0, stdDeviation: 5.5, 'flood-color': color, 'flood-opacity': g1 }))
     const f2 = s('filter', { id: `glow2-${l.id}`, x: '-60%', y: '-60%', width: '220%', height: '220%' })
-    f2.append(s('feDropShadow', { dx: 0, dy: 0, stdDeviation: 9, 'flood-color': l.color, 'flood-opacity': .8 }))
+    f2.append(s('feDropShadow', { dx: 0, dy: 0, stdDeviation: 9, 'flood-color': color, 'flood-opacity': g2 }))
     const f3 = s('filter', { id: `cglow-${l.id}`, x: '-35%', y: '-45%', width: '170%', height: '190%' })
-    f3.append(s('feDropShadow', { dx: 0, dy: 2, stdDeviation: 9, 'flood-color': l.color, 'flood-opacity': .38 }))
+    f3.append(s('feDropShadow', { dx: 0, dy: 2, stdDeviation: 9, 'flood-color': color, 'flood-opacity': g3 }))
     const m = s('marker', { id: `arr-${l.id}`, markerWidth: 7, markerHeight: 7, refX: 5.6, refY: 3, orient: 'auto', markerUnits: 'userSpaceOnUse' })
-    m.append(s('path', { d: 'M0,0 L6,3 L0,6 z', fill: l.color, 'fill-opacity': .85 }))
+    m.append(s('path', { d: 'M0,0 L6,3 L0,6 z', fill: color, 'fill-opacity': .85 }))
     const gm = s('marker', { id: `garr-${l.id}`, markerWidth: 13, markerHeight: 13, refX: 11, refY: 5.5, orient: 'auto', markerUnits: 'userSpaceOnUse' })
-    gm.append(s('path', { d: 'M0,0.6 L11,5.5 L0,10.4 L2.6,5.5 z', fill: l.color, 'fill-opacity': .95 }))
+    gm.append(s('path', { d: 'M0,0.6 L11,5.5 L0,10.4 L2.6,5.5 z', fill: color, 'fill-opacity': .95 }))
     const grad = s('linearGradient', { id: `cardgrad-${l.id}`, x1: 0, y1: 0, x2: 0.35, y2: 1 })
-    const s1 = s('stop', { offset: '0%', 'stop-color': l.color, 'stop-opacity': .16 })
-    const s2 = s('stop', { offset: '58%', 'stop-color': '#101a2e', 'stop-opacity': .96 })
-    const s3 = s('stop', { offset: '100%', 'stop-color': '#0b1322', 'stop-opacity': .98 })
-    grad.append(s1, s2, s3)
-    defs.append(f1, f2, f3, m, gm, grad)
+    grad.append(
+      s('stop', { offset: '0%', 'stop-color': color, 'stop-opacity': isLight() ? .13 : .17 }),
+      s('stop', { class: 'stop-mid', offset: '58%', 'stop-opacity': .97 }),
+      s('stop', { class: 'stop-low', offset: '100%', 'stop-opacity': .99 }))
+    const bgrad = s('linearGradient', { id: `bigcard-${l.id}`, x1: 0, y1: 0, x2: 0.55, y2: 1 })
+    bgrad.append(
+      s('stop', { offset: '0%', 'stop-color': color, 'stop-opacity': isLight() ? .2 : .3 }),
+      s('stop', { class: 'stop-mid', offset: '52%', 'stop-opacity': .96 }),
+      s('stop', { class: 'stop-low', offset: '100%', 'stop-opacity': .99 }))
+    next.append(f1, f2, f3, m, gm, grad, bgrad)
   }
+  defs.replaceWith(next)
+  defs = next
 }
-svg.append(defs)
+buildDefs()
 const gridbg = s('rect', { class: 'gridbg', x: -20000, y: -20000, width: 60000, height: 60000, fill: 'url(#grid)' })
 svg.append(gridbg)
 const gDetails = s('g')
 const gOverview = s('g')
 svg.append(gDetails, gOverview)
 
-/* ── kind-иконки слоёв (24×24, только SVG-примитивы) ──────── */
+/* ── библиотека значков ──
+   Если внешний скрипт подставил window.ARCHMAP_BRANDS / ARCHMAP_GLYPHS,
+   технологии рисуются узнаваемым фирменным глифом; иначе — векторной
+   иконкой категории (поведение по умолчанию). */
+function brandFor (name) {
+  if (!name) return null
+  // основной путь: библиотека сама разбирает «@scope/pkg@1.2», «Next.js», «pg^8»
+  try {
+    if (typeof window.ARCHMAP_BRAND === 'function') {
+      const found = window.ARCHMAP_BRAND(String(name))
+      if (found && typeof found === 'object') return found
+    }
+  } catch (err) { /* библиотека необязательна */ }
+  const lib = window.ARCHMAP_BRANDS
+  if (!lib) return null
+  let key = null
+  try { if (typeof window.ARCHMAP_BRAND_KEY === 'function') key = window.ARCHMAP_BRAND_KEY(String(name)) } catch (err) { key = null }
+  const plain = String(name).toLowerCase().replace(/[^a-z0-9]+/g, '')
+  const brand = (key && lib[key]) || lib[plain] || lib[String(name).toLowerCase()]
+  if (!brand || typeof brand !== 'object') return null
+  const glyphs = window.ARCHMAP_GLYPHS || {}
+  return Object.assign({}, brand, { path: brand.path || glyphs[brand.glyph] || '' })
+}
+function glyphPath (keys) {
+  const lib = window.ARCHMAP_GLYPHS
+  if (!lib) return null
+  for (const k of keys) if (k && typeof lib[k] === 'string' && lib[k]) return lib[k]
+  return null
+}
+function monogram (name) {
+  const clean = String(name || '?').replace(/[^\p{L}\p{N} ]/gu, ' ').trim()
+  const parts = clean.split(/\s+/).filter(Boolean)
+  if (parts.length > 1) return (parts[0][0] + parts[1][0]).toUpperCase()
+  return clean.slice(0, 2).toUpperCase() || '?'
+}
+/* Значок технологии: фирменный глиф → монограмма в фирменном цвете. */
+function brandMark (name, x, y, size, fallbackColor) {
+  const brand = brandFor(name)
+  const g = s('g', { transform: `translate(${x},${y})` })
+  const color = themed((brand && brand.color) || fallbackColor || '#94a3b8')
+  g.append(s('rect', { width: size, height: size, rx: size * 0.28, fill: color, 'fill-opacity': isLight() ? .16 : .2, stroke: color, 'stroke-opacity': .5 }))
+  const path = brand && typeof brand.path === 'string' && brand.path ? brand.path : null
+  if (path) {
+    // глифы библиотеки нарисованы обводкой в системе координат 24×24
+    const inner = s('g', {
+      class: 'gicon', transform: `translate(${(size * 0.16).toFixed(2)},${(size * 0.16).toFixed(2)}) scale(${(size * 0.68 / 24).toFixed(4)})`,
+      stroke: color, 'stroke-width': 1.9,
+    })
+    inner.append(s('path', { d: path }))
+    g.append(inner)
+  } else {
+    const text = st(size / 2, size * 0.68, (brand && brand.mono) || monogram(name), 'bmono', color)
+    text.setAttribute('text-anchor', 'middle')
+    text.setAttribute('font-size', (size * 0.44).toFixed(1))
+    g.append(text)
+  }
+  const tip = s('title')
+  tip.textContent = (brand && brand.label) || String(name)
+  g.append(tip)
+  return g
+}
+
+/* ── kind-иконки слоёв (24×24, только SVG-примитивы) ── */
 // Иконка по смыслу сущности: категория внешней системы или библиотеки важнее
 // слоя — так на карте видно, что MongoDB это база, а Twilio — канал сообщений.
+/* Ключи из window.ARCHMAP_GLYPHS, если библиотека значков подставлена.
+   Иконки самих слоёв остаются встроенными — они выверены под этот макет. */
+const GLYPH_ALIASES = {
+  'cat:database': ['db'], 'cat:cache-queue': ['queue'], 'cat:ai': ['ai'],
+  'cat:payments': ['pay'], 'cat:messaging': ['mail'], 'cat:auth': ['lock'],
+  'cat:observability': ['chart'], 'cat:search': ['search'], 'cat:framework': ['layers'],
+  'cat:testing': ['flask'], 'cat:cloud': ['cloud'],
+  'k:container': ['box'], 'k:ci': ['git'], 'k:test': ['flask'], 'k:hook': ['link'],
+  'k:command': ['terminal'], 'k:skill': ['code'], 'k:tool': ['chip'],
+}
 function iconFor (layerId, x, y, size, color) {
   const g = s('g', { class: 'gicon', transform: `translate(${x},${y}) scale(${(size / 24).toFixed(4)})` })
   g.setAttribute('stroke', color)
   const P = d => s('path', { d })
-  if (layerId === 'cat:database') {
+  const lib = glyphPath(GLYPH_ALIASES[layerId] || [])
+  if (lib) {
+    g.append(s('path', { d: lib }))
+    return g
+  }
+  if (layerId === 'cat:database' || layerId === 'data') {
     g.append(s('ellipse', { cx: 12, cy: 5, rx: 8.6, ry: 3.2 }),
       P('M3.4 5v14c0 1.7 3.9 3 8.6 3s8.6-1.3 8.6-3V5'),
       P('M20.6 12c0 1.7-3.9 3-8.6 3s-8.6-1.3-8.6-3'))
@@ -536,12 +980,23 @@ function iconFor (layerId, x, y, size, color) {
       s('rect', { x: 13.4, y: 2.6, width: 8, height: 8, rx: 1.8 }),
       s('rect', { x: 2.6, y: 13.4, width: 8, height: 8, rx: 1.8 }),
       s('rect', { x: 13.4, y: 13.4, width: 8, height: 8, rx: 1.8 }))
-  } else if (layerId === 'cat:testing') {
+  } else if (layerId === 'cat:testing' || layerId === 'k:test') {
     g.append(P('M9 2.6v6.2L4.2 18a2.4 2.4 0 0 0 2.1 3.6h11.4a2.4 2.4 0 0 0 2.1-3.6L15 8.8V2.6'), P('M8 2.6h8'))
-  } else if (layerId === 'data') {
-    g.append(s('ellipse', { cx: 12, cy: 5, rx: 8.6, ry: 3.2 }),
-      P('M3.4 5v14c0 1.7 3.9 3 8.6 3s8.6-1.3 8.6-3V5'),
-      P('M20.6 12c0 1.7-3.9 3-8.6 3s-8.6-1.3-8.6-3'))
+  } else if (layerId === 'product' || layerId === 'k:feature') {
+    g.append(P('M12 2.8l2.7 5.9 6.4.8-4.7 4.4 1.2 6.3-5.6-3.1-5.6 3.1 1.2-6.3L3 9.5l6.4-.8z'))
+  } else if (layerId === 'k:container') {
+    g.append(P('M3.2 8.4 12 3.6l8.8 4.8v7.2L12 20.4l-8.8-4.8z'), P('M3.2 8.4 12 13.2l8.8-4.8'), P('M12 13.2v7.2'))
+  } else if (layerId === 'k:ci') {
+    g.append(s('circle', { cx: 5.6, cy: 6.4, r: 2.6 }), s('circle', { cx: 5.6, cy: 17.6, r: 2.6 }), s('circle', { cx: 18.4, cy: 12, r: 2.6 }),
+      P('M8.2 6.4h4.2a3.4 3.4 0 0 1 3.4 3.4v.4'), P('M8.2 17.6h4.2a3.4 3.4 0 0 0 3.4-3.4v-.4'))
+  } else if (layerId === 'k:command') {
+    g.append(s('rect', { x: 2.6, y: 4, width: 18.8, height: 16, rx: 2.6 }), P('M6.6 9.4 9.8 12l-3.2 2.6'), P('M12.4 15h5'))
+  } else if (layerId === 'k:skill') {
+    g.append(P('M4 4.6h6.4A2.6 2.6 0 0 1 13 7.2v12a2.2 2.2 0 0 0-2.2-2.2H4z'), P('M20 4.6h-6.4A2.6 2.6 0 0 0 11 7.2v12a2.2 2.2 0 0 1 2.2-2.2H20z'))
+  } else if (layerId === 'k:hook') {
+    g.append(P('M15.4 3.6v7.8a4.6 4.6 0 0 1-9.2 0'), s('circle', { cx: 15.4, cy: 19, r: 2.4 }))
+  } else if (layerId === 'k:tool') {
+    g.append(P('M14.8 3.4a5.4 5.4 0 0 0-5 8.6L3.6 18.2a2 2 0 0 0 2.8 2.8l6.2-6.2a5.4 5.4 0 0 0 6.6-7.4l-3 3-2.6-2.6 3-3a5.4 5.4 0 0 0-1.8-1.4z'))
   } else if (layerId === 'api') {
     g.append(s('rect', { x: 2.4, y: 2.6, width: 19.2, height: 7.4, rx: 2.2 }),
       s('rect', { x: 2.4, y: 14, width: 19.2, height: 7.4, rx: 2.2 }),
@@ -574,25 +1029,36 @@ function iconFor (layerId, x, y, size, color) {
   return g
 }
 
+const KIND_ICON = {
+  feature: 'k:feature', capability: 'k:feature', container: 'k:container', 'ci-pipeline': 'k:ci',
+  'test-suite': 'k:test', hook: 'k:hook', command: 'k:command', skill: 'k:skill', 'mcp-tool': 'k:tool',
+  'mcp-server': 'agents', agent: 'agents', 'llm-call': 'cat:ai', table: 'cat:database', store: 'cat:cache-queue',
+  env: 'cat:auth', middleware: 'cat:auth', route: 'api', webhook: 'api', ws: 'api', module: 'logic',
+}
 // Группа библиотек/сервисов рисуется иконкой своей категории, остальные — иконкой слоя.
 function iconKeyOf (item) {
   const id = String(item.id || '')
   const techCat = id.match(/^grp:infra:tech:(.+)$/)
   if (techCat) return `cat:${techCat[1]}`
   if (id === 'grp:infra:services') return 'cat:cloud'
-  if (item.counts && item.counts.store) return 'cat:cache-queue'
-  if (item.counts && (item.counts['llm-call'] || item.counts.agent)) return item.layer
+  const counts = item.counts || {}
+  if (productLayerIds.has(item.layer)) return 'product'
+  const top = Object.entries(counts).sort((a, b) => b[1] - a[1])[0]
+  if (top && KIND_ICON[top[0]]) return KIND_ICON[top[0]]
+  if (counts.store) return 'cat:cache-queue'
   return item.layer
 }
 
-/* ── ДЕТАЛИ: колонки по слоям + barycenter (3 прохода) ────── */
+/* ── ДЕТАЛИ: колонки по слоям + barycenter (3 прохода) ── */
 const posD = new Map()
 const dNodeEls = new Map()
 const dEdgeEls = new Map()
+const dLaneEls = new Map()
 let detailsBuilt = false
 let detailCols = []
 let detailMaxH = 0
 function layoutDetails () {
+  posD.clear()
   const cols = []
   for (const layer of layers) {
     const list = nodes.filter(n => n.layer === layer.id)
@@ -661,7 +1127,8 @@ function layoutDetails () {
 /* карточка отдельного узла (детальный рендер, общий для обоих режимов) */
 function renderNode (n, p) {
   const color = layerColor(n.layer)
-  const g = s('g', { class: 'node' + (n.inferred ? ' inf' : ''), transform: `translate(${p.x},${p.y})` })
+  const product = PRODUCT_KINDS.has(n.kind)
+  const g = s('g', { class: 'node' + (n.inferred ? ' inf' : '') + (product ? ' feat' : ''), transform: `translate(${p.x},${p.y})` })
   g.dataset.id = n.id
   g.dataset.layer = n.layer
   const frame = s('rect', { class: 'frame', width: p.w, height: p.h, rx: 8, filter: `url(#glow-${n.layer})` })
@@ -680,16 +1147,38 @@ function renderNode (n, p) {
       // '⚿' нет в системных шрифтах macOS (тофу) — ключ рисуем эмодзи
       const mark = col.pk ? '🔑 ' : (col.fk ? '→ ' : '· ')
       const row = st(14, y, mark + String(col.name ?? ''), 'ncol', col.pk ? color : null, 22)
-      const ty = st(p.w - 12, y, col.fk ? `${col.fk.table}.${col.fk.column}` : String(col.type ?? ''), 'ncol cty', '#5c6b85', 14)
+      const ty = st(p.w - 12, y, col.fk ? `${col.fk.table}.${col.fk.column}` : String(col.type ?? ''), 'ncol cty', null, 14)
       ty.setAttribute('text-anchor', 'end')
       g.append(row, ty)
       y += 17
     }
     if (extra) g.append(st(14, y, `+${extra} ещё`, 'nmore'))
+  } else if (product) {
+    // продуктовая фича — самый понятный человеку уровень, поэтому крупнее прочих
+    g.append(s('rect', { width: p.w, height: p.h, rx: 8, fill: color, 'fill-opacity': isLight() ? .1 : .13 }))
+    g.append(s('rect', { width: 4.5, height: p.h, rx: 2.2, fill: color, 'fill-opacity': .9 }))
+    g.append(iconFor('k:feature', 14, 12, 18, color))
+    const label = st(39, 25, n.label, 'nlabel', null, 24)
+    label.setAttribute('font-size', '12.5')
+    label.setAttribute('font-weight', '700')
+    g.append(label, kindTag)
+    const meta = n.meta || {}
+    const sub = meta.summary || meta.description || meta.area ||
+      ((fwd.get(n.id) || []).length ? `реализуется в ${(fwd.get(n.id) || []).length} местах` : (n.source && n.source.file) || '')
+    g.append(st(39, 43, sub, 'nmut', null, 34))
+  } else if ((n.kind === 'external-service' || n.kind === 'tech') && n.meta && n.meta.category) {
+    // внешняя система и библиотека узнаются по значку категории или бренда
+    const name = n.meta.label || n.label
+    const brand = brandFor(name)
+    if (brand) g.append(brandMark(name, 10, 12, 20, color))
+    else g.append(iconFor(`cat:${n.meta.category}`, 10, 12, 17, color))
+    g.append(st(36, 19, name, 'nlabel', null, 24), kindTag)
+    const sub = [n.meta.version, n.meta.category].filter(Boolean).join(' · ') || (n.source && n.source.file) || ''
+    g.append(st(36, 35, sub, 'nmut', null, 30))
   } else if (n.kind === 'route') {
     const method = String((n.meta && n.meta.method) || '').toUpperCase()
     const pathStr = (n.meta && n.meta.path) || n.label
-    const mColor = METHOD_COLORS[method] || '#94a3b8'
+    const mColor = themed(METHOD_COLORS[method] || '#94a3b8')
     if (method) {
       g.append(st(12, 19, method, 'nlabel', mColor, 8))
       g.append(st(12 + (method.length + 1) * 7.4, 19, pathStr, 'nlabel', null, 26 - method.length))
@@ -701,21 +1190,20 @@ function renderNode (n, p) {
     if (n.meta && Array.isArray(n.meta.middleware) && n.meta.middleware.length) extras.push(n.meta.middleware.join(' · '))
     if (n.meta && n.meta.auth) extras.push(String(n.meta.auth))
     g.append(st(12, 35, extras.join('  ·  ') || (n.meta && n.meta.framework) || '', 'nmut', null, 34))
-  } else if ((n.kind === 'external-service' || n.kind === 'tech') && n.meta && n.meta.category) {
-    // внешняя система и библиотека узнаются по значку категории, а не только по имени
-    g.append(iconFor(`cat:${n.meta.category}`, 10, 12, 17, layerColor(n.layer)))
-    g.append(st(33, 19, n.meta.label || n.label, 'nlabel', null, 24), kindTag)
-    const sub = [n.meta.version, n.meta.category].filter(Boolean).join(' · ') || (n.source && n.source.file) || ''
-    g.append(st(33, 35, sub, 'nmut', null, 30))
   } else {
-    g.append(st(12, 19, n.label, 'nlabel', null, 28), kindTag)
-    const sub = n.kind === 'enum' && n.meta && Array.isArray(n.meta.values)
-      ? n.meta.values.join(' | ')
-      : (n.source && n.source.file) || ''
-    g.append(st(12, 35, sub, 'nmut', null, 34))
+    const iconKey = KIND_ICON[n.kind]
+    let tx = 12
+    if (iconKey) { g.append(iconFor(iconKey, 11, 13, 16, color)); tx = 34 }
+    g.append(st(tx, 19, n.label, 'nlabel', null, 28), kindTag)
+    const meta = n.meta || {}
+    const sub = n.kind === 'enum' && Array.isArray(meta.values)
+      ? meta.values.join(' | ')
+      : (meta.summary || meta.description || (n.source && n.source.file) || '')
+    g.append(st(tx, 35, sub, 'nmut', null, 34))
   }
   const tip = s('title')
-  tip.textContent = n.id + (n.inferred ? ' · inferred' : '')
+  tip.textContent = `${n.label} · ${KIND_RU[n.kind] || n.kind}` + (n.inferred ? ' · inferred' : '') +
+    (n.source && n.source.file ? `\n${n.source.file}:${n.source.line ?? 0}` : '')
   g.append(tip)
   return g
 }
@@ -739,19 +1227,26 @@ function edgePathD (a, b) {
 function buildDetails () {
   if (detailsBuilt) return
   detailsBuilt = true
+  dNodeEls.clear()
+  dEdgeEls.clear()
+  dLaneEls.clear()
+  gDetails.replaceChildren()
   layoutDetails()
   const laneG = s('g', { class: 'lane-bg' })
   const edgeG = s('g')
   const nodeG = s('g')
   gDetails.append(laneG, edgeG, nodeG)
   for (const col of detailCols) {
-    const lane = s('rect', {
-      x: col.x - 22, y: 4, rx: 14, width: col.width + 44, height: detailMaxH + LANE_PAD + 18,
-      fill: col.layer.color, 'fill-opacity': .028, stroke: col.layer.color, 'stroke-opacity': .16,
-    })
-    const label = st(col.x - 6, 28, `${String(col.layer.label || col.layer.id).toUpperCase()} · ${col.list.length}`, 'lane-label', col.layer.color)
-    label.setAttribute('fill-opacity', .8)
-    laneG.append(lane, label)
+    const color = layerColor(col.layer.id)
+    const box = { x: col.x - 22, y: 4, width: col.width + 44, height: detailMaxH + LANE_PAD + 18 }
+    const lane = s('rect', Object.assign({ rx: 14, fill: color, 'fill-opacity': .03, stroke: color, 'stroke-opacity': .16 }, box))
+    const halo = s('rect', Object.assign({ class: 'halo', rx: 14, fill: color, 'fill-opacity': .07, stroke: color, 'stroke-opacity': .5, 'stroke-width': 1.6 }, box))
+    halo.style.opacity = '0'
+    halo.style.transition = 'opacity .2s'
+    const label = st(col.x - 6, 28, `${String(col.layer.label || col.layer.id).toUpperCase()} · ${col.list.length}`, 'lane-label', color)
+    label.setAttribute('fill-opacity', .85)
+    laneG.append(lane, halo, label)
+    dLaneEls.set(col.layer.id, halo)
   }
   for (const n of nodes) {
     const p = posD.get(n.id)
@@ -770,7 +1265,7 @@ function buildDetails () {
     if (e.inferred) p.setAttribute('stroke-dasharray', '5 4')
     p.dataset.id = e.id
     const tip = s('title')
-    tip.textContent = `${e.kind}: ${e.from} → ${e.to}` + (e.label ? ` (${e.label})` : '') + (e.inferred ? ' · inferred' : '')
+    tip.textContent = `${edgeWhy(e.kind)}\n${e.from} → ${e.to}` + (e.label ? ` (${e.label})` : '') + (e.inferred ? ' · inferred' : '')
     p.append(tip)
     dEdgeEls.set(e.id, p)
     edgeG.append(p)
@@ -801,16 +1296,18 @@ for (const e of groupEdges) {
   gback.get(e.to).push(e)
 }
 
-/* ── ОБЗОР: раскладка ─────────────────────────────────────── */
+/* ── ОБЗОР: раскладка ── */
 let mode = HAS_GROUPS ? 'overview' : 'details'
 const expanded = new Set()      // развёрнутые группы
 const laneOpen = new Set()      // слои, где показаны все группы (а не топ-N)
 const posO = new Map()          // id (группы / «more» / узла) -> {x,y,w,h}
 const oCardEls = new Map()
 const oNodeEls = new Map()
+const oLaneEls = new Map()
 const oEdgeEls = []
 const hiddenHost = new Map()    // groupId скрытой группы -> id карточки «+N ещё»
 let ovBounds = null
+let ovBoxes = []                // прямоугольники для мини-карты
 
 const inferredToggle = document.getElementById('inferredToggle')
 const inferredOn = () => inferredToggle.checked
@@ -845,6 +1342,12 @@ function planOverview (lanes, cols) {
   let y = 0
   const laneGeom = []
   for (const ln of lanes) {
+    // продуктовый слой — «обложка» карты: его блоки шире и выше остальных
+    const lcols = ln.big ? Math.max(1, Math.round(cols / 2)) : cols
+    const cw = ln.big ? Math.round((gridW - (lcols - 1) * CARD_GX) / lcols) : CARD_W
+    // высота продуктового блока — по числу возможностей внутри, без пустого низа
+    const bigRows = ln.big ? Math.min(4, Math.max(1, ...ln.col.map(g => (g.members || []).length || 1))) : 0
+    const ch = ln.big ? Math.min(CARD_H_BIG, 104 + 19 * bigRows) : CARD_H
     const top = y
     let cy = y + TIER_LABEL
     const items = []
@@ -854,15 +1357,15 @@ function planOverview (lanes, cols) {
     }
     const cells = ln.col.concat(ln.more ? [ln.more] : [])
     // одиночный неполный ряд центрируем — иначе разрежённый слой «прилипает» к левому краю
-    const gridW = cols * CARD_W + (cols - 1) * CARD_GX
-    const off = cells.length < cols ? Math.round((gridW - (cells.length * CARD_W + (cells.length - 1) * CARD_GX)) / 2) : 0
+    const rowW = n => n * cw + (n - 1) * CARD_GX
+    const off = cells.length < lcols ? Math.round((gridW - rowW(cells.length)) / 2) : 0
     cells.forEach((c, i) => {
-      const r = Math.floor(i / cols)
-      const cc = i % cols
-      items.push({ kind: 'card', ref: c, x: off + cc * (CARD_W + CARD_GX), y: cy + r * (CARD_H + CARD_GY), w: CARD_W, h: CARD_H })
+      const r = Math.floor(i / lcols)
+      const cc = i % lcols
+      items.push({ kind: 'card', ref: c, x: off + cc * (cw + CARD_GX), y: cy + r * (ch + CARD_GY), w: cw, h: ch, big: !!ln.big })
     })
-    const rows = Math.ceil(cells.length / cols)
-    if (rows) cy += rows * (CARD_H + CARD_GY) - CARD_GY
+    const rows = Math.ceil(cells.length / lcols)
+    if (rows) cy += rows * (ch + CARD_GY) - CARD_GY
     else if (ln.exp.length) cy -= CARD_GY
     laneGeom.push({ ln, top, bottom: cy, items })
     y = cy + TIER_GAP
@@ -899,6 +1402,7 @@ function buildLanes () {
       exp,
       col,
       more,
+      big: productLayerIds.has(l.id),
       total: list.length,
       nodesTotal: list.reduce((acc, g) => acc + g.size, 0),
     })
@@ -945,7 +1449,7 @@ function viewAspect () {
   return (r.width > 0 && r.height > 0) ? r.width / r.height : 16 / 9
 }
 
-/* ── ОБЗОР: рендер ────────────────────────────────────────── */
+/* ── ОБЗОР: рендер ── */
 function plural (n, one, few, many) {
   const a = Math.abs(n) % 100
   const b = a % 10
@@ -957,28 +1461,32 @@ function fmtCounts (counts, fallback) {
   if (!items.length) return fallback || ''
   return items.slice(0, 3).map(([k, v]) => `${v} ${v === 1 ? k : k + 's'}`).join(' · ')
 }
+const TECH_KINDS = new Set(['tech', 'external-service', 'mcp-server'])
 function renderCard (item, p, maxSize) {
   const color = layerColor(item.layer)
-  const g = s('g', { class: 'gcard' + (item.isMore ? ' more' : '') + (item.inferred ? ' inf' : ''), transform: `translate(${p.x},${p.y})` })
+  const big = !!p.big
+  const g = s('g', { class: 'gcard' + (big ? ' big' : '') + (item.isMore ? ' more' : '') + (item.inferred ? ' inf' : ''), transform: `translate(${p.x},${p.y})` })
   g.dataset.id = item.id
   g.dataset.layer = item.layer
   if (item.isMore) g.dataset.more = item.layer
   const frame = s('rect', {
-    class: 'gframe', width: p.w, height: p.h, rx: 15,
-    fill: item.isMore ? '#0d1524d9' : `url(#cardgrad-${item.layer})`,
+    class: 'gframe', width: p.w, height: p.h, rx: big ? 18 : 15,
     stroke: color, 'stroke-opacity': item.isMore ? .5 : .95,
-    filter: item.isMore ? null : `url(#cglow-${item.layer})`,
   })
-  if (item.isMore) frame.removeAttribute('filter')
+  if (!item.isMore) {
+    frame.setAttribute('fill', `url(#${big ? 'bigcard' : 'cardgrad'}-${item.layer})`)
+    frame.setAttribute('filter', `url(#cglow-${item.layer})`)
+  }
+  if (big) frame.setAttribute('stroke-width', '2.2')
   g.append(frame)
 
   if (item.isMore) {
-    const t = st(p.w / 2, 56, `+${item.count}`, 'gtitle', color)
+    const t = st(p.w / 2, p.h / 2 - 3, `+${item.count}`, 'gtitle', color)
     t.setAttribute('text-anchor', 'middle')
     t.setAttribute('font-size', '30')
-    const sub = st(p.w / 2, 78, `${item.count === 1 ? 'группа' : 'групп'} ещё · ${plural(item.nodes, 'узел', 'узла', 'узлов')}`, 'gsub')
+    const sub = st(p.w / 2, p.h / 2 + 19, `${item.count === 1 ? 'группа' : 'групп'} ещё · ${plural(item.nodes, 'узел', 'узла', 'узлов')}`, 'gsub')
     sub.setAttribute('text-anchor', 'middle')
-    const hintT = st(p.w / 2, 98, 'показать все', 'gsrc', color)
+    const hintT = st(p.w / 2, p.h / 2 + 39, 'показать все', 'gsrc', color)
     hintT.setAttribute('text-anchor', 'middle')
     g.append(t, sub, hintT)
     const tip = s('title')
@@ -988,34 +1496,70 @@ function renderCard (item, p, maxSize) {
   }
 
   // шапка блока (клик по ней открывает панель деталей)
-  const head = s('rect', { class: 'ghead', width: p.w, height: 44, rx: 15, fill: color, 'fill-opacity': .12 })
-  const headFix = s('rect', { class: 'ghead', y: 30, width: p.w, height: 14, fill: color, 'fill-opacity': .12 })
-  const accent = s('rect', { width: 4.5, height: p.h, rx: 2.2, fill: color, 'fill-opacity': .85 })
-  g.append(head, headFix, accent, s('line', { x1: 0, y1: 44, x2: p.w, y2: 44, stroke: color, 'stroke-opacity': .28 }))
-  g.append(iconFor(iconKeyOf(item), 15, 10, 24, color))
-  g.append(st(50, 30, item.label, 'gtitle', null, 22))
+  const headH = big ? 54 : 44
+  const iconSize = big ? 28 : 24
+  const head = s('rect', { class: 'ghead', width: p.w, height: headH, rx: big ? 18 : 15, fill: color, 'fill-opacity': .13 })
+  const headFix = s('rect', { class: 'ghead', y: headH - 16, width: p.w, height: 16, fill: color, 'fill-opacity': .13 })
+  const accent = s('rect', { width: big ? 6 : 4.5, height: p.h, rx: 3, fill: color, 'fill-opacity': .9 })
+  g.append(head, headFix, accent, s('line', { x1: 0, y1: headH, x2: p.w, y2: headH, stroke: color, 'stroke-opacity': .28 }))
+  g.append(iconFor(iconKeyOf(item), big ? 17 : 15, big ? 13 : 10, iconSize, color))
+  const titleMax = Math.floor((p.w - (big ? 84 : 78)) / (big ? 10.4 : 8.6))
+  g.append(st(big ? 57 : 50, big ? 37 : 30, item.label, 'gtitle', null, titleMax))
 
-  g.append(st(16, 68, fmtCounts(item.counts, `${item.size} nodes`), 'gsub', null, 34))
-  const barW = p.w - 32 - 34
-  g.append(s('rect', { class: 'gbar-bg', x: 16, y: 78, width: barW, height: 6, rx: 3 }))
-  const ratio = maxSize > 0 ? Math.max(0.06, Math.min(1, item.size / maxSize)) : 0.06
-  g.append(s('rect', { x: 16, y: 78, width: Math.round(barW * ratio), height: 6, rx: 3, fill: color, 'fill-opacity': .9 }))
-  const num = st(p.w - 14, 84, String(item.size), 'gnum', color)
-  num.setAttribute('text-anchor', 'end')
-  g.append(num)
-  g.append(st(16, 104, item.source && item.source.file ? item.source.file : (item.synthetic ? 'вне групп' : '—'), 'gsrc', null, 34))
+  const subY = headH + 24
+  g.append(st(16, subY, fmtCounts(item.counts, `${item.size} nodes`), 'gsub', null, Math.floor((p.w - 40) / 6.3)))
+  const barY = subY + 10
+  // у продуктовых блоков полоса «размера» ни о чём не говорит — состав важнее
+  if (!big) {
+    const barW = p.w - 32 - 40
+    g.append(s('rect', { class: 'gbar-bg', x: 16, y: barY, width: barW, height: 6, rx: 3 }))
+    const ratio = maxSize > 0 ? Math.max(0.06, Math.min(1, item.size / maxSize)) : 0.06
+    g.append(s('rect', { x: 16, y: barY, width: Math.round(barW * ratio), height: 6, rx: 3, fill: color, 'fill-opacity': .9 }))
+    const num = st(p.w - 14, barY + 6, String(item.size), 'gnum', color)
+    num.setAttribute('text-anchor', 'end')
+    g.append(num)
+  }
+
+  // строка узнаваемых значков — для блоков технологий и внешних систем
+  const members = item.members ? item.members.map(id => nodeById.get(id)).filter(Boolean) : []
+  const techish = members.length && members.filter(n => TECH_KINDS.has(n.kind)).length >= Math.max(1, members.length * 0.6)
+  if (techish) {
+    // значки занимают место подписи файла — иначе строки наезжают друг на друга
+    const row = s('g', { transform: `translate(16,${p.h - 30})` })
+    const fit = Math.max(1, Math.floor((p.w - 40) / 26))
+    members.slice(0, fit).forEach((n, i) => {
+      row.append(brandMark((n.meta && n.meta.label) || n.label, i * 26, 0, 20, color))
+    })
+    if (members.length > fit) row.append(st(fit * 26 + 3, 14, `+${members.length - fit}`, 'gsrc'))
+    g.append(row)
+  } else if (big) {
+    // продуктовые блоки показывают, из каких возможностей состоят
+    const listY = barY + 12
+    const step = 19
+    const room = Math.max(1, Math.floor((p.h - 8 - listY) / step) + 1)
+    const show = members.length > room ? room - 1 : members.length
+    members.slice(0, show).forEach((n, i) => {
+      const dot = s('circle', { cx: 20, cy: listY + i * step - 4, r: 2.6, fill: color, 'fill-opacity': .9 })
+      g.append(dot, st(30, listY + i * step, n.label, 'gitem', null, Math.floor((p.w - 56) / 6.8)))
+    })
+    if (members.length > show) g.append(st(30, listY + show * step, `+${members.length - show} ещё`, 'gsrc'))
+  } else {
+    g.append(st(16, p.h - 14, item.source && item.source.file ? item.source.file : (item.synthetic ? 'вне групп' : '—'), 'gsrc', null, Math.floor((p.w - 40) / 5.6)))
+  }
 
   // «+» — подсказка, что блок разворачивается
   const plus = s('g', { class: 'gplus' })
   plus.setAttribute('stroke', color)
-  plus.append(s('circle', { cx: p.w - 20, cy: 22, r: 9.5 }),
-    s('path', { d: `M${p.w - 25} 22h10` }), s('path', { d: `M${p.w - 20} 17v10` }))
+  const px = p.w - 20
+  const py = big ? 27 : 22
+  plus.append(s('circle', { cx: px, cy: py, r: 9.5 }),
+    s('path', { d: `M${px - 5} ${py}h10` }), s('path', { d: `M${px} ${py - 5}v10` }))
   g.append(plus)
 
-  const hit = s('rect', { class: 'hit hit-info', width: p.w, height: 44, rx: 15 })
+  const hit = s('rect', { class: 'hit hit-info', width: p.w, height: headH, rx: 15 })
   g.append(hit)
   const tip = s('title')
-  tip.textContent = `${item.label} — ${item.size} узлов\nклик: развернуть · клик по заголовку: детали`
+  tip.textContent = `${item.label} — ${plural(item.size, 'узел', 'узла', 'узлов')}\nклик: развернуть · клик по заголовку: детали`
   g.append(tip)
   return g
 }
@@ -1099,22 +1643,25 @@ function renderOverview () {
   posO.clear()
   oCardEls.clear()
   oNodeEls.clear()
+  oLaneEls.clear()
   oEdgeEls.length = 0
   hiddenHost.clear()
+  ovBoxes = []
   if (!HAS_GROUPS) return
 
   const lanes = buildLanes()
   for (const ln of lanes) if (ln.more) for (const g of ln.more.hidden) hiddenHost.set(g.id, ln.more.id)
   if (!lanes.length) {
-    const msg = st(0, 0, 'нет групп для показа — включите слои', '', null)
-    msg.setAttribute('id', 'emptymsg')
-    gOverview.append(msg)
     ovBounds = { minX: -200, minY: -60, maxX: 200, maxY: 60 }
     return
   }
   const ar = viewAspect()
   let best = null
-  for (let cols = 2; cols <= 7; cols++) {
+  // больше колонок, чем блоков в самом широком слое, только растянет пустоту
+  let maxCells = 2
+  for (const ln of lanes) maxCells = Math.max(maxCells, ln.col.length + (ln.more ? 1 : 0))
+  const colCap = Math.max(2, Math.min(9, maxCells))
+  for (let cols = 2; cols <= colCap; cols++) {
     const plan = planOverview(lanes, cols)
     const score = Math.abs(Math.log((plan.W / plan.H) / ar))
     if (!best || score < best.score) best = { score, cols }
@@ -1128,19 +1675,22 @@ function renderOverview () {
   gOverview.append(bandG, edgeG, cardG)
 
   for (const lg of laneGeom) {
-    const color = lg.ln.l.color
-    bandG.append(s('rect', {
-      x: -TIER_PADX, y: lg.top, rx: 20, width: W + TIER_PADX * 2, height: lg.bottom - lg.top + 22,
-      fill: color, 'fill-opacity': .035, stroke: color, 'stroke-opacity': .18,
-    }))
-    bandG.append(s('rect', { x: -TIER_PADX, y: lg.top + 14, width: 5, height: 26, rx: 2.5, fill: color }))
+    const color = layerColor(lg.ln.l.id)
+    const box = { x: -TIER_PADX, y: lg.top, width: W + TIER_PADX * 2, height: lg.bottom - lg.top + 22 }
+    const band = s('g', { class: 'tier-band' })
+    band.append(s('rect', Object.assign({ rx: 20, fill: color, 'fill-opacity': lg.ln.big ? .06 : .035, stroke: color, 'stroke-opacity': lg.ln.big ? .3 : .18 }, box)))
+    const halo = s('rect', Object.assign({ class: 'halo', rx: 20, fill: color, 'fill-opacity': .07, stroke: color, 'stroke-opacity': .5, 'stroke-width': 1.8 }, box))
+    band.append(halo)
+    band.append(s('rect', { x: -TIER_PADX, y: lg.top + 14, width: 5, height: 26, rx: 2.5, fill: color }))
     const title = st(-TIER_PADX + 18, lg.top + 36, String(lg.ln.l.label || lg.ln.l.id).toUpperCase(), 'tier-title', color)
-    title.setAttribute('fill-opacity', .92)
+    title.setAttribute('fill-opacity', .95)
     const shown = lg.ln.exp.length + lg.ln.col.length
     const sub = st(-TIER_PADX + 24 + String(lg.ln.l.label || lg.ln.l.id).length * 15, lg.top + 36,
       `${plural(lg.ln.total, 'группа', 'группы', 'групп')} · ${plural(lg.ln.nodesTotal, 'узел', 'узла', 'узлов')}` +
       (shown < lg.ln.total ? `  ·  показано ${shown}` : ''), 'tier-sub')
-    bandG.append(title, sub)
+    band.append(title, sub)
+    bandG.append(band)
+    oLaneEls.set(lg.ln.l.id, band)
   }
 
   // карточки и развёрнутые контейнеры
@@ -1148,6 +1698,7 @@ function renderOverview () {
     const maxSize = Math.max(1, ...lg.ln.col.map(g => g.size), ...lg.ln.exp.map(g => g.size))
     for (const item of lg.items) {
       posO.set(item.ref.id, { x: item.x, y: item.y, w: item.w, h: item.h })
+      ovBoxes.push({ x: item.x, y: item.y, w: item.w, h: item.h, layer: item.ref.layer })
       if (item.kind === 'exp') {
         const g = renderExpanded(item.ref, item)
         oCardEls.set(item.ref.id, g)
@@ -1180,7 +1731,7 @@ function renderOverview () {
     const gB = groupById.get(ge.to)
     if (!groupVisible(gA) || !groupVisible(gB)) continue
     addFlow(anchorOfGroup(ge.from), anchorOfGroup(ge.to), ge.kind || 'flow',
-      ge.count || 1, pairEdges.get(ge.from + ' ' + ge.to) || [], ge.from, ge.to)
+      ge.count || 1, pairEdges.get(ge.from + ' ' + ge.to) || [], ge.from, ge.to)
   }
   for (const e of edges) {
     const gf = groupOf.get(e.from)
@@ -1233,13 +1784,13 @@ function renderOverview () {
     const p = s('path', {
       class: 'gedge', d: flowPath(a, b, f.ax, f.bx), stroke: color,
       'stroke-width': width.toFixed(2), 'marker-end': `url(#garr-${lay})`,
-      'stroke-linecap': 'round', 'stroke-opacity': (0.3 + 0.55 * weight).toFixed(2),
+      'stroke-linecap': 'round', 'stroke-opacity': (0.28 + 0.55 * weight).toFixed(2),
     })
     p.dataset.kind = f.kind
     const tip = s('title')
     const fromLabel = groupById.has(f.a) ? groupById.get(f.a).label : (nodeById.has(f.a) ? nodeById.get(f.a).label : f.a)
     const toLabel = groupById.has(f.b) ? groupById.get(f.b).label : (nodeById.has(f.b) ? nodeById.get(f.b).label : f.b)
-    tip.textContent = `${fromLabel} → ${toLabel} · ${f.kind} ×${f.count}`
+    tip.textContent = `${fromLabel} → ${toLabel}\n${edgeWhy(f.kind)} · ×${f.count}`
     p.append(tip)
     f.el = p
     f.width = width
@@ -1273,12 +1824,15 @@ function renderOverview () {
     taken.push(pt)
     const color = layerColor(anchorLayer(f.a))
     const text = `${f.kind} ×${f.count}`
-    const w = text.length * 6.5 + 16
+    const w = text.length * 6.5 + 18
     const g = s('g', { class: 'gelabelw', transform: `translate(${(pt.x - w / 2).toFixed(1)},${(pt.y - 11).toFixed(1)})` })
     g.append(s('rect', { class: 'geplate', width: w, height: 22, rx: 7, stroke: color, 'stroke-opacity': .55 }))
     const t = st(w / 2, 15, text, 'gelabel', color)
     t.setAttribute('text-anchor', 'middle')
     g.append(t)
+    const tip = s('title')
+    tip.textContent = edgeWhy(f.kind)
+    g.append(tip)
     labelG.append(g)
   }
 
@@ -1291,7 +1845,7 @@ function renderOverview () {
   ovBounds = { minX, minY, maxX, maxY }
 }
 
-/* ── видимость: слои + inferred (детальный режим) ─────────── */
+/* ── видимость: слои + inferred (детальный режим) ── */
 function nodeVisible (n) {
   return n && !hiddenLayers.has(n.layer) && (inferredOn() || !n.inferred)
 }
@@ -1311,12 +1865,17 @@ function applyVisibility () {
 }
 inferredToggle.addEventListener('change', () => {
   if (mode === 'overview') { renderOverview(); applyQuery() } else applyVisibility()
+  afterViewChange()
 })
 
-/* ── pan / zoom / fit через viewBox ───────────────────────── */
+/* ── pan / zoom / fit через viewBox ── */
 const vb = { x: 0, y: 0, w: 1000, h: 600 }
+let baseW = 1000
 function updateVB () {
   svg.setAttribute('viewBox', `${vb.x} ${vb.y} ${vb.w} ${vb.h}`)
+  updateMinimapView()
+  const lvl = document.getElementById('zoomlvl')
+  if (lvl && baseW > 0) lvl.textContent = Math.round(baseW / vb.w * 100) + '%'
 }
 function fitBox (minX, minY, maxX, maxY, pad) {
   if (!(minX < maxX) || !(minY < maxY)) { minX = 0; minY = 0; maxX = 1000; maxY = 600 }
@@ -1332,12 +1891,8 @@ function fitBox (minX, minY, maxX, maxY, pad) {
   vb.h = h
   updateVB()
 }
-function fit () {
-  if (mode === 'overview') {
-    const b = ovBounds || { minX: 0, minY: 0, maxX: 1000, maxY: 600 }
-    fitBox(b.minX, b.minY, b.maxX, b.maxY, 70)
-    return
-  }
+function contentBounds () {
+  if (mode === 'overview') return ovBounds || { minX: 0, minY: 0, maxX: 1000, maxY: 600 }
   let minX = Infinity; let minY = Infinity; let maxX = -Infinity; let maxY = -Infinity
   for (const n of nodes) {
     if (!nodeVisible(n)) continue
@@ -1346,7 +1901,23 @@ function fit () {
     minX = Math.min(minX, p.x); minY = Math.min(minY, p.y)
     maxX = Math.max(maxX, p.x + p.w); maxY = Math.max(maxY, p.y + p.h)
   }
-  fitBox(minX, minY - LANE_PAD, maxX, maxY, 60)
+  if (!(minX < maxX)) return { minX: 0, minY: 0, maxX: 1000, maxY: 600 }
+  return { minX, minY: minY - LANE_PAD, maxX, maxY }
+}
+function fit () {
+  const b = contentBounds()
+  fitBox(b.minX, b.minY, b.maxX, b.maxY, mode === 'overview' ? 70 : 60)
+  baseW = vb.w
+  updateVB()
+}
+function zoomBy (k) {
+  const cx = vb.x + vb.w / 2
+  const cy = vb.y + vb.h / 2
+  vb.w *= k
+  vb.h *= k
+  vb.x = cx - vb.w / 2
+  vb.y = cy - vb.h / 2
+  updateVB()
 }
 svg.addEventListener('wheel', e => {
   e.preventDefault()
@@ -1393,10 +1964,8 @@ function fitOn (id) {
   if (!p) return
   fitBox(p.x, p.y, p.x + p.w, p.y + p.h, 90)
 }
-document.getElementById('fitBtn').addEventListener('click', fit)
-document.getElementById('printBtn').addEventListener('click', () => window.print())
 
-/* ── trace (BFS, циклы безопасны — visited) ───────────────── */
+/* ── trace (BFS, циклы безопасны — visited) ── */
 let traceActive = false
 function traceSets (startId, direction) {
   const adjacency = direction === 'down' ? fwd : back
@@ -1431,6 +2000,7 @@ function runTrace (startId, direction) {
       p.classList.toggle('traced', pathEdges.has(e.id))
       p.classList.toggle('dimmed', !pathEdges.has(e.id))
     }
+    toast(`${direction === 'down' ? 'Вниз' : 'Вверх'}: ${visited.size - 1} связанных узлов`)
     return
   }
   const anchors = new Set()
@@ -1445,6 +2015,7 @@ function runTrace (startId, direction) {
     f.el.classList.toggle('traced', hit)
     f.el.classList.toggle('dimmed', !hit)
   }
+  toast(`${direction === 'down' ? 'Вниз' : 'Вверх'}: ${visited.size - 1} связанных узлов`)
 }
 function runGroupTrace (startId, direction) {
   const adjacency = direction === 'down' ? gfwd : gback
@@ -1474,6 +2045,7 @@ function runGroupTrace (startId, direction) {
     f.el.classList.toggle('traced', hit)
     f.el.classList.toggle('dimmed', !hit)
   }
+  toast(`${direction === 'down' ? 'Вниз' : 'Вверх'}: ${visited.size - 1} связанных блоков`)
 }
 function clearTrace () {
   if (!traceActive) return
@@ -1485,13 +2057,46 @@ function clearTrace () {
   for (const f of oEdgeEls) f.el.classList.remove('dimmed', 'traced')
 }
 
-/* ── панель деталей ───────────────────────────────────────── */
+/* ── тост ── */
+const toastEl = document.getElementById('toast')
+let toastTimer = null
+function toast (msg) {
+  toastEl.textContent = String(msg)
+  toastEl.classList.add('on')
+  clearTimeout(toastTimer)
+  toastTimer = setTimeout(() => toastEl.classList.remove('on'), 2200)
+}
+
+/* ── панель деталей ── */
 const details = document.getElementById('details')
 let selected = null   // {type:'node'|'group', id}
+function panelHead (kindText, color, title, inferred, extraBadge) {
+  const head = el('div', 'dhead')
+  const top = el('div', 'd-top')
+  const badge = el('span', 'kbadge', kindText)
+  badge.style.setProperty('--c', color)
+  top.append(badge)
+  if (extraBadge) {
+    const b2 = el('span', 'kbadge', extraBadge)
+    b2.style.setProperty('--c', color)
+    top.append(b2)
+  }
+  if (inferred) {
+    const inf = el('span', 'd-inferred', 'inferred')
+    inf.title = 'элемент выведен эвристикой — в коде он не объявлен явно'
+    top.append(inf)
+  }
+  const x = el('button', 'dclose', '✕')
+  x.title = 'Закрыть панель (Esc)'
+  x.addEventListener('click', () => clearSelection())
+  head.append(top, el('h2', '', title), x)
+  return head
+}
 function srcBlock (source) {
   const src = el('div', 'src')
   const code = el('code', '', source && source.file ? `${source.file}:${source.line ?? 0}` : 'источник неизвестен')
   const copy = el('button', 'copy', 'copy')
+  copy.title = 'Скопировать путь к файлу'
   copy.addEventListener('click', () => {
     const value = code.textContent
     const done = () => { copy.textContent = '✓'; setTimeout(() => { copy.textContent = 'copy' }, 900) }
@@ -1510,64 +2115,78 @@ function metaRest (n) {
   }
   return rest
 }
+function emptyRel (ul, text) {
+  const li = el('li', 'nohover')
+  li.append(el('span', 'empty', text))
+  ul.append(li)
+  return ul
+}
 function relList (list, direction) {
   const ul = el('ul', 'rel')
-  if (!list.length) {
-    const li = el('li', '', '')
-    li.append(el('span', 'empty', '—'))
-    ul.append(li)
-    return ul
-  }
+  if (!list.length) return emptyRel(ul, '— связей нет')
   for (const e of list) {
     const otherId = direction === 'in' ? e.from : e.to
     const other = nodeById.get(otherId)
     const li = el('li')
     li.dataset.goto = otherId
     const name = el('span', 'en', other ? other.label : otherId)
-    const small = el('small', '', e.inferred ? ' · inferred' : '')
-    name.append(small)
+    name.append(el('small', '', e.inferred ? ' · inferred' : ''))
     li.append(el('span', 'ek', e.kind), name)
-    li.title = e.id
+    li.title = edgeWhy(e.kind) + '\n' + e.id
     ul.append(li)
   }
   return ul
 }
+/* «guards — middleware защищает роут»: расшифровка видов связей узла */
+function whyBlock (list) {
+  const kinds = [...new Set(list.map(e => e.kind))]
+  if (!kinds.length) return null
+  const ul = el('ul', 'whyrel')
+  for (const k of kinds) {
+    const li = el('li')
+    const text = edgeWhy(k)
+    const dash = text.indexOf('—')
+    li.append(el('b', '', k), el('span', '', dash > 0 ? text.slice(dash + 2) : text))
+    ul.append(li)
+  }
+  return ul
+}
+/* панель трассировки — одинакова для узла и для блока */
+function traceBar (run, what) {
+  const bar = el('div', 'tracebar')
+  const mk = (text, hint, fn) => { const b = el('button', 'btn', text); b.title = hint; b.addEventListener('click', fn); return b }
+  bar.append(
+    mk('↑ Кто зовёт', `Что ведёт к этому ${what} (upstream)`, () => run('up')),
+    mk('↓ Куда ведёт', `До чего дотягивается этот ${what} (downstream)`, () => run('down')),
+    mk('Сброс', 'Снять подсветку трассировки', clearTrace))
+  return bar
+}
 function showDetails (n) {
   details.replaceChildren()
   const color = layerColor(n.layer)
-  const top = el('div', 'd-top')
-  const badge = el('span', 'kbadge', n.kind)
-  badge.style.setProperty('--c', color)
-  top.append(badge)
-  if (n.inferred) top.append(el('span', 'd-inferred', 'inferred'))
-  details.append(top, el('h2', '', n.label))
-  details.append(srcBlock(n.source))
+  details.append(panelHead(KIND_RU[n.kind] || n.kind, color, n.label, n.inferred, layerLabel(n.layer)))
+  const body = el('div', 'dbody')
+  details.append(body)
+  body.append(srcBlock(n.source))
 
-  const bar = el('div', 'tracebar')
-  const up = el('button', 'btn', '↑ Trace upstream')
-  const down = el('button', 'btn', '↓ Trace downstream')
-  const reset = el('button', 'btn', 'Reset')
-  up.addEventListener('click', () => runTrace(n.id, 'up'))
-  down.addEventListener('click', () => runTrace(n.id, 'down'))
-  reset.addEventListener('click', clearTrace)
-  bar.append(up, down, reset)
-  details.append(bar)
+  body.append(traceBar(dir => runTrace(n.id, dir), 'узел'))
 
   const gid = groupOf.get(n.id)
   if (gid && groupById.has(gid)) {
     const g0 = groupById.get(gid)
-    details.append(el('h3', '', 'Группа'))
+    body.append(el('h3', '', 'Блок'))
     const ul = el('ul', 'rel')
     const li = el('li')
     li.dataset.group = gid
+    li.title = 'Открыть блок целиком'
     li.append(el('span', 'ek', 'group'), el('span', 'en', g0.label))
     li.append(el('span', 'cnt', String(g0.size)))
     ul.append(li)
-    details.append(ul)
+    body.append(ul)
   }
 
   if (n.kind === 'table' && n.meta && Array.isArray(n.meta.columns) && n.meta.columns.length) {
-    details.append(el('h3', '', `Колонки · ${n.meta.columns.length}`))
+    body.append(el('h3', '', `Колонки · ${n.meta.columns.length}`))
     const table = el('table')
     const hr = el('tr')
     for (const h of ['name', 'type', 'flags']) hr.append(el('th', '', h))
@@ -1584,10 +2203,10 @@ function showDetails (n) {
     }
     const wrap = el('div', 'twrap')
     wrap.append(table)
-    details.append(wrap)
+    body.append(wrap)
   }
   if (n.kind === 'route' && n.meta) {
-    details.append(el('h3', '', 'Роут'))
+    body.append(el('h3', '', 'Роут'))
     const kv = el('div', 'kv')
     const push = (k, v) => { kv.append(el('b', '', k), el('span', '', v)) }
     if (n.meta.method) push('method', String(n.meta.method).toUpperCase())
@@ -1596,9 +2215,9 @@ function showDetails (n) {
     if (n.meta.framework) push('framework', String(n.meta.framework))
     if (Array.isArray(n.meta.middleware) && n.meta.middleware.length) push('middleware', n.meta.middleware.join(', '))
     if (n.meta.handler) push('handler', `${n.meta.handler.file || ''}:${n.meta.handler.line ?? ''} ${n.meta.handler.name || ''}`)
-    details.append(kv)
+    body.append(kv)
     if (Array.isArray(n.meta.params) && n.meta.params.length) {
-      details.append(el('h3', '', 'Параметры'))
+      body.append(el('h3', '', 'Параметры'))
       const table = el('table')
       const hr = el('tr')
       for (const h of ['name', 'in', 'type', 'req']) hr.append(el('th', '', h))
@@ -1610,28 +2229,27 @@ function showDetails (n) {
       }
       const wrap = el('div', 'twrap')
       wrap.append(table)
-      details.append(wrap)
+      body.append(wrap)
     }
   }
   const rest = metaRest(n)
   if (rest.length) {
-    details.append(el('h3', '', 'Meta'))
+    body.append(el('h3', '', 'Meta'))
     const kv = el('div', 'kv')
     for (const [k, v] of rest) kv.append(el('b', '', k), el('span', '', v))
-    details.append(kv)
+    body.append(kv)
   }
-  details.append(el('h3', '', `Входящие · ${(back.get(n.id) || []).length}`), relList(back.get(n.id) || [], 'in'))
-  details.append(el('h3', '', `Исходящие · ${(fwd.get(n.id) || []).length}`), relList(fwd.get(n.id) || [], 'out'))
+  const inList = back.get(n.id) || []
+  const outList = fwd.get(n.id) || []
+  const why = whyBlock(inList.concat(outList))
+  if (why) { body.append(el('h3', '', 'Что значат связи')); body.append(why) }
+  body.append(el('h3', '', `Входящие · ${inList.length}`), relList(inList, 'in'))
+  body.append(el('h3', '', `Исходящие · ${outList.length}`), relList(outList, 'out'))
   details.hidden = false
 }
 function groupRelList (list, direction) {
   const ul = el('ul', 'rel')
-  if (!list.length) {
-    const li = el('li', '', '')
-    li.append(el('span', 'empty', '—'))
-    ul.append(li)
-    return ul
-  }
+  if (!list.length) return emptyRel(ul, '— потоков нет')
   for (const e of [...list].sort((a, b) => (b.count || 0) - (a.count || 0))) {
     const otherId = direction === 'in' ? e.from : e.to
     const other = groupById.get(otherId)
@@ -1639,7 +2257,7 @@ function groupRelList (list, direction) {
     li.dataset.group = otherId
     li.append(el('span', 'ek', e.kind || 'flow'), el('span', 'en', other ? other.label : otherId),
       el('span', 'cnt', '×' + (e.count || 1)))
-    li.title = e.id || otherId
+    li.title = edgeWhy(e.kind || 'flow')
     ul.append(li)
   }
   return ul
@@ -1647,64 +2265,50 @@ function groupRelList (list, direction) {
 function showGroupDetails (g0) {
   details.replaceChildren()
   const color = layerColor(g0.layer)
-  const top = el('div', 'd-top')
-  const badge = el('span', 'kbadge', 'group')
-  badge.style.setProperty('--c', color)
-  const lay = el('span', 'kbadge', layerLabel(g0.layer))
-  lay.style.setProperty('--c', color)
-  top.append(badge, lay)
-  if (g0.inferred) top.append(el('span', 'd-inferred', 'inferred'))
-  details.append(top, el('h2', '', g0.label))
-  details.append(srcBlock(g0.source))
+  details.append(panelHead('блок', color, g0.label, g0.inferred, layerLabel(g0.layer)))
+  const body = el('div', 'dbody')
+  details.append(body)
+  body.append(srcBlock(g0.source))
 
-  const bar = el('div', 'tracebar')
-  const up = el('button', 'btn', '↑ Trace upstream')
-  const down = el('button', 'btn', '↓ Trace downstream')
-  const reset = el('button', 'btn', 'Reset')
-  up.addEventListener('click', () => runGroupTrace(g0.id, 'up'))
-  down.addEventListener('click', () => runGroupTrace(g0.id, 'down'))
-  reset.addEventListener('click', clearTrace)
-  bar.append(up, down, reset)
-  details.append(bar)
+  body.append(traceBar(dir => runGroupTrace(g0.id, dir), 'блок'))
 
   const act = el('div', 'tracebar')
-  const toggle = el('button', 'btn', expanded.has(g0.id) ? '− Свернуть группу' : '+ Развернуть группу')
+  const toggle = el('button', 'btn', expanded.has(g0.id) ? '− Свернуть блок' : '+ Развернуть блок')
+  toggle.title = 'Показать узлы блока прямо на карте (клавиша E)'
   toggle.addEventListener('click', () => { toggleExpand(g0.id); showGroupDetails(g0) })
   const focus = el('button', 'btn', '⤢ Приблизить')
+  focus.title = 'Развернуть и вписать блок в экран'
   focus.addEventListener('click', () => { if (!expanded.has(g0.id)) toggleExpand(g0.id); fitOn(g0.id) })
   act.append(toggle, focus)
-  details.append(act)
+  body.append(act)
 
-  details.append(el('h3', '', 'Состав'))
+  body.append(el('h3', '', 'Состав'))
   const pills = el('div', 'pills')
   const entries = Object.entries(g0.counts || {}).sort((a, b) => b[1] - a[1])
   if (!entries.length) pills.append(el('span', 'empty', `${g0.size} узлов`))
   for (const [k, v] of entries) {
     const pill = el('span', 'pill', `${k} · ${v}`)
+    pill.title = KIND_RU[k] || k
     pill.style.setProperty('--c', color)
     pills.append(pill)
   }
-  details.append(pills)
+  body.append(pills)
 
-  details.append(el('h3', '', `Потоки входящие · ${(gback.get(g0.id) || []).length}`), groupRelList(gback.get(g0.id) || [], 'in'))
-  details.append(el('h3', '', `Потоки исходящие · ${(gfwd.get(g0.id) || []).length}`), groupRelList(gfwd.get(g0.id) || [], 'out'))
+  body.append(el('h3', '', `Потоки входящие · ${(gback.get(g0.id) || []).length}`), groupRelList(gback.get(g0.id) || [], 'in'))
+  body.append(el('h3', '', `Потоки исходящие · ${(gfwd.get(g0.id) || []).length}`), groupRelList(gfwd.get(g0.id) || [], 'out'))
 
   const members = g0.members.map(id => nodeById.get(id)).filter(Boolean)
-  details.append(el('h3', '', `Узлы · ${members.length}`))
+  body.append(el('h3', '', `Узлы · ${members.length}`))
   const ul = el('ul', 'rel')
   for (const n of members.slice(0, 400)) {
     const li = el('li')
     li.dataset.goto = n.id
     li.append(el('span', 'ek', n.kind), el('span', 'en', n.label))
-    li.title = n.id
+    li.title = KIND_RU[n.kind] || n.kind
     ul.append(li)
   }
-  if (members.length > 400) {
-    const li = el('li', '', '')
-    li.append(el('span', 'empty', `…и ещё ${members.length - 400}`))
-    ul.append(li)
-  }
-  details.append(ul)
+  if (members.length > 400) emptyRel(ul, `…и ещё ${members.length - 400}`)
+  body.append(ul)
   details.hidden = false
 }
 details.addEventListener('click', e => {
@@ -1714,15 +2318,55 @@ details.addEventListener('click', e => {
   if (!li) return
   selectNode(li.dataset.goto)
 })
+
+/* ── выделение, подсветка слоя, история ── */
 function markSelected (id, on) {
   const g = (mode === 'overview' ? (oNodeEls.get(id) || oCardEls.get(id)) : dNodeEls.get(id))
   if (g) g.classList.toggle('selected', on)
 }
+function highlightLayer (layerId) {
+  for (const [id, g] of oLaneEls) g.classList.toggle('act', id === layerId)
+  for (const [id, r] of dLaneEls) r.style.opacity = id === layerId ? '1' : '0'
+}
+const history = []
+let histPos = -1
+let histLock = false
+function pushHistory (entry) {
+  if (histLock) return
+  const cur = history[histPos]
+  if (cur && cur.type === entry.type && cur.id === entry.id) return
+  history.splice(histPos + 1)
+  history.push(entry)
+  if (history.length > 60) history.shift()
+  histPos = history.length - 1
+  updateHist()
+}
+function updateHist () {
+  document.getElementById('histBack').disabled = histPos <= 0
+  document.getElementById('histFwd').disabled = histPos >= history.length - 1
+}
+function goHistory (delta) {
+  const next = histPos + delta
+  if (next < 0 || next >= history.length) return
+  histPos = next
+  const entry = history[histPos]
+  histLock = true
+  try {
+    if (entry.type === 'group') selectGroup(entry.id, true)
+    else selectNode(entry.id)
+  } finally { histLock = false }
+  updateHist()
+}
+document.getElementById('histBack').addEventListener('click', () => goHistory(-1))
+document.getElementById('histFwd').addEventListener('click', () => goHistory(1))
+
 function clearSelection (silent) {
   if (selected) markSelected(selected.id, false)
   selected = null
   details.hidden = true
+  highlightLayer(null)
   if (!silent) clearTrace()
+  renderCrumbs()
 }
 function selectNode (id, noCenter) {
   const n = nodeById.get(id)
@@ -1734,13 +2378,17 @@ function selectNode (id, noCenter) {
       laneOpen.add(groupById.get(gid).layer)
       renderOverview()
       applyQuery()
+      afterViewChange()
     }
     if (!posO.has(id)) return
   }
   if (selected) markSelected(selected.id, false)
   selected = { type: 'node', id }
   markSelected(id, true)
+  highlightLayer(n.layer)
   showDetails(n)
+  pushHistory({ type: 'node', id })
+  renderCrumbs()
   if (!noCenter) centerOn(id)
 }
 function selectGroup (id, center) {
@@ -1750,13 +2398,19 @@ function selectGroup (id, center) {
   if (!posO.has(id)) {
     laneOpen.add(g0.layer)
     hiddenLayers.delete(g0.layer)
+    const chip = layerChipEls.get(g0.layer)
+    if (chip) chip.classList.remove('off')
     renderOverview()
     applyQuery()
+    afterViewChange()
   }
   if (selected) markSelected(selected.id, false)
   selected = { type: 'group', id }
   markSelected(id, true)
+  highlightLayer(g0.layer)
   showGroupDetails(g0)
+  pushHistory({ type: 'group', id })
+  renderCrumbs()
   if (center) centerOn(id)
 }
 function toggleExpand (id) {
@@ -1767,13 +2421,197 @@ function toggleExpand (id) {
   clearTrace()
   renderOverview()
   applyQuery()
+  afterViewChange()
   if (wasSelected) {
     selected = wasSelected
     markSelected(wasSelected.id, true)
+    const lay = wasSelected.type === 'group'
+      ? (groupById.get(wasSelected.id) || {}).layer
+      : (nodeById.get(wasSelected.id) || {}).layer
+    highlightLayer(lay || null)
   }
 }
 
-/* ── клики по канве ───────────────────────────────────────── */
+/* ── хлебные крошки ── */
+const crumbs = document.getElementById('crumbs')
+function crumbBtn (text, title, onClick, color) {
+  const b = el('button', 'cr', '')
+  if (color) {
+    const dot = el('span', 'lc')
+    dot.style.background = color
+    b.append(dot)
+  }
+  b.append(document.createTextNode(text))
+  b.title = title
+  if (onClick) b.addEventListener('click', onClick)
+  else b.classList.add('last')
+  return b
+}
+function renderCrumbs () {
+  crumbs.replaceChildren()
+  const parts = []
+  parts.push({ text: mode === 'overview' ? 'Обзор' : 'Детали', title: 'Вернуться к полной карте', fn: () => { clearSelection(); fit() } })
+  let layerId = null
+  let groupId = null
+  if (selected) {
+    if (selected.type === 'group') {
+      const g0 = groupById.get(selected.id)
+      if (g0) { layerId = g0.layer; groupId = g0.id }
+    } else {
+      const n = nodeById.get(selected.id)
+      if (n) { layerId = n.layer; groupId = groupOf.get(n.id) || null }
+    }
+  }
+  if (layerId) {
+    const l = layerById[layerId] || { label: layerId }
+    parts.push({ text: l.label, title: `Слой «${l.label}» — приблизить`, color: layerColor(layerId), fn: () => focusLayer(layerId) })
+  }
+  if (groupId && !(selected && selected.type === 'group' && selected.id === groupId)) {
+    const g0 = groupById.get(groupId)
+    if (g0) parts.push({ text: g0.label, title: 'Открыть блок', fn: () => selectGroup(g0.id, true) })
+  }
+  if (selected) {
+    const label = selected.type === 'group'
+      ? (groupById.get(selected.id) || {}).label
+      : (nodeById.get(selected.id) || {}).label
+    if (label) parts.push({ text: label, title: label, fn: null })
+  }
+  parts.forEach((p, i) => {
+    if (i) crumbs.append(el('span', 'sep', '›'))
+    crumbs.append(crumbBtn(p.text, p.title, p.fn, p.color))
+  })
+}
+function focusLayer (layerId) {
+  if (mode === 'overview') {
+    let minX = Infinity; let minY = Infinity; let maxX = -Infinity; let maxY = -Infinity
+    for (const b of ovBoxes) {
+      if (b.layer !== layerId) continue
+      minX = Math.min(minX, b.x); minY = Math.min(minY, b.y)
+      maxX = Math.max(maxX, b.x + b.w); maxY = Math.max(maxY, b.y + b.h)
+    }
+    if (minX < maxX) fitBox(minX, minY, maxX, maxY, 90)
+  } else {
+    const col = detailCols.find(c => c.layer.id === layerId)
+    if (col) fitBox(col.x, 0, col.x + col.width, col.height + LANE_PAD, 60)
+  }
+  highlightLayer(layerId)
+}
+
+/* ── мини-карта ── */
+const mmWrap = document.getElementById('minimap')
+const mmSvg = document.getElementById('mmsvg')
+let mmView = null
+let mmBounds = null
+let minimapOn = true
+function renderMinimap () {
+  mmSvg.replaceChildren()
+  mmView = null
+  if (!minimapOn || mmWrap.hidden) return
+  const b = contentBounds()
+  const w = Math.max(1, b.maxX - b.minX)
+  const h = Math.max(1, b.maxY - b.minY)
+  mmBounds = b
+  mmSvg.setAttribute('viewBox', `${b.minX} ${b.minY} ${w} ${h}`)
+  const gg = s('g')
+  if (mode === 'overview') {
+    for (const box of ovBoxes) {
+      gg.append(s('rect', {
+        x: box.x, y: box.y, width: box.w, height: box.h, rx: Math.min(10, box.w / 12),
+        fill: layerColor(box.layer), 'fill-opacity': .55,
+      }))
+    }
+  } else {
+    for (const n of nodes) {
+      if (!nodeVisible(n)) continue
+      const p = posD.get(n.id)
+      if (!p) continue
+      gg.append(s('rect', { x: p.x, y: p.y, width: p.w, height: p.h, fill: layerColor(n.layer), 'fill-opacity': .5 }))
+    }
+  }
+  mmSvg.append(gg)
+  mmView = s('rect', { class: 'mmv', rx: 3 })
+  mmSvg.append(mmView)
+  updateMinimapView()
+}
+function updateMinimapView () {
+  if (!mmView) return
+  mmView.setAttribute('x', vb.x)
+  mmView.setAttribute('y', vb.y)
+  mmView.setAttribute('width', Math.max(1, vb.w))
+  mmView.setAttribute('height', Math.max(1, vb.h))
+}
+function mmGoto (e) {
+  if (!mmBounds) return
+  const r = mmSvg.getBoundingClientRect()
+  const w = mmBounds.maxX - mmBounds.minX
+  const h = mmBounds.maxY - mmBounds.minY
+  // preserveAspectRatio="xMidYMid meet": содержимое вписано с полями
+  const scale = Math.min(r.width / w, r.height / h)
+  const offX = (r.width - w * scale) / 2
+  const offY = (r.height - h * scale) / 2
+  const x = mmBounds.minX + (e.clientX - r.left - offX) / scale
+  const y = mmBounds.minY + (e.clientY - r.top - offY) / scale
+  vb.x = x - vb.w / 2
+  vb.y = y - vb.h / 2
+  updateVB()
+}
+let mmDrag = false
+mmSvg.addEventListener('pointerdown', e => { mmDrag = true; mmSvg.setPointerCapture(e.pointerId); mmGoto(e) })
+mmSvg.addEventListener('pointermove', e => { if (mmDrag) mmGoto(e) })
+mmSvg.addEventListener('pointerup', () => { mmDrag = false })
+function setMinimap (on) {
+  minimapOn = on
+  mmWrap.hidden = !on
+  document.getElementById('mmBtn').classList.toggle('on', on)
+  if (on) renderMinimap()
+}
+document.getElementById('mmBtn').addEventListener('click', () => setMinimap(!minimapOn))
+document.getElementById('mmClose').addEventListener('click', () => setMinimap(false))
+document.getElementById('zoomIn').addEventListener('click', () => zoomBy(1 / 1.25))
+document.getElementById('zoomOut').addEventListener('click', () => zoomBy(1.25))
+document.getElementById('fitBtn').addEventListener('click', fit)
+document.getElementById('printBtn').addEventListener('click', () => window.print())
+
+/* ── пустые состояния ── */
+const emptyState = document.getElementById('emptystate')
+function updateEmptyState () {
+  const q = search.value.trim()
+  let title = null
+  let text = null
+  if (mode === 'overview' && HAS_GROUPS && !posO.size) {
+    title = 'В этих слоях ничего не найдено'
+    text = 'Все слои выключены или отфильтрованы. Включите слой в панели сверху.'
+  } else if (mode === 'details' && !nodes.some(nodeVisible)) {
+    title = 'В этих слоях ничего не найдено'
+    text = 'Ни один узел не проходит текущие фильтры слоёв и inferred.'
+  } else if (q && !nodes.some(n => matchesQuery(n, q.toLowerCase())) && !groups.some(g => matchesGroup(g, q.toLowerCase()))) {
+    title = 'Ничего не найдено'
+    text = `По запросу «${q}» нет ни узлов, ни блоков. Попробуйте часть пути к файлу или имя таблицы.`
+  }
+  if (!title) { emptyState.hidden = true; return }
+  document.getElementById('esTitle').textContent = title
+  document.getElementById('esText').textContent = text
+  emptyState.hidden = false
+}
+document.getElementById('esBtn').addEventListener('click', () => {
+  search.value = ''
+  hiddenLayers.clear()
+  for (const chip of layerChipEls.values()) chip.classList.remove('off')
+  if (mode === 'overview') renderOverview()
+  else applyVisibility()
+  applyQuery()
+  afterViewChange()
+  fit()
+})
+
+/* общий хук после любого изменения содержимого карты */
+function afterViewChange () {
+  renderMinimap()
+  updateEmptyState()
+  renderCrumbs()
+}
+
+/* ── клики по канве ── */
 svg.addEventListener('click', e => {
   if (dragMoved) { dragMoved = false; return }
   const target = e.target
@@ -1785,6 +2623,7 @@ svg.addEventListener('click', e => {
       laneOpen.add(card.dataset.more)
       renderOverview()
       applyQuery()
+      afterViewChange()
       return
     }
     if (target.closest('.hit-info')) selectGroup(card.dataset.id)
@@ -1807,11 +2646,8 @@ svg.addEventListener('dblclick', e => {
   if (!expanded.has(id)) toggleExpand(id)
   fitOn(id)
 })
-document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') clearSelection()
-})
 
-/* ── режимы ───────────────────────────────────────────────── */
+/* ── режимы ── */
 const modeSeg = document.getElementById('modeSeg')
 const collapseBtn = document.getElementById('collapseBtn')
 function setMode (m) {
@@ -1834,6 +2670,7 @@ function setMode (m) {
   }
   applyQuery()
   fit()
+  afterViewChange()
 }
 modeSeg.addEventListener('click', e => {
   const b = e.target.closest('button')
@@ -1846,9 +2683,10 @@ collapseBtn.addEventListener('click', () => {
   renderOverview()
   applyQuery()
   fit()
+  afterViewChange()
 })
 
-/* ── поиск ────────────────────────────────────────────────── */
+/* ── поиск ── */
 const search = document.getElementById('search')
 function matchesQuery (n, q) {
   return n.label.toLowerCase().includes(q) || n.id.toLowerCase().includes(q) ||
@@ -1885,8 +2723,9 @@ function applyQuery () {
     g.classList.toggle('matched', !!q && !!n && matchesQuery(n, q))
   }
 }
-search.addEventListener('input', applyQuery)
+search.addEventListener('input', () => { applyQuery(); updateEmptyState() })
 search.addEventListener('keydown', e => {
+  if (e.key === 'Escape') { search.value = ''; applyQuery(); updateEmptyState(); search.blur(); return }
   if (e.key !== 'Enter') return
   const q = search.value.trim().toLowerCase()
   if (!q) return
@@ -1894,23 +2733,409 @@ search.addEventListener('keydown', e => {
     const grp = groups.find(g => groupVisible(g) && matchesGroup(g, q))
     if (grp) { selectGroup(grp.id, true); return }
     const n = nodes.find(nn => nodeVisible(nn) && matchesQuery(nn, q))
-    if (!n) return
+    if (!n) { toast('Ничего не найдено'); return }
     selectNode(n.id, true)
     const p = posO.get(n.id)
     if (p) fitBox(p.x - 420, p.y - 280, p.x + p.w + 420, p.y + p.h + 280, 0)
     return
   }
   const first = nodes.find(n => nodeVisible(n) && matchesQuery(n, q))
-  if (first) centerOn(first.id)
+  if (first) { selectNode(first.id, true); centerOn(first.id) } else toast('Ничего не найдено')
 })
 
-/* ── старт ────────────────────────────────────────────────── */
+/* ── тема ── */
+function applyTheme (next) {
+  theme = next === 'light' ? 'light' : 'dark'
+  if (theme === 'light') document.documentElement.setAttribute('data-theme', 'light')
+  else document.documentElement.removeAttribute('data-theme')
+  buildDefs()
+  for (const l of layers) {
+    const chip = layerChipEls.get(l.id)
+    if (chip) chip.style.setProperty('--c', layerColor(l.id))
+  }
+  buildLegend()
+  const keepSelected = selected
+  const keepVb = { x: vb.x, y: vb.y, w: vb.w, h: vb.h }
+  if (detailsBuilt) { detailsBuilt = false; buildDetails() }
+  if (mode === 'overview') renderOverview()
+  applyQuery()
+  applyVisibility()
+  if (keepSelected) {
+    if (keepSelected.type === 'group') selectGroup(keepSelected.id)
+    else selectNode(keepSelected.id, true)
+  }
+  Object.assign(vb, keepVb)
+  updateVB()
+  afterViewChange()
+}
+function toggleTheme () {
+  applyTheme(theme === 'light' ? 'dark' : 'light')
+  writeTheme(theme)
+  toast(theme === 'light' ? 'Светлая тема' : 'Тёмная тема')
+}
+document.getElementById('themeBtn').addEventListener('click', toggleTheme)
+
+/* ── экспорт: SVG и PNG без внешних библиотек ── */
+const SVG_VARS = ['--text', '--muted', '--faint', '--line', '--line2', '--frame', '--plate', '--exp',
+  '--card-mid', '--card-low', '--grid', '--grid-op', '--btn', '--accent', '--bg', '--mono', '--sans']
+function collectCss () {
+  let out = ''
+  for (const sheet of document.styleSheets) {
+    let rules = null
+    try { rules = sheet.cssRules } catch (err) { rules = null }
+    if (!rules) continue
+    for (const rule of rules) {
+      const text = rule.cssText || ''
+      // печатные и оверлейные правила экспортируемой картинке не нужны
+      if (/^@(media print|page)/.test(text)) continue
+      out += text + '\n'
+    }
+  }
+  return out
+}
+function exportSvgText () {
+  const clone = svg.cloneNode(true)
+  const b = contentBounds()
+  const pad = 40
+  const w = Math.round(b.maxX - b.minX + pad * 2)
+  const h = Math.round(b.maxY - b.minY + pad * 2)
+  clone.setAttribute('viewBox', `${Math.round(b.minX - pad)} ${Math.round(b.minY - pad)} ${w} ${h}`)
+  clone.setAttribute('width', w)
+  clone.setAttribute('height', h)
+  clone.removeAttribute('id')
+  clone.setAttribute('xmlns', SVGNS)
+  clone.setAttribute('xmlns:xlink', 'http://www.w3.org/1999/xlink')
+  const cs = getComputedStyle(document.documentElement)
+  let vars = ''
+  for (const name of SVG_VARS) vars += `${name}:${cs.getPropertyValue(name).trim()};`
+  const style = document.createElementNS(SVGNS, 'style')
+  style.textContent = `svg{${vars}background:var(--bg)}\n` + collectCss()
+  const bg = document.createElementNS(SVGNS, 'rect')
+  bg.setAttribute('x', Math.round(b.minX - pad))
+  bg.setAttribute('y', Math.round(b.minY - pad))
+  bg.setAttribute('width', w)
+  bg.setAttribute('height', h)
+  bg.setAttribute('fill', cs.getPropertyValue('--bg').trim() || '#0b1120')
+  clone.insertBefore(bg, clone.firstChild)
+  clone.insertBefore(style, clone.firstChild)
+  return '<?xml version="1.0" encoding="UTF-8"?>\n' + new XMLSerializer().serializeToString(clone)
+}
+function fileBase () {
+  const t = (document.getElementById('title').textContent || 'archmap').trim().replace(/[^\w.-]+/g, '-')
+  return `${t || 'archmap'}-${mode}`
+}
+function downloadBlob (blob, name) {
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = name
+  document.body.append(a)
+  a.click()
+  a.remove()
+  setTimeout(() => URL.revokeObjectURL(url), 4000)
+}
+function exportSvg () {
+  try {
+    downloadBlob(new Blob([exportSvgText()], { type: 'image/svg+xml;charset=utf-8' }), fileBase() + '.svg')
+    toast('SVG сохранён')
+  } catch (err) {
+    toast('Не удалось сохранить SVG: ' + (err && err.message ? err.message : err))
+  }
+}
+function exportPng () {
+  let text = ''
+  try { text = exportSvgText() } catch (err) { toast('Не удалось подготовить картинку'); return }
+  const img = new Image()
+  img.onload = () => {
+    try {
+      const scale = Math.min(2, 4200 / Math.max(1, img.width))
+      const canvas = document.createElement('canvas')
+      canvas.width = Math.max(1, Math.round(img.width * scale))
+      canvas.height = Math.max(1, Math.round(img.height * scale))
+      const ctx = canvas.getContext('2d')
+      ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--bg').trim() || '#0b1120'
+      ctx.fillRect(0, 0, canvas.width, canvas.height)
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height)
+      canvas.toBlob(blob => {
+        if (!blob) { toast('Браузер не дал сохранить PNG — скачайте SVG'); return }
+        downloadBlob(blob, fileBase() + '.png')
+        toast('PNG сохранён')
+      }, 'image/png')
+    } catch (err) {
+      toast('Браузер запретил экспорт PNG — скачайте SVG')
+    }
+  }
+  img.onerror = () => toast('Браузер не смог отрисовать PNG — скачайте SVG')
+  img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(text)
+}
+document.getElementById('svgBtn').addEventListener('click', exportSvg)
+document.getElementById('pngBtn').addEventListener('click', exportPng)
+
+/* ── стартовая панель «О проекте» ── */
+const aboutEl = document.getElementById('about')
+const keysEl = document.getElementById('keys')
+function usesRank () {
+  const score = new Map()
+  for (const e of edges) {
+    const target = nodeById.get(e.to)
+    if (!target) continue
+    if (target.kind !== 'tech' && target.kind !== 'external-service' && target.kind !== 'mcp-server') continue
+    if (e.kind !== 'uses' && e.kind !== 'import' && e.kind !== 'calls') continue
+    score.set(e.to, (score.get(e.to) || 0) + 1)
+  }
+  return [...score.entries()].sort((a, b) => b[1] - a[1]).map(([id, n]) => ({ node: nodeById.get(id), n }))
+}
+function featureRank () {
+  const feats = nodes.filter(n => PRODUCT_KINDS.has(n.kind))
+  return feats.map(n => ({ node: n, n: (fwd.get(n.id) || []).length + (back.get(n.id) || []).length }))
+    .sort((a, b) => b.n - a.n)
+}
+function topList (items, unit, onPick) {
+  const ul = el('ul', 'toplist')
+  const max = Math.max(1, ...items.map(i => i.n))
+  items.forEach((item, i) => {
+    if (!item.node) return
+    const li = el('li')
+    li.append(el('span', 'rank', String(i + 1)))
+    const nm = el('span', 'nm', item.node.label)
+    const meta = item.node.meta || {}
+    const sub = [KIND_RU[item.node.kind] || item.node.kind, meta.version, meta.category].filter(Boolean).join(' · ')
+    nm.append(el('small', '', sub))
+    li.append(nm)
+    const bar = el('span', 'bar')
+    const fillEl = el('i')
+    fillEl.style.width = Math.round(item.n / max * 100) + '%'
+    fillEl.style.background = layerColor(item.node.layer)
+    bar.append(fillEl)
+    li.append(bar, el('span', 'mt', `${item.n} ${unit}`))
+    li.title = `${item.node.label} — открыть на карте`
+    li.addEventListener('click', () => { closeAbout(); onPick(item.node) })
+    ul.append(li)
+  })
+  return ul
+}
+function buildAbout () {
+  const body = document.getElementById('abBody')
+  body.replaceChildren()
+  const repo = data.repo || {}
+  const when = data.generatedAt ? new Date(data.generatedAt) : null
+  const subParts = []
+  if (when && !isNaN(when.getTime())) subParts.push('снимок ' + when.toISOString().slice(0, 16).replace('T', ' '))
+  if (stats.files) subParts.push(`${stats.files} файлов просканировано`)
+  if (repo.monorepo) subParts.push('монорепозиторий')
+  if (data.version) subParts.push('schema v' + data.version)
+  document.getElementById('abSub').textContent = subParts.join('  ·  ')
+  document.getElementById('abNote').textContent = 'клавиша I — открыть снова · Esc — закрыть'
+
+  // ── счётчики
+  const tiles = el('div', 'tiles')
+  const tile = (value, label, acc) => {
+    const t = el('div', 'tile' + (acc ? ' acc' : ''))
+    t.append(el('b', '', String(value)), el('span', '', label))
+    tiles.append(t)
+  }
+  const featCount = kc('feature') + kc('capability')
+  if (featCount) tile(featCount, 'фич', true)
+  tile(stats.nodes ?? nodes.length, 'узлов')
+  tile(stats.edges ?? edges.length, 'связей')
+  if (HAS_GROUPS) tile(groups.length, 'блоков')
+  if (HAS_GROUPS) tile(groupEdges.length, 'потоков')
+  if (kc('route') + kc('webhook') + kc('ws')) tile(kc('route') + kc('webhook') + kc('ws'), 'роутов')
+  if (kc('table')) tile(kc('table'), 'таблиц')
+  // каждая плитка считает ровно свою сущность: смешивать агентов со скиллами
+  // и командами нельзя — «186 агентов» вместо 21 читается как ошибка данных
+  if (kc('agent')) tile(kc('agent'), 'агентов')
+  if (kc('skill')) tile(kc('skill'), 'скиллов')
+  if (kc('command')) tile(kc('command'), 'команд')
+  if (kc('mcp-server')) tile(kc('mcp-server'), 'MCP-серверов')
+  if (kc('tech')) tile(kc('tech'), 'библиотек')
+  if (kc('external-service')) tile(kc('external-service'), 'внешних систем')
+  if (kc('test-suite')) tile(kc('test-suite'), 'тестов')
+  if (kc('container') + kc('ci-pipeline')) tile(kc('container') + kc('ci-pipeline'), 'деплой')
+  if (kc('env')) tile(kc('env'), 'env-переменных')
+  body.append(tiles)
+
+  // ── стеки
+  const stacks = data.stacks || {}
+  const detected = Array.isArray(stacks.detected) ? stacks.detected : []
+  const cols = el('div', 'cols')
+  if (detected.length) {
+    const sec = el('div', 'sec')
+    sec.append(el('h3', '', 'Стек'))
+    const list = el('div', 'stacklist')
+    for (const name of detected) {
+      const ev = (stacks.evidence || {})[name] || {}
+      const pill = el('span', 'stackpill', name)
+      const hint = ev.dep || ev.file || ev.script || ''
+      if (hint) pill.append(el('em', '', String(hint)))
+      pill.title = hint ? `${name} — найдено: ${hint}` : name
+      list.append(pill)
+    }
+    if (stacks.parser) {
+      const pill = el('span', 'stackpill', 'parser')
+      pill.append(el('em', '', String(stacks.parser) + (stacks.tsVersion ? ' ' + stacks.tsVersion : '')))
+      list.append(pill)
+    }
+    sec.append(list)
+    body.append(sec)
+  }
+
+  // ── топ фич и технологий
+  const feats = featureRank().slice(0, 5)
+  if (feats.length) {
+    const sec = el('div', 'sec')
+    sec.append(el('h3', '', 'Ключевые возможности'))
+    sec.append(topList(feats, 'связей', n => selectNode(n.id)))
+    cols.append(sec)
+  }
+  const tech = usesRank().slice(0, 5)
+  if (tech.length) {
+    const sec = el('div', 'sec')
+    sec.append(el('h3', '', 'Чаще всего используется'))
+    sec.append(topList(tech, 'исп.', n => selectNode(n.id)))
+    cols.append(sec)
+  }
+  // ── находки
+  const findings = []
+  const cycleNodes = nodes.filter(n => n.meta && n.meta.cycle)
+  const cycleCount = stats.cycles || (cycleNodes.length ? 1 : 0)
+  if (cycleCount) findings.push(['bad', `Циклы импортов: ${cycleCount}`, cycleNodes.length ? `затронуто ${cycleNodes.length} модулей` : 'см. модули с пометкой cycle'])
+  if (inferredTotal) findings.push(['warn', `Выведено эвристикой: ${inferredTotal}`, 'рисуется пунктиром — стоит проверить вручную'])
+  if (stats.truncated) findings.push(['warn', 'Карта усечена', 'часть узлов не показана: репозиторий больше лимита сканера'])
+  if (stats.collapsedModules) findings.push(['ok', 'Модули свёрнуты по каталогам', 'иначе граф импортов нечитаем'])
+  if (stats.conflicts) findings.push(['warn', `Конфликты данных: ${stats.conflicts}`, 'один и тот же элемент описан по-разному'])
+  if (stats.stubs) findings.push(['warn', `Заглушки: ${stats.stubs}`, 'ссылки на элементы, которых нет в коде'])
+  if (stats.validationErrors) findings.push(['bad', `Ошибки валидации: ${stats.validationErrors}`, 'проверьте architecture.json'])
+  if (!findings.length) findings.push(['ok', 'Явных проблем не найдено', 'ни циклов, ни усечения, ни конфликтов'])
+  {
+    const sec = el('div', 'sec')
+    sec.append(el('h3', '', 'Находки'))
+    const ul = el('ul', 'findings')
+    for (const [level, title, note] of findings) {
+      const li = el('li')
+      const dot = el('span', 'fi')
+      dot.style.background = level === 'bad' ? 'var(--bad)' : (level === 'warn' ? 'var(--warn)' : 'var(--ok)')
+      const text = el('span')
+      text.append(el('b', '', title), document.createTextNode(' — ' + note))
+      li.append(dot, text)
+      ul.append(li)
+    }
+    sec.append(ul)
+    cols.append(sec)
+  }
+  body.append(cols)
+}
+function openAbout () { buildAbout(); aboutEl.hidden = false }
+function closeAbout () { aboutEl.hidden = true }
+document.getElementById('aboutBtn').addEventListener('click', openAbout)
+document.getElementById('abX').addEventListener('click', closeAbout)
+document.getElementById('abGo').addEventListener('click', closeAbout)
+document.getElementById('abKeys').addEventListener('click', () => { closeAbout(); openKeys() })
+aboutEl.addEventListener('click', e => { if (e.target === aboutEl) closeAbout() })
+
+/* ── горячие клавиши ── */
+const HOTKEYS = [
+  ['O', 'режим «Обзор»'], ['D', 'режим «Детали»'], ['F', 'вписать карту в экран'],
+  ['/', 'фокус в поиск'], ['Esc', 'сбросить выделение и панели'], ['E', 'развернуть выбранный блок'],
+  ['C', 'свернуть все блоки'], ['1…9', 'вкл/выкл слой по номеру'], ['M', 'мини-карта'],
+  ['T', 'светлая / тёмная тема'], ['P', 'печать или PDF'], ['I', 'панель «О проекте»'],
+  ['?', 'эта подсказка'], ['Alt+←/→', 'назад / вперёд по выделениям'],
+]
+function buildKeys () {
+  const box = document.getElementById('keysBody')
+  box.replaceChildren()
+  for (const [k, v] of HOTKEYS) {
+    const row = el('div')
+    row.append(el('kbd', '', k), el('span', '', v))
+    box.append(row)
+  }
+}
+function openKeys () { buildKeys(); keysEl.hidden = false }
+function closeKeys () { keysEl.hidden = true }
+document.getElementById('keysBtn').addEventListener('click', openKeys)
+document.getElementById('kX').addEventListener('click', closeKeys)
+keysEl.addEventListener('click', e => { if (e.target === keysEl) closeKeys() })
+
+document.addEventListener('keydown', e => {
+  const tag = (e.target && e.target.tagName || '').toLowerCase()
+  const typing = tag === 'input' || tag === 'textarea' || (e.target && e.target.isContentEditable)
+  if (e.key === 'Escape') {
+    if (!keysEl.hidden) { closeKeys(); return }
+    if (!aboutEl.hidden) { closeAbout(); return }
+    if (typing) return
+    clearSelection()
+    return
+  }
+  if (typing || e.metaKey || e.ctrlKey) return
+  if (e.altKey) {
+    if (e.key === 'ArrowLeft') { e.preventDefault(); goHistory(-1) }
+    if (e.key === 'ArrowRight') { e.preventDefault(); goHistory(1) }
+    return
+  }
+  const k = e.key
+  if (k === '/') { e.preventDefault(); search.focus(); search.select(); return }
+  if (k === '?') { e.preventDefault(); if (keysEl.hidden) openKeys(); else closeKeys(); return }
+  if (/^[1-9]$/.test(k)) {
+    const l = layers[Number(k) - 1]
+    if (l) { e.preventDefault(); toggleLayer(l.id) }
+    return
+  }
+  const low = k.toLowerCase()
+  if (low === 'o') { setMode('overview'); return }
+  if (low === 'd') { setMode('details'); return }
+  if (low === 'f') { fit(); return }
+  if (low === 'm') { setMinimap(!minimapOn); return }
+  if (low === 't') { toggleTheme(); return }
+  if (low === 'i') { if (aboutEl.hidden) openAbout(); else closeAbout(); return }
+  if (low === 'p') { e.preventDefault(); window.print(); return }
+  if (low === 'c') { collapseBtn.click(); return }
+  if (low === 'e') {
+    if (!selected) { toast('Сначала выберите блок'); return }
+    const gid = selected.type === 'group' ? selected.id : groupOf.get(selected.id)
+    if (gid) toggleExpand(gid)
+  }
+})
+
+/* печатаем всегда в светлой теме — неон на бумаге нечитаем */
+let printRestore = null
+window.addEventListener('beforeprint', () => {
+  printRestore = { theme, vb: { x: vb.x, y: vb.y, w: vb.w, h: vb.h } }
+  if (theme !== 'light') applyTheme('light')
+  // на бумаге пропорции страницы другие — отдаём точные границы содержимого,
+  // preserveAspectRatio сам впишет карту в лист без лишних полей
+  const b = contentBounds()
+  vb.x = b.minX - 30
+  vb.y = b.minY - 30
+  vb.w = Math.max(1, b.maxX - b.minX + 60)
+  vb.h = Math.max(1, b.maxY - b.minY + 60)
+  updateVB()
+})
+window.addEventListener('afterprint', () => {
+  if (!printRestore) return
+  if (printRestore.theme !== theme) applyTheme(printRestore.theme)
+  Object.assign(vb, printRestore.vb)
+  updateVB()
+  printRestore = null
+})
+
+/* ── старт ── */
 modeSeg.hidden = !HAS_GROUPS
-if (HAS_GROUPS) setMode('overview')
-else { setMode('details') }
-window.addEventListener('resize', () => { if (!traceActive) fit() })
+setMode(HAS_GROUPS ? 'overview' : 'details')
+setMinimap(true)
+renderCrumbs()
+updateHist()
+openAbout()
+let resizeTimer = null
+window.addEventListener('resize', () => {
+  clearTimeout(resizeTimer)
+  resizeTimer = setTimeout(() => { if (!traceActive) { fit(); renderMinimap() } }, 120)
+})
 /* хук для e2e-проверок раскладки (никаких данных наружу не отдаём) */
-window.__archmap = { setMode, toggleExpand, selectGroup, selectNode, fit, fitOn, expanded, laneOpen, groups, search }
+window.__archmap = {
+  setMode, toggleExpand, selectGroup, selectNode, fit, fitOn, expanded, laneOpen, groups, search,
+  openAbout, closeAbout, openKeys, closeKeys, applyTheme, setMinimap, exportSvgText, toggleLayer,
+  runTrace, runGroupTrace, clearTrace, goHistory, get mode () { return mode }, get theme () { return theme },
+}
 </script>
 </body>
 </html>
