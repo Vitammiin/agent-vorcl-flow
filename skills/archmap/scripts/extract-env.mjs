@@ -1,8 +1,11 @@
 #!/usr/bin/env node
-// archmap extract-env.mjs — фаза 1: env-переменные (process.env + .env.example),
-// внешние сервисы (известные SDK в deps) и ПОЛНЫЙ техстек: каждая зависимость всех
-// package.json (dependencies + devDependencies) становится узлом tech с meta.category —
-// именно по category lib/graph.mjs buildGroups строит блоки верхнего уровня карты.
+// archmap extract-env.mjs — фаза 1: env-переменные (process.env + .env.example + .mcp.json),
+// внешние системы (svc) и ПОЛНЫЙ техстек: каждая зависимость всех package.json
+// (dependencies + devDependencies) становится узлом tech с meta.category — именно по
+// category lib/graph.mjs buildGroups строит блоки верхнего уровня карты.
+// Внешняя система находится по ЛЮБОМУ доказательству — строка подключения в коде,
+// MCP-сервер, имя env-переменной, зависимость (сила: dsn > mcp > env > dep), и всегда
+// остаётся ОДНИМ узлом svc:<slug> с человекочитаемым label.
 // Использование: node extract-env.mjs --root <target> --plan <plan.json> --out <env.part.json>
 
 import path from 'node:path'
@@ -10,6 +13,10 @@ import {
   parseArgs, readText, readJson, lineOfIndex, makeNode, makeEdge, partFile, writeJson, loadPlan,
 } from './lib/core.mjs'
 import { RE, matchAll } from './lib/ts.mjs'
+import {
+  EVIDENCE_RANK, DSN_RE, serviceForEnv, serviceForDep, serviceForDsn, serviceForMcp,
+  mcpHaystack, mcpEnvNames,
+} from './lib/services.mjs'
 
 const args = parseArgs(process.argv.slice(2), {
   root: { flag: '--root', default: process.cwd() },
@@ -28,17 +35,21 @@ const edges = new Map()
 const addNode = (node) => { if (!nodes.has(node.id)) nodes.set(node.id, node) }
 const addEdge = (edge) => { if (!edges.has(edge.id)) edges.set(edge.id, edge) }
 
-// ── Известные SDK → внешний сервис (только белый список) ─────────────────────
-const SVC_DEPS = {
-  'stripe': 'stripe', 'twilio': 'twilio', 'resend': 'resend', '@sendgrid/mail': 'sendgrid',
-  'aws-sdk': 'aws', 'firebase': 'firebase', 'firebase-admin': 'firebase',
-  'posthog-node': 'posthog', 'posthog-js': 'posthog', 'googleapis': 'google',
-  '@anthropic-ai/sdk': 'anthropic', 'openai': 'openai', 'ai': 'vercel-ai',
+// ── Внешние системы: копим доказательства, узел создаём один раз в конце ─────
+// Таблица распознавания живёт в lib/services.mjs и общая с extract-api/extract-agents.
+const serviceHits = new Map() // slug → {service, source, evidence, extra}
+function noteService (service, source, evidence, extra = {}) {
+  const previous = serviceHits.get(service.slug)
+  if (!previous) {
+    serviceHits.set(service.slug, { service, source, evidence, extra: { ...extra } })
+    return
+  }
+  Object.assign(previous.extra, extra)
+  if (EVIDENCE_RANK[evidence] > EVIDENCE_RANK[previous.evidence]) {
+    previous.evidence = evidence
+    previous.source = source
+  }
 }
-const SVC_PREFIXES = [
-  ['@aws-sdk/', 'aws'], ['@sentry/', 'sentry'], ['@supabase/', 'supabase'], ['@slack/', 'slack'],
-]
-const svcOf = (dep) => SVC_DEPS[dep] ?? SVC_PREFIXES.find(([prefix]) => dep.startsWith(prefix))?.[1] ?? null
 
 // ── Категории техстека: точное имя → префикс скоупа → эвристика → 'other' ────
 // Категория — не украшение: это ключ группировки (buildGroups → grp:infra:tech:<category>),
@@ -184,7 +195,10 @@ function categorize (name) {
 const workspaceNames = new Set((plan.repo?.packages ?? []).map((pkg) => pkg.name))
 const isTechDep = (dep) => !dep.startsWith('@types/') && !workspaceNames.has(dep)
 
-// ── 1. Env-переменные: process.env в коде + ребро reads-env от модуля ────────
+// ── 1. Env-переменные: process.env в коде + ребро reads-env от модуля.
+// Тем же проходом ищем строки подключения (схемы mongodb, postgres, redis, amqp) —
+// файл читается ровно один раз.
+const dsnEdges = []
 for (const file of plan.files?.code ?? []) {
   const text = readText(path.join(root, file))
   if (!text) continue
@@ -197,6 +211,15 @@ for (const file of plan.files?.code ?? []) {
     }))
     // module-узлы создаёт extract-modules; недостающие endpoint'ы merge закроет stub'ом
     addEdge(makeEdge({ kind: 'reads-env', from: `module:${file}`, to: `env:${name}`, source: { file, line } }))
+  }
+  for (const { match, index } of matchAll(DSN_RE, text)) {
+    const service = serviceForDsn(match[1])
+    if (!service) continue
+    const line = lineOfIndex(text, index)
+    noteService(service, { file, line }, 'dsn', { dsn: `${match[1].toLowerCase()}://` })
+    dsnEdges.push(makeEdge({
+      kind: 'uses', from: `module:${file}`, to: `svc:${service.slug}`, source: { file, line },
+    }))
   }
 }
 
@@ -220,6 +243,36 @@ for (const file of plan.files?.envFiles ?? []) {
   }
 }
 
+// ── 1c. Переменные и системы из .mcp.json: чем живут MCP-серверы ─────────────
+// Ребро mcp→svc/env рисует extract-api; здесь заводим сами узлы, чтобы merge не
+// закрывал их stub'ами.
+for (const file of plan.files?.mcpJson ?? []) {
+  const json = readJson(path.join(root, file))
+  const text = readText(path.join(root, file)) ?? ''
+  const lineOfToken = (token, from) => {
+    const at = text.indexOf(token, from)
+    return at === -1 ? null : { at, line: lineOfIndex(text, at) }
+  }
+  for (const [name, config] of Object.entries(json?.mcpServers ?? {})) {
+    const server = lineOfToken(`"${name}"`, 0)
+    const serverLine = server?.line ?? 1
+    for (const variable of mcpEnvNames(config)) {
+      const found = lineOfToken(variable, server?.at ?? 0)
+      const id = `env:${variable}`
+      if (nodes.has(id)) {
+        nodes.get(id).meta.inMcp = true
+      } else {
+        addNode(makeNode({
+          id, kind: 'env', layer: 'infra', label: variable,
+          source: { file, line: found?.line ?? serverLine }, meta: { inMcp: true },
+        }))
+      }
+    }
+    const service = serviceForMcp(name, mcpHaystack(config))
+    if (service) noteService(service, { file, line: serverLine }, 'mcp', { mcp: name })
+  }
+}
+
 // ── 2+3. Внешние сервисы (svc) и весь техстек (tech) из deps всех package.json ─
 // svc и tech намеренно сосуществуют: у них разные kind и разный смысл на карте
 // («мы платим этому сервису» vs «в коде стоит эта библиотека»).
@@ -231,13 +284,8 @@ for (const file of plan.files?.packageJson ?? []) {
     for (const [dep, version] of Object.entries(pkg[section] ?? {})) {
       const at = text.indexOf(`"${dep}":`)
       const source = { file, line: at === -1 ? 1 : lineOfIndex(text, at) }
-      const svc = svcOf(dep)
-      if (svc) {
-        addNode(makeNode({
-          id: `svc:${svc}`, kind: 'external-service', layer: 'infra', label: svc,
-          source, meta: { dep },
-        }))
-      }
+      const service = serviceForDep(dep)
+      if (service) noteService(service, source, 'dep', { dep })
       // peer — контракт для потребителя пакета, а не стек самого репо
       if (section === 'peerDependencies' || !isTechDep(dep)) continue
       const id = `tech:${dep}`
@@ -261,6 +309,31 @@ for (const file of plan.files?.packageJson ?? []) {
   }
 }
 
+// ── 4. Материализация внешних систем + рёбра env→svc и module→svc ───────────
+// env-переменная — самое наглядное доказательство «мы ходим в эту систему»:
+// MONGODB_URI → MongoDB, TWILIO_* → Twilio. Считаем ПОСЛЕ сбора всех env-узлов,
+// чтобы у ребра был source именно строки объявления переменной.
+for (const node of [...nodes.values()]) {
+  if (node.kind !== 'env') continue
+  const service = serviceForEnv(node.label)
+  if (service) noteService(service, node.source, 'env', { env: node.label })
+}
+for (const { service, source, evidence, extra } of serviceHits.values()) {
+  addNode(makeNode({
+    id: `svc:${service.slug}`, kind: 'external-service', layer: 'infra', label: service.label,
+    source, meta: { label: service.label, category: service.category, evidence, ...extra },
+  }))
+}
+for (const node of [...nodes.values()]) {
+  if (node.kind !== 'env') continue
+  const service = serviceForEnv(node.label)
+  if (!service || !serviceHits.has(service.slug)) continue
+  addEdge(makeEdge({
+    kind: 'uses', from: node.id, to: `svc:${service.slug}`, source: node.source,
+  }))
+}
+for (const edge of dsnEdges) addEdge(edge)
+
 // ── Запись part-файла ────────────────────────────────────────────────────────
 const nodeList = [...nodes.values()]
 const edgeList = [...edges.values()]
@@ -269,10 +342,17 @@ const byCategory = {}
 for (const node of techNodes) {
   byCategory[node.meta.category] = (byCategory[node.meta.category] ?? 0) + 1
 }
+const serviceNodes = nodeList.filter((node) => node.kind === 'external-service')
 const stats = {
   env: nodeList.filter((node) => node.kind === 'env').length,
-  services: nodeList.filter((node) => node.kind === 'external-service').length,
+  services: serviceNodes.length,
   tech: techNodes.length,
+  readsEnvEdges: edgeList.filter((edge) => edge.kind === 'reads-env').length,
+  serviceEdges: edgeList.filter((edge) => edge.kind === 'uses').length,
+  servicesByEvidence: serviceNodes.reduce((acc, node) => {
+    acc[node.meta.evidence] = (acc[node.meta.evidence] ?? 0) + 1
+    return acc
+  }, {}),
   techByCategory: Object.fromEntries(Object.keys(byCategory).sort().map((key) => [key, byCategory[key]])),
 }
 writeJson(args.out, partFile({ part: 'env', root, nodes: nodeList, edges: edgeList, stats }))
@@ -281,5 +361,10 @@ const categorySummary = Object.entries(stats.techByCategory)
   .map(([category, count]) => `${category} ${count}`)
   .join(', ')
 console.log(`archmap extract-env: ${stats.env} env, ${stats.services} services, ` +
-  `${stats.tech} tech, ${edgeList.length} reads-env edges → ${args.out}`)
+  `${stats.tech} tech, ${stats.readsEnvEdges} reads-env + ${stats.serviceEdges} uses edges → ${args.out}`)
+if (serviceNodes.length) {
+  console.log('  внешние системы: ' + serviceNodes
+    .map((node) => `${node.label} (${node.meta.category}/${node.meta.evidence})`)
+    .join(', '))
+}
 if (categorySummary) console.log(`  tech по категориям: ${categorySummary}`)

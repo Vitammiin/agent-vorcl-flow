@@ -12,6 +12,7 @@ import {
   parseArgs, readText, readJson, lineOfIndex, makeNode, makeEdge, partFile, writeJson, loadPlan,
 } from './lib/core.mjs'
 import { loadTypeScript, parseSource, lineOf, RE, matchAll } from './lib/ts.mjs'
+import { serviceForMcp, mcpHaystack, mcpEnvNames } from './lib/services.mjs'
 
 const args = parseArgs(process.argv.slice(2), {
   root: { flag: '--root', default: process.cwd() },
@@ -461,6 +462,10 @@ function compressCommand(config) {
   return joined.length > 100 ? joined.slice(0, 99) + '…' : joined
 }
 
+// MCP-сервер сам по себе — чёрный ящик; ценно то, ЧТО за ним стоит.
+// Систему узнаём по имени сервера И по строке запуска (mongodb-mcp-server → MongoDB,
+// @modelcontextprotocol/server-postgres → PostgreSQL, https://mcp.render.com → Render).
+// Узлы svc:* создаёт extract-env по той же таблице lib/services.mjs — здесь только рёбра.
 function extractMcpJson() {
   for (const file of planFiles.mcpJson ?? []) {
     const json = readJson(path.join(root, file))
@@ -468,10 +473,28 @@ function extractMcpJson() {
     for (const [name, config] of Object.entries(json?.mcpServers ?? {})) {
       const keyMatch = new RegExp(`"${escapeRegExp(name)}"\\s*:`).exec(text)
       const line = keyMatch ? lineOfIndex(text, keyMatch.index) : 1
+      const id = `mcp:${name}`
+      const haystack = mcpHaystack(config)
+      const service = serviceForMcp(name, haystack)
+      const meta = { command: compressCommand(config) }
+      if (service) meta.service = service.slug
       addNode(makeNode({
-        id: `mcp:${name}`, kind: 'mcp-server', layer: 'api', label: name,
-        source: { file, line }, meta: { command: compressCommand(config) },
+        id, kind: 'mcp-server', layer: 'api', label: name,
+        source: { file, line }, meta,
       }))
+      if (service) {
+        addEdge(makeEdge({
+          kind: 'uses', from: id, to: `svc:${service.slug}`,
+          source: { file, line }, meta: { via: 'mcp-command' },
+        }))
+      }
+      for (const variable of mcpEnvNames(config)) {
+        const at = text.indexOf(variable, keyMatch?.index ?? 0)
+        addEdge(makeEdge({
+          kind: 'reads-env', from: id, to: `env:${variable}`,
+          source: { file, line: at === -1 ? line : lineOfIndex(text, at) },
+        }))
+      }
     }
   }
 }
@@ -551,8 +574,13 @@ const stats = {
   mcpServers: count('mcp-server'),
   mcpTools: count('mcp-tool'),
   middleware: count('middleware'),
+  mcpServiceEdges: edgeList.filter((edge) => edge.from.startsWith('mcp:') && edge.to.startsWith('svc:')).length,
+  mcpEnvEdges: edgeList.filter((edge) => edge.from.startsWith('mcp:') && edge.to.startsWith('env:')).length,
 }
 writeJson(args.out, partFile({ part: 'api', root, nodes: nodeList, edges: edgeList, stats }))
 console.log(`archmap extract-api: ${stats.routes} routes, ${stats.webhooks} webhooks, ` +
   `${stats.ws} ws, ${stats.cron} cron, ${stats.mcpServers} mcp-servers, ${stats.mcpTools} mcp-tools, ` +
   `${stats.middleware} middleware → ${args.out}`)
+if (stats.mcpServiceEdges || stats.mcpEnvEdges) {
+  console.log(`  MCP-связи: ${stats.mcpServiceEdges} → внешние системы, ${stats.mcpEnvEdges} → env`)
+}

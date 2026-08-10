@@ -30,10 +30,15 @@ const candidates = [
   '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
   '/Applications/Chromium.app/Contents/MacOS/Chromium',
   '/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge',
+  // любой Chromium-браузер печатает через тот же --print-to-pdf
+  '/Applications/Brave Browser.app/Contents/MacOS/Brave Browser',
+  '/Applications/Vivaldi.app/Contents/MacOS/Vivaldi',
+  '/Applications/Arc.app/Contents/MacOS/Arc',
+  '/Applications/Opera.app/Contents/MacOS/Opera',
 ].filter(Boolean)
 let chrome = candidates.find((candidate) => fs.existsSync(candidate)) ?? null
 if (!chrome) {
-  for (const name of ['google-chrome', 'chromium', 'chromium-browser']) {
+  for (const name of ['google-chrome', 'chromium', 'chromium-browser', 'brave-browser', 'microsoft-edge']) {
     try {
       const found = execFileSync('which', [name], { encoding: 'utf8' }).trim()
       if (found) { chrome = found; break }
@@ -43,7 +48,7 @@ if (!chrome) {
   }
 }
 if (!chrome) {
-  console.log('archmap to-pdf: Chrome/Chromium/Edge не найден — PDF пропущен.')
+  console.log('archmap to-pdf: Chromium-браузер (Chrome/Chromium/Edge/Brave/Vivaldi/Arc/Opera) не найден — PDF пропущен.')
   console.log('Подсказка: открой architecture.html в любом браузере и Cmd+P → Save as PDF (print-CSS уже встроен).')
   process.exit(0)
 }

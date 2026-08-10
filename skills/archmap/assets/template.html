@@ -504,11 +504,41 @@ const gOverview = s('g')
 svg.append(gDetails, gOverview)
 
 /* ── kind-иконки слоёв (24×24, только SVG-примитивы) ──────── */
+// Иконка по смыслу сущности: категория внешней системы или библиотеки важнее
+// слоя — так на карте видно, что MongoDB это база, а Twilio — канал сообщений.
 function iconFor (layerId, x, y, size, color) {
   const g = s('g', { class: 'gicon', transform: `translate(${x},${y}) scale(${(size / 24).toFixed(4)})` })
   g.setAttribute('stroke', color)
   const P = d => s('path', { d })
-  if (layerId === 'data') {
+  if (layerId === 'cat:database') {
+    g.append(s('ellipse', { cx: 12, cy: 5, rx: 8.6, ry: 3.2 }),
+      P('M3.4 5v14c0 1.7 3.9 3 8.6 3s8.6-1.3 8.6-3V5'),
+      P('M20.6 12c0 1.7-3.9 3-8.6 3s-8.6-1.3-8.6-3'))
+  } else if (layerId === 'cat:cache-queue') {
+    g.append(P('M3 6.5 12 2.5l9 4-9 4-9-4Z'), P('M3 12l9 4 9-4'), P('M3 17.5l9 4 9-4'))
+  } else if (layerId === 'cat:ai') {
+    g.append(s('circle', { cx: 12, cy: 12, r: 3.1 }),
+      P('M12 8.9V4.4'), P('M12 15.1v4.5'), P('M8.9 12H4.4'), P('M15.1 12h4.5'),
+      P('M9.8 9.8 6.6 6.6'), P('M14.2 14.2l3.2 3.2'), P('M14.2 9.8l3.2-3.2'), P('M9.8 14.2l-3.2 3.2'))
+  } else if (layerId === 'cat:payments') {
+    g.append(s('rect', { x: 2.4, y: 5, width: 19.2, height: 14, rx: 2.6 }), P('M2.4 10h19.2'), P('M6 15h4'))
+  } else if (layerId === 'cat:messaging') {
+    g.append(s('rect', { x: 2.4, y: 4.6, width: 19.2, height: 14.8, rx: 2.4 }), P('M2.8 6.4 12 13l9.2-6.6'))
+  } else if (layerId === 'cat:auth') {
+    g.append(s('rect', { x: 4.4, y: 10.6, width: 15.2, height: 10.4, rx: 2.4 }),
+      P('M8 10.6V7.6a4 4 0 1 1 8 0v3'), s('circle', { cx: 12, cy: 15.6, r: 1.4 }))
+  } else if (layerId === 'cat:observability') {
+    g.append(P('M3 20.4h18'), P('M3 16l5-5 4 3.4 5.6-7.4'), s('circle', { cx: 17.6, cy: 7, r: 1.5 }))
+  } else if (layerId === 'cat:search') {
+    g.append(s('circle', { cx: 10.6, cy: 10.6, r: 6.6 }), P('M15.4 15.4 21 21'))
+  } else if (layerId === 'cat:framework') {
+    g.append(s('rect', { x: 2.6, y: 2.6, width: 8, height: 8, rx: 1.8 }),
+      s('rect', { x: 13.4, y: 2.6, width: 8, height: 8, rx: 1.8 }),
+      s('rect', { x: 2.6, y: 13.4, width: 8, height: 8, rx: 1.8 }),
+      s('rect', { x: 13.4, y: 13.4, width: 8, height: 8, rx: 1.8 }))
+  } else if (layerId === 'cat:testing') {
+    g.append(P('M9 2.6v6.2L4.2 18a2.4 2.4 0 0 0 2.1 3.6h11.4a2.4 2.4 0 0 0 2.1-3.6L15 8.8V2.6'), P('M8 2.6h8'))
+  } else if (layerId === 'data') {
     g.append(s('ellipse', { cx: 12, cy: 5, rx: 8.6, ry: 3.2 }),
       P('M3.4 5v14c0 1.7 3.9 3 8.6 3s8.6-1.3 8.6-3V5'),
       P('M20.6 12c0 1.7-3.9 3-8.6 3s-8.6-1.3-8.6-3'))
@@ -542,6 +572,17 @@ function iconFor (layerId, x, y, size, color) {
     g.append(P('M17.6 10.2h-1.3A7.6 7.6 0 1 0 9 19.6h8.6a4.7 4.7 0 0 0 0-9.4z'))
   }
   return g
+}
+
+// Группа библиотек/сервисов рисуется иконкой своей категории, остальные — иконкой слоя.
+function iconKeyOf (item) {
+  const id = String(item.id || '')
+  const techCat = id.match(/^grp:infra:tech:(.+)$/)
+  if (techCat) return `cat:${techCat[1]}`
+  if (id === 'grp:infra:services') return 'cat:cloud'
+  if (item.counts && item.counts.store) return 'cat:cache-queue'
+  if (item.counts && (item.counts['llm-call'] || item.counts.agent)) return item.layer
+  return item.layer
 }
 
 /* ── ДЕТАЛИ: колонки по слоям + barycenter (3 прохода) ────── */
@@ -660,6 +701,12 @@ function renderNode (n, p) {
     if (n.meta && Array.isArray(n.meta.middleware) && n.meta.middleware.length) extras.push(n.meta.middleware.join(' · '))
     if (n.meta && n.meta.auth) extras.push(String(n.meta.auth))
     g.append(st(12, 35, extras.join('  ·  ') || (n.meta && n.meta.framework) || '', 'nmut', null, 34))
+  } else if ((n.kind === 'external-service' || n.kind === 'tech') && n.meta && n.meta.category) {
+    // внешняя система и библиотека узнаются по значку категории, а не только по имени
+    g.append(iconFor(`cat:${n.meta.category}`, 10, 12, 17, layerColor(n.layer)))
+    g.append(st(33, 19, n.meta.label || n.label, 'nlabel', null, 24), kindTag)
+    const sub = [n.meta.version, n.meta.category].filter(Boolean).join(' · ') || (n.source && n.source.file) || ''
+    g.append(st(33, 35, sub, 'nmut', null, 30))
   } else {
     g.append(st(12, 19, n.label, 'nlabel', null, 28), kindTag)
     const sub = n.kind === 'enum' && n.meta && Array.isArray(n.meta.values)
@@ -945,7 +992,7 @@ function renderCard (item, p, maxSize) {
   const headFix = s('rect', { class: 'ghead', y: 30, width: p.w, height: 14, fill: color, 'fill-opacity': .12 })
   const accent = s('rect', { width: 4.5, height: p.h, rx: 2.2, fill: color, 'fill-opacity': .85 })
   g.append(head, headFix, accent, s('line', { x1: 0, y1: 44, x2: p.w, y2: 44, stroke: color, 'stroke-opacity': .28 }))
-  g.append(iconFor(item.layer, 15, 10, 24, color))
+  g.append(iconFor(iconKeyOf(item), 15, 10, 24, color))
   g.append(st(50, 30, item.label, 'gtitle', null, 22))
 
   g.append(st(16, 68, fmtCounts(item.counts, `${item.size} nodes`), 'gsub', null, 34))
@@ -981,7 +1028,7 @@ function renderExpanded (g0, p) {
   g.append(s('rect', { width: p.w, height: EXP_HEAD - 12, rx: 18, fill: color, 'fill-opacity': .1 }),
     s('rect', { y: EXP_HEAD - 26, width: p.w, height: 14, fill: color, 'fill-opacity': .1 }),
     s('line', { x1: 0, y1: EXP_HEAD - 12, x2: p.w, y2: EXP_HEAD - 12, stroke: color, 'stroke-opacity': .3 }))
-  g.append(iconFor(g0.layer, 18, 9, 24, color))
+  g.append(iconFor(iconKeyOf(g0), 18, 9, 24, color))
   g.append(st(54, 29, g0.label, 'exphead', null, 46))
   g.append(st(54, 44, fmtCounts(g0.counts, `${g0.size} nodes`) + (g0.source && g0.source.file ? '  ·  ' + g0.source.file : ''), 'expsub', null, 78))
 

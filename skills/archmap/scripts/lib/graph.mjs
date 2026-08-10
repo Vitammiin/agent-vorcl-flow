@@ -390,7 +390,8 @@ export function buildGroups (nodes, edges, options = {}) {
     if (group.weak && group.members.length < minWeak) {
       const id = `grp:${group.layer}:misc`
       if (!spill.has(id)) {
-        spill.set(id, { id, layer: group.layer, label: 'Прочее', kind: 'group', members: [], counts: {}, source: group.source, inferred: group.inferred })
+        const label = group.layer === 'infra' ? 'Config & env' : 'Прочее'
+        spill.set(id, { id, layer: group.layer, label, kind: 'group', members: [], counts: {}, source: group.source, inferred: group.inferred })
       }
       const target = spill.get(id)
       target.members.push(...group.members)
