@@ -66,6 +66,25 @@ npx github:Vitammiin/agent-vorcl-flow --kimi     # только Kimi CLI
 
 > Инсталлер не вписывает секреты — он лишь создаёт пустой `.env` из шаблона. Ключи ты добавляешь туда сам (см. [MCP и секреты](#mcp-и-секреты)).
 
+### Обновление до последней версии
+
+Повторно запусти инсталлер с npm-тегом `latest`:
+
+```bash
+npx --yes agent-vorcl-flow@latest
+```
+
+Чтобы обновить только один рантайм, оставь тот же флаг, который использовался при установке:
+
+```bash
+npx --yes agent-vorcl-flow@latest --claude
+npx --yes agent-vorcl-flow@latest --codex
+npx --yes agent-vorcl-flow@latest --cursor
+npx --yes agent-vorcl-flow@latest --kimi
+```
+
+Обновление перезаписывает управляемые Agent-Vorcl-Flow skills, agents, hooks, launcher и конфигурационные блоки. Существующий `~/.config/agent-vorcl-flow/.env` с секретами остаётся без изменений; upstream-скиллы Firecrawl также сохраняются. После обновления перезапусти coding client (либо выполни `/reload-plugins` в Claude Code).
+
 ### Альтернативные способы (Claude Code)
 
 ```bash

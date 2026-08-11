@@ -75,6 +75,25 @@ What the installer does:
 
 > The installer never fills in your secrets — it only creates an empty `.env` from the template. You add keys there (see [Configuration](#configuration-mcp--keys)).
 
+### Update to the latest version
+
+Run the installer again with the npm `latest` tag:
+
+```bash
+npx --yes agent-vorcl-flow@latest
+```
+
+To update only one runtime, keep the same runtime flag you used during installation:
+
+```bash
+npx --yes agent-vorcl-flow@latest --claude
+npx --yes agent-vorcl-flow@latest --codex
+npx --yes agent-vorcl-flow@latest --cursor
+npx --yes agent-vorcl-flow@latest --kimi
+```
+
+The update overlays Agent-Vorcl-Flow-managed skills, agents, hooks, launcher, and configuration blocks. It keeps your existing `~/.config/agent-vorcl-flow/.env` and its secrets unchanged, and preserves upstream Firecrawl skills. Restart the updated coding client afterward (or run `/reload-plugins` in Claude Code).
+
 ### Alternative installs (Claude Code)
 
 ```bash
