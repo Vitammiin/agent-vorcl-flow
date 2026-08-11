@@ -1,0 +1,75 @@
+name: Publish to npm
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: npm-publish-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    if: github.repository == 'Vitammiin/agent-vorcl-flow'
+    runs-on: ubuntu-latest
+    environment: npm-publish
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Check out the tagged source
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node.js and npm registry
+        uses: actions/setup-node@v6
+        with:
+          node-version: "24"
+          registry-url: "https://registry.npmjs.org"
+          package-manager-cache: false
+
+      - name: Pin an OIDC-capable npm CLI
+        run: npm install --global npm@11.12.1
+
+      - name: Verify tag, package version, and main ancestry
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          tag_version="${GITHUB_REF_NAME#v}"
+          package_version="$(node -p "require('./package.json').version")"
+          tagged_commit="$(git rev-parse "${GITHUB_SHA}^{commit}")"
+
+          if [[ "$tag_version" != "$package_version" ]]; then
+            echo "::error::Tag v${tag_version} does not match package.json ${package_version}"
+            exit 1
+          fi
+
+          git fetch --no-tags origin main:refs/remotes/origin/main
+          if ! git merge-base --is-ancestor "$tagged_commit" origin/main; then
+            echo "::error::Tagged commit is not contained in origin/main"
+            exit 1
+          fi
+
+      - name: Check mirrored skills and commands
+        run: bash scripts/sync-check.sh
+
+      - name: Check JavaScript syntax
+        shell: bash
+        run: |
+          set -euo pipefail
+          while IFS= read -r -d '' file; do
+            node --check "$file"
+          done < <(git ls-files -z '*.js' '*.mjs')
+
+      - name: Preview package contents
+        run: npm publish --dry-run --access public
+
+      - name: Publish with npm Trusted Publishing
+        run: npm publish --access public
