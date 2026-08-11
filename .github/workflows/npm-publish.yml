@@ -35,7 +35,7 @@ jobs:
           package-manager-cache: false
 
       - name: Pin an OIDC-capable npm CLI
-        run: npm install --global npm@11.12.1
+        run: npm install --global npm@11.18.0
 
       - name: Verify tag, package version, and main ancestry
         shell: bash
