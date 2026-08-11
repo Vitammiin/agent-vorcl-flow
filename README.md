@@ -15,14 +15,14 @@ One `npx` command installs them. No remote backend or cloud hosting: your coding
 ![License](https://img.shields.io/badge/license-MIT-green)
 
 <details>
-<summary>🌐 <strong>Languages (22)</strong> — English · Русский · Українська · +19</summary>
+<summary>🌐 <strong>Languages (22)</strong> — all translations are stored in Git</summary>
 
-[**English**](./README.md) · [Русский](./README.ru.md) · [Українська](https://translate.google.com/translate?sl=en&tl=uk&u=https%3A%2F%2Fgithub.com%2FVitammiin%2Fagent-vorcl-flow) · [Deutsch](https://translate.google.com/translate?sl=en&tl=de&u=https%3A%2F%2Fgithub.com%2FVitammiin%2Fagent-vorcl-flow) · [Français](https://translate.google.com/translate?sl=en&tl=fr&u=https%3A%2F%2Fgithub.com%2FVitammiin%2Fagent-vorcl-flow) · [Español](https://translate.google.com/translate?sl=en&tl=es&u=https%3A%2F%2Fgithub.com%2FVitammiin%2Fagent-vorcl-flow)<br>
-[Português](https://translate.google.com/translate?sl=en&tl=pt&u=https%3A%2F%2Fgithub.com%2FVitammiin%2Fagent-vorcl-flow) · [Italiano](https://translate.google.com/translate?sl=en&tl=it&u=https%3A%2F%2Fgithub.com%2FVitammiin%2Fagent-vorcl-flow) · [Polski](https://translate.google.com/translate?sl=en&tl=pl&u=https%3A%2F%2Fgithub.com%2FVitammiin%2Fagent-vorcl-flow) · [Türkçe](https://translate.google.com/translate?sl=en&tl=tr&u=https%3A%2F%2Fgithub.com%2FVitammiin%2Fagent-vorcl-flow) · [中文](https://translate.google.com/translate?sl=en&tl=zh-CN&u=https%3A%2F%2Fgithub.com%2FVitammiin%2Fagent-vorcl-flow) · [日本語](https://translate.google.com/translate?sl=en&tl=ja&u=https%3A%2F%2Fgithub.com%2FVitammiin%2Fagent-vorcl-flow)<br>
-[한국어](https://translate.google.com/translate?sl=en&tl=ko&u=https%3A%2F%2Fgithub.com%2FVitammiin%2Fagent-vorcl-flow) · [العربية](https://translate.google.com/translate?sl=en&tl=ar&u=https%3A%2F%2Fgithub.com%2FVitammiin%2Fagent-vorcl-flow) · [Nederlands](https://translate.google.com/translate?sl=en&tl=nl&u=https%3A%2F%2Fgithub.com%2FVitammiin%2Fagent-vorcl-flow) · [Čeština](https://translate.google.com/translate?sl=en&tl=cs&u=https%3A%2F%2Fgithub.com%2FVitammiin%2Fagent-vorcl-flow) · [Română](https://translate.google.com/translate?sl=en&tl=ro&u=https%3A%2F%2Fgithub.com%2FVitammiin%2Fagent-vorcl-flow) · [Magyar](https://translate.google.com/translate?sl=en&tl=hu&u=https%3A%2F%2Fgithub.com%2FVitammiin%2Fagent-vorcl-flow)<br>
-[Български](https://translate.google.com/translate?sl=en&tl=bg&u=https%3A%2F%2Fgithub.com%2FVitammiin%2Fagent-vorcl-flow) · [Српски](https://translate.google.com/translate?sl=en&tl=sr&u=https%3A%2F%2Fgithub.com%2FVitammiin%2Fagent-vorcl-flow) · [हिन्दी](https://translate.google.com/translate?sl=en&tl=hi&u=https%3A%2F%2Fgithub.com%2FVitammiin%2Fagent-vorcl-flow) · [Tiếng Việt](https://translate.google.com/translate?sl=en&tl=vi&u=https%3A%2F%2Fgithub.com%2FVitammiin%2Fagent-vorcl-flow)
+[**English**](./README.md) · [Русский](./README.ru.md) · [Українська](./README.uk.md) · [Deutsch](./README.de.md) · [Français](./README.fr.md) · [Español](./README.es.md)<br>
+[Português](./README.pt.md) · [Italiano](./README.it.md) · [Polski](./README.pl.md) · [Türkçe](./README.tr.md) · [中文](./README.zh-CN.md) · [日本語](./README.ja.md)<br>
+[한국어](./README.ko.md) · [العربية](./README.ar.md) · [Nederlands](./README.nl.md) · [Čeština](./README.cs.md) · [Română](./README.ro.md) · [Magyar](./README.hu.md)<br>
+[Български](./README.bg.md) · [Српски](./README.sr.md) · [हिन्दी](./README.hi.md) · [Tiếng Việt](./README.vi.md)
 
-<sub>The 20 additional languages are machine-translated from the canonical English README.</sub>
+<sub>English is canonical; every link above opens a repository-local README file.</sub>
 </details>
 
 </div>

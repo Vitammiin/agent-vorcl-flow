@@ -7,6 +7,10 @@ and this project follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Added
+
+- Repository-local README translations for all 22 documented languages, with automated parity, link, anchor, script, and code-block validation.
+
 ## [2.3.1] - 2026-08-11
 
 ### Fixed

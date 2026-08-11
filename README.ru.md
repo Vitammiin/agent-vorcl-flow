@@ -6,14 +6,14 @@
 Ставится одной командой `npx`. Без удалённого бэкенда и облачного хостинга — всё исполняется локально.
 
 <details>
-<summary>🌐 <strong>Языки (22)</strong> — English · Русский · Українська · +19</summary>
+<summary>🌐 <strong>Languages (22)</strong> — all translations are stored in Git</summary>
 
-[English](./README.md) · [**Русский**](./README.ru.md) · [Українська](https://translate.google.com/translate?sl=en&tl=uk&u=https%3A%2F%2Fgithub.com%2FVitammiin%2Fagent-vorcl-flow) · [Deutsch](https://translate.google.com/translate?sl=en&tl=de&u=https%3A%2F%2Fgithub.com%2FVitammiin%2Fagent-vorcl-flow) · [Français](https://translate.google.com/translate?sl=en&tl=fr&u=https%3A%2F%2Fgithub.com%2FVitammiin%2Fagent-vorcl-flow) · [Español](https://translate.google.com/translate?sl=en&tl=es&u=https%3A%2F%2Fgithub.com%2FVitammiin%2Fagent-vorcl-flow)<br>
-[Português](https://translate.google.com/translate?sl=en&tl=pt&u=https%3A%2F%2Fgithub.com%2FVitammiin%2Fagent-vorcl-flow) · [Italiano](https://translate.google.com/translate?sl=en&tl=it&u=https%3A%2F%2Fgithub.com%2FVitammiin%2Fagent-vorcl-flow) · [Polski](https://translate.google.com/translate?sl=en&tl=pl&u=https%3A%2F%2Fgithub.com%2FVitammiin%2Fagent-vorcl-flow) · [Türkçe](https://translate.google.com/translate?sl=en&tl=tr&u=https%3A%2F%2Fgithub.com%2FVitammiin%2Fagent-vorcl-flow) · [中文](https://translate.google.com/translate?sl=en&tl=zh-CN&u=https%3A%2F%2Fgithub.com%2FVitammiin%2Fagent-vorcl-flow) · [日本語](https://translate.google.com/translate?sl=en&tl=ja&u=https%3A%2F%2Fgithub.com%2FVitammiin%2Fagent-vorcl-flow)<br>
-[한국어](https://translate.google.com/translate?sl=en&tl=ko&u=https%3A%2F%2Fgithub.com%2FVitammiin%2Fagent-vorcl-flow) · [العربية](https://translate.google.com/translate?sl=en&tl=ar&u=https%3A%2F%2Fgithub.com%2FVitammiin%2Fagent-vorcl-flow) · [Nederlands](https://translate.google.com/translate?sl=en&tl=nl&u=https%3A%2F%2Fgithub.com%2FVitammiin%2Fagent-vorcl-flow) · [Čeština](https://translate.google.com/translate?sl=en&tl=cs&u=https%3A%2F%2Fgithub.com%2FVitammiin%2Fagent-vorcl-flow) · [Română](https://translate.google.com/translate?sl=en&tl=ro&u=https%3A%2F%2Fgithub.com%2FVitammiin%2Fagent-vorcl-flow) · [Magyar](https://translate.google.com/translate?sl=en&tl=hu&u=https%3A%2F%2Fgithub.com%2FVitammiin%2Fagent-vorcl-flow)<br>
-[Български](https://translate.google.com/translate?sl=en&tl=bg&u=https%3A%2F%2Fgithub.com%2FVitammiin%2Fagent-vorcl-flow) · [Српски](https://translate.google.com/translate?sl=en&tl=sr&u=https%3A%2F%2Fgithub.com%2FVitammiin%2Fagent-vorcl-flow) · [हिन्दी](https://translate.google.com/translate?sl=en&tl=hi&u=https%3A%2F%2Fgithub.com%2FVitammiin%2Fagent-vorcl-flow) · [Tiếng Việt](https://translate.google.com/translate?sl=en&tl=vi&u=https%3A%2F%2Fgithub.com%2FVitammiin%2Fagent-vorcl-flow)
+[English](./README.md) · [**Русский**](./README.ru.md) · [Українська](./README.uk.md) · [Deutsch](./README.de.md) · [Français](./README.fr.md) · [Español](./README.es.md)<br>
+[Português](./README.pt.md) · [Italiano](./README.it.md) · [Polski](./README.pl.md) · [Türkçe](./README.tr.md) · [中文](./README.zh-CN.md) · [日本語](./README.ja.md)<br>
+[한국어](./README.ko.md) · [العربية](./README.ar.md) · [Nederlands](./README.nl.md) · [Čeština](./README.cs.md) · [Română](./README.ro.md) · [Magyar](./README.hu.md)<br>
+[Български](./README.bg.md) · [Српски](./README.sr.md) · [हिन्दी](./README.hi.md) · [Tiếng Việt](./README.vi.md)
 
-<sub>20 дополнительных языков переводятся автоматически из канонического README на английском.</sub>
+<sub>English is canonical; every link above opens a repository-local README file.</sub>
 </details>
 
 </div>
@@ -41,17 +41,17 @@ Agent-Vorcl-Flow превращает поддерживаемый coding agent 
 ### Установка (одна команда)
 
 ```bash
-# Ставит адаптеры для Claude Code, Codex, Cursor и Kimi CLI:
+# Installs adapters for Claude Code, Codex, Cursor, and Kimi CLI:
 npx github:Vitammiin/agent-vorcl-flow
 ```
 
 Один конкретный рантайм — флагом:
 
 ```bash
-npx github:Vitammiin/agent-vorcl-flow --claude   # только Claude Code
-npx github:Vitammiin/agent-vorcl-flow --codex    # только GPT Codex
-npx github:Vitammiin/agent-vorcl-flow --cursor   # только Cursor
-npx github:Vitammiin/agent-vorcl-flow --kimi     # только Kimi CLI
+npx github:Vitammiin/agent-vorcl-flow --claude   # Claude Code only
+npx github:Vitammiin/agent-vorcl-flow --codex    # GPT Codex only
+npx github:Vitammiin/agent-vorcl-flow --cursor   # Cursor only
+npx github:Vitammiin/agent-vorcl-flow --kimi     # Kimi CLI only
 ```
 
 Что делает инсталлер:
@@ -88,11 +88,11 @@ npx --yes agent-vorcl-flow@latest --kimi
 ### Альтернативные способы (Claude Code)
 
 ```bash
-# Только на текущую сессию (удобно попробовать):
-claude --plugin-dir /путь/к/agent-vorcl-flow
+# Load for the current session only (great for trying it out):
+claude --plugin-dir /path/to/agent-vorcl-flow
 
-# Или постоянно через локальный маркетплейс:
-/plugin marketplace add /путь/к/agent-vorcl-flow
+# Or install persistently from a local marketplace:
+/plugin marketplace add /path/to/agent-vorcl-flow
 /plugin install agent-vorcl-flow
 ```
 
@@ -106,15 +106,15 @@ claude --plugin-dir /путь/к/agent-vorcl-flow
 
 ### 1. Универсальная точка входа — просто сформулируй цель
 ```text
-/vorcl добавить корзину в чекаут
+/vorcl add a shopping cart to checkout
 /audit .
 ```
 `/vorcl` сам определяет, какому субагенту отдать работу, и ведёт полный цикл Task Master. `/audit` автоматически находит backend, frontend, mobile, data и infrastructure и создаёт доказательный `PROJECT_AUDIT.md`, используя все релевантные роли.
 
 ### 2. Обратиться к конкретному субагенту
 ```text
-@agent-vorcl-flow:architect  спроектируй биллинг для SaaS
-@agent-vorcl-flow:backend    добавь эндпоинт POST /invoices
+@agent-vorcl-flow:architect  design billing for a SaaS
+@agent-vorcl-flow:backend    add a POST /invoices endpoint
 ```
 
 ### 3. Запустить конкретную слэш-команду
@@ -130,8 +130,8 @@ claude --plugin-dir /путь/к/agent-vorcl-flow
 Любая нетривиальная задача идёт через **Task Master** (`task-master-ai`, MCP-сервер `task-master`):
 
 ```text
-цель → задачи (parse_prd / add_task) → next_task → get_task → expand_task
-     → реализация → проверка (testStrategy) → set_task_status done
+goal → tasks (parse_prd / add_task) → next_task → get_task → expand_task
+     → implement → verify (testStrategy) → set_task_status done
 ```
 
 Работа спланирована, чекпойнтится и возобновляема — ничего не объявляется «готовым» без прохождения проверки. Дисциплину задаёт скилл `workflow`, справочник команд — скилл `task-master`.
@@ -443,13 +443,13 @@ node skills/liveboard/scripts/server.mjs \
 Инсталлер создаёт его из [`.env.example`](./.env.example). Открой и впиши только те ключи, которыми пользуешься:
 
 ```dotenv
-ANTHROPIC_API_KEY=      # main-провайдер Task Master: Claude
-OPENAI_API_KEY=         # альтернативный main-провайдер: GPT
-PERPLEXITY_API_KEY=     # опционально: research-режим Task Master
-FIRECRAWL_API_KEY=      # веб-ресёрч firecrawl
+ANTHROPIC_API_KEY=      # Task Master main provider: Claude
+OPENAI_API_KEY=         # alternative main provider: GPT
+PERPLEXITY_API_KEY=     # optional: Task Master research mode
+FIRECRAWL_API_KEY=      # firecrawl web research
 GITHUB_TOKEN=           # github MCP
 
-# Для агента `database` — это подключение к БД ТВОЕГО проекта, не плагина:
+# For the `database` agent — these point at YOUR project's DB, not the plugin's:
 MONGODB_URI=            # mongodb://user:pass@host:27017/db
 REDIS_URL=              # redis://host:6379
 POSTGRES_URL=           # postgres://user:pass@host:5432/db
@@ -466,9 +466,9 @@ POSTGRES_URL=           # postgres://user:pass@host:5432/db
 Отдельно выбери, какой провайдер Task Master реально выполняет генерацию — само наличие ключа модель не переключает:
 
 ```bash
-/task-master:provider anthropic <model-id>   # Claude через ANTHROPIC_API_KEY
-/task-master:provider openai <model-id>      # GPT через OPENAI_API_KEY
-/task-master:provider codex-cli <model-id>   # ChatGPT OAuth через `codex login`
+/task-master:provider anthropic <model-id>   # Claude via ANTHROPIC_API_KEY
+/task-master:provider openai <model-id>      # GPT via OPENAI_API_KEY
+/task-master:provider codex-cli <model-id>   # ChatGPT OAuth via `codex login`
 ```
 
 Команда использует официальный `task-master models` и сохраняет в `.taskmaster/config.json` только выбор модели. `PERPLEXITY_API_KEY` опционален и нужен лишь тогда, когда Perplexity выбран как research-модель.
@@ -480,13 +480,13 @@ POSTGRES_URL=           # postgres://user:pass@host:5432/db
 ## Проверка установки
 
 ```bash
-claude plugin validate . --strict      # валидация манифеста и компонентов
-/plugin details agent-vorcl-flow       # список подхваченных агентов/скиллов/команд
-@agent-vorcl-flow:architect            # субагент появляется в typeahead
-/architect:analyze биллинг для SaaS    # запуск слэш-команды
+claude plugin validate . --strict      # validate the manifest and components
+/plugin details agent-vorcl-flow       # list the loaded agents / skills / commands
+@agent-vorcl-flow:architect            # the sub-agent appears in the typeahead
+/architect:analyze billing for a SaaS  # run a slash command
 
-# Cursor: после установки открой новое окно Agent
-/vorcl добавить корзину в checkout
+# Cursor: open a new Agent window after installation
+/vorcl add a shopping cart to checkout
 /backend-create-api POST /invoices
 ```
 
@@ -506,10 +506,10 @@ claude plugin validate . --strict      # валидация манифеста �
 
 ```bash
 codex
-> $vorcl  добавить корзину в чекаут
+> $vorcl  add a shopping cart to checkout
 > $backend-create-api  POST /invoices
 > $analyzer-audit
-codex --profile analyzer     # роль с повышенным reasoning effort
+codex --profile analyzer     # a role with higher reasoning effort
 ```
 
 Полная карта соответствий — в [`codex/README.md`](./codex/README.md).
@@ -545,8 +545,8 @@ Cursor использует тот же открытый формат `SKILL.md`
 
 ```bash
 npx github:Vitammiin/agent-vorcl-flow --kimi
-kimi mcp list          # список подключённых серверов
-kimi mcp test github   # проверить соединение и инструменты сервера
+kimi mcp list          # verify connected servers
+kimi mcp test github   # check a server's connection and tools
 kimi --agent-file ~/.kimi/agents/avf-expo-mobile.yaml
 ```
 
@@ -557,19 +557,18 @@ kimi --agent-file ~/.kimi/agents/avf-expo-mobile.yaml
 ## Структура проекта
 
 ```text
-.claude-plugin/plugin.json      # манифест плагина
-.claude-plugin/marketplace.json # локальный маркетплейс (для установки)
-agents/       22 определения субагентов (*.md)
-skills/       <скилл>/SKILL.md            (44 скилла; некоторые содержат references/scripts/tests/assets)
-commands/     <namespace>/<команда>.md    (135 команд, /namespace:команда, включая /vorcl и /audit)
-hooks/        hooks.json + SessionStart + PostToolUse guards (пустые catch, Expo architecture/UI boundaries)
+.claude-plugin/plugin.json      # plugin manifest
+.claude-plugin/marketplace.json # local marketplace (for install)
+agents/       22 sub-agent definitions (*.md)
+skills/       <skill>/SKILL.md            (44 skills; some ship references, scripts, tests or HTML assets)
+commands/     <namespace>/<command>.md    (135 commands, /namespace:command, including /vorcl and /audit)
+hooks/        hooks.json + SessionStart + PostToolUse guards (empty catch, Expo architecture/UI boundaries)
 .mcp.json     github, filesystem, postgres, mongodb, redis, docker, firecrawl, vercel, render, task-master, mermaid
-.env.example  шаблон единого файла ключей (→ ~/.config/agent-vorcl-flow/.env)
-bin/          install.mjs                 (npx-инсталлер)
-              mcp-env.mjs                 (launcher: читает .env и запускает stdio MCP-сервер)
-codex/        адаптер под GPT Codex (skills + config.toml + install.sh)
-cursor/       адаптер под Cursor (MCP-шаблон + инструкция)
-kimi/         адаптер под Kimi CLI (mcp.json + инструкция)
+.env.example  template for ~/.config/agent-vorcl-flow/.env (single key file for all runtimes)
+bin/          install.mjs (the npx installer) + mcp-env.mjs (cross-runtime MCP launcher / .env loader)
+codex/        GPT Codex adapter (skills + config.toml + install.sh)
+cursor/       Cursor adapter (MCP template + installation notes)
+kimi/         Kimi CLI adapter (skills install + Expo agent/hook + MCP)
 ```
 
 **Как это связано:** `agents/*.md` объявляют роль и в frontmatter `skills:` подключают навыки → скиллы из `skills/*/SKILL.md` автоподхватываются по описанию → команды `commands/<агент>/*.md` дают быстрые `/агент:команда` и делегируют субагенту → `.mcp.json` даёт агентам инструменты. Хук `SessionStart` сообщает Claude о наличии агентов.
