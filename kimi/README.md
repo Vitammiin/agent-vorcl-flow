@@ -1,6 +1,6 @@
 # Agent-Vorcl-Flow — адаптер для Kimi CLI
 
-Skills, нативный Expo custom agent, architecture hook и MCP-серверы для [Kimi CLI](https://github.com/MoonshotAI/kimi-cli) (MoonshotAI).
+Skills, нативный Expo custom agent, architecture + UI/motion hooks и MCP-серверы для [Kimi CLI](https://github.com/MoonshotAI/kimi-cli) (MoonshotAI).
 
 ## Установка
 
@@ -13,7 +13,7 @@ npx github:Vitammiin/agent-vorcl-flow --kimi
 2. создаёт единый файл секретов `~/.config/agent-vorcl-flow/.env` из шаблона (если его ещё нет);
 3. копирует AVF skills в `~/.kimi/skills` — они доступны автоматически и через `/skill:<name>`;
 4. устанавливает `~/.kimi/agents/avf-expo-mobile.yaml`;
-5. идемпотентно добавляет Expo PostToolUse guard в `~/.kimi/config.toml`;
+5. идемпотентно добавляет Expo architecture и UI/motion PostToolUse guards в `~/.kimi/config.toml`;
 6. вмёрживает серверы в `~/.kimi/mcp.json`, не затирая существующие.
 
 Затем впиши ключи в `~/.config/agent-vorcl-flow/.env` (тот же файл, что для Claude/Codex/Cursor)
@@ -28,8 +28,15 @@ kimi --agent-file ~/.kimi/agents/avf-expo-mobile.yaml
 ```text
 /skill:expo-mobile-vorcl добавить offline-first транзакции
 /skill:expo-mobile-create-screen экран истории операций
+/skill:expo-mobile-design-screen premium portfolio dashboard
+/skill:expo-mobile-motion card-to-details transition
 /skill:expo-mobile-audit
+/skill:expo-mobile-ui-audit
+/skill:expo-mobile-compatibility ./apps/mobile Reanimated upgrade
+/skill:audit .
 ```
+
+`/skill:audit` применяет те же role-skills, но в Kimi без отдельных native agents выполняет их как последовательные изолированные проходы; отчёт обязан честно указать этот execution model.
 
 ## Почему через launcher
 
@@ -43,7 +50,7 @@ Kimi CLI не поддерживает подстановку `${VAR}` в `mcp.j
 ```bash
 kimi mcp list          # список подключённых серверов
 kimi mcp test github   # проверить соединение и инструменты сервера
-/hooks                 # убедиться, что Expo guard загружен
+/hooks                 # убедиться, что оба Expo guard загружены
 ```
 
 Сервер без нужного ключа не поднимается — в логах будет строка вида
@@ -52,8 +59,9 @@ kimi mcp test github   # проверить соединение и инстру
 ## Ручная установка (без установщика)
 
 Скопируй `codex/skills/*` в `~/.kimi/skills`, `kimi/agents/*` в `~/.kimi/agents`, затем
-добавь `kimi/hooks.toml` в `~/.kimi/config.toml`, заменив `__AVF_EXPO_GUARD__` абсолютным путём
-к `skills/expo-mobile-architecture/scripts/guard.mjs`. Для MCP скопируй `mcp.json` и замени
+добавь `kimi/hooks.toml` в `~/.kimi/config.toml`, заменив `__AVF_EXPO_GUARD__`,
+`__AVF_EXPO_UI_GUARD__` и `__AVF_EXPO_COMPATIBILITY__` абсолютными путями к scripts в `expo-mobile-architecture` и
+`expo-ui-design-motion`. Для MCP скопируй `mcp.json` и замени
 `__AVF_LAUNCHER__` абсолютным путём к `bin/mcp-env.mjs`, либо добавь сервер точечно:
 
 ```bash

@@ -21,6 +21,7 @@ codex/
 | скилл `frontend-architecture` | скилл `$frontend-architecture` |
 | команда `/analyzer:audit` | скилл-задача `$analyzer-audit` |
 | команда `/vorcl` | скилл-задача `$vorcl` |
+| команда `/audit` | скилл-задача `$audit` + доменный `$project-audit` |
 | `.mcp.json` (task-master) | `[mcp_servers.task-master]` в `config.toml` |
 | хук SessionStart | роутинг ролей в `AGENTS.md` |
 
@@ -44,12 +45,17 @@ bash codex/scripts/install.sh
 ```
 codex
 > $vorcl  добавить корзину в чекаут          # цель → задачи → цикл (роутит к роли)
+> $audit  .                                  # multi-role аудит → PROJECT_AUDIT.md
 > $architect  спроектируй биллинг для SaaS
 > $backend-create-api  POST /invoices
 > $frontend-create-component  список заказов с пагинацией
 > $frontend-vorcl  экран профиля пользователя
 > $expo-mobile-create-screen  offline-first история транзакций
+> $expo-mobile-design-screen  premium portfolio dashboard
+> $expo-mobile-motion  card-to-details transition и bottom sheet
 > $expo-mobile-audit  ./apps/mobile
+> $expo-mobile-ui-audit  ./apps/mobile/src/modules
+> $expo-mobile-compatibility  ./apps/mobile Reanimated upgrade
 > $analyzer-audit                            # полный read-only аудит
 > $analyzer-mocks  src/features              # mockup-данные на фронте
 > $render-vorcl  подними api-сервис и дай ему доступ к БД   # инфра-цель → задачи → цикл

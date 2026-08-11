@@ -5,4 +5,4 @@ description: Создать production business module React Native + Expo по 
 
 # Создать Expo business module
 
-Изучи проект и domain boundaries. Создай минимальные `api/model/hooks/ui/index.ts`; добавляй `domain/application/repository/sync/native` только по доказанной сложности. TanStack Query — server state, Zustand — настоящий shared client state. Validate external data, map DTO, экспортируй public API, добавь tests и запусти guard/typecheck/lint. Следуй `$expo-mobile-architecture`, работай как `$expo-mobile`.
+Изучи проект и domain boundaries. Если затрагиваются packages/native/storage/test tooling, сначала выполни `$expo-mobile-compatibility`. Создай минимальные `api/model/hooks/ui/index.ts`; добавляй `domain/application/repository/sync/native` только по доказанной сложности. TanStack Query — server state, Zustand — настоящий shared client state. Validate external data, map DTO, экспортируй public API, добавь tests и запусти compatibility/guard/typecheck/lint. Следуй `$expo-mobile-architecture`, работай как `$expo-mobile`.

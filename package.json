@@ -1,13 +1,16 @@
 {
   "name": "agent-vorcl-flow",
-  "version": "2.2.0",
+  "version": "2.3.0",
   "description": "Agent-Vorcl-Flow для Claude Code, GPT Codex, Cursor и Kimi CLI: роли, skills, команды, MCP и эфемерное локальное live-табло.",
   "bin": {
     "agent-vorcl-flow": "bin/install.mjs"
   },
   "scripts": {
-    "test": "node --test skills/expo-mobile-architecture/tests/*.test.mjs",
-    "test:expo-architecture": "node --test skills/expo-mobile-architecture/tests/*.test.mjs"
+    "test": "node --test skills/expo-mobile-architecture/tests/*.test.mjs skills/expo-ui-design-motion/tests/*.test.mjs skills/project-audit/tests/*.test.mjs",
+    "test:expo-architecture": "node --test skills/expo-mobile-architecture/tests/*.test.mjs",
+    "test:expo-compatibility": "node --test skills/expo-mobile-architecture/tests/compatibility-preflight.test.mjs",
+    "test:expo-ui": "node --test skills/expo-ui-design-motion/tests/*.test.mjs",
+    "test:project-audit": "node --test skills/project-audit/tests/*.test.mjs"
   },
   "files": [
     "bin/",

@@ -24,7 +24,7 @@
 
 Agent-Vorcl-Flow превращает поддерживаемый coding agent в **структурированную инженерную команду**. Вместо одного универсального ассистента ты получаешь **22 узкопрофильных субагента** (архитектор, бэкенд, фронтенд, Expo mobile-инженер, инженер БД, картограф архитектуры, оператор liveboard и другие) — у каждого свои доменные **скиллы**, быстрые **слэш-команды** и нужные ему **MCP-инструменты**. Любая нетривиальная задача идёт через дисциплинированный цикл **Task Master** — *цель → задачи → реализация → проверка → готово* — работа спланирована, отслеживается и переживает прерывания.
 
-- 🧩 **22 субагента**, 42 скилла, 130 слэш-команд
+- 🧩 **22 субагента**, 44 скилла, 135 слэш-команд
 - ⚡ **Установка одной командой** в Claude Code, Codex, Cursor и/или Kimi CLI — `npx`
 - 🔌 **11 MCP-серверов** из коробки (GitHub, Postgres, MongoDB, Redis, Docker, Firecrawl, Vercel, Render, filesystem, Task Master, Mermaid)
 - 🔑 **Один файл `.env` для всех рантаймов** — ключи читает launcher, а не `~/.zshrc`, поэтому они работают даже при запуске из GUI/IDE; удалённого сервиса AVF нет; liveboard локальный и эфемерный
@@ -62,7 +62,7 @@ npx github:Vitammiin/agent-vorcl-flow --kimi     # только Kimi CLI
 | **Claude Code** | Регистрирует репозиторий как **marketplace** плагинов и включает плагин (через `claude plugin …`, фолбэк — прямая запись в `~/.claude/settings.json`). |
 | **GPT Codex** | Вмёрживает скиллы в `~/.agents/skills`, а блоки `config.toml` + `AGENTS.md` — в `~/.codex` (идемпотентно, между маркерами). |
 | **Cursor** | Устанавливает скиллы в `~/.cursor/skills`, нативных субагентов в `~/.cursor/agents` и добавляет отсутствующие серверы в `~/.cursor/mcp.json`. |
-| **Kimi CLI** | Ставит skills в `~/.kimi/skills`, нативный Expo agent в `~/.kimi/agents`, architecture hook в `~/.kimi/config.toml` и добавляет MCP-серверы. |
+| **Kimi CLI** | Ставит skills в `~/.kimi/skills`, нативный Expo agent в `~/.kimi/agents`, оба Expo architecture/UI hook в `~/.kimi/config.toml` и добавляет MCP-серверы. |
 
 > Инсталлер не вписывает секреты — он лишь создаёт пустой `.env` из шаблона. Ключи ты добавляешь туда сам (см. [MCP и секреты](#mcp-и-секреты)).
 
@@ -88,8 +88,9 @@ claude --plugin-dir /путь/к/agent-vorcl-flow
 ### 1. Универсальная точка входа — просто сформулируй цель
 ```text
 /vorcl добавить корзину в чекаут
+/audit .
 ```
-`/vorcl` сам определяет, какому субагенту отдать работу, и ведёт полный цикл Task Master.
+`/vorcl` сам определяет, какому субагенту отдать работу, и ведёт полный цикл Task Master. `/audit` автоматически находит backend, frontend, mobile, data и infrastructure и создаёт доказательный `PROJECT_AUDIT.md`, используя все релевантные роли.
 
 ### 2. Обратиться к конкретному субагенту
 ```text
@@ -125,7 +126,7 @@ claude --plugin-dir /путь/к/agent-vorcl-flow
 | 🔵 **architect** | Архитектор систем и решений | Анализ требований, проектирование системы/БД/API, ревью архитектуры |
 | 🟢 **backend** | Backend-разработчик | Node/TS, Postgres, Redis; модульная архитектура; каждый роут полностью покрыт OpenAPI |
 | 🟣 **frontend** | Frontend (React 19 / Next.js App Router) | Компоненты, состояние, data-fetching, оптимизация рендера/бандла, тесты |
-| 📱 **expo-mobile** | React Native + Expo инженер | Expo Router, business modules, Query/Zustand, SecureStore/SQLite, offline/native/permissions, mobile tests |
+| 📱 **expo-mobile** | React Native + Expo инженер | Модульная архитектура + Design/Motion/Interaction System, native navigation, tokens, gestures, haptics, Reduced Motion |
 | 🟠 **analyzer** | Аудитор кода (read-only) | Баги, типобезопасность, структура БД, моки на фронте, «плохой» код на бэке |
 | 🟡 **swagger** | Покрытие OpenAPI/Swagger (любой стек) | Находит недокументированные роуты и покрывает их, с проверкой |
 | 🔴 **firecrawl** | Веб-исследователь | Live CLI/MCP/REST, интеграция в приложения и готовые web-workflows |
@@ -166,6 +167,7 @@ claude --plugin-dir /путь/к/agent-vorcl-flow
 | Команда | Что делает |
 | --- | --- |
 | `/vorcl <цель>` | Превращает любую цель в задачи, роутит нужному субагенту и ведёт полный цикл до готового. |
+| `/audit [путь] [фокус]` | Глубокий read-only multi-role аудит → системы, security/CVE/resilience, целевая архитектура и поэтапный `PROJECT_AUDIT.md`. |
 
 ### 🔵 architect — архитектура
 | Команда | Что делает |
@@ -200,8 +202,12 @@ claude --plugin-dir /путь/к/agent-vorcl-flow
 | `/expo-mobile:vorcl <цель>` | Цель → Task Master цикл для Expo mobile. |
 | `/expo-mobile:create-module <домен>` | Создать business module с минимально необходимыми слоями. |
 | `/expo-mobile:create-screen <сценарий>` | Создать тонкий Expo Router route и module screen со всеми состояниями. |
+| `/expo-mobile:design-screen <сценарий>` | Создать premium screen через общие design/motion tokens, states и accessibility. |
+| `/expo-mobile:motion <interaction>` | Спроектировать native navigation, springs, gestures, haptics и reduced-motion fallback. |
 | `/expo-mobile:add-api <контракт>` | Добавить schema/DTO/mapper/query keys и TanStack Query. |
 | `/expo-mobile:audit [scope]` | Read-only architecture guard и доказательный аудит. |
+| `/expo-mobile:ui-audit [scope]` | Read-only аудит Design System, motion, interactions, accessibility и performance. |
+| `/expo-mobile:compatibility [app] [изменение]` | Live read-only аудит совместимости Expo/RN/Node/packages/native runtime по versioned official sources. |
 | `/expo-mobile:test <scope>` | Unit/RNTL/Maestro проверки mobile-кода. |
 
 ### 🟠 analyzer — аудит кода (read-only)
@@ -535,9 +541,9 @@ kimi --agent-file ~/.kimi/agents/avf-expo-mobile.yaml
 .claude-plugin/plugin.json      # манифест плагина
 .claude-plugin/marketplace.json # локальный маркетплейс (для установки)
 agents/       22 определения субагентов (*.md)
-skills/       <скилл>/SKILL.md            (42 скилла; некоторые содержат references/scripts/tests/assets)
-commands/     <namespace>/<команда>.md    (130 команд, /namespace:команда, включая /vorcl)
-hooks/        hooks.json + SessionStart + PostToolUse guards (пустые catch, Expo boundaries)
+skills/       <скилл>/SKILL.md            (44 скилла; некоторые содержат references/scripts/tests/assets)
+commands/     <namespace>/<команда>.md    (135 команд, /namespace:команда, включая /vorcl и /audit)
+hooks/        hooks.json + SessionStart + PostToolUse guards (пустые catch, Expo architecture/UI boundaries)
 .mcp.json     github, filesystem, postgres, mongodb, redis, docker, firecrawl, vercel, render, task-master, mermaid
 .env.example  шаблон единого файла ключей (→ ~/.config/agent-vorcl-flow/.env)
 bin/          install.mjs                 (npx-инсталлер)

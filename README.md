@@ -11,7 +11,7 @@ One `npx` command installs them. No remote backend or cloud hosting: your coding
 ![Kimi CLI](https://img.shields.io/badge/Kimi%20CLI-adapter-000000)
 ![Node](https://img.shields.io/badge/node-%E2%89%A518-339933?logo=node.js&logoColor=white)
 ![Agents](https://img.shields.io/badge/agents-22-blue)
-![Commands](https://img.shields.io/badge/commands-130-blue)
+![Commands](https://img.shields.io/badge/commands-135-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
 <details>
@@ -33,7 +33,7 @@ One `npx` command installs them. No remote backend or cloud hosting: your coding
 
 Agent-Vorcl-Flow turns a supported coding agent into a **structured engineering team**. Instead of one general assistant, you get **22 focused sub-agents** (architect, backend, frontend, Expo mobile engineer, DB engineer, architecture cartographer, liveboard operator, and more), each with its own domain **skills**, quick **slash commands**, and the **MCP tools** it needs. Every non-trivial task runs through a disciplined **Task Master** loop — *goal → tasks → implement → verify → done* — so work is planned, tracked, and survives interruptions.
 
-- 🧩 **22 sub-agents**, 42 skills, 130 slash commands
+- 🧩 **22 sub-agents**, 44 skills, 135 slash commands
 - ⚡ **One-command install** for Claude Code, Codex, Cursor, and/or Kimi CLI — `npx`
 - 🔌 **11 MCP servers** wired in (GitHub, Postgres, MongoDB, Redis, Docker, Firecrawl, Vercel, Render, filesystem, Task Master, Mermaid)
 - 🔑 **One `.env` file for all runtimes** — keys read by a launcher, not `~/.zshrc`, so they work even from GUI/IDE launches; no remote AVF service; liveboard is localhost-only and ephemeral
@@ -71,7 +71,7 @@ What the installer does:
 | **Claude Code** | Registers this repo as a plugin **marketplace** and enables the plugin (via `claude plugin …`, with a direct `~/.claude/settings.json` fallback). |
 | **GPT Codex** | Merges the skills into `~/.agents/skills` and the `config.toml` + `AGENTS.md` blocks into `~/.codex` (idempotent, between markers). |
 | **Cursor** | Installs skills into `~/.cursor/skills`, native custom subagents into `~/.cursor/agents`, and merges missing servers into `~/.cursor/mcp.json`. |
-| **Kimi CLI** | Installs skills into `~/.kimi/skills`, the native Expo custom agent into `~/.kimi/agents`, the Expo architecture hook into `~/.kimi/config.toml`, and merges MCP servers. |
+| **Kimi CLI** | Installs skills into `~/.kimi/skills`, the native Expo custom agent into `~/.kimi/agents`, both Expo architecture/UI hooks into `~/.kimi/config.toml`, and merges MCP servers. |
 
 > The installer never fills in your secrets — it only creates an empty `.env` from the template. You add keys there (see [Configuration](#configuration-mcp--keys)).
 
@@ -97,8 +97,9 @@ The examples in this section use Claude Code syntax; see the [Cursor](#cursor) a
 ### 1. Universal entry point — just state a goal
 ```text
 /vorcl add a shopping cart to checkout
+/audit .
 ```
-`/vorcl` figures out which sub-agent should own the work and drives the full Task Master cycle.
+`/vorcl` figures out which sub-agent should own the work and drives the full Task Master cycle. `/audit` auto-detects backend, frontend, mobile, data and infrastructure and writes an evidence-based `PROJECT_AUDIT.md` using all relevant roles.
 
 ### 2. Talk to a specific sub-agent
 ```text
@@ -134,7 +135,7 @@ This keeps work planned, checkpointed, and resumable — nothing is declared "do
 | 🔵 **architect** | Systems & solution architect | Requirements analysis, system/DB/API design, architecture reviews |
 | 🟢 **backend** | Backend developer | Node/TS, Postgres, Redis; modular architecture; every route fully covered by OpenAPI |
 | 🟣 **frontend** | Frontend (React 19 / Next.js App Router) | Components, state, data-fetching, render/bundle optimization, tests |
-| 📱 **expo-mobile** | React Native + Expo engineer | Expo Router, modular business slices, Query/Zustand, SecureStore/SQLite, offline/native/permissions, mobile tests |
+| 📱 **expo-mobile** | React Native + Expo engineer | Modular architecture plus Design/Motion/Interaction System, native navigation, tokens, gestures, haptics, Reduced Motion |
 | 🟠 **analyzer** | Code auditor (read-only) | Bugs, type safety, DB structure, frontend mocks, backend smells |
 | 🟡 **swagger** | OpenAPI/Swagger coverage (any stack) | Finds routes not fully documented and covers them, with verification |
 | 🔴 **firecrawl** | Web researcher | Live CLI/MCP/REST, app integration and finished web-data workflows |
@@ -173,6 +174,7 @@ Every command below is a slash command. `<…>` marks your input.
 | Command | What it does |
 | --- | --- |
 | `/vorcl <goal>` | Turns any goal into tasks and routes it to the right sub-agent, then runs the full cycle to done. |
+| `/audit [path] [focus]` | Deep read-only multi-role audit → detected systems, security/CVE/resilience findings, target architecture and phased `PROJECT_AUDIT.md`. |
 
 ### 🔵 architect — architecture
 | Command | What it does |
@@ -207,8 +209,12 @@ Every command below is a slash command. `<…>` marks your input.
 | `/expo-mobile:vorcl <goal>` | Goal → Task Master cycle for Expo mobile work. |
 | `/expo-mobile:create-module <domain>` | Create a modular business slice with only the layers its complexity needs. |
 | `/expo-mobile:create-screen <flow>` | Create a thin Expo Router route plus a module-owned screen and states. |
+| `/expo-mobile:design-screen <flow>` | Build a premium screen with shared design/motion tokens, states and accessibility. |
+| `/expo-mobile:motion <interaction>` | Design native navigation, springs, gestures, haptics and reduced-motion fallbacks. |
 | `/expo-mobile:add-api <contract>` | Add schema/DTO/mapper/query keys and TanStack Query integration. |
 | `/expo-mobile:audit [scope]` | Read-only architecture guard and evidence-based audit. |
+| `/expo-mobile:ui-audit [scope]` | Read-only Design System, motion, interaction, accessibility and performance audit. |
+| `/expo-mobile:compatibility [app] [change]` | Live read-only Expo/RN/Node/package/native-runtime compatibility audit against versioned official sources. |
 | `/expo-mobile:test <scope>` | Run domain unit, React Native Testing Library and Maestro checks. |
 
 ### 🟠 analyzer — code audit (read-only)
@@ -542,9 +548,9 @@ Kimi CLI has no `${VAR}` expansion in `mcp.json`, so keys come from the shared `
 .claude-plugin/plugin.json      # plugin manifest
 .claude-plugin/marketplace.json # local marketplace (for install)
 agents/       22 sub-agent definitions (*.md)
-skills/       <skill>/SKILL.md            (42 skills; some ship references, scripts, tests or HTML assets)
-commands/     <namespace>/<command>.md    (130 commands, /namespace:command, including /vorcl)
-hooks/        hooks.json + SessionStart + PostToolUse guards (empty catch, Expo boundaries)
+skills/       <skill>/SKILL.md            (44 skills; some ship references, scripts, tests or HTML assets)
+commands/     <namespace>/<command>.md    (135 commands, /namespace:command, including /vorcl and /audit)
+hooks/        hooks.json + SessionStart + PostToolUse guards (empty catch, Expo architecture/UI boundaries)
 .mcp.json     github, filesystem, postgres, mongodb, redis, docker, firecrawl, vercel, render, task-master, mermaid
 .env.example  template for ~/.config/agent-vorcl-flow/.env (single key file for all runtimes)
 bin/          install.mjs (the npx installer) + mcp-env.mjs (cross-runtime MCP launcher / .env loader)

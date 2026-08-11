@@ -5,3 +5,18 @@ event = "PostToolUse"
 matcher = "WriteFile|StrReplaceFile"
 command = "node \"__AVF_EXPO_GUARD__\" --hook"
 timeout = 30
+
+# Agent-Vorcl-Flow Expo dependency/config compatibility reminder. It is static
+# and fast; the agent then runs the full online preflight explicitly.
+[[hooks]]
+event = "PostToolUse"
+matcher = "WriteFile|StrReplaceFile"
+command = "node \"__AVF_EXPO_COMPATIBILITY__\" --hook"
+timeout = 30
+
+# Agent-Vorcl-Flow Expo UI design/motion guard.
+[[hooks]]
+event = "PostToolUse"
+matcher = "WriteFile|StrReplaceFile"
+command = "node \"__AVF_EXPO_UI_GUARD__\" --hook"
+timeout = 30

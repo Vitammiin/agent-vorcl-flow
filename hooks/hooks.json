@@ -29,6 +29,24 @@
             "command": "node \"${CLAUDE_PLUGIN_ROOT}/skills/expo-mobile-architecture/scripts/guard.mjs\" --hook"
           }
         ]
+      },
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/skills/expo-ui-design-motion/scripts/guard.mjs\" --hook"
+          }
+        ]
+      },
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/skills/expo-mobile-architecture/scripts/compatibility-preflight.mjs\" --hook"
+          }
+        ]
       }
     ]
   }

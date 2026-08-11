@@ -18,6 +18,7 @@ npx github:Vitammiin/agent-vorcl-flow --cursor
 
 ```text
 /vorcl добавить корзину в checkout
+/audit .
 /backend-create-api POST /invoices
 /analyzer-audit
 /avf-backend реализуй API выставления счетов
@@ -25,7 +26,11 @@ npx github:Vitammiin/agent-vorcl-flow --cursor
 /firecrawl-research сравни подходы к browser agents
 /visual-research-answer ./screen.png почему кнопка недоступна?
 /avf-expo-mobile добавь offline-first экран транзакций
+/expo-mobile-design-screen premium dashboard портфеля
+/expo-mobile-motion card-to-details interaction
 /expo-mobile-audit
+/expo-mobile-ui-audit
+/expo-mobile-compatibility ./apps/mobile Reanimated upgrade
 ```
 
 В Cursor namespaced Claude-команды представлены дефисными skills: например, `/firecrawl:interact` → `/firecrawl-interact`, `/firecrawl:integrate` → `/firecrawl-integrate`. Официальные upstream `firecrawl-*` skills не перезаписываются.

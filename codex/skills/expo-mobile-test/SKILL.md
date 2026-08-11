@@ -5,4 +5,4 @@ description: "Создать и реально прогнать Expo tests: doma
 
 # Тестировать Expo mobile
 
-Определи runner проекта. Domain rules/transitions покрывай unit tests, hooks/components — React Native Testing Library, critical user flows — Maestro. Мокай I/O/native boundaries, не domain. Проверь validation, data states, permissions и offline/network edges. Запусти guard/typecheck/lint/tests реально и покажи вывод. Следуй `$expo-mobile-architecture` и `$react-testing`.
+Определи runner проекта и через `$expo-mobile-compatibility` проверь SDK/React/Node, jest-expo и RNTL peers/engines; не используй react-test-renderer с React 19. Domain rules/transitions покрывай unit tests, hooks/components — React Native Testing Library, critical user flows — Maestro. Мокай I/O/native boundaries, не domain. Проверь validation, data states, permissions, offline/network edges, Reduced Motion и experimental fallbacks. Запусти compatibility + оба Expo guard/typecheck/lint/tests реально и покажи вывод. Следуй `$expo-mobile-architecture`, `$expo-ui-design-motion` и `$react-testing`.

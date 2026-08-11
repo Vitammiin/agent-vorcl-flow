@@ -1,0 +1,4 @@
+interface:
+  display_name: "Expo UI Design & Motion"
+  short_description: "Premium UI, motion and interaction for Expo"
+  default_prompt: "Use $expo-ui-design-motion to design this Expo screen with coherent tokens, motion and interaction."

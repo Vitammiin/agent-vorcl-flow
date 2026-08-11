@@ -64,6 +64,8 @@ function avfHome() {
 // и принимается node на Windows). Заполняется installShared().
 let STABLE_LAUNCHER = ''
 let STABLE_EXPO_GUARD = ''
+let STABLE_EXPO_UI_GUARD = ''
+let STABLE_EXPO_COMPATIBILITY = ''
 const withLauncher = (content) => content.split('__AVF_LAUNCHER__').join(STABLE_LAUNCHER)
 
 // Общий слой для всех рантаймов: стабильная копия launcher'а + единый файл секретов .env.
@@ -84,6 +86,22 @@ function installShared() {
     fs.cpSync(expoGuardSource, expoGuardDest)
     STABLE_EXPO_GUARD = expoGuardDest.split(path.sep).join('/')
     ok(`Expo architecture guard → ${expoGuardDest}`)
+  }
+
+  const expoUiGuardSource = path.join(PKG_ROOT, 'skills', 'expo-ui-design-motion', 'scripts', 'guard.mjs')
+  if (fs.existsSync(expoUiGuardSource)) {
+    const expoUiGuardDest = path.join(binDir, 'expo-ui-design-motion-guard.mjs')
+    fs.cpSync(expoUiGuardSource, expoUiGuardDest)
+    STABLE_EXPO_UI_GUARD = expoUiGuardDest.split(path.sep).join('/')
+    ok(`Expo UI/motion guard → ${expoUiGuardDest}`)
+  }
+
+  const expoCompatibilitySource = path.join(PKG_ROOT, 'skills', 'expo-mobile-architecture', 'scripts', 'compatibility-preflight.mjs')
+  if (fs.existsSync(expoCompatibilitySource)) {
+    const expoCompatibilityDest = path.join(binDir, 'expo-mobile-compatibility-preflight.mjs')
+    fs.cpSync(expoCompatibilitySource, expoCompatibilityDest)
+    STABLE_EXPO_COMPATIBILITY = expoCompatibilityDest.split(path.sep).join('/')
+    ok(`Expo compatibility preflight → ${expoCompatibilityDest}`)
   }
 
   const envFile = path.join(home, '.env')
@@ -325,12 +343,15 @@ function installKimi() {
     ok(`${agentFiles.length} Kimi agent-файлов → ${agentsDir}`)
   }
 
-  if (fs.existsSync(srcHooks) && STABLE_EXPO_GUARD) {
-    const hookConfig = fs.readFileSync(srcHooks, 'utf8').split('__AVF_EXPO_GUARD__').join(STABLE_EXPO_GUARD)
+  if (fs.existsSync(srcHooks) && STABLE_EXPO_GUARD && STABLE_EXPO_UI_GUARD && STABLE_EXPO_COMPATIBILITY) {
+    const hookConfig = fs.readFileSync(srcHooks, 'utf8')
+      .split('__AVF_EXPO_GUARD__').join(STABLE_EXPO_GUARD)
+      .split('__AVF_EXPO_UI_GUARD__').join(STABLE_EXPO_UI_GUARD)
+      .split('__AVF_EXPO_COMPATIBILITY__').join(STABLE_EXPO_COMPATIBILITY)
     mergeMarkedBlock(
       path.join(kimiHome, 'config.toml'),
       hookConfig,
-      'Expo architecture hook',
+      'Expo architecture/UI hooks',
       '# >>> agent-vorcl-flow expo-mobile >>>',
       '# <<< agent-vorcl-flow expo-mobile <<<',
     )

@@ -21,16 +21,17 @@ Expo Router → business modules → shared infrastructure
 
 ## Обязательный workflow
 
-1. Определи бизнес-домен изменения: `auth`, `payments`, `transactions`, `settings` или другой.
-2. Найди или создай `src/modules/<domain>/`; не раскладывай одну feature по глобальным `screens/services/hooks/stores/types`.
-3. Классифицируй код: route, UI, server state, client state, domain rule, application use case, API, storage или shared infrastructure.
-4. Выбери минимальную структуру модуля. Для простой CRUD-feature используй `api/model/hooks/ui/index.ts`; добавляй `domain/` и `application/` только при реальных правилах, инвариантах или orchestration.
-5. Сохрани направление зависимостей `app → modules → shared`. `domain` держи чистым от React Native, Expo, HTTP, Query, Zustand и storage.
-6. Внешние данные провалидируй runtime schema; DTO преобразуй mapper-ом в внутреннюю модель.
-7. Экспортируй внешний контракт через `modules/<domain>/index.ts`; запрети deep imports между модулями.
-8. Реализуй loading, success, empty, error и refreshing для data-driven экранов.
-9. Добавь тесты бизнес-инвариантов и затронутого пользовательского сценария.
-10. Запусти архитектурный guard и проверки проекта до выдачи результата.
+1. Перед любым dependency/SDK/native/navigation/test tooling изменением выполни обязательный online compatibility protocol из `references/version-compatibility.md`; версии по памяти запрещены.
+2. Определи бизнес-домен изменения: `auth`, `payments`, `transactions`, `settings` или другой.
+3. Найди или создай `src/modules/<domain>/`; не раскладывай одну feature по глобальным `screens/services/hooks/stores/types`.
+4. Классифицируй код: route, UI, server state, client state, domain rule, application use case, API, storage или shared infrastructure.
+5. Выбери минимальную структуру модуля. Для простой CRUD-feature используй `api/model/hooks/ui/index.ts`; добавляй `domain/` и `application/` только при реальных правилах, инвариантах или orchestration.
+6. Сохрани направление зависимостей `app → modules → shared`. `domain` держи чистым от React Native, Expo, HTTP, Query, Zustand и storage.
+7. Внешние данные провалидируй runtime schema; DTO преобразуй mapper-ом в внутреннюю модель.
+8. Экспортируй внешний контракт через `modules/<domain>/index.ts`; запрети deep imports между модулями.
+9. Реализуй loading, success, empty, error и refreshing для data-driven экранов.
+10. Добавь тесты бизнес-инвариантов и затронутого пользовательского сценария.
+11. Запусти compatibility preflight, архитектурный guard и проверки проекта до выдачи результата.
 
 ## Неподвижные границы
 
@@ -64,6 +65,8 @@ Expo Router → business modules → shared infrastructure
 
 Перед архитектурным проектированием, созданием нового модуля или крупным рефакторингом полностью прочитай [references/architecture-guide.md](references/architecture-guide.md). Для точечной правки найди там релевантный раздел по заголовку.
 
+Перед установкой/обновлением/удалением packages, Expo SDK upgrade, изменением native config/plugin, Router/navigation, Reanimated/gestures, test tooling или EAS Update полностью прочитай [references/version-compatibility.md](references/version-compatibility.md). Live official docs и registry metadata важнее snapshot.
+
 ## Автоматическая проверка
 
 Из корня Expo-проекта выполни:
@@ -74,6 +77,14 @@ node <skill-root>/scripts/guard.mjs --root .
 
 Guard проверяет направление зависимостей, публичные API модулей, чистоту domain, route imports, явные platform-suffix imports и Node built-ins. Он не заменяет `tsc`, ESLint и tests. Код возврата: `0` — чисто, `1` — нарушения, `2` — ошибка запуска. JSON для CI: `--format json`.
 
+Compatibility preflight по умолчанию выполняет static rules и live read-only checks:
+
+```bash
+node <skill-root>/scripts/compatibility-preflight.mjs --root .
+```
+
+`--offline` не подтверждает готовность dependency work. Исправления (`expo install --fix`, package mutation, `prebuild --clean`) выполняй отдельным осознанным шагом после review.
+
 ## Definition of Done
 
 - Ответственность принадлежит правильному business module.
@@ -82,4 +93,4 @@ Guard проверяет направление зависимостей, пуб
 - External data валидируется; DTO не протекает в domain без mapper.
 - Модуль экспортирует public API; deep imports и циклы отсутствуют.
 - Data states и critical business tests реализованы.
-- `guard.mjs`, typecheck, lint и релевантные tests зелёные.
+- Online compatibility preflight, `guard.mjs`, typecheck, lint и релевантные tests зелёные.

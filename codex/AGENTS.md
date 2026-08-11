@@ -1,5 +1,7 @@
 # Agent-Vorcl-Flow — роли для Codex
 
+Общая команда `$audit` автоматически определяет backend/frontend/mobile/data/infra, использует `$project-audit` и релевантные роли и создаёт evidence-based `PROJECT_AUDIT.md` без исправления production code.
+
 Двадцать две специализированные роли. Выбирай подходящую и опирайся на её навыки-скиллы (вызов через `$имя`).
 
 ## Workflow (обязательно, для всех ролей)
@@ -24,9 +26,9 @@
 - Профиль: `codex --profile frontend`
 
 ## expo-mobile — React Native + Expo инженер
-Production mobile-разработка по Modular Vertical Slice: Expo Router только для маршрутов, бизнес-модули в `src/modules/*`, shared infrastructure в `src/shared/*`, TanStack Query/Zustand, domain/application для сложной логики, SecureStore/SQLite, permissions/native/offline и mobile tests.
-- Скиллы: `$expo-mobile-architecture`, `$react`, `$typescript`, `$state-management`, `$data-fetching`, `$i18n`, `$react-testing`, `$error-handling`, `$workflow`, `$task-master`
-- Задачи: `$expo-mobile-vorcl`, `$expo-mobile-create-module`, `$expo-mobile-create-screen`, `$expo-mobile-add-api`, `$expo-mobile-audit`, `$expo-mobile-test`
+Production mobile-разработка по Modular Vertical Slice и единому Design/Motion/Interaction System: Expo Router только для маршрутов, business modules в `src/modules/*`, shared infrastructure/tokens в `src/shared/*`, Query/Zustand, native navigation, springs/gestures/haptics, Reduced Motion и mobile tests.
+- Скиллы: `$expo-mobile-architecture`, `$expo-ui-design-motion`, `$react`, `$typescript`, `$state-management`, `$data-fetching`, `$i18n`, `$react-testing`, `$error-handling`, `$workflow`, `$task-master`
+- Задачи: `$expo-mobile-vorcl`, `$expo-mobile-create-module`, `$expo-mobile-create-screen`, `$expo-mobile-add-api`, `$expo-mobile-design-screen`, `$expo-mobile-motion`, `$expo-mobile-audit`, `$expo-mobile-ui-audit`, `$expo-mobile-compatibility`, `$expo-mobile-test`
 - Профиль: `codex --profile expo-mobile`
 
 ## analyzer — Аудит кода (только чтение)

@@ -118,7 +118,10 @@ for rel in \
   SKILL.md \
   agents/openai.yaml \
   references/architecture-guide.md \
+  references/version-compatibility.md \
+  scripts/compatibility-preflight.mjs \
   scripts/guard.mjs \
+  tests/compatibility-preflight.test.mjs \
   tests/guard.test.mjs
 do
   canonical="skills/expo-mobile-architecture/$rel"
@@ -130,8 +133,41 @@ do
   fi
 done
 
+for rel in \
+  SKILL.md \
+  agents/openai.yaml \
+  references/audit-playbook.md \
+  scripts/inventory.mjs \
+  scripts/validate-report.mjs \
+  tests/project-audit.test.mjs
+do
+  canonical="skills/project-audit/$rel"
+  mirror="codex/skills/project-audit/$rel"
+  if [ -f "$canonical" ] && [ -f "$mirror" ] && cmp -s "$canonical" "$mirror"; then
+    pass
+  else
+    fail "Project audit resource отсутствует или разошёлся: $canonical ↔ $mirror"
+  fi
+done
+
+for rel in \
+  SKILL.md \
+  agents/openai.yaml \
+  references/design-motion-guide.md \
+  scripts/guard.mjs \
+  tests/guard.test.mjs
+do
+  canonical="skills/expo-ui-design-motion/$rel"
+  mirror="codex/skills/expo-ui-design-motion/$rel"
+  if [ -f "$canonical" ] && [ -f "$mirror" ] && cmp -s "$canonical" "$mirror"; then
+    pass
+  else
+    fail "Expo UI/motion resource отсутствует или разошёлся: $canonical ↔ $mirror"
+  fi
+done
+
 if [ -f kimi/agents/expo-mobile.yaml ] && grep -q 'expo-mobile' kimi/agents/expo-mobile.yaml; then pass; else fail "нет Kimi Expo custom agent"; fi
-if [ -f kimi/hooks.toml ] && grep -q '__AVF_EXPO_GUARD__' kimi/hooks.toml; then pass; else fail "нет Kimi Expo hook template"; fi
+if [ -f kimi/hooks.toml ] && grep -q '__AVF_EXPO_GUARD__' kimi/hooks.toml && grep -q '__AVF_EXPO_UI_GUARD__' kimi/hooks.toml && grep -q '__AVF_EXPO_COMPATIBILITY__' kimi/hooks.toml; then pass; else fail "нет полного Kimi Expo hook template"; fi
 if grep -q 'srcAgents.*kimi.*agents' bin/install.mjs && grep -q 'srcHooks.*kimi.*hooks.toml' bin/install.mjs; then
   pass
 else

@@ -5,4 +5,4 @@ description: Создать Expo Router route и production module screen с п�
 
 # Создать Expo screen
 
-Route оставь тонким и импортируй screen через module public API. Screen размести в `modules/<domain>/ui`; данные получай через module hook/Query, rules — через domain/application. Реализуй loading/success/empty/error/refreshing, accessibility и navigation edges. Добавь RNTL test и запусти guard/typecheck/lint/tests. Следуй `$expo-mobile-architecture`, работай как `$expo-mobile`.
+Route оставь тонким и импортируй screen через module public API. До Router/native UI решений выполни `$expo-mobile-compatibility`. Screen размести в `modules/<domain>/ui`; данные получай через module hook/Query, rules — через domain/application. Реализуй loading/success/empty/error/refreshing, semantic tokens, accessibility, Reduced Motion и navigation edges. Добавь RNTL test и запусти compatibility + оба Expo guard/typecheck/lint/tests. Следуй `$expo-mobile-architecture` + `$expo-ui-design-motion`, работай как `$expo-mobile`.

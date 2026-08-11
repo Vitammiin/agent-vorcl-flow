@@ -1,0 +1,4 @@
+interface:
+  display_name: "Project Audit"
+  short_description: "Deep multi-role codebase audit to Markdown"
+  default_prompt: "Use $project-audit to inspect this repository and produce a prioritized Markdown remediation report."
