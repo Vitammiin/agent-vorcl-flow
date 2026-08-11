@@ -7,6 +7,12 @@ and this project follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [2.3.1] - 2026-08-11
+
+### Fixed
+
+- Restored npm Trusted Publishing by preventing `actions/setup-node` from generating a token-based `.npmrc` that masks the OIDC authentication flow.
+
 ## [2.3.0] - 2026-08-11
 
 ### Added
@@ -21,5 +27,6 @@ and this project follows [Semantic Versioning](https://semver.org/).
 
 - Extended the installer and synchronization checks to distribute mobile hooks, compatibility tooling, shared audit skills, and Kimi-native role files consistently.
 
-[Unreleased]: https://github.com/Vitammiin/agent-vorcl-flow/compare/v2.3.0...HEAD
+[Unreleased]: https://github.com/Vitammiin/agent-vorcl-flow/compare/v2.3.1...HEAD
+[2.3.1]: https://github.com/Vitammiin/agent-vorcl-flow/compare/v2.3.0...v2.3.1
 [2.3.0]: https://github.com/Vitammiin/agent-vorcl-flow/compare/v2.2.0...v2.3.0
