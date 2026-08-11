@@ -62,7 +62,7 @@ env = { TASK_MASTER_TOOLS = "parse_prd,get_tasks,get_task,next_task,expand_task,
 command = "node"
 args = ["__AVF_LAUNCHER__", "--", "npx", "-y", "mcp-mermaid"]
 
-# ===== Профили под роли (codex --profile architect | backend | frontend | analyzer | swagger | firecrawl | render | database | resilience | screenshot | pinpoint | drawio | mermaid | archmap | testing | gitflow | security | docs | devops | liveboard) =====
+# ===== Профили под роли (codex --profile architect | backend | frontend | expo-mobile | analyzer | swagger | firecrawl | render | database | resilience | screenshot | pinpoint | drawio | mermaid | archmap | testing | gitflow | security | docs | devops | liveboard) =====
 [profiles.architect]
 model_reasoning_effort = "high"
 # model = "gpt-5.1-codex"   # при необходимости укажите модель
@@ -71,6 +71,9 @@ model_reasoning_effort = "high"
 model_reasoning_effort = "medium"
 
 [profiles.frontend]
+model_reasoning_effort = "medium"
+
+[profiles.expo-mobile]
 model_reasoning_effort = "medium"
 
 [profiles.analyzer]

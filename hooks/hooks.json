@@ -20,6 +20,15 @@
             "command": "node \"${CLAUDE_PLUGIN_ROOT}/scripts/catch-guard.js\""
           }
         ]
+      },
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/skills/expo-mobile-architecture/scripts/guard.mjs\" --hook"
+          }
+        ]
       }
     ]
   }

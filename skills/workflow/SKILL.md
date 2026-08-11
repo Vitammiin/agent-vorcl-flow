@@ -12,7 +12,7 @@ description: Обязательная дисциплина работы — лю
 ### 1. Слэш-командой — обычный путь
 - **`/vorcl <цель>`** — универсальный вход: при необходимости инициализирует Task Master, раскладывает цель на задачи и ведёт весь цикл, сам определяя домен и делегируя профильному субагенту.
 - **`/<agent>:vorcl <цель>`** — если область известна заранее, входи сразу в неё:
-  `/architect:vorcl` · `/backend:vorcl` · `/frontend:vorcl` · `/analyzer:vorcl` · `/swagger:vorcl` · `/firecrawl:vorcl` · `/render:vorcl` · `/database:vorcl` · `/resilience:vorcl` · `/screenshot:vorcl` · `/drawio:vorcl`
+  `/architect:vorcl` · `/backend:vorcl` · `/frontend:vorcl` · `/expo-mobile:vorcl` · `/analyzer:vorcl` · `/swagger:vorcl` · `/firecrawl:vorcl` · `/render:vorcl` · `/database:vorcl` · `/resilience:vorcl` · `/screenshot:vorcl` · `/drawio:vorcl`
 
 Примеры:
 ```

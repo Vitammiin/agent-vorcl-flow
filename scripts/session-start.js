@@ -6,6 +6,7 @@ const note = [
   "- architect (архитектура): /architect:vorcl, /architect:analyze, /architect:design, /architect:review",
   "- backend (сервер): /backend:vorcl, /backend:create-api, /backend:refactor, /backend:optimize, /backend:test",
   "- frontend (React/Next.js): /frontend:vorcl, /frontend:create-component, /frontend:refactor, /frontend:optimize, /frontend:test",
+  "- expo-mobile (React Native/Expo): /expo-mobile:vorcl, /expo-mobile:create-module, /expo-mobile:create-screen, /expo-mobile:add-api, /expo-mobile:audit, /expo-mobile:test",
   "- analyzer (аудит, read-only): /analyzer:vorcl, /analyzer:audit, /analyzer:bugs, /analyzer:types, /analyzer:db, /analyzer:mocks, /analyzer:backend",
   "- swagger (покрытие OpenAPI/Swagger, любой стек): /swagger:vorcl, /swagger:audit, /swagger:cover",
   "- firecrawl (CLI → MCP → REST, build/workflows): /firecrawl:vorcl, /firecrawl:setup, /firecrawl:search, /firecrawl:scrape, /firecrawl:map, /firecrawl:crawl, /firecrawl:extract, /firecrawl:interact, /firecrawl:parse, /firecrawl:monitor, /firecrawl:agent, /firecrawl:research, /firecrawl:ask, /firecrawl:docs-search, /firecrawl:integrate, /firecrawl:deliverable",

@@ -5,6 +5,10 @@
   "bin": {
     "agent-vorcl-flow": "bin/install.mjs"
   },
+  "scripts": {
+    "test": "node --test skills/expo-mobile-architecture/tests/*.test.mjs",
+    "test:expo-architecture": "node --test skills/expo-mobile-architecture/tests/*.test.mjs"
+  },
   "files": [
     "bin/",
     "agents/",

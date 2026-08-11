@@ -63,6 +63,7 @@ function avfHome() {
 // Абсолютный путь к стабильной копии launcher'а (posix-слэши — валидно и в JSON, и в TOML,
 // и принимается node на Windows). Заполняется installShared().
 let STABLE_LAUNCHER = ''
+let STABLE_EXPO_GUARD = ''
 const withLauncher = (content) => content.split('__AVF_LAUNCHER__').join(STABLE_LAUNCHER)
 
 // Общий слой для всех рантаймов: стабильная копия launcher'а + единый файл секретов .env.
@@ -76,6 +77,14 @@ function installShared() {
   fs.cpSync(path.join(PKG_ROOT, 'bin', 'mcp-env.mjs'), dest)
   STABLE_LAUNCHER = dest.split(path.sep).join('/')
   ok(`launcher → ${dest}`)
+
+  const expoGuardSource = path.join(PKG_ROOT, 'skills', 'expo-mobile-architecture', 'scripts', 'guard.mjs')
+  if (fs.existsSync(expoGuardSource)) {
+    const expoGuardDest = path.join(binDir, 'expo-mobile-architecture-guard.mjs')
+    fs.cpSync(expoGuardSource, expoGuardDest)
+    STABLE_EXPO_GUARD = expoGuardDest.split(path.sep).join('/')
+    ok(`Expo architecture guard → ${expoGuardDest}`)
+  }
 
   const envFile = path.join(home, '.env')
   if (fs.existsSync(envFile)) {
@@ -195,6 +204,17 @@ function mergeBlock(file, content, label) {
   ok(`${label} → ${file}`)
 }
 
+function mergeMarkedBlock(file, content, label, start, end) {
+  const cur = fs.existsSync(file) ? fs.readFileSync(file, 'utf8') : ''
+  if (cur.includes(start)) {
+    log(`  ${label}: уже установлено — пропуск`)
+    return
+  }
+  fs.mkdirSync(path.dirname(file), { recursive: true })
+  fs.writeFileSync(file, cur + `\n${start}\n${content.replace(/\s*$/, '')}\n${end}\n`)
+  ok(`${label} → ${file}`)
+}
+
 // ---------- Cursor ----------
 function installCursor() {
   log('\n▸ Cursor')
@@ -237,7 +257,7 @@ function toCursorAgent(source, file) {
   if (!name || !description) throw new Error(`у агента ${file} нет name/description`)
 
   const readonly = !/(^|,\s*)(Edit|Write)(,|$)/.test(tools)
-  const body = match[2].replace(/\/([a-z]+):([a-z0-9-]+)/g, '/$1-$2')
+  const body = match[2].replace(/\/([a-z][a-z0-9-]*):([a-z0-9-]+)/g, '/$1-$2')
   return `---\nname: avf-${name}\ndescription: ${JSON.stringify(description)}\nmodel: inherit\nreadonly: ${readonly}\n---\n${body}`
 }
 
@@ -283,13 +303,42 @@ function installKimi() {
   log('\n▸ Kimi CLI')
   const kimiHome = process.env.KIMI_HOME || path.join(os.homedir(), '.kimi')
   const srcMcp = path.join(PKG_ROOT, 'kimi', 'mcp.json')
-  if (!fs.existsSync(srcMcp)) {
+  const srcSkills = path.join(PKG_ROOT, 'codex', 'skills')
+  const srcAgents = path.join(PKG_ROOT, 'kimi', 'agents')
+  const srcHooks = path.join(PKG_ROOT, 'kimi', 'hooks.toml')
+  if (!fs.existsSync(srcMcp) || !fs.existsSync(srcSkills)) {
     warn('kimi-адаптер в пакете отсутствует — пропуск')
     return
   }
   fs.mkdirSync(kimiHome, { recursive: true })
+
+  const skillsDir = path.join(kimiHome, 'skills')
+  const copied = copySkillsPreservingUpstream(srcSkills, skillsDir)
+  installLiveboardRuntime(skillsDir)
+  ok(`скиллы → ${skillsDir} (${copied.copied} скопировано${copied.preserved ? `, ${copied.preserved} upstream Firecrawl сохранено` : ''})`)
+
+  if (fs.existsSync(srcAgents)) {
+    const agentsDir = path.join(kimiHome, 'agents')
+    fs.mkdirSync(agentsDir, { recursive: true })
+    const agentFiles = fs.readdirSync(srcAgents).filter((file) => /\.ya?ml$/.test(file))
+    for (const file of agentFiles) fs.cpSync(path.join(srcAgents, file), path.join(agentsDir, `avf-${file}`))
+    ok(`${agentFiles.length} Kimi agent-файлов → ${agentsDir}`)
+  }
+
+  if (fs.existsSync(srcHooks) && STABLE_EXPO_GUARD) {
+    const hookConfig = fs.readFileSync(srcHooks, 'utf8').split('__AVF_EXPO_GUARD__').join(STABLE_EXPO_GUARD)
+    mergeMarkedBlock(
+      path.join(kimiHome, 'config.toml'),
+      hookConfig,
+      'Expo architecture hook',
+      '# >>> agent-vorcl-flow expo-mobile >>>',
+      '# <<< agent-vorcl-flow expo-mobile <<<',
+    )
+  }
+
   mergeCursorMcp(path.join(kimiHome, 'mcp.json'), srcMcp)
-  log('    альтернатива: kimi mcp list  — проверить подключённые серверы')
+  log(`    Expo role: kimi --agent-file "${path.join(kimiHome, 'agents', 'avf-expo-mobile.yaml')}"`)
+  log('    проверка: /skill:expo-mobile-audit или kimi mcp list')
 }
 
 // ---------- banner ----------

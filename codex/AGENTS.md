@@ -1,6 +1,6 @@
 # Agent-Vorcl-Flow — роли для Codex
 
-Двадцать одна специализированная роль. Выбирай подходящую и опирайся на её навыки-скиллы (вызов через `$имя`).
+Двадцать две специализированные роли. Выбирай подходящую и опирайся на её навыки-скиллы (вызов через `$имя`).
 
 ## Workflow (обязательно, для всех ролей)
 Любая нетривиальная задача идёт через **Task Master** (`$workflow` + `$task-master`): цель → задачи (`parse_prd`/`add_task`) → `next_task` → `get_task` → `expand_task` → реализация → проверка `testStrategy` → `set_task_status done`. Единая точка входа — `$vorcl`; у каждой роли есть свой `$<role>-vorcl`.
@@ -22,6 +22,12 @@
 - Скиллы: `$frontend-architecture`, `$react`, `$nextjs`, `$typescript`, `$tailwind`, `$state-management`, `$data-fetching`, `$i18n`, `$react-testing`, `$vercel`, `$workflow`, `$task-master`
 - Задачи: `$frontend-vorcl`, `$frontend-create-component`, `$frontend-refactor`, `$frontend-optimize`, `$frontend-test`
 - Профиль: `codex --profile frontend`
+
+## expo-mobile — React Native + Expo инженер
+Production mobile-разработка по Modular Vertical Slice: Expo Router только для маршрутов, бизнес-модули в `src/modules/*`, shared infrastructure в `src/shared/*`, TanStack Query/Zustand, domain/application для сложной логики, SecureStore/SQLite, permissions/native/offline и mobile tests.
+- Скиллы: `$expo-mobile-architecture`, `$react`, `$typescript`, `$state-management`, `$data-fetching`, `$i18n`, `$react-testing`, `$error-handling`, `$workflow`, `$task-master`
+- Задачи: `$expo-mobile-vorcl`, `$expo-mobile-create-module`, `$expo-mobile-create-screen`, `$expo-mobile-add-api`, `$expo-mobile-audit`, `$expo-mobile-test`
+- Профиль: `codex --profile expo-mobile`
 
 ## analyzer — Аудит кода (только чтение)
 Баги, ошибки типов, структура БД, mockup на фронте, языковой хардкод (i18n) в мультиязычном коде, «плохой» код на беке — фронт и бек раздельно. Ничего не правит; находки оформляет в задачи (`add_task`).

@@ -20,6 +20,7 @@ description: Универсальная точка входа в Task Master wor
 | Архитектура, выбор технологий, system design | `$architect` |
 | API, серверная логика, Node.js/TypeScript | `$backend` |
 | UI, React/Next.js, состояние, загрузка данных | `$frontend` |
+| React Native + Expo: routes, screens, modules, state, storage, native | `$expo-mobile` |
 | Аудит кода без правок (баги, типы, mockup, БД) | `$analyzer` |
 | Покрытие OpenAPI/Swagger | `$swagger` |
 | Веб-ресёрч, сбор данных с сайтов | `$firecrawl` |

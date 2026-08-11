@@ -1,7 +1,6 @@
 # Agent-Vorcl-Flow — адаптер для Kimi CLI
 
-MCP-серверы плагина для [Kimi CLI](https://github.com/MoonshotAI/kimi-cli) (MoonshotAI). Kimi
-читает `~/.kimi/mcp.json` в той же `mcpServers`-схеме, что Claude и Cursor.
+Skills, нативный Expo custom agent, architecture hook и MCP-серверы для [Kimi CLI](https://github.com/MoonshotAI/kimi-cli) (MoonshotAI).
 
 ## Установка
 
@@ -12,11 +11,25 @@ npx github:Vitammiin/agent-vorcl-flow --kimi
 Установщик:
 1. кладёт launcher в `~/.config/agent-vorcl-flow/bin/mcp-env.mjs`;
 2. создаёт единый файл секретов `~/.config/agent-vorcl-flow/.env` из шаблона (если его ещё нет);
-3. вмёрживает наши серверы в `~/.kimi/mcp.json`, подставляя абсолютный путь launcher'а
-   (существующие серверы не затирает).
+3. копирует AVF skills в `~/.kimi/skills` — они доступны автоматически и через `/skill:<name>`;
+4. устанавливает `~/.kimi/agents/avf-expo-mobile.yaml`;
+5. идемпотентно добавляет Expo PostToolUse guard в `~/.kimi/config.toml`;
+6. вмёрживает серверы в `~/.kimi/mcp.json`, не затирая существующие.
 
 Затем впиши ключи в `~/.config/agent-vorcl-flow/.env` (тот же файл, что для Claude/Codex/Cursor)
-и перезапусти Kimi.
+и перезапусти Kimi. Expo-профиль запускается так:
+
+```bash
+kimi --agent-file ~/.kimi/agents/avf-expo-mobile.yaml
+```
+
+Примеры skills:
+
+```text
+/skill:expo-mobile-vorcl добавить offline-first транзакции
+/skill:expo-mobile-create-screen экран истории операций
+/skill:expo-mobile-audit
+```
 
 ## Почему через launcher
 
@@ -30,6 +43,7 @@ Kimi CLI не поддерживает подстановку `${VAR}` в `mcp.j
 ```bash
 kimi mcp list          # список подключённых серверов
 kimi mcp test github   # проверить соединение и инструменты сервера
+/hooks                 # убедиться, что Expo guard загружен
 ```
 
 Сервер без нужного ключа не поднимается — в логах будет строка вида
@@ -37,8 +51,10 @@ kimi mcp test github   # проверить соединение и инстру
 
 ## Ручная установка (без установщика)
 
-Скопируй `mcp.json` в `~/.kimi/mcp.json` и замени в нём `__AVF_LAUNCHER__` на абсолютный путь
-к `bin/mcp-env.mjs`. Либо добавь сервер точечно:
+Скопируй `codex/skills/*` в `~/.kimi/skills`, `kimi/agents/*` в `~/.kimi/agents`, затем
+добавь `kimi/hooks.toml` в `~/.kimi/config.toml`, заменив `__AVF_EXPO_GUARD__` абсолютным путём
+к `skills/expo-mobile-architecture/scripts/guard.mjs`. Для MCP скопируй `mcp.json` и замени
+`__AVF_LAUNCHER__` абсолютным путём к `bin/mcp-env.mjs`, либо добавь сервер точечно:
 
 ```bash
 kimi mcp add --transport stdio mermaid -- \

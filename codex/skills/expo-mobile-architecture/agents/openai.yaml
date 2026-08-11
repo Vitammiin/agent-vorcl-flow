@@ -1,0 +1,4 @@
+interface:
+  display_name: "Expo Mobile Architecture"
+  short_description: "Production architecture for Expo mobile apps"
+  default_prompt: "Use $expo-mobile-architecture to structure this Expo feature as a modular business slice."

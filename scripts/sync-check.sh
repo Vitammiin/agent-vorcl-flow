@@ -113,6 +113,31 @@ for f in agents/*.md; do
   fi
 done
 
+# ---------- 7. Expo Mobile runtime/resources и Kimi-native adapter ----------
+for rel in \
+  SKILL.md \
+  agents/openai.yaml \
+  references/architecture-guide.md \
+  scripts/guard.mjs \
+  tests/guard.test.mjs
+do
+  canonical="skills/expo-mobile-architecture/$rel"
+  mirror="codex/skills/expo-mobile-architecture/$rel"
+  if [ -f "$canonical" ] && [ -f "$mirror" ] && cmp -s "$canonical" "$mirror"; then
+    pass
+  else
+    fail "Expo architecture resource отсутствует или разошёлся: $canonical ↔ $mirror"
+  fi
+done
+
+if [ -f kimi/agents/expo-mobile.yaml ] && grep -q 'expo-mobile' kimi/agents/expo-mobile.yaml; then pass; else fail "нет Kimi Expo custom agent"; fi
+if [ -f kimi/hooks.toml ] && grep -q '__AVF_EXPO_GUARD__' kimi/hooks.toml; then pass; else fail "нет Kimi Expo hook template"; fi
+if grep -q 'srcAgents.*kimi.*agents' bin/install.mjs && grep -q 'srcHooks.*kimi.*hooks.toml' bin/install.mjs; then
+  pass
+else
+  fail "Kimi installer не подключает native agent/hook"
+fi
+
 # ---------- Сводка ----------
 echo ""
 echo "Итог: OK=$OK WARN=$WARN FAIL=$FAIL"

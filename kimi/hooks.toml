@@ -1,0 +1,7 @@
+# Agent-Vorcl-Flow Expo architecture guard. The installer replaces the placeholder
+# with the absolute path of the stable bundled script.
+[[hooks]]
+event = "PostToolUse"
+matcher = "WriteFile|StrReplaceFile"
+command = "node \"__AVF_EXPO_GUARD__\" --hook"
+timeout = 30

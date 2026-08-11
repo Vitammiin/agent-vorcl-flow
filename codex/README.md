@@ -7,12 +7,12 @@
 codex/
 ├── skills/<name>/SKILL.md   # навыки Codex (.agents/skills): персоны ролей + доменные + задачи
 ├── config.toml              # MCP-серверы [mcp_servers.*] + профили ролей [profiles.*]
-├── AGENTS.md                # роутинг ролей (architect, backend, frontend, analyzer, swagger, firecrawl, render, database, resilience, screenshot, pinpoint, drawio, mermaid, archmap, testing, gitflow, security, docs, devops, liveboard)
+├── AGENTS.md                # роутинг ролей (architect, backend, frontend, expo-mobile, analyzer, swagger, firecrawl, render, database, resilience, screenshot, pinpoint, drawio, mermaid, archmap, testing, gitflow, security, docs, devops, liveboard)
 └── scripts/install.sh       # установка в ~/.agents/skills и ~/.codex
 ```
 
 ## Роли
-`$architect` · `$backend` · `$frontend` · `$analyzer` · `$swagger` · `$firecrawl` · `$render` · `$database` · `$resilience` · `$screenshot` · `$pinpoint` · `$drawio` · `$mermaid` · `$archmap` · `$testing` · `$gitflow` · `$security` · `$docs` · `$devops` · `$liveboard`. Все работают через Task Master (`$workflow` + `$task-master`); единая точка входа — `$vorcl`, у каждой роли свой `$<role>-vorcl`. `$liveboard-start` запускает локальное in-memory табло worktree/агентов/задач на свободном порту. У `render`, `database` и `archmap` персона и доменный скилл совпадают; остальные доменные маршруты перечислены в `AGENTS.md`.
+`$architect` · `$backend` · `$frontend` · `$expo-mobile` · `$analyzer` · `$swagger` · `$firecrawl` · `$render` · `$database` · `$resilience` · `$screenshot` · `$pinpoint` · `$drawio` · `$mermaid` · `$archmap` · `$testing` · `$gitflow` · `$security` · `$docs` · `$devops` · `$liveboard`. Все работают через Task Master (`$workflow` + `$task-master`); единая точка входа — `$vorcl`, у каждой роли свой `$<role>-vorcl`. `$liveboard-start` запускает локальное in-memory табло worktree/агентов/задач на свободном порту. У `render`, `database` и `archmap` персона и доменный скилл совпадают; остальные доменные маршруты перечислены в `AGENTS.md`.
 
 ## Маппинг Claude Code → Codex
 | Claude Code | Codex |
@@ -48,6 +48,8 @@ codex
 > $backend-create-api  POST /invoices
 > $frontend-create-component  список заказов с пагинацией
 > $frontend-vorcl  экран профиля пользователя
+> $expo-mobile-create-screen  offline-first история транзакций
+> $expo-mobile-audit  ./apps/mobile
 > $analyzer-audit                            # полный read-only аудит
 > $analyzer-mocks  src/features              # mockup-данные на фронте
 > $render-vorcl  подними api-сервис и дай ему доступ к БД   # инфра-цель → задачи → цикл
@@ -69,6 +71,7 @@ codex
 > $devops-dockerfile  node-api               # multistage Dockerfile + реальный docker build
 
 codex --profile analyzer    # роль аудита с повышенным reasoning
+codex --profile expo-mobile # React Native + Expo роль
 codex --profile render      # роль хостинга/деплоя на Render
 codex --profile security    # security-аудит с повышенным reasoning
 ```

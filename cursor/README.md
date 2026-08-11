@@ -3,7 +3,7 @@
 Инсталлер использует нативные механизмы Cursor:
 
 - `~/.cursor/skills/<name>/SKILL.md` — все доменные и task-скиллы; доступны автоматически и через `/name`.
-- `~/.cursor/agents/avf-<name>.md` — 20 custom subagents с `model: inherit`; read-only роли получают `readonly: true`. Префикс `avf-` не даёт именам конфликтовать со скиллами-персонами.
+- `~/.cursor/agents/avf-<name>.md` — 22 custom subagents с `model: inherit`; read-only роли получают `readonly: true`. Префикс `avf-` не даёт именам конфликтовать со скиллами-персонами.
 - `~/.cursor/mcp.json` — MCP-серверы. Существующие серверы пользователя не перезаписываются.
 
 ## Установка
@@ -24,6 +24,8 @@ npx github:Vitammiin/agent-vorcl-flow --cursor
 /firecrawl-setup
 /firecrawl-research сравни подходы к browser agents
 /visual-research-answer ./screen.png почему кнопка недоступна?
+/avf-expo-mobile добавь offline-first экран транзакций
+/expo-mobile-audit
 ```
 
 В Cursor namespaced Claude-команды представлены дефисными skills: например, `/firecrawl:interact` → `/firecrawl-interact`, `/firecrawl:integrate` → `/firecrawl-integrate`. Официальные upstream `firecrawl-*` skills не перезаписываются.

@@ -12,7 +12,7 @@ description: Обязательная дисциплина работы — лю
 ### 1. Скилл-задачей — обычный путь
 - **`$vorcl <цель>`** — универсальный вход: при необходимости инициализирует Task Master, раскладывает цель на задачи и ведёт весь цикл, роутя к профильной роли.
 - **`$<role>-vorcl <цель>`** — если область известна заранее, входи сразу в неё:
-  `$architect-vorcl` · `$backend-vorcl` · `$frontend-vorcl` · `$analyzer-vorcl` · `$swagger-vorcl` · `$firecrawl-vorcl` · `$render-vorcl` · `$database-vorcl` · `$resilience-vorcl` · `$screenshot-vorcl` · `$pinpoint-vorcl` · `$drawio-vorcl` · `$mermaid-vorcl`
+  `$architect-vorcl` · `$backend-vorcl` · `$frontend-vorcl` · `$expo-mobile-vorcl` · `$analyzer-vorcl` · `$swagger-vorcl` · `$firecrawl-vorcl` · `$render-vorcl` · `$database-vorcl` · `$resilience-vorcl` · `$screenshot-vorcl` · `$pinpoint-vorcl` · `$drawio-vorcl` · `$mermaid-vorcl`
 
 Примеры:
 ```

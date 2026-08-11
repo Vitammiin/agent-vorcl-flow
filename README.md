@@ -10,8 +10,8 @@ One `npx` command installs them. No remote backend or cloud hosting: your coding
 ![Cursor](https://img.shields.io/badge/Cursor-native%20adapter-111111)
 ![Kimi CLI](https://img.shields.io/badge/Kimi%20CLI-adapter-000000)
 ![Node](https://img.shields.io/badge/node-%E2%89%A518-339933?logo=node.js&logoColor=white)
-![Agents](https://img.shields.io/badge/agents-21-blue)
-![Commands](https://img.shields.io/badge/commands-124-blue)
+![Agents](https://img.shields.io/badge/agents-22-blue)
+![Commands](https://img.shields.io/badge/commands-130-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
 <details>
@@ -31,9 +31,9 @@ One `npx` command installs them. No remote backend or cloud hosting: your coding
 
 ## What is this?
 
-Agent-Vorcl-Flow turns a supported coding agent into a **structured engineering team**. Instead of one general assistant, you get **21 focused sub-agents** (architect, backend, frontend, DB engineer, architecture cartographer, liveboard operator, and more), each with its own domain **skills**, quick **slash commands**, and the **MCP tools** it needs. Every non-trivial task runs through a disciplined **Task Master** loop — *goal → tasks → implement → verify → done* — so work is planned, tracked, and survives interruptions.
+Agent-Vorcl-Flow turns a supported coding agent into a **structured engineering team**. Instead of one general assistant, you get **22 focused sub-agents** (architect, backend, frontend, Expo mobile engineer, DB engineer, architecture cartographer, liveboard operator, and more), each with its own domain **skills**, quick **slash commands**, and the **MCP tools** it needs. Every non-trivial task runs through a disciplined **Task Master** loop — *goal → tasks → implement → verify → done* — so work is planned, tracked, and survives interruptions.
 
-- 🧩 **21 sub-agents**, 41 skills, 124 slash commands
+- 🧩 **22 sub-agents**, 42 skills, 130 slash commands
 - ⚡ **One-command install** for Claude Code, Codex, Cursor, and/or Kimi CLI — `npx`
 - 🔌 **11 MCP servers** wired in (GitHub, Postgres, MongoDB, Redis, Docker, Firecrawl, Vercel, Render, filesystem, Task Master, Mermaid)
 - 🔑 **One `.env` file for all runtimes** — keys read by a launcher, not `~/.zshrc`, so they work even from GUI/IDE launches; no remote AVF service; liveboard is localhost-only and ephemeral
@@ -71,7 +71,7 @@ What the installer does:
 | **Claude Code** | Registers this repo as a plugin **marketplace** and enables the plugin (via `claude plugin …`, with a direct `~/.claude/settings.json` fallback). |
 | **GPT Codex** | Merges the skills into `~/.agents/skills` and the `config.toml` + `AGENTS.md` blocks into `~/.codex` (idempotent, between markers). |
 | **Cursor** | Installs skills into `~/.cursor/skills`, native custom subagents into `~/.cursor/agents`, and merges missing servers into `~/.cursor/mcp.json`. |
-| **Kimi CLI** | Merges missing servers into `~/.kimi/mcp.json` (same `mcpServers` schema). |
+| **Kimi CLI** | Installs skills into `~/.kimi/skills`, the native Expo custom agent into `~/.kimi/agents`, the Expo architecture hook into `~/.kimi/config.toml`, and merges MCP servers. |
 
 > The installer never fills in your secrets — it only creates an empty `.env` from the template. You add keys there (see [Configuration](#configuration-mcp--keys)).
 
@@ -134,6 +134,7 @@ This keeps work planned, checkpointed, and resumable — nothing is declared "do
 | 🔵 **architect** | Systems & solution architect | Requirements analysis, system/DB/API design, architecture reviews |
 | 🟢 **backend** | Backend developer | Node/TS, Postgres, Redis; modular architecture; every route fully covered by OpenAPI |
 | 🟣 **frontend** | Frontend (React 19 / Next.js App Router) | Components, state, data-fetching, render/bundle optimization, tests |
+| 📱 **expo-mobile** | React Native + Expo engineer | Expo Router, modular business slices, Query/Zustand, SecureStore/SQLite, offline/native/permissions, mobile tests |
 | 🟠 **analyzer** | Code auditor (read-only) | Bugs, type safety, DB structure, frontend mocks, backend smells |
 | 🟡 **swagger** | OpenAPI/Swagger coverage (any stack) | Finds routes not fully documented and covers them, with verification |
 | 🔴 **firecrawl** | Web researcher | Live CLI/MCP/REST, app integration and finished web-data workflows |
@@ -198,6 +199,17 @@ Every command below is a slash command. `<…>` marks your input.
 | `/frontend:refactor <target>` | Refactor UI / hooks without changing behavior. |
 | `/frontend:optimize <target>` | Optimize render / bundle / Core Web Vitals. |
 | `/frontend:test <target>` | Generate component tests. |
+
+### 📱 expo-mobile — React Native / Expo
+
+| Command | What it does |
+| --- | --- |
+| `/expo-mobile:vorcl <goal>` | Goal → Task Master cycle for Expo mobile work. |
+| `/expo-mobile:create-module <domain>` | Create a modular business slice with only the layers its complexity needs. |
+| `/expo-mobile:create-screen <flow>` | Create a thin Expo Router route plus a module-owned screen and states. |
+| `/expo-mobile:add-api <contract>` | Add schema/DTO/mapper/query keys and TanStack Query integration. |
+| `/expo-mobile:audit [scope]` | Read-only architecture guard and evidence-based audit. |
+| `/expo-mobile:test <scope>` | Run domain unit, React Native Testing Library and Maestro checks. |
 
 ### 🟠 analyzer — code audit (read-only)
 | Command | What it does |
@@ -503,10 +515,13 @@ The installer converts role definitions to Cursor frontmatter, prefixes subagent
 
 ## Kimi CLI
 
-[Kimi CLI](https://github.com/MoonshotAI/kimi-cli) (MoonshotAI) reads `~/.kimi/mcp.json` in the same `mcpServers` schema as Claude and Cursor, so the same servers apply:
+[Kimi CLI](https://github.com/MoonshotAI/kimi-cli) (MoonshotAI) natively loads Agent Skills, custom agent files and lifecycle hooks; AVF also merges the same MCP servers used by Claude and Cursor:
 
 | Agent-Vorcl-Flow concept | Kimi CLI equivalent |
 | --- | --- |
+| skills / task commands | `~/.kimi/skills` and `/skill:<name>` |
+| Expo custom agent | `kimi --agent-file ~/.kimi/agents/avf-expo-mobile.yaml` |
+| Expo PostToolUse guard | merged into `~/.kimi/config.toml` |
 | `.mcp.json` | merged servers in `~/.kimi/mcp.json` |
 | per-runtime key file | the shared `~/.config/agent-vorcl-flow/.env` (via the launcher) |
 
@@ -514,6 +529,7 @@ The installer converts role definitions to Cursor frontmatter, prefixes subagent
 npx github:Vitammiin/agent-vorcl-flow --kimi
 kimi mcp list          # verify connected servers
 kimi mcp test github   # check a server's connection and tools
+kimi --agent-file ~/.kimi/agents/avf-expo-mobile.yaml
 ```
 
 Kimi CLI has no `${VAR}` expansion in `mcp.json`, so keys come from the shared `.env` through the launcher — exactly like the other runtimes. See [`kimi/README.md`](./kimi/README.md).
@@ -525,16 +541,16 @@ Kimi CLI has no `${VAR}` expansion in `mcp.json`, so keys come from the shared `
 ```text
 .claude-plugin/plugin.json      # plugin manifest
 .claude-plugin/marketplace.json # local marketplace (for install)
-agents/       21 sub-agent definitions (*.md)
-skills/       <skill>/SKILL.md            (41 skills; liveboard and archmap ship their own scripts + HTML assets)
-commands/     <namespace>/<command>.md    (124 commands, /namespace:command, including /vorcl)
-hooks/        hooks.json + session-start.js + catch-guard.js (PostToolUse: empty catch)
+agents/       22 sub-agent definitions (*.md)
+skills/       <skill>/SKILL.md            (42 skills; some ship references, scripts, tests or HTML assets)
+commands/     <namespace>/<command>.md    (130 commands, /namespace:command, including /vorcl)
+hooks/        hooks.json + SessionStart + PostToolUse guards (empty catch, Expo boundaries)
 .mcp.json     github, filesystem, postgres, mongodb, redis, docker, firecrawl, vercel, render, task-master, mermaid
 .env.example  template for ~/.config/agent-vorcl-flow/.env (single key file for all runtimes)
 bin/          install.mjs (the npx installer) + mcp-env.mjs (cross-runtime MCP launcher / .env loader)
 codex/        GPT Codex adapter (skills + config.toml + install.sh)
 cursor/       Cursor adapter (MCP template + installation notes)
-kimi/         Kimi CLI adapter (mcp.json + installation notes)
+kimi/         Kimi CLI adapter (skills install + Expo agent/hook + MCP)
 ```
 
 **How it fits together:** `agents/*.md` declare a role and, in front-matter `skills:`, attach skills → skills in `skills/*/SKILL.md` are auto-loaded by description → `commands/<agent>/*.md` provide quick `/agent:command` shortcuts that delegate to the sub-agent → `.mcp.json` gives agents their tools, each started through `bin/mcp-env.mjs` which loads secrets from the shared `.env`. A `SessionStart` hook tells Claude the agents are available.
