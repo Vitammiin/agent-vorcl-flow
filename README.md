@@ -10,17 +10,17 @@ One `npx` command installs them. No remote backend or cloud hosting: your coding
 ![Cursor](https://img.shields.io/badge/Cursor-native%20adapter-111111)
 ![Kimi CLI](https://img.shields.io/badge/Kimi%20CLI-adapter-000000)
 ![Node](https://img.shields.io/badge/node-%E2%89%A518-339933?logo=node.js&logoColor=white)
-![Agents](https://img.shields.io/badge/agents-22-blue)
-![Commands](https://img.shields.io/badge/commands-135-blue)
+![Agents](https://img.shields.io/badge/agents-24-blue)
+![Commands](https://img.shields.io/badge/commands-150-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
 <details>
-<summary>🌐 <strong>Languages (22)</strong> — all translations are stored in Git</summary>
+<summary>🌐 <strong>Languages (22)</strong> — translations live in `translations/`</summary>
 
-[**English**](./README.md) · [Русский](./README.ru.md) · [Українська](./README.uk.md) · [Deutsch](./README.de.md) · [Français](./README.fr.md) · [Español](./README.es.md)<br>
-[Português](./README.pt.md) · [Italiano](./README.it.md) · [Polski](./README.pl.md) · [Türkçe](./README.tr.md) · [中文](./README.zh-CN.md) · [日本語](./README.ja.md)<br>
-[한국어](./README.ko.md) · [العربية](./README.ar.md) · [Nederlands](./README.nl.md) · [Čeština](./README.cs.md) · [Română](./README.ro.md) · [Magyar](./README.hu.md)<br>
-[Български](./README.bg.md) · [Српски](./README.sr.md) · [हिन्दी](./README.hi.md) · [Tiếng Việt](./README.vi.md)
+[**English**](./README.md) · [Русский](./translations/README.ru.md) · [Українська](./translations/README.uk.md) · [Deutsch](./translations/README.de.md) · [Français](./translations/README.fr.md) · [Español](./translations/README.es.md)<br>
+[Português](./translations/README.pt.md) · [Italiano](./translations/README.it.md) · [Polski](./translations/README.pl.md) · [Türkçe](./translations/README.tr.md) · [中文](./translations/README.zh-CN.md) · [日本語](./translations/README.ja.md)<br>
+[한국어](./translations/README.ko.md) · [العربية](./translations/README.ar.md) · [Nederlands](./translations/README.nl.md) · [Čeština](./translations/README.cs.md) · [Română](./translations/README.ro.md) · [Magyar](./translations/README.hu.md)<br>
+[Български](./translations/README.bg.md) · [Српски](./translations/README.sr.md) · [हिन्दी](./translations/README.hi.md) · [Tiếng Việt](./translations/README.vi.md)
 
 <sub>English is canonical; every link above opens a repository-local README file.</sub>
 </details>
@@ -31,9 +31,9 @@ One `npx` command installs them. No remote backend or cloud hosting: your coding
 
 ## What is this?
 
-Agent-Vorcl-Flow turns a supported coding agent into a **structured engineering team**. Instead of one general assistant, you get **22 focused sub-agents** (architect, backend, frontend, Expo mobile engineer, DB engineer, architecture cartographer, liveboard operator, and more), each with its own domain **skills**, quick **slash commands**, and the **MCP tools** it needs. Every non-trivial task runs through a disciplined **Task Master** loop — *goal → tasks → implement → verify → done* — so work is planned, tracked, and survives interruptions.
+Agent-Vorcl-Flow turns a supported coding agent into a **structured engineering team**. Instead of one general assistant, you get **24 focused sub-agents** (architect, code-grounded principal architect, backend, frontend, Expo mobile engineer, product and visual design engineer, DB engineer, architecture cartographer, liveboard operator, and more), each with its own domain **skills**, quick **slash commands**, and the **MCP tools** it needs. Every non-trivial task runs through a disciplined **Task Master** loop — *goal → tasks → implement → verify → done* — so work is planned, tracked, and survives interruptions.
 
-- 🧩 **22 sub-agents**, 44 skills, 135 slash commands
+- 🧩 **24 sub-agents**, 46 skills, 150 slash commands
 - ⚡ **One-command install** for Claude Code, Codex, Cursor, and/or Kimi CLI — `npx`
 - 🔌 **11 MCP servers** wired in (GitHub, Postgres, MongoDB, Redis, Docker, Firecrawl, Vercel, Render, filesystem, Task Master, Mermaid)
 - 🔑 **One `.env` file for all runtimes** — keys read by a launcher, not `~/.zshrc`, so they work even from GUI/IDE launches; no remote AVF service; liveboard is localhost-only and ephemeral
@@ -152,6 +152,7 @@ This keeps work planned, checkpointed, and resumable — nothing is declared "do
 | Agent | Role | Highlights |
 | --- | --- | --- |
 | 🔵 **architect** | Systems & solution architect | Requirements analysis, system/DB/API design, architecture reviews |
+| 🏛️ **principal-architect** | Principal software / infrastructure / AI architect | Scans real code in 11 languages and creates evidence-backed MD, JSON, HTML, PDF, draw.io and Mermaid; full-rescan updates preserve annotations |
 | 🟢 **backend** | Backend developer | Node/TS, Postgres, Redis; modular architecture; every route fully covered by OpenAPI |
 | 🟣 **frontend** | Frontend (React 19 / Next.js App Router) | Components, state, data-fetching, render/bundle optimization, tests |
 | 📱 **expo-mobile** | React Native + Expo engineer | Modular architecture plus Design/Motion/Interaction System, native navigation, tokens, gestures, haptics, Reduced Motion |
@@ -162,6 +163,7 @@ This keeps work planned, checkpointed, and resumable — nothing is declared "do
 | 🟦 **database** | DB engineer / DBA | Schema, queries & plans, indexes, N+1, safe reversible migrations, cache |
 | ⚪ **resilience** | Reliability: errors + logging | try/catch at the right boundaries, typed errors, retries/timeouts, structured logs |
 | 🖼️ **screenshot** | Screenshot UI → code | Turns a UI screenshot into production-ready, responsive, accessible code |
+| 🎨 **design-studio** | Product & visual design studio | Local HTML artifacts, prototypes, wireframes, decks/PPTX, documents, animation, 3D, design systems and Figma/GitHub/HTML import; adapted from MIT `JimLiu/baoyu-design` |
 | 🔎 **visual-research** | Screenshot → verified answer | Identifies the site/page, finds official docs, checks live data and answers with URLs and confidence |
 | 🎯 **pinpoint** | Screenshot → place in an existing project (read-only) | Grounds a running-app screenshot in the real codebase — component, `file:line`, route/page, the exact control, and the logic behind it; creates nothing, delegates the edit |
 | 📊 **drawio** | Diagrams (draw.io / diagrams.net) | Flowchart, BPMN, UML, ERD, network/cloud, and PMP/PMBOK (WBS, Gantt, RACI…) |
@@ -179,6 +181,7 @@ This keeps work planned, checkpointed, and resumable — nothing is declared "do
 - **`database` mutations require explicit confirmation.** Analytics are read-only; schema/data changes (DDL/DML/migrations) never run without your go-ahead.
 - **`resilience` ships a safety hook.** A non-blocking `PostToolUse` hook (`catch-guard.js`) gently flags empty `catch {}` blocks in files you just edited.
 - **`archmap` never draws from imagination.** Extraction and rendering are strictly separated: zero-dependency scripts walk the repo into `architecture.json` (databases with real FK cardinality, API routes, AI agents with their models/tools/memory, import graph, env), and every diagram is rendered from that JSON only. Anything the LLM adds without a verifiable `file:line` is force-marked `inferred:true` and drawn dashed.
+- **`principal-architect` is the full architecture publication workflow.** It works in whichever repository launches the agent, ignores Markdown claims as topology evidence, uses bundled offline Tree-sitter WASM for TS/JS, Python, Go, Java, C#, Rust, PHP, Ruby, Kotlin and Swift, writes `ARCHITECTURE.md` first, then produces the shared JSON model, self-contained HTML, PDF, native draw.io and copyable Mermaid L0–L4. `update` performs a full rescan and preserves annotations and unmanaged files.
 - **`pinpoint` finds, never creates.** Given a screenshot of a running app, it maps the screen to the real code — component, route, the exact control and the logic behind it — and hands the edit to `frontend`/`backend`. It works on what already exists (the inverse of `screenshot`).
 - **`visual-research` verifies instead of guessing.** It treats a screenshot as evidence, confirms the official domain and docs, checks current site data, and flags possible phishing or stale values.
 - **`i18n` enforces "zero language hardcoding."** Agents first detect whether a project is multilingual and adapt — user-facing strings go through a translation layer (next-intl / react-i18next / i18next), never inline.
@@ -202,6 +205,13 @@ Every command below is a slash command. `<…>` marks your input.
 | `/architect:analyze <context>` | Analyze requirements and the task's context. |
 | `/architect:design <problem>` | Design the solution architecture (system, DB, API). |
 | `/architect:review <target>` | Review an existing architecture. |
+
+### 🏛️ principal-architect — code-grounded architecture package
+| Command | What it does |
+| --- | --- |
+| `/principal-architect:vorcl <goal>` | Runs a large architecture objective through Task Master and verified artifacts. |
+| `/principal-architect:create [options]` | Scans the current repository and creates MD, JSON, HTML, PDF, draw.io and Mermaid from code evidence. |
+| `/principal-architect:update [options]` | Full-rescans an existing package, writes an evidence diff and atomically refreshes generated artifacts. |
 
 ### 🟢 backend — server (Node/TS, Postgres, Redis)
 | Command | What it does |
@@ -311,6 +321,22 @@ Every command below is a slash command. `<…>` marks your input.
 | `/screenshot:convert <image> [framework]` | Generate full runnable code from a screenshot (default React + Tailwind v4). |
 | `/screenshot:tokens <image>` | Extract design tokens (OKLCH colors, typography, spacing) into Tailwind `@theme`. |
 | `/screenshot:responsive <target>` | Make the generated UI responsive — breakpoints, fluid, `clamp()`, container queries. |
+
+### 🎨 design-studio — product and visual design
+| Command | What it does |
+| --- | --- |
+| `/design-studio:vorcl <goal>` | Full design goal through Task Master — context → variants → HTML → preview → verification → export. |
+| `/design-studio:create <brief>` | Create a polished self-contained visual artifact or hi-fi UI. |
+| `/design-studio:prototype <flow>` | Build an interactive web/mobile prototype with states and transitions. |
+| `/design-studio:wireframe <flow>` | Build a low-fi wireframe focused on information architecture and UX. |
+| `/design-studio:design-system <operation>` | Create, import, compile, bind, refresh or check a design system. |
+| `/design-studio:import <type> <source>` | Import Figma `.fig`, GitHub or HTML/CSS with provenance. |
+| `/design-studio:deck <brief>` | Build an HTML deck with speaker notes, animations and optional editable PPTX. |
+| `/design-studio:document <brief>` | Build a print-ready document, résumé, memo, one-pager or report. |
+| `/design-studio:animation <brief>` | Build a motion artifact and optionally render it to MP4. |
+| `/design-studio:research <question>` | Create a source-backed visual research artifact. |
+| `/design-studio:export <project> <format>` | Export to standalone HTML, PDF, PPTX, MP4 or a handoff format. |
+| `/design-studio:review <target>` | Read-only visual, UX, responsive, a11y and design-system review. |
 
 ### 🔎 visual-research — screenshot → verified web answer
 | Command | What it does |
@@ -566,12 +592,13 @@ Kimi CLI has no `${VAR}` expansion in `mcp.json`, so keys come from the shared `
 ```text
 .claude-plugin/plugin.json      # plugin manifest
 .claude-plugin/marketplace.json # local marketplace (for install)
-agents/       22 sub-agent definitions (*.md)
-skills/       <skill>/SKILL.md            (44 skills; some ship references, scripts, tests or HTML assets)
-commands/     <namespace>/<command>.md    (135 commands, /namespace:command, including /vorcl and /audit)
+agents/       24 sub-agent definitions (*.md)
+skills/       <skill>/SKILL.md            (46 skills; some ship references, scripts, tests or HTML assets)
+commands/     <namespace>/<command>.md    (150 commands, /namespace:command, including /vorcl and /audit)
 hooks/        hooks.json + SessionStart + PostToolUse guards (empty catch, Expo architecture/UI boundaries)
 .mcp.json     github, filesystem, postgres, mongodb, redis, docker, firecrawl, vercel, render, task-master, mermaid
 .env.example  template for ~/.config/agent-vorcl-flow/.env (single key file for all runtimes)
+translations/ localized README files (21 translations)
 bin/          install.mjs (the npx installer) + mcp-env.mjs (cross-runtime MCP launcher / .env loader)
 codex/        GPT Codex adapter (skills + config.toml + install.sh)
 cursor/       Cursor adapter (MCP template + installation notes)

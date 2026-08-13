@@ -1,0 +1,432 @@
+{
+  "generatedAt": "2026-07-26T01:37:56.278Z",
+  "extracted": "<upstream-extract>",
+  "target": "<upstream-skill>",
+  "dryRun": false,
+  "protectedSkills": [
+    "design-components.md",
+    "frontend-design.md",
+    "hi-fi-design.md",
+    "make-a-deck.md",
+    "read-pdf.md",
+    "save-as-pdf.md",
+    "save-as-standalone-html.md",
+    "speaker-notes.md"
+  ],
+  "changes": [
+    {
+      "action": "copy",
+      "source": "<upstream-extract>/built-in-skills/3d-object.md",
+      "destination": "<upstream-skill>/built-in-skills/3d-object.md",
+      "bytes": 4282
+    },
+    {
+      "action": "copy",
+      "source": "<upstream-extract>/built-in-skills/animated-video.md",
+      "destination": "<upstream-skill>/built-in-skills/animated-video.md",
+      "bytes": 10190
+    },
+    {
+      "action": "copy",
+      "source": "<upstream-extract>/built-in-skills/ask-the-user.md",
+      "destination": "<upstream-skill>/built-in-skills/ask-the-user.md",
+      "bytes": 17691
+    },
+    {
+      "action": "copy",
+      "source": "<upstream-extract>/built-in-skills/claude-api-in-prototypes.md",
+      "destination": "<upstream-skill>/built-in-skills/claude-api-in-prototypes.md",
+      "bytes": 1101
+    },
+    {
+      "action": "copy",
+      "source": "<upstream-extract>/built-in-skills/create-design-system.md",
+      "destination": "<upstream-skill>/built-in-skills/create-design-system.md",
+      "bytes": 19020
+    },
+    {
+      "action": "copy",
+      "source": "<upstream-extract>/built-in-skills/data-science.md",
+      "destination": "<upstream-skill>/built-in-skills/data-science.md",
+      "bytes": 22110
+    },
+    {
+      "action": "copy",
+      "source": "<upstream-extract>/built-in-skills/data-visualization.md",
+      "destination": "<upstream-skill>/built-in-skills/data-visualization.md",
+      "bytes": 9720
+    },
+    {
+      "action": "preserve-for-merge",
+      "name": "design-components.md"
+    },
+    {
+      "action": "copy",
+      "source": "<upstream-extract>/built-in-skills/design-feedback.md",
+      "destination": "<upstream-skill>/built-in-skills/design-feedback.md",
+      "bytes": 6255
+    },
+    {
+      "action": "copy",
+      "source": "<upstream-extract>/built-in-skills/experiment-workflow.md",
+      "destination": "<upstream-skill>/built-in-skills/experiment-workflow.md",
+      "bytes": 11623
+    },
+    {
+      "action": "copy",
+      "source": "<upstream-extract>/built-in-skills/export-pptx-editable.md",
+      "destination": "<upstream-skill>/built-in-skills/export-pptx-editable.md",
+      "bytes": 6107
+    },
+    {
+      "action": "copy",
+      "source": "<upstream-extract>/built-in-skills/export-pptx-screenshots.md",
+      "destination": "<upstream-skill>/built-in-skills/export-pptx-screenshots.md",
+      "bytes": 1884
+    },
+    {
+      "action": "copy",
+      "source": "<upstream-extract>/built-in-skills/exportable-video.md",
+      "destination": "<upstream-skill>/built-in-skills/exportable-video.md",
+      "bytes": 2360
+    },
+    {
+      "action": "copy",
+      "source": "<upstream-extract>/built-in-skills/flier.md",
+      "destination": "<upstream-skill>/built-in-skills/flier.md",
+      "bytes": 2113
+    },
+    {
+      "action": "preserve-for-merge",
+      "name": "frontend-design.md"
+    },
+    {
+      "action": "copy",
+      "source": "<upstream-extract>/built-in-skills/gemini-image.md",
+      "destination": "<upstream-skill>/built-in-skills/gemini-image.md",
+      "bytes": 604
+    },
+    {
+      "action": "copy",
+      "source": "<upstream-extract>/built-in-skills/google-slides-safe.md",
+      "destination": "<upstream-skill>/built-in-skills/google-slides-safe.md",
+      "bytes": 821
+    },
+    {
+      "action": "copy",
+      "source": "<upstream-extract>/built-in-skills/handoff-to-claude-code.md",
+      "destination": "<upstream-skill>/built-in-skills/handoff-to-claude-code.md",
+      "bytes": 4103
+    },
+    {
+      "action": "preserve-for-merge",
+      "name": "hi-fi-design.md"
+    },
+    {
+      "action": "copy",
+      "source": "<upstream-extract>/built-in-skills/html-email.md",
+      "destination": "<upstream-skill>/built-in-skills/html-email.md",
+      "bytes": 2606
+    },
+    {
+      "action": "copy",
+      "source": "<upstream-extract>/built-in-skills/interactive-prototype.md",
+      "destination": "<upstream-skill>/built-in-skills/interactive-prototype.md",
+      "bytes": 423
+    },
+    {
+      "action": "preserve-for-merge",
+      "name": "make-a-deck.md"
+    },
+    {
+      "action": "copy",
+      "source": "<upstream-extract>/built-in-skills/make-a-doc.md",
+      "destination": "<upstream-skill>/built-in-skills/make-a-doc.md",
+      "bytes": 2635
+    },
+    {
+      "action": "copy",
+      "source": "<upstream-extract>/built-in-skills/make-tweakable.md",
+      "destination": "<upstream-skill>/built-in-skills/make-tweakable.md",
+      "bytes": 369
+    },
+    {
+      "action": "copy",
+      "source": "<upstream-extract>/built-in-skills/maps-geography.md",
+      "destination": "<upstream-skill>/built-in-skills/maps-geography.md",
+      "bytes": 2870
+    },
+    {
+      "action": "copy",
+      "source": "<upstream-extract>/built-in-skills/mobile-prototype.md",
+      "destination": "<upstream-skill>/built-in-skills/mobile-prototype.md",
+      "bytes": 3382
+    },
+    {
+      "action": "copy",
+      "source": "<upstream-extract>/built-in-skills/options-stack.md",
+      "destination": "<upstream-skill>/built-in-skills/options-stack.md",
+      "bytes": 1170
+    },
+    {
+      "action": "preserve-for-merge",
+      "name": "read-pdf.md"
+    },
+    {
+      "action": "preserve-for-merge",
+      "name": "save-as-pdf.md"
+    },
+    {
+      "action": "preserve-for-merge",
+      "name": "save-as-standalone-html.md"
+    },
+    {
+      "action": "copy",
+      "source": "<upstream-extract>/built-in-skills/social-media-content.md",
+      "destination": "<upstream-skill>/built-in-skills/social-media-content.md",
+      "bytes": 10881
+    },
+    {
+      "action": "copy",
+      "source": "<upstream-extract>/built-in-skills/something-cool.md",
+      "destination": "<upstream-skill>/built-in-skills/something-cool.md",
+      "bytes": 999
+    },
+    {
+      "action": "copy",
+      "source": "<upstream-extract>/built-in-skills/sound-effects.md",
+      "destination": "<upstream-skill>/built-in-skills/sound-effects.md",
+      "bytes": 599
+    },
+    {
+      "action": "preserve-for-merge",
+      "name": "speaker-notes.md"
+    },
+    {
+      "action": "copy",
+      "source": "<upstream-extract>/built-in-skills/trifold-brochure.md",
+      "destination": "<upstream-skill>/built-in-skills/trifold-brochure.md",
+      "bytes": 2696
+    },
+    {
+      "action": "copy",
+      "source": "<upstream-extract>/built-in-skills/watercolor-illustration.md",
+      "destination": "<upstream-skill>/built-in-skills/watercolor-illustration.md",
+      "bytes": 10467
+    },
+    {
+      "action": "copy",
+      "source": "<upstream-extract>/built-in-skills/web-research.md",
+      "destination": "<upstream-skill>/built-in-skills/web-research.md",
+      "bytes": 2000
+    },
+    {
+      "action": "copy",
+      "source": "<upstream-extract>/built-in-skills/website-landing-page.md",
+      "destination": "<upstream-skill>/built-in-skills/website-landing-page.md",
+      "bytes": 3863
+    },
+    {
+      "action": "copy",
+      "source": "<upstream-extract>/built-in-skills/wireframe.md",
+      "destination": "<upstream-skill>/built-in-skills/wireframe.md",
+      "bytes": 847
+    },
+    {
+      "action": "copy",
+      "source": "<upstream-extract>/starter-components/android-frame.jsx",
+      "destination": "<upstream-skill>/starter-components/android-frame.jsx",
+      "bytes": 10079
+    },
+    {
+      "action": "copy",
+      "source": "<upstream-extract>/starter-components/animations-v2.jsx",
+      "destination": "<upstream-skill>/starter-components/animations-v2.jsx",
+      "bytes": 60879
+    },
+    {
+      "action": "copy",
+      "source": "<upstream-extract>/starter-components/animations-v3.jsx",
+      "destination": "<upstream-skill>/starter-components/animations-v3.jsx",
+      "bytes": 43509
+    },
+    {
+      "action": "copy",
+      "source": "<upstream-extract>/starter-components/browser-window.jsx",
+      "destination": "<upstream-skill>/starter-components/browser-window.jsx",
+      "bytes": 4497
+    },
+    {
+      "action": "copy",
+      "source": "<upstream-extract>/starter-components/chart-stage.js",
+      "destination": "<upstream-skill>/starter-components/chart-stage.js",
+      "bytes": 22716
+    },
+    {
+      "action": "copy",
+      "source": "<upstream-extract>/starter-components/chrome-shell.js",
+      "destination": "<upstream-skill>/starter-components/chrome-shell.js",
+      "bytes": 10179
+    },
+    {
+      "action": "copy",
+      "source": "<upstream-extract>/starter-components/data-overlay.js",
+      "destination": "<upstream-skill>/starter-components/data-overlay.js",
+      "bytes": 96714
+    },
+    {
+      "action": "preserve-for-merge",
+      "name": "deck-stage.js"
+    },
+    {
+      "action": "copy",
+      "source": "<upstream-extract>/starter-components/design-canvas.jsx",
+      "destination": "<upstream-skill>/starter-components/design-canvas.jsx",
+      "bytes": 53258
+    },
+    {
+      "action": "copy",
+      "source": "<upstream-extract>/starter-components/doc-page.js",
+      "destination": "<upstream-skill>/starter-components/doc-page.js",
+      "bytes": 36948
+    },
+    {
+      "action": "copy",
+      "source": "<upstream-extract>/starter-components/facebook-shell.js",
+      "destination": "<upstream-skill>/starter-components/facebook-shell.js",
+      "bytes": 15574
+    },
+    {
+      "action": "copy",
+      "source": "<upstream-extract>/starter-components/file-window.js",
+      "destination": "<upstream-skill>/starter-components/file-window.js",
+      "bytes": 37744
+    },
+    {
+      "action": "copy",
+      "source": "<upstream-extract>/starter-components/image-slot.js",
+      "destination": "<upstream-skill>/starter-components/image-slot.js",
+      "bytes": 65113
+    },
+    {
+      "action": "copy",
+      "source": "<upstream-extract>/starter-components/instagram-shell.js",
+      "destination": "<upstream-skill>/starter-components/instagram-shell.js",
+      "bytes": 16039
+    },
+    {
+      "action": "copy",
+      "source": "<upstream-extract>/starter-components/instagram-story.js",
+      "destination": "<upstream-skill>/starter-components/instagram-story.js",
+      "bytes": 14236
+    },
+    {
+      "action": "copy",
+      "source": "<upstream-extract>/starter-components/ios-frame.jsx",
+      "destination": "<upstream-skill>/starter-components/ios-frame.jsx",
+      "bytes": 16270
+    },
+    {
+      "action": "copy",
+      "source": "<upstream-extract>/starter-components/ios-shell.js",
+      "destination": "<upstream-skill>/starter-components/ios-shell.js",
+      "bytes": 12715
+    },
+    {
+      "action": "copy",
+      "source": "<upstream-extract>/starter-components/linkedin-shell.js",
+      "destination": "<upstream-skill>/starter-components/linkedin-shell.js",
+      "bytes": 14307
+    },
+    {
+      "action": "copy",
+      "source": "<upstream-extract>/starter-components/macos-window.jsx",
+      "destination": "<upstream-skill>/starter-components/macos-window.jsx",
+      "bytes": 8574
+    },
+    {
+      "action": "copy",
+      "source": "<upstream-extract>/starter-components/pinterest-shell.js",
+      "destination": "<upstream-skill>/starter-components/pinterest-shell.js",
+      "bytes": 12242
+    },
+    {
+      "action": "copy",
+      "source": "<upstream-extract>/starter-components/post-card.js",
+      "destination": "<upstream-skill>/starter-components/post-card.js",
+      "bytes": 9507
+    },
+    {
+      "action": "copy",
+      "source": "<upstream-extract>/starter-components/reddit-shell.js",
+      "destination": "<upstream-skill>/starter-components/reddit-shell.js",
+      "bytes": 13213
+    },
+    {
+      "action": "copy",
+      "source": "<upstream-extract>/starter-components/social-frames.js",
+      "destination": "<upstream-skill>/starter-components/social-frames.js",
+      "bytes": 10052
+    },
+    {
+      "action": "copy",
+      "source": "<upstream-extract>/starter-components/three-d-stage.js",
+      "destination": "<upstream-skill>/starter-components/three-d-stage.js",
+      "bytes": 16375
+    },
+    {
+      "action": "copy",
+      "source": "<upstream-extract>/starter-components/tiktok-shell.js",
+      "destination": "<upstream-skill>/starter-components/tiktok-shell.js",
+      "bytes": 19197
+    },
+    {
+      "action": "copy",
+      "source": "<upstream-extract>/starter-components/tweaks-panel.jsx",
+      "destination": "<upstream-skill>/starter-components/tweaks-panel.jsx",
+      "bytes": 25202
+    },
+    {
+      "action": "copy",
+      "source": "<upstream-extract>/starter-components/x-shell.js",
+      "destination": "<upstream-skill>/starter-components/x-shell.js",
+      "bytes": 13970
+    },
+    {
+      "action": "copy",
+      "source": "<upstream-extract>/starter-components/youtube-shell.js",
+      "destination": "<upstream-skill>/starter-components/youtube-shell.js",
+      "bytes": 13514
+    },
+    {
+      "action": "copy",
+      "source": "/tmp/deck-merge.KKdukS/skills/baoyu-design/starter-components/deck-stage.js",
+      "destination": "<upstream-skill>/starter-components/deck-stage.js",
+      "bytes": 178469
+    },
+    {
+      "action": "copy",
+      "source": "<upstream-extract>/system-prompt.md",
+      "destination": "<upstream-skill>/references/upstream-system-prompt.md",
+      "bytes": 30410
+    },
+    {
+      "action": "copy",
+      "source": "<upstream-extract>/built-in-skills.json",
+      "destination": "<upstream-skill>/references/upstream-sync/built-in-skills.json",
+      "bytes": 223701
+    },
+    {
+      "action": "copy",
+      "source": "<upstream-extract>/starter-components.json",
+      "destination": "<upstream-skill>/references/upstream-sync/starter-components.json",
+      "bytes": 16338
+    },
+    {
+      "action": "copy",
+      "source": "<upstream-extract>/provenance.json",
+      "destination": "<upstream-skill>/references/upstream-sync/provenance.json",
+      "bytes": 1251
+    }
+  ]
+}

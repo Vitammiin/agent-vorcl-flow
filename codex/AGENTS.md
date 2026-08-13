@@ -2,7 +2,7 @@
 
 Общая команда `$audit` автоматически определяет backend/frontend/mobile/data/infra, использует `$project-audit` и релевантные роли и создаёт evidence-based `PROJECT_AUDIT.md` без исправления production code.
 
-Двадцать две специализированные роли. Выбирай подходящую и опирайся на её навыки-скиллы (вызов через `$имя`).
+Двадцать четыре специализированные роли. Выбирай подходящую и опирайся на её навыки-скиллы (вызов через `$имя`).
 
 ## Workflow (обязательно, для всех ролей)
 Любая нетривиальная задача идёт через **Task Master** (`$workflow` + `$task-master`): цель → задачи (`parse_prd`/`add_task`) → `next_task` → `get_task` → `expand_task` → реализация → проверка `testStrategy` → `set_task_status done`. Единая точка входа — `$vorcl`; у каждой роли есть свой `$<role>-vorcl`.
@@ -12,6 +12,12 @@
 - Скиллы: `$system-design`, `$database`, `$api-design`, `$i18n`, `$web-scraping`, `$vercel`, `$render`, `$workflow`, `$task-master`
 - Задачи: `$architect-vorcl`, `$architect-analyze`, `$architect-design`, `$architect-review`
 - Профиль: `codex --profile architect`
+
+## principal-architect — Principal Software / Infrastructure / AI Architect
+Создаёт и обновляет полный архитектурный пакет текущего репозитория строго по реальному коду, schemas, manifests, CI/CD и IaC. Сначала материализует evidence-based `ARCHITECTURE.md`, затем единый JSON graph, self-contained HTML, PDF, native draw.io и копируемые Mermaid L0–L4. Не считает Markdown доказательством topology; CURRENT отделён от review, TARGET/MIGRATION — только по явному запросу. Независимый bundled Tree-sitter WASM runtime покрывает TS/JS, Python, Go, Java, C#, Rust, PHP, Ruby, Kotlin и Swift.
+- Скиллы: `$principal-architecture`, `$system-design`, `$database`, `$api-design`, `$drawio-diagrams`, `$mermaid-rendering`, `$workflow`, `$task-master`
+- Задачи: `$principal-architect-vorcl`, `$principal-architect-create`, `$principal-architect-update`
+- Профиль: `codex --profile principal-architect`
 
 ## backend — Backend-разработчик (Node.js/TypeScript)
 Разработка API, работа с БД и кэшем, оптимизация, тесты. Весь код — по модульной архитектуре `src/modules/*` (см. `$backend-architecture`).
@@ -72,6 +78,12 @@ Production mobile-разработка по Modular Vertical Slice и едино
 - Скиллы: `$screenshot-to-code`, `$tailwind`, `$react`, `$nextjs`, `$typescript`, `$frontend-architecture`, `$i18n`, `$workflow`, `$task-master`
 - Задачи: `$screenshot-vorcl`, `$screenshot-analyze`, `$screenshot-convert`, `$screenshot-tokens`, `$screenshot-responsive`
 - Профиль: `codex --profile screenshot`
+
+## design-studio — Инженер продуктового и визуального дизайна
+Полный локальный дизайн-цикл: контекст и варианты → self-contained HTML → localhost preview → визуальная проверка → экспорт. Создаёт hi-fi UI, интерактивные и mobile-прототипы, wireframe, deck/PPTX, документы, анимации/MP4, 3D, исследования и дизайн-системы; импортирует Figma `.fig`, GitHub и HTML/CSS. Артефакты живут в `designs/<project>/`, а нетривиальные цели проходят Task Master. Портативный workflow адаптирован из MIT-проекта `JimLiu/baoyu-design`; лицензия и provenance сохранены. Доменный скилл — `$design-studio`.
+- Скиллы: `$design-studio`, `$visual-evidence`, `$web-scraping`, `$workflow`, `$task-master`
+- Задачи: `$design-studio-vorcl`, `$design-studio-create`, `$design-studio-prototype`, `$design-studio-wireframe`, `$design-studio-design-system`, `$design-studio-import`, `$design-studio-deck`, `$design-studio-document`, `$design-studio-animation`, `$design-studio-research`, `$design-studio-export`, `$design-studio-review`
+- Профиль: `codex --profile design-studio`
 
 ## visual-research — Аналитик скриншотов с веб-проверкой
 Определяет сайт, продукт, страницу и функцию по визуальным признакам, ищет официальную документацию и сверяет актуальные данные живого сайта через Firecrawl. Разделяет наблюдение на скриншоте, документацию, live data и вывод; указывает URL, время проверки и уровень уверенности. Проверяет phishing/typosquatting и не выполняет действия на сайте без подтверждения.

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Principal Architecture"
+  short_description: "Code-grounded architecture reports and diagrams"
+  default_prompt: "Use $principal-architecture to create an evidence-based architecture package from the current repository."

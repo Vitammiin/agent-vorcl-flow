@@ -17,6 +17,7 @@ allowed-tools: Read, Write, Edit, Bash, Grep, Glob
 | Домен задачи | Субагент |
 | --- | --- |
 | Архитектура, выбор технологий, system design | `architect` |
+| Полная реальная архитектура текущего репозитория по коду + MD/HTML/PDF/draw.io/Mermaid | `principal-architect` |
 | API, серверная логика, Node.js/TypeScript | `backend` |
 | UI, React/Next.js, состояние, загрузка данных | `frontend` |
 | React Native + Expo: routes, screens, modules, state, storage, native | `expo-mobile` |
@@ -27,6 +28,7 @@ allowed-tools: Read, Write, Edit, Bash, Grep, Glob
 | Схема БД, запросы, миграции, кэш (Postgres/Mongo/Redis) | `database` |
 | Обработка ошибок, try/catch, логирование | `resilience` |
 | Скриншот UI → новый код | `screenshot` |
+| Продуктовый/визуальный дизайн: prototype, wireframe, deck, document, animation, design system | `design-studio` |
 | Скриншот → место в существующем коде (read-only) | `pinpoint` |
 | Диаграммы draw.io (сложная раскладка, PMP/PMBOK) | `drawio` |
 | Карта архитектуры по коду (architecture.json, ERD, интерактивный HTML) | `archmap` |

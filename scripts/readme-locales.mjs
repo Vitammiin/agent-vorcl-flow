@@ -8,31 +8,32 @@ import { fileURLToPath } from 'node:url'
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const CANONICAL = path.join(ROOT, 'README.md')
+const TRANSLATIONS_DIR = 'translations'
 const GENERATED_MARKER_PATTERN = /<!-- Generated from README\.md by scripts\/readme-locales\.mjs(?:; source-sha256: [a-f0-9]{64})?\. -->/
 
 const LOCALES = [
   { code: 'en', label: 'English', file: 'README.md', source: true },
-  { code: 'ru', label: 'Русский', file: 'README.ru.md', source: true },
-  { code: 'uk', label: 'Українська', file: 'README.uk.md' },
-  { code: 'de', label: 'Deutsch', file: 'README.de.md' },
-  { code: 'fr', label: 'Français', file: 'README.fr.md' },
-  { code: 'es', label: 'Español', file: 'README.es.md' },
-  { code: 'pt', label: 'Português', file: 'README.pt.md' },
-  { code: 'it', label: 'Italiano', file: 'README.it.md' },
-  { code: 'pl', label: 'Polski', file: 'README.pl.md' },
-  { code: 'tr', label: 'Türkçe', file: 'README.tr.md' },
-  { code: 'zh-CN', label: '中文', file: 'README.zh-CN.md' },
-  { code: 'ja', label: '日本語', file: 'README.ja.md' },
-  { code: 'ko', label: '한국어', file: 'README.ko.md' },
-  { code: 'ar', label: 'العربية', file: 'README.ar.md', rtl: true },
-  { code: 'nl', label: 'Nederlands', file: 'README.nl.md' },
-  { code: 'cs', label: 'Čeština', file: 'README.cs.md' },
-  { code: 'ro', label: 'Română', file: 'README.ro.md' },
-  { code: 'hu', label: 'Magyar', file: 'README.hu.md' },
-  { code: 'bg', label: 'Български', file: 'README.bg.md' },
-  { code: 'sr', label: 'Српски', file: 'README.sr.md' },
-  { code: 'hi', label: 'हिन्दी', file: 'README.hi.md' },
-  { code: 'vi', label: 'Tiếng Việt', file: 'README.vi.md' },
+  { code: 'ru', label: 'Русский', file: `${TRANSLATIONS_DIR}/README.ru.md`, source: true },
+  { code: 'uk', label: 'Українська', file: `${TRANSLATIONS_DIR}/README.uk.md` },
+  { code: 'de', label: 'Deutsch', file: `${TRANSLATIONS_DIR}/README.de.md` },
+  { code: 'fr', label: 'Français', file: `${TRANSLATIONS_DIR}/README.fr.md` },
+  { code: 'es', label: 'Español', file: `${TRANSLATIONS_DIR}/README.es.md` },
+  { code: 'pt', label: 'Português', file: `${TRANSLATIONS_DIR}/README.pt.md` },
+  { code: 'it', label: 'Italiano', file: `${TRANSLATIONS_DIR}/README.it.md` },
+  { code: 'pl', label: 'Polski', file: `${TRANSLATIONS_DIR}/README.pl.md` },
+  { code: 'tr', label: 'Türkçe', file: `${TRANSLATIONS_DIR}/README.tr.md` },
+  { code: 'zh-CN', label: '中文', file: `${TRANSLATIONS_DIR}/README.zh-CN.md` },
+  { code: 'ja', label: '日本語', file: `${TRANSLATIONS_DIR}/README.ja.md` },
+  { code: 'ko', label: '한국어', file: `${TRANSLATIONS_DIR}/README.ko.md` },
+  { code: 'ar', label: 'العربية', file: `${TRANSLATIONS_DIR}/README.ar.md`, rtl: true },
+  { code: 'nl', label: 'Nederlands', file: `${TRANSLATIONS_DIR}/README.nl.md` },
+  { code: 'cs', label: 'Čeština', file: `${TRANSLATIONS_DIR}/README.cs.md` },
+  { code: 'ro', label: 'Română', file: `${TRANSLATIONS_DIR}/README.ro.md` },
+  { code: 'hu', label: 'Magyar', file: `${TRANSLATIONS_DIR}/README.hu.md` },
+  { code: 'bg', label: 'Български', file: `${TRANSLATIONS_DIR}/README.bg.md` },
+  { code: 'sr', label: 'Српски', file: `${TRANSLATIONS_DIR}/README.sr.md` },
+  { code: 'hi', label: 'हिन्दी', file: `${TRANSLATIONS_DIR}/README.hi.md` },
+  { code: 'vi', label: 'Tiếng Việt', file: `${TRANSLATIONS_DIR}/README.vi.md` },
 ]
 
 const REQUIRED_TOKENS = [
@@ -73,19 +74,26 @@ function protectedToken(index, ascii) {
 function languageBlock(active) {
   const links = LOCALES.map((locale) => {
     const label = locale.code === active ? `**${locale.label}**` : locale.label
-    return `[${label}](./${locale.file})`
+    const href = active === 'en'
+      ? `./${locale.file}`
+      : locale.code === 'en' ? '../README.md' : `./${path.basename(locale.file)}`
+    return `[${label}](${href})`
   })
   const rows = []
   for (let index = 0; index < links.length; index += 6) rows.push(links.slice(index, index + 6).join(' · '))
   return [
     '<details>',
-    `<summary>🌐 <strong>Languages (${LOCALES.length})</strong> — all translations are stored in Git</summary>`,
+    `<summary>🌐 <strong>Languages (${LOCALES.length})</strong> — translations live in \`translations/\`</summary>`,
     '',
     rows.join('<br>\n'),
     '',
     '<sub>English is canonical; every link above opens a repository-local README file.</sub>',
     '</details>',
   ].join('\n')
+}
+
+function relocateRepositoryLinks(source) {
+  return source.replace(/(!?\[[^\]\n]*\]\()\.\//g, '$1../')
 }
 
 function generatedMarker(canonical) {
@@ -114,6 +122,9 @@ function protectMarkdown(source, { asciiTokens = false } = {}) {
   }
   let text = source
   text = text.replace(/```[\s\S]*?```/g, protect)
+  // Keep complete headings stable. Translators sometimes split or merge heading
+  // lines, which changes GitHub anchors and can silently break the TOC.
+  text = text.replace(/^\s{0,3}#{1,6}\s+.*$/gm, protect)
   text = text.replace(/`[^`\n]+`/g, protect)
   text = text.replace(/!?\[[^\]\n]*\]\((?:[^()\n]|\([^)]*\))+\)/g, protect)
   text = text.replace(/\]\((?:[^()\n]|\([^)]*\))+\)/g, protect)
@@ -121,7 +132,6 @@ function protectMarkdown(source, { asciiTokens = false } = {}) {
   text = text.replace(/https?:\/\/[^\s)>]+/g, protect)
   const terms = PROTECTED_TERMS.map((term) => term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|')
   text = text.replace(new RegExp(`(?<![\\p{Letter}\\p{Number}])(?:${terms})(?![\\p{Letter}\\p{Number}])`, 'gu'), protect)
-  text = text.replace(/^(\s{0,3}#{1,6}\s+)/gm, protect)
   return {
     text,
     restore(translated) {
@@ -222,6 +232,7 @@ async function generateLocale(locale, canonical) {
   const protectedSource = protectMarkdown(withoutSwitcher, { asciiTokens: locale.code === 'zh-CN' })
   const translatedChunks = await mapPool(chunks(protectedSource.text), 3, (chunk) => translateChunk(chunk, locale.code))
   let output = protectedSource.restore(translatedChunks.join(''))
+  output = relocateRepositoryLinks(output)
   output = output.replace(languageToken, languageBlock(locale.code))
   output = localizeAnchorLinks(canonical, output)
   const marker = generatedMarker(canonical)
@@ -279,7 +290,12 @@ function check() {
     }
     const source = fs.readFileSync(file, 'utf8')
     if (source.includes('translate.google.com')) errors.push(`${locale.file}: external translation link remains`)
-    for (const target of LOCALES) if (!source.includes(`](./${target.file})`)) errors.push(`${locale.file}: missing local link to ${target.file}`)
+    for (const target of LOCALES) {
+      const href = locale.code === 'en'
+        ? `./${target.file}`
+        : target.code === 'en' ? '../README.md' : `./${path.basename(target.file)}`
+      if (!source.includes(`](${href})`)) errors.push(`${locale.file}: missing local link to ${target.file}`)
+    }
     if (!locale.source && !source.includes(generatedMarker(canonical))) errors.push(`${locale.file}: generated source hash differs from README.md`)
     if (JSON.stringify(fencedBlocks(source)) !== JSON.stringify(canonicalFences)) errors.push(`${locale.file}: fenced code blocks differ from README.md`)
     if (count(source, /^## /gm) !== canonicalH2) errors.push(`${locale.file}: H2 section count differs from README.md`)

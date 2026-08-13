@@ -7,12 +7,12 @@
 codex/
 ├── skills/<name>/SKILL.md   # навыки Codex (.agents/skills): персоны ролей + доменные + задачи
 ├── config.toml              # MCP-серверы [mcp_servers.*] + профили ролей [profiles.*]
-├── AGENTS.md                # роутинг ролей (architect, backend, frontend, expo-mobile, analyzer, swagger, firecrawl, render, database, resilience, screenshot, pinpoint, drawio, mermaid, archmap, testing, gitflow, security, docs, devops, liveboard)
+├── AGENTS.md                # роутинг ролей (architect, principal-architect, backend, frontend, expo-mobile, analyzer, swagger, firecrawl, render, database, resilience, screenshot, design-studio, pinpoint, drawio, mermaid, archmap, testing, gitflow, security, docs, devops, liveboard)
 └── scripts/install.sh       # установка в ~/.agents/skills и ~/.codex
 ```
 
 ## Роли
-`$architect` · `$backend` · `$frontend` · `$expo-mobile` · `$analyzer` · `$swagger` · `$firecrawl` · `$render` · `$database` · `$resilience` · `$screenshot` · `$pinpoint` · `$drawio` · `$mermaid` · `$archmap` · `$testing` · `$gitflow` · `$security` · `$docs` · `$devops` · `$liveboard`. Все работают через Task Master (`$workflow` + `$task-master`); единая точка входа — `$vorcl`, у каждой роли свой `$<role>-vorcl`. `$liveboard-start` запускает локальное in-memory табло worktree/агентов/задач на свободном порту. У `render`, `database` и `archmap` персона и доменный скилл совпадают; остальные доменные маршруты перечислены в `AGENTS.md`.
+`$architect` · `$principal-architect` · `$backend` · `$frontend` · `$expo-mobile` · `$analyzer` · `$swagger` · `$firecrawl` · `$render` · `$database` · `$resilience` · `$screenshot` · `$design-studio` · `$pinpoint` · `$drawio` · `$mermaid` · `$archmap` · `$testing` · `$gitflow` · `$security` · `$docs` · `$devops` · `$liveboard`. Все работают через Task Master (`$workflow` + `$task-master`); единая точка входа — `$vorcl`, у каждой роли свой `$<role>-vorcl`. `$principal-architect-create` и `$principal-architect-update` строят полный code-grounded архитектурный пакет текущего репозитория. `$liveboard-start` запускает локальное in-memory табло worktree/агентов/задач на свободном порту. У `render`, `database` и `archmap` персона и доменный скилл совпадают; остальные доменные маршруты перечислены в `AGENTS.md`.
 
 ## Маппинг Claude Code → Codex
 | Claude Code | Codex |

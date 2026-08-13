@@ -1,0 +1,4 @@
+interface:
+  display_name: "Design Studio"
+  short_description: "Create and verify rich visual design artifacts"
+  default_prompt: "Use $design-studio to create a polished, self-contained design artifact."

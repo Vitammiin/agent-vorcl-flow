@@ -136,6 +136,40 @@ done
 for rel in \
   SKILL.md \
   agents/openai.yaml \
+  references/architecture-methodology.md \
+  references/evidence-model.md \
+  references/rendering-contract.md \
+  scripts/principal-architecture.mjs \
+  scripts/render-md.mjs \
+  scripts/render-html.mjs \
+  scripts/render-drawio.mjs \
+  scripts/render-mermaid.mjs \
+  scripts/render-pdf.mjs \
+  scripts/validate.mjs \
+  scripts/lib/core.mjs \
+  scripts/lib/extract.mjs \
+  scripts/lib/model.mjs \
+  tests/principal-architecture.test.mjs \
+  assets/THIRD_PARTY_NOTICES.md
+do
+  canonical="skills/principal-architecture/$rel"
+  mirror="codex/skills/principal-architecture/$rel"
+  if [ -f "$canonical" ] && [ -f "$mirror" ] && cmp -s "$canonical" "$mirror"; then
+    pass
+  else
+    fail "Principal architecture resource отсутствует или разошёлся: $canonical ↔ $mirror"
+  fi
+done
+
+if [ -d skills/principal-architecture/assets/parsers ] && [ -d codex/skills/principal-architecture/assets/parsers ] && diff -qr skills/principal-architecture/assets/parsers codex/skills/principal-architecture/assets/parsers >/dev/null; then
+  pass
+else
+  fail "Principal architecture parser runtime отсутствует или разошёлся"
+fi
+
+for rel in \
+  SKILL.md \
+  agents/openai.yaml \
   references/audit-playbook.md \
   scripts/inventory.mjs \
   scripts/validate-report.mjs \

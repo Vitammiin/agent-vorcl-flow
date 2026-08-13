@@ -6,13 +6,15 @@
     "agent-vorcl-flow": "bin/install.mjs"
   },
   "scripts": {
-    "test": "node scripts/readme-locales.mjs --check && node --test skills/expo-mobile-architecture/tests/*.test.mjs skills/expo-ui-design-motion/tests/*.test.mjs skills/project-audit/tests/*.test.mjs",
+    "test": "node scripts/readme-locales.mjs --check && node --test skills/design-studio/agents/tests/*.test.mjs skills/expo-mobile-architecture/tests/*.test.mjs skills/expo-ui-design-motion/tests/*.test.mjs skills/project-audit/tests/*.test.mjs skills/principal-architecture/tests/*.test.mjs",
     "docs:locales": "node scripts/readme-locales.mjs --check",
     "docs:locales:generate": "node scripts/readme-locales.mjs --generate",
     "test:expo-architecture": "node --test skills/expo-mobile-architecture/tests/*.test.mjs",
     "test:expo-compatibility": "node --test skills/expo-mobile-architecture/tests/compatibility-preflight.test.mjs",
     "test:expo-ui": "node --test skills/expo-ui-design-motion/tests/*.test.mjs",
-    "test:project-audit": "node --test skills/project-audit/tests/*.test.mjs"
+    "test:project-audit": "node --test skills/project-audit/tests/*.test.mjs",
+    "test:design-studio": "node --test skills/design-studio/agents/tests/*.test.mjs",
+    "test:principal-architecture": "node --test skills/principal-architecture/tests/*.test.mjs"
   },
   "files": [
     "bin/",
@@ -28,7 +30,7 @@
     "cursor/",
     "kimi/",
     "README.md",
-    "README.*.md"
+    "translations/"
   ],
   "keywords": [
     "claude",
