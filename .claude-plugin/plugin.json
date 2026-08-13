@@ -1,7 +1,7 @@
 {
   "name": "agent-vorcl-flow",
   "displayName": "Agent Vorcl Flow",
-  "version": "2.3.1",
+  "version": "2.4.0",
   "description": "Специализированные субагенты со скиллами, Task Master, MCP, Expo tooling и общей /audit-командой для multi-role архитектурного, security, resilience и dependency аудита в PROJECT_AUDIT.md.",
   "author": { "name": "Avis" },
   "keywords": ["agents", "architect", "principal-architect", "principal-architecture", "polyglot", "tree-sitter", "backend", "frontend", "expo-mobile", "react-native", "expo-router", "expo-compatibility", "reanimated", "design-studio", "design-system", "prototype", "wireframe", "pptx", "motion-system", "haptics", "analyzer", "swagger", "firecrawl", "render", "database", "resilience", "error-handling", "i18n", "localization", "локализация", "интернационализация", "screenshot", "screenshot-to-code", "pinpoint", "ui-source-mapping", "locate", "drawio", "diagrams", "drawio-diagrams", "pmp-diagrams", "bpmn", "uml", "wbs", "mermaid", "mermaid-diagrams", "mermaid-rendering", "flowchart", "sequence-diagram", "archmap", "architecture-map", "architecture-diagram", "erd", "code-graph", "dependency-graph", "testing", "vitest", "playwright", "e2e", "gitflow", "conventional-commits", "semver", "changelog", "security", "security-audit", "secrets-detection", "owasp", "docs", "documentation", "technical-writing", "devops", "docker", "ci-cd", "github-actions", "liveboard", "dashboard", "worktree", "task-master", "workflow"],
