@@ -25,7 +25,7 @@ Bir `npx` komutuyla bunları yüklersiniz. Uzak arka uç veya bulut barındırma
 <sub>English is canonical; every link above opens a repository-local README file.</sub>
 </details>
 
-<!-- Generated from README.md by scripts/readme-locales.mjs; source-sha256: 72c33da6cabafc1329d572eb271a485d678403c7f9b5e6a96911fd227cabbc6c. -->
+<!-- Generated from README.md by scripts/readme-locales.mjs; source-sha256: 3321a7089b3f749787125626da692c98b8a2d556b237e1ba36bbf67afc34dc3d. -->
 
 </div>
 
@@ -35,7 +35,7 @@ Bir `npx` komutuyla bunları yüklersiniz. Uzak arka uç veya bulut barındırma
 
 Agent-Vorcl-Flow, desteklenen bir kodlama aracısını **yapılandırılmış bir mühendislik ekibine** dönüştürür. Bir genel asistan yerine, her biri kendi alanına ait **becerilere**, hızlı **eğik çizgi komutlarına** ve ihtiyaç duyduğu **MCP araçlara** sahip **25 odaklanmış alt aracı** (mimar, kod temelli baş mimar, arka uç, ön uç, Expo mobil mühendisi, ürün ve görsel tasarım mühendisi, DB mühendis, diller arası bütünlük denetçisi, mimari haritacı, liveboard operatörü ve daha fazlası) alırsınız. Önemsiz olmayan her görev disiplinli bir **Task Master** döngüden geçer — *hedef → görevler → uygulama → doğrulama → yapıldı* — böylece iş planlanır, takip edilir ve kesintilere karşı dayanıklı olur.
 
-- 🧩 **25 alt ajan**, 71 beceri, 155 eğik çizgi komutu
+- 🧩 **25 alt ajan**, 73 beceri, 155 eğik çizgi komutu
 - ⚡ Claude Code, Codex, Cursor ve/veya Kimi CLI — `npx` için **Tek komutla kurulum**
 - 🔌 **11 MCP sunucu** kablolu (GitHub, Postgres, MongoDB, Redis, Docker, Firecrawl, Vercel, Oluşturma, dosya sistemi, Task Master, Mermaid)
 - 🔑 **Tüm çalışma zamanları için tek bir `.env` dosyası** — anahtarlar `~/.zshrc` tarafından değil başlatıcı tarafından okunur, böylece GUI/IDE başlatıldığında bile çalışırlar; uzaktan AVF hizmeti yok; liveboard yalnızca localhost'a yöneliktir ve geçicidir
@@ -592,7 +592,7 @@ Kimi CLI'nin `mcp.json`'de `${VAR}` genişlemesi yoktur, bu nedenle anahtarlar, 
 .claude-plugin/plugin.json      # plugin manifest
 .claude-plugin/marketplace.json # local marketplace (for install)
 agents/       25 sub-agent definitions (*.md)
-skills/       <skill>/SKILL.md            (71 skills; some ship references, scripts, tests or HTML assets)
+skills/       <skill>/SKILL.md            (73 skills; some ship references, scripts, tests or HTML assets)
 commands/     <namespace>/<command>.md    (150 commands, /namespace:command, including /vorcl and /audit)
 hooks/        hooks.json + SessionStart + PostToolUse guards (empty catch, Expo architecture/UI boundaries)
 .mcp.json     github, filesystem, postgres, mongodb, redis, docker, firecrawl, vercel, render, task-master, mermaid

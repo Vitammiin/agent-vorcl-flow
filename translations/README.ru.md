@@ -587,7 +587,7 @@ kimi --agent-file ~/.kimi/agents/avf-expo-mobile.yaml
 .claude-plugin/plugin.json      # plugin manifest
 .claude-plugin/marketplace.json # local marketplace (for install)
 agents/       25 sub-agent definitions (*.md)
-skills/       <skill>/SKILL.md            (71 skills; some ship references, scripts, tests or HTML assets)
+skills/       <skill>/SKILL.md            (73 skills; some ship references, scripts, tests or HTML assets)
 commands/     <namespace>/<command>.md    (150 commands, /namespace:command, including /vorcl and /audit)
 hooks/        hooks.json + SessionStart + PostToolUse guards (empty catch, Expo architecture/UI boundaries)
 .mcp.json     github, filesystem, postgres, mongodb, redis, docker, firecrawl, vercel, render, task-master, mermaid

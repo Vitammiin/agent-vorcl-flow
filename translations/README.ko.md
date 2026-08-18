@@ -25,7 +25,7 @@
 <sub>English is canonical; every link above opens a repository-local README file.</sub>
 </details>
 
-<!-- Generated from README.md by scripts/readme-locales.mjs; source-sha256: 72c33da6cabafc1329d572eb271a485d678403c7f9b5e6a96911fd227cabbc6c. -->
+<!-- Generated from README.md by scripts/readme-locales.mjs; source-sha256: 3321a7089b3f749787125626da692c98b8a2d556b237e1ba36bbf67afc34dc3d. -->
 
 </div>
 
@@ -35,7 +35,7 @@
 
 Agent-Vorcl-Flow 지원되는 코딩 에이전트를 **구조화된 엔지니어링 팀**으로 전환합니다. 한 명의 일반 보조자 대신 **25개의 집중 하위 에이전트**(설계자, 코드 기반 수석 설계자, 백엔드, 프런트엔드, Expo 모바일 엔지니어, 제품 및 시각 디자인 엔지니어, DB 엔지니어, 교차 언어 무결성 감사자, 아키텍처 지도 제작자, 라이브보드 운영자 등)가 각각 고유한 도메인 **기술**, 빠른 **슬래시 명령** 및 필요한 **MCP 도구**를 갖습니다. 모든 중요 작업은 엄격한 **Task Master** 루프(*목표 → 작업 → 구현 → 확인 → 완료*)를 통해 실행되므로 작업이 계획되고 추적되며 중단 후에도 살아남습니다.
 
-- 🧩 **25개의 하위 에이전트**, 71개의 스킬, 155개의 슬래시 명령
+- 🧩 **25개의 하위 에이전트**, 73개의 스킬, 155개의 슬래시 명령
 - ⚡ **한 명령 설치** Claude Code, Codex, Cursor 및/또는 Kimi CLI — `npx`
 - 🔌 **11개의 MCP 서버** 유선 연결(GitHub, Postgres, MongoDB, Redis, Docker, Firecrawl, Vercel, 렌더링, 파일 시스템, Task Master, Mermaid)
 - 🔑 **모든 런타임에 하나의 `.env` 파일** — `~/.zshrc`가 아닌 실행 프로그램에서 키를 읽으므로 GUI/IDE 실행 시에도 작동합니다. 원격 AVF 서비스가 없습니다. 라이브보드는 로컬호스트 전용이며 일시적입니다.
@@ -592,7 +592,7 @@ Kimi CLI에는 `mcp.json`에 `${VAR}` 확장이 없으므로 키는 다른 런�
 .claude-plugin/plugin.json      # plugin manifest
 .claude-plugin/marketplace.json # local marketplace (for install)
 agents/       25 sub-agent definitions (*.md)
-skills/       <skill>/SKILL.md            (71 skills; some ship references, scripts, tests or HTML assets)
+skills/       <skill>/SKILL.md            (73 skills; some ship references, scripts, tests or HTML assets)
 commands/     <namespace>/<command>.md    (150 commands, /namespace:command, including /vorcl and /audit)
 hooks/        hooks.json + SessionStart + PostToolUse guards (empty catch, Expo architecture/UI boundaries)
 .mcp.json     github, filesystem, postgres, mongodb, redis, docker, firecrawl, vercel, render, task-master, mermaid

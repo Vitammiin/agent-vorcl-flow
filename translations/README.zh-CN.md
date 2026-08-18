@@ -25,7 +25,7 @@
 <sub>English is canonical; every link above opens a repository-local README file.</sub>
 </details>
 
-<!-- Generated from README.md by scripts/readme-locales.mjs; source-sha256: 72c33da6cabafc1329d572eb271a485d678403c7f9b5e6a96911fd227cabbc6c. -->
+<!-- Generated from README.md by scripts/readme-locales.mjs; source-sha256: 3321a7089b3f749787125626da692c98b8a2d556b237e1ba36bbf67afc34dc3d. -->
 
 </div>
 
@@ -35,7 +35,7 @@
 
 Agent-Vorcl-Flow 将受支持的编码代理转变为**结构化工程团队**。您不再需要一名普通助理，而是拥有 **25 个专注的子代理**（架构师、以代码为基础的首席架构师、后端、前端、Expo 移动工程师、产品和视觉设计工程师、DB 工程师、跨语言完整性审核员、架构制图师、Liveboard 操作员等），每个代理都有自己的领域 **技能**、快速 **斜线命令** 以及所需的 **MCP 工具**。每项重要任务都经过严格的 **Task Master** 循环 — *目标 → 任务 → 实施 → 验证 → 完成* — 因此，工作会得到计划、跟踪，并且不会受到干扰。
 
-- 🧩 **25 个子代理**，71 种技能，155 条斜线命令
+- 🧩 **25 个子代理**，73 种技能，155 条斜线命令
 - ⚡ **单命令安装** 适用于 Claude Code、Codex、Cursor 和/或 Kimi CLI — `npx`
 - 🔌 **11 个 MCP 服务器** 连接（GitHub、Postgres、MongoDB、Redis、Docker、Firecrawl、Vercel、渲染、文件系统、Task Master、Mermaid）
 - 🔑 **一个适用于所有运行时的 `.env` 文件** — 由启动器读取的密钥，而不是 `~/.zshrc`，因此它们甚至可以在 GUI/IDE 启动时工作；无远程 AVF 服务； liveboard 仅限本地主机且短暂
@@ -588,7 +588,7 @@ Kimi CLI 在 `mcp.json` 中没有 `${VAR}` 扩展，因此密钥通过启动器�
 .claude-plugin/plugin.json      # plugin manifest
 .claude-plugin/marketplace.json # local marketplace (for install)
 agents/       25 sub-agent definitions (*.md)
-skills/       <skill>/SKILL.md            (71 skills; some ship references, scripts, tests or HTML assets)
+skills/       <skill>/SKILL.md            (73 skills; some ship references, scripts, tests or HTML assets)
 commands/     <namespace>/<command>.md    (150 commands, /namespace:command, including /vorcl and /audit)
 hooks/        hooks.json + SessionStart + PostToolUse guards (empty catch, Expo architecture/UI boundaries)
 .mcp.json     github, filesystem, postgres, mongodb, redis, docker, firecrawl, vercel, render, task-master, mermaid

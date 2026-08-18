@@ -25,7 +25,7 @@ Met één `npx`-commando worden ze geïnstalleerd. Geen externe backend of cloud
 <sub>English is canonical; every link above opens a repository-local README file.</sub>
 </details>
 
-<!-- Generated from README.md by scripts/readme-locales.mjs; source-sha256: 72c33da6cabafc1329d572eb271a485d678403c7f9b5e6a96911fd227cabbc6c. -->
+<!-- Generated from README.md by scripts/readme-locales.mjs; source-sha256: 3321a7089b3f749787125626da692c98b8a2d556b237e1ba36bbf67afc34dc3d. -->
 
 </div>
 
@@ -35,7 +35,7 @@ Met één `npx`-commando worden ze geïnstalleerd. Geen externe backend of cloud
 
 Agent-Vorcl-Flow verandert een ondersteunde codeeragent in een **gestructureerd engineeringteam**. In plaats van één algemene assistent krijgt u **25 gerichte subagenten** (architect, op code gebaseerde hoofdarchitect, backend, frontend, Expo mobiele ingenieur, product- en visueel ontwerpingenieur, DB ingenieur, inter-taalintegriteitsauditor, architectuurcartograaf, liveboard-operator en meer), elk met zijn eigen domein **vaardigheden**, snelle **slash-opdrachten** en de **MCP tools** die hij nodig heeft. Elke niet-triviale taak doorloopt een gedisciplineerde **Task Master**-lus – *doel → taken → implementeren → verifiëren → klaar* – zodat het werk wordt gepland, bijgehouden en onderbrekingen overleeft.
 
-- 🧩 **25 subagenten**, 71 vaardigheden, 155 slash-opdrachten
+- 🧩 **25 subagenten**, 73 vaardigheden, 155 slash-opdrachten
 - ⚡ **Installatie met één opdracht** voor Claude Code, Codex, Cursor en/of Kimi CLI — `npx`
 - 🔌 **11 MCP servers** aangesloten (GitHub, Postgres, MongoDB, Redis, Docker, Firecrawl, Vercel, Render, bestandssysteem, Task Master, Mermaid)
 - 🔑 **Eén `.env`-bestand voor alle runtimes** — sleutels die worden gelezen door een opstartprogramma, niet door `~/.zshrc`, dus ze werken zelfs vanuit GUI/IDE-starts; geen externe AVF-service; liveboard is alleen localhost en kortstondig
@@ -592,7 +592,7 @@ Kimi CLI heeft geen `${VAR}`-uitbreiding in `mcp.json`, dus de sleutels komen va
 .claude-plugin/plugin.json      # plugin manifest
 .claude-plugin/marketplace.json # local marketplace (for install)
 agents/       25 sub-agent definitions (*.md)
-skills/       <skill>/SKILL.md            (71 skills; some ship references, scripts, tests or HTML assets)
+skills/       <skill>/SKILL.md            (73 skills; some ship references, scripts, tests or HTML assets)
 commands/     <namespace>/<command>.md    (150 commands, /namespace:command, including /vorcl and /audit)
 hooks/        hooks.json + SessionStart + PostToolUse guards (empty catch, Expo architecture/UI boundaries)
 .mcp.json     github, filesystem, postgres, mongodb, redis, docker, firecrawl, vercel, render, task-master, mermaid

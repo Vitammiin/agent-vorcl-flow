@@ -245,6 +245,7 @@ async function generateLocale(locale, canonical) {
   const marker = generatedMarker(canonical)
   output = output.replace('</details>', `</details>\n\n${marker}`, 1)
   if (locale.rtl) output = output.replace(marker, `${marker}\n<p dir="rtl">هذه ترجمة عربية محفوظة داخل المستودع.</p>`)
+  output = output.replace(/[ \t]+$/gm, '')
   if (!output.endsWith('\n')) output += '\n'
   fs.writeFileSync(path.join(ROOT, locale.file), output)
   process.stdout.write(`generated ${locale.file}\n`)

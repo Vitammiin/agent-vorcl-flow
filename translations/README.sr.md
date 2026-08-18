@@ -25,7 +25,7 @@
 <sub>English is canonical; every link above opens a repository-local README file.</sub>
 </details>
 
-<!-- Generated from README.md by scripts/readme-locales.mjs; source-sha256: 72c33da6cabafc1329d572eb271a485d678403c7f9b5e6a96911fd227cabbc6c. -->
+<!-- Generated from README.md by scripts/readme-locales.mjs; source-sha256: 3321a7089b3f749787125626da692c98b8a2d556b237e1ba36bbf67afc34dc3d. -->
 
 </div>
 
@@ -35,7 +35,7 @@
 
 Agent-Vorcl-Flow претвара подржаног агента за кодирање у **структурирани инжењерски тим**. Уместо једног генералног асистента, добијате **25 фокусираних подагената** (архитекта, главни архитекта заснован на коду, позадина, фронтенд, Expo инжењер за мобилне уређаје, инжењер за визуелни дизајн, DB инжењер, ревизор интегритета на више језика, картограф архитектуре, оператор ливебоард-а и још много тога), сваки са својим сопственим скиллсласх** и брзим доменом** **MCP алати** који су му потребни. Сваки нетривијалан задатак пролази кроз дисциплиновану **Task Master** петљу — *циљ → задаци → имплементација → верификација → обављено* — тако да се рад планира, прати и преживљава прекиде.
 
-- 🧩 **25 подагента**, 71 вештина, 155 команди
+- 🧩 **25 подагента**, 73 вештине, 155 команди
 - ⚡ **Инсталација једном командом** за Claude Code, Codex, Cursor и/или Kimi CLI — `npx`
 - 🔌 **11 MCP сервера** повезаних (GitHub, Postgres, MongoDB, Redis, Docker, Firecrawl, Vercel, Рендер, систем датотека, Task Master, Mermaid)
 - 🔑 **Једна `.env` датотека за сва времена извођења** — кључеви које чита покретач, а не `~/.zshrc`, тако да раде чак и од покретања ГУИ/ИДЕ; нема даљинске АВФ услуге; ливебоард је само за локални хост и ефемеран
@@ -592,7 +592,7 @@ Kimi CLI нема проширење `${VAR}` у `mcp.json`, тако да кљ�
 .claude-plugin/plugin.json      # plugin manifest
 .claude-plugin/marketplace.json # local marketplace (for install)
 agents/       25 sub-agent definitions (*.md)
-skills/       <skill>/SKILL.md            (71 skills; some ship references, scripts, tests or HTML assets)
+skills/       <skill>/SKILL.md            (73 skills; some ship references, scripts, tests or HTML assets)
 commands/     <namespace>/<command>.md    (150 commands, /namespace:command, including /vorcl and /audit)
 hooks/        hooks.json + SessionStart + PostToolUse guards (empty catch, Expo architecture/UI boundaries)
 .mcp.json     github, filesystem, postgres, mongodb, redis, docker, firecrawl, vercel, render, task-master, mermaid

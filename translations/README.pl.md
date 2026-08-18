@@ -25,7 +25,7 @@ Instaluje je jedno polecenie `npx`. Żadnego zdalnego backendu ani hostingu w ch
 <sub>English is canonical; every link above opens a repository-local README file.</sub>
 </details>
 
-<!-- Generated from README.md by scripts/readme-locales.mjs; source-sha256: 72c33da6cabafc1329d572eb271a485d678403c7f9b5e6a96911fd227cabbc6c. -->
+<!-- Generated from README.md by scripts/readme-locales.mjs; source-sha256: 3321a7089b3f749787125626da692c98b8a2d556b237e1ba36bbf67afc34dc3d. -->
 
 </div>
 
@@ -35,7 +35,7 @@ Instaluje je jedno polecenie `npx`. Żadnego zdalnego backendu ani hostingu w ch
 
 Agent-Vorcl-Flow zmienia obsługiwanego agenta kodującego w **ustrukturyzowany zespół inżynierów**. Zamiast jednego ogólnego asystenta otrzymujesz **25 wyspecjalizowanych podagentów** (architekt, główny architekt zorientowany na kod, backend, frontend, Expo inżynier mobilny, inżynier produktu i projektanta wizualnego, DB inżynier, audytor integralności międzyjęzykowej, kartograf architektury, operator liveboardu i nie tylko), każdy z własną domeną **umiejętności**, szybkimi **poleceniami ukośnikowymi** i **MCP narzędziami**, których potrzebuje. Każde nietrywialne zadanie przebiega przez zdyscyplinowaną **Task Master** pętlę — *cel → zadania → wdrożenie → weryfikacja → wykonane* — dzięki czemu praca jest planowana, śledzona i przetrwa wszelkie przerwy.
 
-- 🧩 **25 podagentów**, 71 umiejętności, 155 poleceń ukośnikowych
+- 🧩 **25 podagentów**, 73 umiejętności, 155 poleceń ukośnikowych
 - ⚡ **Instalacja jednym poleceniem** dla Claude Code, Codex, Cursor i/lub Kimi CLI — `npx`
 - 🔌 **11 MCP serwerów** podłączonych przewodowo (GitHub, Postgres, MongoDB, Redis, Docker, Firecrawl, Vercel, Render, system plików, Task Master, Mermaid)
 - 🔑 **Jeden plik `.env` dla wszystkich środowisk wykonawczych** — klucze odczytywane są przez program uruchamiający, a nie `~/.zshrc`, więc działają nawet po uruchomieniu GUI/IDE; brak zdalnej usługi AVF; liveboard jest dostępny tylko na serwerze lokalnym i jest tymczasowy
@@ -592,7 +592,7 @@ Kimi CLI nie ma rozwinięcia `${VAR}` w `mcp.json`, więc klucze pochodzą ze ws
 .claude-plugin/plugin.json      # plugin manifest
 .claude-plugin/marketplace.json # local marketplace (for install)
 agents/       25 sub-agent definitions (*.md)
-skills/       <skill>/SKILL.md            (71 skills; some ship references, scripts, tests or HTML assets)
+skills/       <skill>/SKILL.md            (73 skills; some ship references, scripts, tests or HTML assets)
 commands/     <namespace>/<command>.md    (150 commands, /namespace:command, including /vorcl and /audit)
 hooks/        hooks.json + SessionStart + PostToolUse guards (empty catch, Expo architecture/UI boundaries)
 .mcp.json     github, filesystem, postgres, mongodb, redis, docker, firecrawl, vercel, render, task-master, mermaid

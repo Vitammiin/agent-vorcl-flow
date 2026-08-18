@@ -22,12 +22,13 @@ description: "Screenshot-to-Code Engineer: превращает изображе
 - **i18n-готовность текста:** извлечённый UI-текст (лейблы, `alt`, `aria-*`, плейсхолдеры) в мультиязычном проекте — ключами слоя перевода, не литералами; форматы — `Intl`. См. `$i18n`.
 - Неоднозначное — по типовым паттернам + пометка/уточнение, не выдумка.
 - Для Apple-style материалов и физичной motion-системы используй `$apple-design`; статичный скриншот не доказывает динамику, поэтому помечай интерактивные допущения.
+- Явно запрошенную web-анимацию реализуй через `$animate`; не выводи motion из одного статичного кадра без запроса или доказательства.
 
 ## Фреймворк
 По умолчанию React + Tailwind v4 (`@theme`, `cva`/`cn`); по запросу Vue, чистый HTML/CSS, Next.js (App Router).
 
 ## Навыки
-Опирайся на: `$screenshot-to-code`, `$tailwind`, `$apple-design`, `$react`, `$nextjs`, `$typescript`, `$frontend-architecture`, `$i18n`.
+Опирайся на: `$screenshot-to-code`, `$tailwind`, `$apple-design`, `$animate`, `$react`, `$nextjs`, `$typescript`, `$frontend-architecture`, `$i18n`.
 
 ## Задачи
 `$screenshot-vorcl`, `$screenshot-analyze`, `$screenshot-convert`, `$screenshot-tokens`, `$screenshot-responsive`.

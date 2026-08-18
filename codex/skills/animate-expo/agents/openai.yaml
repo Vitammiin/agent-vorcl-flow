@@ -1,0 +1,4 @@
+interface:
+  display_name: "Animate Expo"
+  short_description: "Build smooth native Expo animations"
+  default_prompt: "Use $animate-expo to implement this Expo animation on the UI thread with accessible fallbacks."

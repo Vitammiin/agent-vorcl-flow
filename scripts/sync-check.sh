@@ -218,11 +218,13 @@ do
   fi
 done
 
-if [ -d skills/apple-design ] && [ -d codex/skills/apple-design ] && diff -qr skills/apple-design codex/skills/apple-design >/dev/null; then
-  pass
-else
-  fail "Apple Design skill отсутствует или разошёлся: skills/apple-design ↔ codex/skills/apple-design"
-fi
+for skill in apple-design animate animate-expo; do
+  if [ -d "skills/$skill" ] && [ -d "codex/skills/$skill" ] && diff -qr "skills/$skill" "codex/skills/$skill" >/dev/null; then
+    pass
+  else
+    fail "Motion skill отсутствует или разошёлся: skills/$skill ↔ codex/skills/$skill"
+  fi
+done
 
 if [ -f kimi/agents/expo-mobile.yaml ] && grep -q 'expo-mobile' kimi/agents/expo-mobile.yaml; then pass; else fail "нет Kimi Expo custom agent"; fi
 if [ -f kimi/hooks.toml ] && grep -q '__AVF_EXPO_GUARD__' kimi/hooks.toml && grep -q '__AVF_EXPO_UI_GUARD__' kimi/hooks.toml && grep -q '__AVF_EXPO_COMPATIBILITY__' kimi/hooks.toml; then pass; else fail "нет полного Kimi Expo hook template"; fi

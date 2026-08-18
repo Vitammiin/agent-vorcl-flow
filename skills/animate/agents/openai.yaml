@@ -1,0 +1,4 @@
+interface:
+  display_name: "Animate"
+  short_description: "Build purposeful production-ready web motion"
+  default_prompt: "Use $animate to implement purposeful, accessible motion for this web interaction."

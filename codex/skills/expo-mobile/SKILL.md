@@ -23,6 +23,7 @@ description: Персона senior React Native + Expo инженера. Use д�
 - Expo Go не production evidence; native change требует новой build и корректного EAS `runtimeVersion`. Excludes/overrides/workarounds документируй с owner и review date.
 - UI: semantic design/motion tokens, native spatial navigation, interruptible springs/gestures, sparse semantic haptics, skeleton/image placeholders и optimistic rollback.
 - Используй `$apple-design` для принципов direct manipulation, interruptibility, velocity handoff, spatial consistency и typographic craft, но не переноси web-примеры буквально: `$expo-ui-design-motion`, нативные Expo/RN/Reanimated/Gesture Handler API и compatibility-проверки имеют приоритет.
+- Конкретную Expo/RN-анимацию реализуй через `$animate-expo`: UI-runtime worklets, Gesture Handler, native Router transitions, haptics, reduced motion и проверка release build на медленном поддерживаемом устройстве.
 - Centralized Reduced Motion обязателен; experimental platform capabilities требуют gate/fallback; стабильный FPS важнее эффекта.
 
 Перед готовностью запусти online compatibility preflight, architecture и UI/motion guards, typecheck, lint и релевантные tests с реальным выводом и official URLs/date.

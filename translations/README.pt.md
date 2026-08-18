@@ -25,7 +25,7 @@ Um comando `npx` os instala. Sem back-end remoto ou hospedagem na nuvem: seu age
 <sub>English is canonical; every link above opens a repository-local README file.</sub>
 </details>
 
-<!-- Generated from README.md by scripts/readme-locales.mjs; source-sha256: 72c33da6cabafc1329d572eb271a485d678403c7f9b5e6a96911fd227cabbc6c. -->
+<!-- Generated from README.md by scripts/readme-locales.mjs; source-sha256: 3321a7089b3f749787125626da692c98b8a2d556b237e1ba36bbf67afc34dc3d. -->
 
 </div>
 
@@ -35,7 +35,7 @@ Um comando `npx` os instala. Sem back-end remoto ou hospedagem na nuvem: seu age
 
 Agent-Vorcl-Flow transforma um agente de codificação suportado em uma **equipe de engenharia estruturada**. Em vez de um assistente geral, você recebe **25 subagentes focados** (arquiteto, arquiteto principal baseado em código, back-end, front-end, Expo engenheiro móvel, engenheiro de design visual e de produto, DB engenheiro, auditor de integridade entre idiomas, cartógrafo de arquitetura, operador de liveboard e muito mais), cada um com suas próprias **habilidades** de domínio, **comandos de barra** rápidos e as **MCP ferramentas** necessárias. Cada tarefa não trivial passa por um ciclo **Task Master** disciplinado — *objetivo → tarefas → implementar → verificar → concluído* — para que o trabalho seja planejado, rastreado e sobreviva a interrupções.
 
-- 🧩 **25 subagentes**, 71 habilidades, 155 comandos de barra
+- 🧩 **25 subagentes**, 73 habilidades, 155 comandos de barra
 - ⚡ **Instalação com um comando** para Claude Code, Codex, Cursor e/ou Kimi CLI — `npx`
 - 🔌 **11 MCP servidores** conectados (GitHub, Postgres, MongoDB, Redis, Docker, Firecrawl, Vercel, Renderização, sistema de arquivos, Task Master, Mermaid)
 - 🔑 **Um arquivo `.env` para todos os tempos de execução** — chaves lidas por um inicializador, não `~/.zshrc`, para que funcionem mesmo em inicialização de GUI/IDE; nenhum serviço AVF remoto; liveboard é apenas localhost e efêmero
@@ -592,7 +592,7 @@ Kimi CLI não tem expansão `${VAR}` em `mcp.json`, então as chaves vêm do `.e
 .claude-plugin/plugin.json      # plugin manifest
 .claude-plugin/marketplace.json # local marketplace (for install)
 agents/       25 sub-agent definitions (*.md)
-skills/       <skill>/SKILL.md            (71 skills; some ship references, scripts, tests or HTML assets)
+skills/       <skill>/SKILL.md            (73 skills; some ship references, scripts, tests or HTML assets)
 commands/     <namespace>/<command>.md    (150 commands, /namespace:command, including /vorcl and /audit)
 hooks/        hooks.json + SessionStart + PostToolUse guards (empty catch, Expo architecture/UI boundaries)
 .mcp.json     github, filesystem, postgres, mongodb, redis, docker, firecrawl, vercel, render, task-master, mermaid

@@ -33,7 +33,7 @@ One `npx` command installs them. No remote backend or cloud hosting: your coding
 
 Agent-Vorcl-Flow turns a supported coding agent into a **structured engineering team**. Instead of one general assistant, you get **25 focused sub-agents** (architect, code-grounded principal architect, backend, frontend, Expo mobile engineer, product and visual design engineer, DB engineer, cross-language integrity auditor, architecture cartographer, liveboard operator, and more), each with its own domain **skills**, quick **slash commands**, and the **MCP tools** it needs. Every non-trivial task runs through a disciplined **Task Master** loop — *goal → tasks → implement → verify → done* — so work is planned, tracked, and survives interruptions.
 
-- 🧩 **25 sub-agents**, 71 skills, 155 slash commands
+- 🧩 **25 sub-agents**, 73 skills, 155 slash commands
 - ⚡ **One-command install** for Claude Code, Codex, Cursor, and/or Kimi CLI — `npx`
 - 🔌 **11 MCP servers** wired in (GitHub, Postgres, MongoDB, Redis, Docker, Firecrawl, Vercel, Render, filesystem, Task Master, Mermaid)
 - 🔑 **One `.env` file for all runtimes** — keys read by a launcher, not `~/.zshrc`, so they work even from GUI/IDE launches; no remote AVF service; liveboard is localhost-only and ephemeral
@@ -607,7 +607,7 @@ Kimi CLI has no `${VAR}` expansion in `mcp.json`, so keys come from the shared `
 .claude-plugin/plugin.json      # plugin manifest
 .claude-plugin/marketplace.json # local marketplace (for install)
 agents/       25 sub-agent definitions (*.md)
-skills/       <skill>/SKILL.md            (71 skills; some ship references, scripts, tests or HTML assets)
+skills/       <skill>/SKILL.md            (73 skills; some ship references, scripts, tests or HTML assets)
 commands/     <namespace>/<command>.md    (150 commands, /namespace:command, including /vorcl and /audit)
 hooks/        hooks.json + SessionStart + PostToolUse guards (empty catch, Expo architecture/UI boundaries)
 .mcp.json     github, filesystem, postgres, mongodb, redis, docker, firecrawl, vercel, render, task-master, mermaid

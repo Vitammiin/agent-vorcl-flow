@@ -25,7 +25,7 @@
 <sub>English is canonical; every link above opens a repository-local README file.</sub>
 </details>
 
-<!-- Generated from README.md by scripts/readme-locales.mjs; source-sha256: 72c33da6cabafc1329d572eb271a485d678403c7f9b5e6a96911fd227cabbc6c. -->
+<!-- Generated from README.md by scripts/readme-locales.mjs; source-sha256: 3321a7089b3f749787125626da692c98b8a2d556b237e1ba36bbf67afc34dc3d. -->
 
 </div>
 
@@ -35,7 +35,7 @@
 
 Agent-Vorcl-Flow は、サポートされているコーディング エージェントを **構造化されたエンジニアリング チーム**に変えます。 1 人の一般的なアシスタントの代わりに、**25 の重点を置いたサブエージェント** (アーキテクト、コードに基づいた主任アーキテクト、バックエンド、フロントエンド、Expo モバイル エンジニア、プロダクトおよびビジュアル デザイン エンジニア、DB エンジニア、言語間整合性監査人、建築地図製作者、ライブボード オペレーターなど) が用意され、それぞれが独自のドメイン ** スキル**、クイック **スラッシュ コマンド**、および必要な **MCP ツール**を備えています。すべての重要なタスクは規律ある **Task Master** ループ (*目標 → タスク → 実装 → 検証 → 完了*) を通じて実行されるため、作業は計画され、追跡され、中断に耐えることができます。
 
-- 🧩 **25 のサブエージェント**、71 のスキル、155 のスラッシュ コマンド
+- 🧩 **25 のサブエージェント**、73 のスキル、155 のスラッシュ コマンド
 - ⚡ **ワンコマンド インストール** (Claude Code、Codex、Cursor、および/または Kimi CLI) — `npx`
 - 🔌 **11 MCP サーバー** 接続 (GitHub、Postgres、MongoDB、Redis、Docker、Firecrawl、Vercel、レンダー、ファイルシステム、Task Master、Mermaid)
 - 🔑 **すべてのランタイムに 1 つの `.env` ファイル** — キーは `~/.zshrc` ではなくランチャーによって読み取られるため、GUI/IDE 起動からも機能します。リモート AVF サービスはありません。ライブボードはローカルホストのみで一時的なものです
@@ -592,7 +592,7 @@ Kimi CLI には `mcp.json` に `${VAR}` 拡張がないため、他のランタ�
 .claude-plugin/plugin.json      # plugin manifest
 .claude-plugin/marketplace.json # local marketplace (for install)
 agents/       25 sub-agent definitions (*.md)
-skills/       <skill>/SKILL.md            (71 skills; some ship references, scripts, tests or HTML assets)
+skills/       <skill>/SKILL.md            (73 skills; some ship references, scripts, tests or HTML assets)
 commands/     <namespace>/<command>.md    (150 commands, /namespace:command, including /vorcl and /audit)
 hooks/        hooks.json + SessionStart + PostToolUse guards (empty catch, Expo architecture/UI boundaries)
 .mcp.json     github, filesystem, postgres, mongodb, redis, docker, firecrawl, vercel, render, task-master, mermaid

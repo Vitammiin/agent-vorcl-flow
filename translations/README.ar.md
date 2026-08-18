@@ -25,7 +25,7 @@
 <sub>English is canonical; every link above opens a repository-local README file.</sub>
 </details>
 
-<!-- Generated from README.md by scripts/readme-locales.mjs; source-sha256: 72c33da6cabafc1329d572eb271a485d678403c7f9b5e6a96911fd227cabbc6c. -->
+<!-- Generated from README.md by scripts/readme-locales.mjs; source-sha256: 3321a7089b3f749787125626da692c98b8a2d556b237e1ba36bbf67afc34dc3d. -->
 <p dir="rtl">هذه ترجمة عربية محفوظة داخل المستودع.</p>
 
 </div>
@@ -36,7 +36,7 @@
 
 Agent-Vorcl-Flow يحول وكيل الترميز المدعوم إلى **فريق هندسي منظم**. بدلاً من مساعد عام واحد، تحصل على **25 وكيلًا فرعيًا مركّزًا** (مهندس معماري، مهندس رئيسي قائم على التعليمات البرمجية، واجهة خلفية، واجهة أمامية، مهندس متنقل، مهندس منتج وتصميم مرئي، مهندس، مدقق سلامة عبر اللغات، رسام خرائط معماري، مشغل لوحة حية، والمزيد)، كل منهم له مجاله الخاص **المهارات**، **أوامر الشرطة المائلة** السريعة، و**MCPالأدوات** التي يحتاجها. يتم تشغيل كل مهمة غير تافهة من خلال حلقة **Task Master** منضبطة — *الهدف ← المهام ← التنفيذ ← التحقق ← إنجاز* - بحيث يتم تخطيط العمل وتتبعه والتغلب على الانقطاعات.
 
-- 🧩 **25 وكيلًا فرعيًا**، 71 مهارة، 155 أمر شرطة مائلة
+- 🧩 **25 وكيلًا فرعيًا**، 73 مهارة، 155 أمر شرطة مائلة
 - ⚡ **التثبيت بأمر واحد** لـ Claude Code، Codex، Cursor، و/أو Kimi CLI — `npx`
 - 🔌 **11 MCP خادمًا** متصلين (GitHub، Postgres، MongoDB، Redis، Docker، Firecrawl، Vercel، Render، نظام الملفات، Task Master، Mermaid)
 - 🔑 **ملف `.env` واحد لجميع أوقات التشغيل** — تتم قراءة المفاتيح بواسطة المشغل، وليس `~/.zshrc`، لذا فهي تعمل حتى من عمليات تشغيل GUI/IDE؛ لا توجد خدمة AVF عن بعد؛ Liveboard هو مضيف محلي فقط وسريع الزوال
@@ -593,7 +593,7 @@ Kimi CLI لا يحتوي على توسيع `${VAR}` في `mcp.json`، لذا ت�
 .claude-plugin/plugin.json      # plugin manifest
 .claude-plugin/marketplace.json # local marketplace (for install)
 agents/       25 sub-agent definitions (*.md)
-skills/       <skill>/SKILL.md            (71 skills; some ship references, scripts, tests or HTML assets)
+skills/       <skill>/SKILL.md            (73 skills; some ship references, scripts, tests or HTML assets)
 commands/     <namespace>/<command>.md    (150 commands, /namespace:command, including /vorcl and /audit)
 hooks/        hooks.json + SessionStart + PostToolUse guards (empty catch, Expo architecture/UI boundaries)
 .mcp.json     github, filesystem, postgres, mongodb, redis, docker, firecrawl, vercel, render, task-master, mermaid

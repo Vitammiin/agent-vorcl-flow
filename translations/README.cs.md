@@ -25,7 +25,7 @@ Jeden `npx` příkaz je nainstaluje. Žádný vzdálený backend nebo cloud host
 <sub>English is canonical; every link above opens a repository-local README file.</sub>
 </details>
 
-<!-- Generated from README.md by scripts/readme-locales.mjs; source-sha256: 72c33da6cabafc1329d572eb271a485d678403c7f9b5e6a96911fd227cabbc6c. -->
+<!-- Generated from README.md by scripts/readme-locales.mjs; source-sha256: 3321a7089b3f749787125626da692c98b8a2d556b237e1ba36bbf67afc34dc3d. -->
 
 </div>
 
@@ -35,7 +35,7 @@ Jeden `npx` příkaz je nainstaluje. Žádný vzdálený backend nebo cloud host
 
 Agent-Vorcl-Flow změní podporovaného kódovacího agenta na **strukturovaný inženýrský tým**. Namísto jednoho obecného asistenta získáte **25 zaměřených dílčích agentů** (architekt, kódově založený hlavní architekt, backend, frontend, Expo mobilní inženýr, produktový a vizuální designový inženýr, DB inženýr, auditor integrity mezi jazyky, kartograf architektury, operátor liveboardu a další), každý s vlastní doménou **dovednosti**, které potřebuje, rychlé**** a **přelomené příkazy**.**. Každý netriviální úkol prochází disciplinovanou **Task Master** smyčkou — *cíl → úkoly → implementovat → ověřit → hotovo* — takže práce je plánována, sledována a přečkává přerušení.
 
-- 🧩 **25 podagentů**, 71 dovedností, 155 příkazů lomítka
+- 🧩 **25 podagentů**, 73 dovedností, 155 příkazů lomítka
 - ⚡ **Instalace jedním příkazem** pro Claude Code, Codex, Cursor a/nebo Kimi CLI — `npx`
 - 🔌 **11 MCP serverů** připojených kabelem (GitHub, Postgres, MongoDB, Redis, Docker, Firecrawl, Vercel, Render, souborový systém, Task Master, Mermaid)
 - 🔑 **Jeden soubor `.env` pro všechna běhová prostředí** – klíče čte spouštěč, nikoli `~/.zshrc`, takže fungují i při spuštění GUI/IDE; žádná vzdálená služba AVF; liveboard je pouze localhost a pomíjivý
@@ -592,7 +592,7 @@ Kimi CLI nemá rozšíření `${VAR}` v `mcp.json`, takže klíče pocházejí z
 .claude-plugin/plugin.json      # plugin manifest
 .claude-plugin/marketplace.json # local marketplace (for install)
 agents/       25 sub-agent definitions (*.md)
-skills/       <skill>/SKILL.md            (71 skills; some ship references, scripts, tests or HTML assets)
+skills/       <skill>/SKILL.md            (73 skills; some ship references, scripts, tests or HTML assets)
 commands/     <namespace>/<command>.md    (150 commands, /namespace:command, including /vorcl and /audit)
 hooks/        hooks.json + SessionStart + PostToolUse guards (empty catch, Expo architecture/UI boundaries)
 .mcp.json     github, filesystem, postgres, mongodb, redis, docker, firecrawl, vercel, render, task-master, mermaid

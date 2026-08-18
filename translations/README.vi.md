@@ -25,7 +25,7 @@ Một lệnh `npx` sẽ cài đặt chúng. Không có phụ trợ từ xa hoặ
 <sub>English is canonical; every link above opens a repository-local README file.</sub>
 </details>
 
-<!-- Generated from README.md by scripts/readme-locales.mjs; source-sha256: 72c33da6cabafc1329d572eb271a485d678403c7f9b5e6a96911fd227cabbc6c. -->
+<!-- Generated from README.md by scripts/readme-locales.mjs; source-sha256: 3321a7089b3f749787125626da692c98b8a2d556b237e1ba36bbf67afc34dc3d. -->
 
 </div>
 
@@ -35,7 +35,7 @@ Một lệnh `npx` sẽ cài đặt chúng. Không có phụ trợ từ xa hoặ
 
 Agent-Vorcl-Flow biến tác nhân mã hóa được hỗ trợ thành **nhóm kỹ thuật có cấu trúc**. Thay vì một trợ lý chung, bạn có **25 tác nhân phụ tập trung** (kiến trúc sư, kiến ​​trúc sư chính dựa trên mã, phần phụ trợ, giao diện người dùng, Expo kỹ sư di động, kỹ sư thiết kế sản phẩm và hình ảnh, DB kỹ sư, người kiểm tra tính toàn vẹn ngôn ngữ chéo, người vẽ bản đồ kiến ​​trúc, người vận hành liveboard, v.v.), mỗi người có **kỹ năng** miền riêng, **lệnh gạch chéo** nhanh và **MCP công cụ** mà nó cần. Mọi nhiệm vụ không hề tầm thường đều chạy qua một vòng lặp **Task Master** có kỷ luật — *mục tiêu → nhiệm vụ → thực hiện → xác minh → hoàn thành* — vì vậy công việc được lên kế hoạch, theo dõi và không bị gián đoạn.
 
-- 🧩 **25 đặc vụ phụ**, 71 kỹ năng, 155 lệnh gạch chéo
+- 🧩 **25 đặc vụ phụ**, 73 kỹ năng, 155 lệnh gạch chéo
 - ⚡ **Cài đặt bằng một lệnh** cho Claude Code, Codex, Cursor, và/hoặc Kimi CLI — `npx`
 - 🔌 **11 MCP máy chủ** được nối dây vào (GitHub, Postgres, MongoDB, Redis, Docker, Firecrawl, Vercel, Kết xuất, hệ thống tập tin, Task Master, Mermaid)
 - 🔑 **Một tệp `.env` cho tất cả thời gian chạy** — các khóa được đọc bởi trình khởi chạy chứ không phải `~/.zshrc`, vì vậy chúng hoạt động ngay cả khi khởi chạy GUI/IDE; không có dịch vụ AVF từ xa; liveboard chỉ dành cho localhost và phù du
@@ -592,7 +592,7 @@ Kimi CLI không có `${VAR}` mở rộng trong `mcp.json`, do đó, các khóa �
 .claude-plugin/plugin.json      # plugin manifest
 .claude-plugin/marketplace.json # local marketplace (for install)
 agents/       25 sub-agent definitions (*.md)
-skills/       <skill>/SKILL.md            (71 skills; some ship references, scripts, tests or HTML assets)
+skills/       <skill>/SKILL.md            (73 skills; some ship references, scripts, tests or HTML assets)
 commands/     <namespace>/<command>.md    (150 commands, /namespace:command, including /vorcl and /audit)
 hooks/        hooks.json + SessionStart + PostToolUse guards (empty catch, Expo architecture/UI boundaries)
 .mcp.json     github, filesystem, postgres, mongodb, redis, docker, firecrawl, vercel, render, task-master, mermaid
