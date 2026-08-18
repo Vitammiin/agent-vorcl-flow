@@ -7,6 +7,20 @@ and this project follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [2.5.0] - 2026-08-18
+
+### Added
+
+- Apple-inspired interface design guidance plus decision-first web and Expo animation skills with reusable recipes, reduced-motion handling, gesture momentum, interruption, and native-runtime performance rules.
+- Cross-language code-integrity auditing for production hardcode and mock, fake, demo, or fixture leakage, including a dedicated read-only `integrity` role and deterministic scanner.
+- Static `init-code` workflow for evidence-based `PROJECT_DESCRIPTION.md` generation and impact checks that keep existing project context synchronized.
+- Native Codex plugin manifest, deterministic role registry, package-budget enforcement, and installer regression coverage across Claude Code, Codex, Cursor, and Kimi.
+
+### Changed
+
+- Hardened Task Master orchestration with scoped task allowlists, atomic claims, independent verification, explicit degraded modes, and project-description drift checks.
+- Expanded frontend, screenshot, design-studio, Expo mobile, analyzer, security, testing, and architecture role contracts with synchronized Codex mirrors and localized documentation.
+
 ## [2.4.0] - 2026-08-13
 
 ### Added
@@ -42,7 +56,8 @@ and this project follows [Semantic Versioning](https://semver.org/).
 
 - Extended the installer and synchronization checks to distribute mobile hooks, compatibility tooling, shared audit skills, and Kimi-native role files consistently.
 
-[Unreleased]: https://github.com/Vitammiin/agent-vorcl-flow/compare/v2.4.0...HEAD
+[Unreleased]: https://github.com/Vitammiin/agent-vorcl-flow/compare/v2.5.0...HEAD
+[2.5.0]: https://github.com/Vitammiin/agent-vorcl-flow/compare/v2.4.0...v2.5.0
 [2.4.0]: https://github.com/Vitammiin/agent-vorcl-flow/compare/v2.3.1...v2.4.0
 [2.3.1]: https://github.com/Vitammiin/agent-vorcl-flow/compare/v2.3.0...v2.3.1
 [2.3.0]: https://github.com/Vitammiin/agent-vorcl-flow/compare/v2.2.0...v2.3.0
