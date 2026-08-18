@@ -5,6 +5,7 @@ import os from 'node:os'
 import path from 'node:path'
 import { spawnSync } from 'node:child_process'
 import { fileURLToPath } from 'node:url'
+import { sanitize } from '../scripts/lib/core.mjs'
 
 const SKILL = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const CLI = path.join(SKILL, 'scripts', 'principal-architecture.mjs')
@@ -42,10 +43,14 @@ function run(root, command, extra = []) {
   return spawnSync(process.execPath, [CLI, command, '--root', root, '--formats=md,html,drawio,mermaid', ...extra], { encoding: 'utf8', timeout: 120_000 })
 }
 
+function outputFor(root) {
+  return path.join(root, 'docs', 'architecture', sanitize(path.basename(root)))
+}
+
 test('creates evidence-based polyglot package without trusting README', () => {
   const root = fixture(); const result = run(root, 'create')
   assert.equal(result.status, 0, result.stderr)
-  const output = path.join(root, 'docs', 'architecture', path.basename(root))
+  const output = outputFor(root)
   const model = JSON.parse(fs.readFileSync(path.join(output, 'architecture.model.json'), 'utf8'))
   const parsers = new Set(model.files.map((file) => file.parser))
   for (const language of ['typescript', 'tsx', 'javascript', 'python', 'go', 'java', 'csharp', 'rust', 'php', 'ruby', 'kotlin', 'swift']) assert.ok([...parsers].some((parser) => parser === `tree-sitter:${language}`), `missing ${language}`)
@@ -94,7 +99,7 @@ test('draw.io renderer splits dense layers instead of shrinking a single canvas'
 
 test('update full-rescans deterministically and preserves annotations and unmanaged files', () => {
   const root = fixture(); assert.equal(run(root, 'create').status, 0)
-  const output = path.join(root, 'docs', 'architecture', path.basename(root))
+  const output = outputFor(root)
   const before = JSON.parse(fs.readFileSync(path.join(output, 'architecture.model.json'), 'utf8'))
   fs.writeFileSync(path.join(output, 'architecture.annotations.json'), JSON.stringify({ schemaVersion: '1.0.0', notes: ['Owner confirmed manually'], proposals: [] }, null, 2))
   fs.writeFileSync(path.join(output, 'MANUAL.md'), 'keep me\n')
@@ -121,7 +126,7 @@ test('always publishes Markdown first and produces portable PDF without project 
   const root = fixture()
   const result = spawnSync(process.execPath, [CLI, 'create', '--root', root, '--formats=pdf'], { encoding: 'utf8', timeout: 120_000 })
   assert.equal(result.status, 0, result.stderr)
-  const output = path.join(root, 'docs', 'architecture', path.basename(root))
+  const output = outputFor(root)
   assert.ok(fs.existsSync(path.join(output, 'ARCHITECTURE.md')))
   assert.equal(fs.readFileSync(path.join(output, 'architecture.pdf')).subarray(0, 5).toString(), '%PDF-')
 })
