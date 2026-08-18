@@ -1,0 +1,4 @@
+interface:
+  display_name: "Init Code"
+  short_description: "Create an evidence-based codebase description"
+  default_prompt: "Use $init-code to inspect this repository and create PROJECT_DESCRIPTION.md."

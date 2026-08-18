@@ -10,8 +10,8 @@ One `npx` command installs them. No remote backend or cloud hosting: your coding
 ![Cursor](https://img.shields.io/badge/Cursor-native%20adapter-111111)
 ![Kimi CLI](https://img.shields.io/badge/Kimi%20CLI-adapter-000000)
 ![Node](https://img.shields.io/badge/node-%E2%89%A518-339933?logo=node.js&logoColor=white)
-![Agents](https://img.shields.io/badge/agents-24-blue)
-![Commands](https://img.shields.io/badge/commands-150-blue)
+![Agents](https://img.shields.io/badge/agents-25-blue)
+![Commands](https://img.shields.io/badge/commands-155-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
 <details>
@@ -31,9 +31,9 @@ One `npx` command installs them. No remote backend or cloud hosting: your coding
 
 ## What is this?
 
-Agent-Vorcl-Flow turns a supported coding agent into a **structured engineering team**. Instead of one general assistant, you get **24 focused sub-agents** (architect, code-grounded principal architect, backend, frontend, Expo mobile engineer, product and visual design engineer, DB engineer, architecture cartographer, liveboard operator, and more), each with its own domain **skills**, quick **slash commands**, and the **MCP tools** it needs. Every non-trivial task runs through a disciplined **Task Master** loop — *goal → tasks → implement → verify → done* — so work is planned, tracked, and survives interruptions.
+Agent-Vorcl-Flow turns a supported coding agent into a **structured engineering team**. Instead of one general assistant, you get **25 focused sub-agents** (architect, code-grounded principal architect, backend, frontend, Expo mobile engineer, product and visual design engineer, DB engineer, cross-language integrity auditor, architecture cartographer, liveboard operator, and more), each with its own domain **skills**, quick **slash commands**, and the **MCP tools** it needs. Every non-trivial task runs through a disciplined **Task Master** loop — *goal → tasks → implement → verify → done* — so work is planned, tracked, and survives interruptions.
 
-- 🧩 **24 sub-agents**, 46 skills, 150 slash commands
+- 🧩 **25 sub-agents**, 71 skills, 155 slash commands
 - ⚡ **One-command install** for Claude Code, Codex, Cursor, and/or Kimi CLI — `npx`
 - 🔌 **11 MCP servers** wired in (GitHub, Postgres, MongoDB, Redis, Docker, Firecrawl, Vercel, Render, filesystem, Task Master, Mermaid)
 - 🔑 **One `.env` file for all runtimes** — keys read by a launcher, not `~/.zshrc`, so they work even from GUI/IDE launches; no remote AVF service; liveboard is localhost-only and ephemeral
@@ -117,8 +117,9 @@ The examples in this section use Claude Code syntax; see the [Cursor](#cursor) a
 ```text
 /vorcl add a shopping cart to checkout
 /audit .
+/init-code .
 ```
-`/vorcl` figures out which sub-agent should own the work and drives the full Task Master cycle. `/audit` auto-detects backend, frontend, mobile, data and infrastructure and writes an evidence-based `PROJECT_AUDIT.md` using all relevant roles.
+`/vorcl` figures out which sub-agent should own the work and drives the full Task Master cycle. `/audit` auto-detects backend, frontend, mobile, data and infrastructure and writes an evidence-based `PROJECT_AUDIT.md` using all relevant roles. `/init-code` reads the repository statically and creates an evidence-based `PROJECT_DESCRIPTION.md` without executing project code. Once that file exists, every modifying role must keep its affected sections synchronized; proven description drift blocks task completion.
 
 ### 2. Talk to a specific sub-agent
 ```text
@@ -157,6 +158,7 @@ This keeps work planned, checkpointed, and resumable — nothing is declared "do
 | 🟣 **frontend** | Frontend (React 19 / Next.js App Router) | Components, state, data-fetching, render/bundle optimization, tests |
 | 📱 **expo-mobile** | React Native + Expo engineer | Modular architecture plus Design/Motion/Interaction System, native navigation, tokens, gestures, haptics, Reduced Motion |
 | 🟠 **analyzer** | Code auditor (read-only) | Bugs, type safety, DB structure, frontend mocks, backend smells |
+| 🧭 **integrity** | Cross-language code integrity auditor (read-only) | Production hardcode and mock/fake/demo/fixture leakage across frontend/backend/mobile/shared |
 | 🟡 **swagger** | OpenAPI/Swagger coverage (any stack) | Finds routes not fully documented and covers them, with verification |
 | 🔴 **firecrawl** | Web researcher | Live CLI/MCP/REST, app integration and finished web-data workflows |
 | 🟤 **render** | Hosting & deploy (Render) | Deploys, log-driven diagnostics, metrics, env vars, Render Postgres |
@@ -197,6 +199,7 @@ Every command below is a slash command. `<…>` marks your input.
 | --- | --- |
 | `/vorcl <goal>` | Turns any goal into tasks and routes it to the right sub-agent, then runs the full cycle to done. |
 | `/audit [path] [focus]` | Deep read-only multi-role audit → detected systems, security/CVE/resilience findings, target architecture and phased `PROJECT_AUDIT.md`. |
+| `/init-code [path] [--update]` | Static codebase discovery → evidence-based `PROJECT_DESCRIPTION.md`; project code is never executed. |
 
 ### 🔵 architect — architecture
 | Command | What it does |
@@ -254,8 +257,19 @@ Every command below is a slash command. `<…>` marks your input.
 | `/analyzer:bugs` | Hunt bugs — unhandled errors, race conditions, edge cases. |
 | `/analyzer:types` | Type check — `tsc`, `any`, unsafe casts, zod↔types drift. |
 | `/analyzer:db` | Audit DB structure — schema, indexes, FKs, N+1, migrations. |
-| `/analyzer:mocks` | Find mockup / fake data on the frontend. |
+| `/analyzer:mocks` | Compatibility route for mock/fake data on frontend and backend; delegates deep polyglot checks to integrity. |
 | `/analyzer:backend` | Find "bad" backend code — architecture violations, logic in controllers. |
+
+### 🧭 integrity — hardcode & mock-data audit (read-only, polyglot)
+
+| Command | What it does |
+| --- | --- |
+| `/integrity:vorcl <goal>` | Runs a non-trivial integrity objective through Task Master and turns findings into owner-specific tasks. |
+| `/integrity:audit [path]` | Scans hardcode and mock leakage together, then proves production reachability. |
+| `/integrity:hardcode [path]` | Finds user/config/business literals that bypass localization, configuration, or the system of record. |
+| `/integrity:mocks [path]` | Finds mock frameworks, fake generators, fixtures, demo data, and static responses reachable from production. |
+
+The bundled zero-dependency scanner supports TS/JS, Python, Go, Java/Kotlin, C#, PHP, Ruby, Rust, Vue/Svelte/HTML and Razor. On backend code it also flags business values hidden in constants, static/final fields, default parameters, named arguments, and static catalogs; the auditor then compares them with schemas/models/repositories/queries/admin mutations to prove that the database—not code or config—owns the value. Tests, fixtures, stories, examples, seeds, generated code, and vendor roots are suppressed by default; lexical candidates are not defects until reachability and ownership are proven.
 
 ### 🟡 swagger — OpenAPI/Swagger coverage (any stack)
 | Command | What it does |
@@ -527,7 +541,7 @@ claude plugin validate . --strict      # validate the manifest and components
 
 ## GPT Codex
 
-Codex has no "plugins," so the same capabilities are expressed as **skills**, **profiles**, and an `AGENTS.md` router:
+The repository now includes a native Codex plugin manifest at `.codex-plugin/plugin.json`. The npm installer remains available and installs the same capabilities as **skills**, **profiles**, and an `AGENTS.md` router for Codex CLI, Cursor, and Kimi:
 
 | Claude Code | Codex equivalent |
 | --- | --- |
@@ -592,8 +606,8 @@ Kimi CLI has no `${VAR}` expansion in `mcp.json`, so keys come from the shared `
 ```text
 .claude-plugin/plugin.json      # plugin manifest
 .claude-plugin/marketplace.json # local marketplace (for install)
-agents/       24 sub-agent definitions (*.md)
-skills/       <skill>/SKILL.md            (46 skills; some ship references, scripts, tests or HTML assets)
+agents/       25 sub-agent definitions (*.md)
+skills/       <skill>/SKILL.md            (71 skills; some ship references, scripts, tests or HTML assets)
 commands/     <namespace>/<command>.md    (150 commands, /namespace:command, including /vorcl and /audit)
 hooks/        hooks.json + SessionStart + PostToolUse guards (empty catch, Expo architecture/UI boundaries)
 .mcp.json     github, filesystem, postgres, mongodb, redis, docker, firecrawl, vercel, render, task-master, mermaid

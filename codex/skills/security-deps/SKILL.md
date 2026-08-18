@@ -1,6 +1,6 @@
 ---
 name: security-deps
-description: Аудит зависимостей — npm audit / lock-файлы: CVE с severity, ломающие обновления, false positives (роль security, read-only). Use для проверки пакетов на уязвимости.
+description: "Read-only аудит зависимостей: CVE, severity, breaking upgrades и false positives по lock-файлам."
 ---
 
 # Задача: аудит зависимостей

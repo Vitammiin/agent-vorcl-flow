@@ -59,6 +59,15 @@ jobs:
       - name: Check mirrored skills and commands
         run: bash scripts/sync-check.sh
 
+      - name: Strict Claude plugin validation
+        run: npx --yes @anthropic-ai/claude-code@2.1.226 plugin validate . --strict
+
+      - name: Run test suite
+        run: npm test
+
+      - name: Enforce package budget
+        run: npm run test:package
+
       - name: Check JavaScript syntax
         shell: bash
         run: |

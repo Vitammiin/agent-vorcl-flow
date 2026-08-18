@@ -1,42 +1,20 @@
 ---
 name: vorcl
-description: Универсальная точка входа в Task Master workflow — превращает цель в задачи и ведёт цикл до готового, роутя к нужной роли. Use when есть цель/фича/багфикс любого домена и нужен полный цикл «цель → задачи → реализация → проверка → done» с делегированием нужным ролям.
+description: "Универсальный scoped Task Master orchestrator: фиксирует IDs текущей цели, атомарно claim-ит их и делегирует реализацию и независимую проверку. Use для нетривиальной tracked/remediation цели любого домена."
 ---
 
-# Задача: цель через Task Master workflow
+# Scoped goal orchestrator
 
-Возьми цель, которую дал пользователь, в работу через Task Master.
+Сначала выбери режим из `$workflow`: report-only пишет только явно запрошенный report artifact, но не `.taskmaster`/product state; track-only не меняет product code; remediation разрешает изменения в границах запроса.
 
-1. Убедись, что Task Master инициализирован (`.taskmaster/`); если нет — `task-master init`.
-2. Цель → задачи: крупная фича — PRD в `.taskmaster/docs/prd.txt` + `parse_prd`; точечная — `add_task`.
-3. `next_task` → `get_task`; при сложности — `expand_task` (после `analyze_project_complexity`).
-4. Реализуй текущую задачу, фиксируя ход через `update_subtask`.
-5. Проверь `testStrategy`; при успехе — `set_task_status --status=done`; повторяй, пока есть задачи.
+Для persistent режима:
 
-Опирайся на `$workflow`, `$task-master`. Оркестрацию цикла веди сам, а реализацию каждой задачи веди профильной ролью по домену:
+1. `add_task`/`parse_prd`; сохрани только возвращённые IDs.
+2. Создай scoped run через `$workflow`; atomic claim каждого ID → `get_task` → `set_task_status in-progress`. Bare `next_task` запрещён.
+3. Профильный Executor работает только над claimed ID.
+4. Отдельный Checker выполняет `testStrategy`, не редактируя implementation/acceptance tests.
+5. Только Orchestrator ставит `done`; цикл ограничен IDs run.
 
-| Домен задачи | Роль |
-| --- | --- |
-| Архитектура, выбор технологий, system design | `$architect` |
-| Полная реальная архитектура текущего репозитория по коду + MD/HTML/PDF/draw.io/Mermaid | `$principal-architect` |
-| API, серверная логика, Node.js/TypeScript | `$backend` |
-| UI, React/Next.js, состояние, загрузка данных | `$frontend` |
-| React Native + Expo: routes, screens, modules, state, storage, native | `$expo-mobile` |
-| Аудит кода без правок (баги, типы, mockup, БД) | `$analyzer` |
-| Покрытие OpenAPI/Swagger | `$swagger` |
-| Веб-ресёрч, сбор данных с сайтов | `$firecrawl` |
-| Хостинг/деплой/логи на Render | `$render` |
-| Схема БД, запросы, миграции, кэш (Postgres/Mongo/Redis) | `$database` |
-| Обработка ошибок, try/catch, логирование | `$resilience` |
-| Скриншот UI → новый код | `$screenshot` |
-| Продуктовый/визуальный дизайн: prototype, wireframe, deck, document, animation, design system | `$design-studio` |
-| Скриншот → место в существующем коде (read-only) | `$pinpoint` |
-| Диаграммы draw.io (сложная раскладка, PMP/PMBOK) | `$drawio` |
-| Диаграммы Mermaid (в git/README, с рендер-проверкой) | `$mermaid` |
-| Тесты (unit/integration/e2e), верификация testStrategy | `$testing` |
-| Коммиты, PR, changelog, релизы, git-гигиена | `$gitflow` |
-| Аудит безопасности: секреты, OWASP, CVE, PII (read-only) | `$security` |
-| Документация: README, API-доки, ARCHITECTURE | `$docs` |
-| Docker, docker-compose, CI/CD (GitHub Actions) | `$devops` |
+Короткий router: architecture — `$architect`, `$principal-architect`, `$archmap`; implementation — `$backend`, `$frontend`, `$expo-mobile`; audits/contracts — `$analyzer`, `$integrity`, `$security`, `$resilience`, `$swagger`; data/platform — `$database`, `$render`, `$devops`; visual/source — `$screenshot`, `$design-studio`, `$visual-research`, `$pinpoint`; artifacts — `$drawio`, `$mermaid`, `$docs`; verification/release — `$testing`, `$gitflow`; research/operations — `$firecrawl`, `$liveboard`.
 
-Задача может пройти через несколько ролей (например, `$architect` → `$backend` → `$swagger` → `$testing` → `$gitflow`). Если домен неочевиден — начни с `$architect` (анализ), а не гадай.
+Targeted hardcode/mock → `$integrity`; broad code-quality audit → `$analyzer`. Полный multi-language architecture package → `$principal-architect`; лёгкая TS/JS dependency map → `$archmap`. Неочевидную междоменную архитектуру начинает `$architect`.

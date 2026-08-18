@@ -1,6 +1,6 @@
 ---
 name: e2e-playwright
-description: E2E-тестирование на Playwright — приоритет селекторов (getByRole > testid > css), fixtures и переиспользование auth-state (storageState), web-first assertions без sleep, trace/screenshot при падении, параллельность и шардинг в CI, паттерн Page Object. Use при написании, ревью или стабилизации браузерных e2e-тестов.
+description: "E2E-тестирование на Playwright — приоритет селекторов (getByRole > testid > css), fixtures и переиспользование auth-state (storageState), web-first assertions без sleep, trace/screenshot при падении, параллельность и шардинг в CI, паттерн Page Object. Use при написании, ревью или стабилизации браузерных e2e-тестов."
 version: 1.0.0
 ---
 

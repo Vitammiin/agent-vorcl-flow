@@ -6,12 +6,12 @@ allowed-tools: Read, Grep, Glob, Bash
 
 Возьми security-цель в работу через Task Master: **$ARGUMENTS**.
 
-1. Убедись, что Task Master инициализирован (`.taskmaster/`); если нет — `task-master init`.
+1. Этот маршрут означает явно выбранный `track-only`; обычный security report Task Master не меняет.
 2. Прогони аудит (**read-only** — ничего не правь): секреты (рабочее дерево + `git log -p --all`), OWASP Top 10 в коде, зависимости (`npm audit`), PII в коде и логах. Каждая находка — с доказательством (`file:line` или коммит-хэш + цитата) и severity.
 3. Перед репортом проверь контекст каждой находки: `${VAR:-default}`, `process.env.*`, плейсхолдеры и фейки в тестах/доках — не findings.
-4. Оформи каждую значимую находку в задачу через `add_task` (заголовок, категория, severity, доказательство, конкретная починка, исполнитель). Реальный секрет в истории — critical с обязательной ротацией ключа.
-5. `next_task` → `get_task`; при сложности — `expand_task` (после `analyze_project_complexity`). Фиксы делегируй: правки кода — `backend`/`frontend`, чистка git-истории — `gitflow`. Сам аудит правок не вносит.
-6. Автор фикса проверяет `testStrategy` и ставит `set_task_status --status=done`; вернись к шагу 5, пока есть задачи.
+4. `add_task` для значимого finding; сохрани возвращённые IDs и создай scoped run. Реальный секрет — critical + обязательная ротация.
+5. Atomic claim каждого ID → `get_task` → `in-progress`; фиксы делегируй `backend`/`frontend`/`gitflow`. Bare `next_task` запрещён.
+6. Независимый `testing` выполняет `testStrategy`; только Orchestrator ставит `done`.
 
 Пустой **$ARGUMENTS** — полный аудит текущего репозитория (все четыре категории). В финале перечисли прогнанные проверки и что не проверялось — вердикт «чисто» только с выводом команд.
 

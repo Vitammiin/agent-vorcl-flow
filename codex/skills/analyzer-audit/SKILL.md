@@ -1,6 +1,6 @@
 ---
 name: analyzer-audit
-description: Полный read-only аудит кода — баги, типы, БД, mockup на фронте, плохой код на беке (роль analyzer). Use when нужен полный проход по всем областям сразу; точечная проверка одной области — $analyzer-bugs/$analyzer-types/$analyzer-db/$analyzer-mocks/$analyzer-backend.
+description: "Широкий read-only аудит багов, типов, БД и структуры backend/frontend; hardcode/mock-data принадлежат integrity."
 ---
 
 # Задача: полный аудит кода
@@ -11,8 +11,8 @@ description: Полный read-only аудит кода — баги, типы, 
 1. **Баги** — необработанные ошибки/тихие падения, race conditions, edge cases.
 2. **Типы** — `tsc --noEmit`, `any`, небезопасные касты, рассинхрон zod↔типы.
 3. **Структура БД** (Postgres и/или MongoDB) — схема, индексы, N+1, миграции: Postgres — read-only SQL (`information_schema`/`pg_indexes`, FK/констрейнты); MongoDB — MCP `mongodb` (`listIndexes`/`explain`, форма документов, embedding vs referencing, schema-валидаторы).
-4. **Mockup на фронте** — хардкод вместо API, `lorem`, `TODO/FIXME`, mock-хендлеры в прод-пути.
-5. **Плохой код на беке** — нарушения `src/modules/*`, логика в контроллерах, доступ к БД из service, нет валидации/обработки ошибок.
-6. **Языковой хардкод (i18n)** — в мультиязычном проекте: пользовательские строки литералами в JSX/шаблонах/ответах вместо слоя перевода, конкатенация переводов, ручная плюрализация, хардкод формата дат/валют, перевод логов/кодов ошибок.
+4. **Плохой код на беке** — нарушения `src/modules/*`, логика в контроллерах, доступ к БД из service, нет валидации/обработки ошибок.
 
-Ничего не правь. Формат находки: `file:line`, что нашли, первопричина, конкретная починка; severity `critical>high>medium>low`. В конце — сводка по областям и severity. По значимым находкам — `add_task`. Опирайся на `$typescript`, `$backend-architecture`, `$frontend-architecture`, `$database`, `$postgresql`, `$mongodb`, `$i18n`.
+Hardcode, i18n literals и mock/fake/demo leakage не дублируй: перенаправь scope в `$integrity-audit`.
+
+Ничего не правь. Формат находки: `file:line`, что нашли, первопричина, конкретная починка; severity `critical>high>medium>low`. В конце — сводка по областям и severity. По значимым находкам — `add_task`. Опирайся на `$typescript`, `$backend-architecture`, `$frontend-architecture`, `$database`, `$postgresql`, `$mongodb`.

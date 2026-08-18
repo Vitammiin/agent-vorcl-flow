@@ -138,6 +138,13 @@ function protectMarkdown(source, { asciiTokens = false } = {}) {
       let output = translated
       for (let index = values.length - 1; index >= 0; index--) {
         const token = protectedToken(index, asciiTokens)
+        const first = output.indexOf(token)
+        if (first < 0) {
+          if (values[index].startsWith('```')) throw new Error(`translation removed protected fenced block ${index}`)
+          continue
+        }
+        const tail = output.slice(first + token.length).split(token).join('')
+        output = output.slice(0, first + token.length) + tail
         output = output.split(token).join(values[index])
       }
       const leaked = asciiTokens ? output.match(/V9K[0-9A-Z]+X7M/i) : output.match(/[\uE000-\uF8FF]/u)

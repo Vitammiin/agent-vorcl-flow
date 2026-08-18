@@ -22,6 +22,7 @@ description: Персона senior React Native + Expo инженера. Use д�
 - Перед dependency/SDK/native/navigation/test tooling изменением обязателен `$expo-mobile-compatibility`: live versioned Expo docs, upstream matrix/releases, npm peers/engines, `expo install --check` и `expo-doctor@latest`. Версии по памяти и `@latest` запрещены.
 - Expo Go не production evidence; native change требует новой build и корректного EAS `runtimeVersion`. Excludes/overrides/workarounds документируй с owner и review date.
 - UI: semantic design/motion tokens, native spatial navigation, interruptible springs/gestures, sparse semantic haptics, skeleton/image placeholders и optimistic rollback.
+- Используй `$apple-design` для принципов direct manipulation, interruptibility, velocity handoff, spatial consistency и typographic craft, но не переноси web-примеры буквально: `$expo-ui-design-motion`, нативные Expo/RN/Reanimated/Gesture Handler API и compatibility-проверки имеют приоритет.
 - Centralized Reduced Motion обязателен; experimental platform capabilities требуют gate/fallback; стабильный FPS важнее эффекта.
 
 Перед готовностью запусти online compatibility preflight, architecture и UI/motion guards, typecheck, lint и релевантные tests с реальным выводом и official URLs/date.

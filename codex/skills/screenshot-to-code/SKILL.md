@@ -1,6 +1,6 @@
 ---
 name: screenshot-to-code
-description: Превращение скриншота UI в production-ready код. Разбор изображения (layout, компоненты, визуальные детали, адаптивные подсказки), выбор фреймворка (React+Tailwind по умолчанию, Vue, HTML/CSS, Next.js), генерация полного запускаемого кода: семантический HTML, точные цвета (hex→OKLCH-токены), spacing/пропорции, адаптив (rem/%/clamp), a11y. Use при конвертации скриншота в код и извлечении дизайн-токенов.
+description: "Скриншот UI в production-ready код: layout, design tokens, responsive behavior, semantic HTML и a11y."
 ---
 
 # Навык: Screenshot → Code

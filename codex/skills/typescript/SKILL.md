@@ -1,6 +1,6 @@
 ---
 name: typescript
-description: Строгая типизация серверного кода на TypeScript — tagged unions и Result<T,E>, generics для типобезопасных API-клиентов, strictNullChecks и optional chaining, exhaustive switch с never-проверкой, вывод типов из zod (z.infer). Use при написании или улучшении типов, обработке ошибок через Result, синхронизации zod-схем и типов, борьбе с any и небезопасными кастами.
+description: "Строгая типизация серверного кода на TypeScript — tagged unions и Result<T,E>, generics для типобезопасных API-клиентов, strictNullChecks и optional chaining, exhaustive switch с never-проверкой, вывод типов из zod (z.infer). Use при написании или улучшении типов, обработке ошибок через Result, синхронизации zod-схем и типов, борьбе с any и небезопасными кастами."
 ---
 
 # Навык: TypeScript

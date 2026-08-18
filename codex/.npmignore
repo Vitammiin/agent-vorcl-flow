@@ -1,0 +1,9 @@
+# Adapter prompts stay in codex/skills. Runtime/reference assets are packaged
+# once under canonical skills/ and overlaid by bin/install.mjs.
+skills/**/agents/
+skills/**/assets/
+skills/**/built-in-skills/
+skills/**/references/
+skills/**/scripts/
+skills/**/starter-components/
+skills/**/tests/

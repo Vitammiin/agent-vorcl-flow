@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "roles": [
+    {"id":"architect","route":"system design and technology choices","owns":"target architecture","notFor":"code-grounded full repository package"},
+    {"id":"principal-architect","route":"complete multi-language current architecture package","owns":"MD/JSON/HTML/PDF/draw.io/Mermaid package","notFor":"lightweight TS/JS dependency map"},
+    {"id":"backend","route":"server APIs and business logic","owns":"backend implementation","notFor":"frontend UI"},
+    {"id":"frontend","route":"React/Next.js UI and client state","owns":"web frontend implementation","notFor":"backend APIs"},
+    {"id":"expo-mobile","route":"React Native and Expo","owns":"mobile implementation","notFor":"web-only UI"},
+    {"id":"analyzer","route":"broad read-only code quality audit","owns":"bugs, types, DB and structural review","notFor":"targeted hardcode or mock-data audit"},
+    {"id":"integrity","route":"targeted hardcode and mock-data audit","owns":"cross-language hardcode/mock production reachability","notFor":"general code-quality audit"},
+    {"id":"swagger","route":"OpenAPI coverage","owns":"API specification coverage","notFor":"general API implementation"},
+    {"id":"firecrawl","route":"web research and extraction","owns":"live web evidence","notFor":"local repository analysis"},
+    {"id":"render","route":"Render hosting, deploys and logs","owns":"Render operations","notFor":"generic CI/CD"},
+    {"id":"database","route":"Postgres, MongoDB and Redis","owns":"schema, query, migration and cache work","notFor":"application business logic"},
+    {"id":"resilience","route":"error handling and logging","owns":"runtime failure boundaries","notFor":"security audit"},
+    {"id":"screenshot","route":"screenshot to new UI code","owns":"new UI reconstruction","notFor":"locating existing source"},
+    {"id":"design-studio","route":"product and visual design artifacts","owns":"prototype, deck, document and design system","notFor":"source-code location"},
+    {"id":"visual-research","route":"identify screenshot with web evidence","owns":"visual identification and live verification","notFor":"code generation"},
+    {"id":"pinpoint","route":"screenshot to existing source","owns":"UI-to-file trace","notFor":"new UI generation"},
+    {"id":"drawio","route":"draw.io and PMP diagrams","owns":"native draw.io artifacts","notFor":"repository extraction"},
+    {"id":"archmap","route":"lightweight TS/JS architecture map","owns":"architecture.json and interactive dependency map","notFor":"complete multi-language architecture package"},
+    {"id":"mermaid","route":"Mermaid diagrams and rendering","owns":"validated Mermaid artifacts","notFor":"repository extraction"},
+    {"id":"testing","route":"unit, integration, E2E and verification","owns":"independent test verdict","notFor":"feature implementation"},
+    {"id":"gitflow","route":"commits, PRs and releases","owns":"git and release workflow","notFor":"product code"},
+    {"id":"security","route":"read-only security audit","owns":"secrets, OWASP, CVE and PII findings","notFor":"security remediation"},
+    {"id":"docs","route":"README, API and architecture documentation","owns":"documentation lifecycle","notFor":"architecture extraction"},
+    {"id":"devops","route":"Docker and CI/CD","owns":"container and pipeline implementation","notFor":"Render-specific operations"},
+    {"id":"liveboard","route":"local live work dashboard","owns":"ephemeral project status UI","notFor":"persistent reporting"}
+  ]
+}

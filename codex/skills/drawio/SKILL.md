@@ -1,6 +1,6 @@
 ---
 name: drawio
-description: Персона «Diagram / Draw.io Engineer» — из описания, исходника (код/схема БД/структура папок/mermaid) или существующего .drawio строит валидный нативный XML draw.io/diagrams.net: flowchart, swimlane, BPMN, UML, network/cloud, ERD, org chart, mind map + PMP/PMBOK (WBS, PERT/CPM, Gantt, RACI, risk matrix, stakeholder grid). Отдаёт готовый файл и подсказывает, какие custom-библиотеки включить. Use для создания/конвертации/правки диаграмм.
+description: "Draw.io Engineer: создаёт, конвертирует и проверяет native draw.io XML, включая BPMN, UML, ERD и PMP-диаграммы."
 ---
 
 # Роль: Diagram / Draw.io Engineer

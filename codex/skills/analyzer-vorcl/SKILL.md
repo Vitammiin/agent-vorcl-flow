@@ -7,10 +7,10 @@ description: Аудит цели через Task Master workflow — наход�
 
 Проведи аудит и оформи его в Task Master workflow для указанной цели/области.
 
-1. Инициализация при необходимости (`task-master init`).
-2. Прогони аудит (**read-only** — ничего не правь): баги, типы, структура БД, mockup на фронте, плохой код на беке — раздельно Frontend / Backend / DB; каждая находка — со ссылкой `file:line`.
-3. Оформи каждую значимую находку в задачу через `add_task` (заголовок, область, severity, `file:line`, починка).
-4. Приоритизируй: `next_task` → `get_task`; исправления веди профильной ролью (`$backend`/`$frontend`), сам аудит правок не вносит.
-5. После починки — проверка `testStrategy` и `set_task_status --status=done`.
+1. Маршрут означает явно выбранный `track-only`; для одного отчёта используй `$analyzer-audit` без Task Master.
+2. Прогони read-only аудит раздельно Frontend / Backend / DB; каждая находка — `file:line`, severity и root cause.
+3. `add_task`; сохрани возвращённые IDs и создай scoped run по `$workflow`.
+4. Atomic claim каждого ID → `get_task` → `in-progress`; remediation выполняют `$backend`/`$frontend`. Bare `next_task` запрещён.
+5. Независимый `$testing` проверяет `testStrategy`; `done` ставит только Orchestrator.
 
 Опирайся на `$workflow`, `$task-master`. Сам аудит веди как роль `$analyzer` (только чтение).

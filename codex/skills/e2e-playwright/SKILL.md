@@ -1,6 +1,6 @@
 ---
 name: e2e-playwright
-description: E2E на Playwright — селекторы (getByRole > testid > css), fixtures/auth-state (storageState), web-first assertions без sleep, trace/screenshot при падении, параллельность/шардинг, CI-конфиг, Page Object. Use при написании, ревью или стабилизации браузерных e2e-тестов.
+description: "E2E на Playwright — селекторы (getByRole > testid > css), fixtures/auth-state (storageState), web-first assertions без sleep, trace/screenshot при падении, параллельность/шардинг, CI-конфиг, Page Object. Use при написании, ревью или стабилизации браузерных e2e-тестов."
 ---
 
 # Навык: Playwright E2E

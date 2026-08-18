@@ -6,13 +6,19 @@
     "agent-vorcl-flow": "bin/install.mjs"
   },
   "scripts": {
-    "test": "node scripts/readme-locales.mjs --check && node --test skills/design-studio/agents/tests/*.test.mjs skills/expo-mobile-architecture/tests/*.test.mjs skills/expo-ui-design-motion/tests/*.test.mjs skills/project-audit/tests/*.test.mjs skills/principal-architecture/tests/*.test.mjs",
+    "test": "node scripts/readme-locales.mjs --check && node --test tests/*.test.mjs skills/code-integrity/tests/*.test.mjs skills/design-studio/agents/tests/*.test.mjs skills/expo-mobile-architecture/tests/*.test.mjs skills/expo-ui-design-motion/tests/*.test.mjs skills/init-code/tests/*.test.mjs skills/project-audit/tests/*.test.mjs skills/principal-architecture/tests/*.test.mjs",
     "docs:locales": "node scripts/readme-locales.mjs --check",
     "docs:locales:generate": "node scripts/readme-locales.mjs --generate",
+    "generate:roles": "node scripts/generate-role-skills.mjs --write",
     "test:expo-architecture": "node --test skills/expo-mobile-architecture/tests/*.test.mjs",
     "test:expo-compatibility": "node --test skills/expo-mobile-architecture/tests/compatibility-preflight.test.mjs",
     "test:expo-ui": "node --test skills/expo-ui-design-motion/tests/*.test.mjs",
     "test:project-audit": "node --test skills/project-audit/tests/*.test.mjs",
+    "test:installer": "node --test tests/installer.test.mjs",
+    "test:init-code": "node --test skills/init-code/tests/*.test.mjs",
+    "test:registry": "node scripts/validate-registry.mjs && bash scripts/sync-check.sh",
+    "test:package": "node scripts/check-package-budget.mjs",
+    "test:code-integrity": "node --test skills/code-integrity/tests/*.test.mjs",
     "test:design-studio": "node --test skills/design-studio/agents/tests/*.test.mjs",
     "test:principal-architecture": "node --test skills/principal-architecture/tests/*.test.mjs"
   },
@@ -26,6 +32,7 @@
     ".mcp.json",
     ".env.example",
     ".claude-plugin/",
+    ".codex-plugin/",
     "codex/",
     "cursor/",
     "kimi/",

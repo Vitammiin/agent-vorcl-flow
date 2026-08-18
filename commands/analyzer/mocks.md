@@ -1,9 +1,9 @@
 ---
-description: Поиск mockup/фейковых данных на фронтенде. Use when подозрение, что UI живёт на заглушках — MSW-хендлеры, faker, хардкод вместо API; проверка типов — /analyzer:types (analyzer)
-argument-hint: "[путь фронтенда; по умолчанию src фронта]"
+description: Совместимый маршрут поиска mockup/фейковых данных во frontend/backend; кросс-языковой глубокий маршрут — /integrity:mocks. Use когда UI/API может жить на заглушках (analyzer → integrity)
+argument-hint: "[путь frontend/backend; по умолчанию весь src]"
 allowed-tools: Read, Grep, Glob, Bash
 ---
 
-Найди mockup/фейковые данные на **фронтенде** (**read-only**): **$ARGUMENTS**.
+Найди mockup/фейковые данные на **frontend и backend** (**read-only**): **$ARGUMENTS**.
 
-Ищи заглушки, попавшие в прод-путь: хардкод-массивы/объекты вместо реальных API-вызовов (`const MOCK_*`, `fakeData`, статические списки в компонентах), `lorem ipsum`/placeholder-тексты и картинки-заглушки, `TODO`/`FIXME`/`hardcoded`, замоканные хендлеры (MSW `setupWorker`/`handlers`, `jest.mock`), генераторы фейков (`faker`/`casual`) в прод-коде, закомментированные реальные вызовы, значения-заглушки (`example.com`, `123-456`, `test@test`). Отличай легитимные фикстуры тестов/сторибука (в `__tests__`/`*.stories.*`/`mocks/`) от утечки в прод — помечай это. Ничего не правь. Формат: `file:line`, что нашли, первопричина (почему заглушка вместо реальных данных), конкретная починка (реальный запрос через `api`/TanStack Query); severity: mockup в прод-пути = `critical/high`. По значимым находкам — `add_task` (Task Master). Опирайся на навыки `frontend-architecture`, `react`, `nextjs`. Делегируй субагенту `analyzer`.
+Используй `code-integrity` (`--mode mocks`) и `mock-data-detection`. Ищи mock frameworks, faker, fixtures/demo imports, static UI/API records, placeholder content и отключённые реальные интеграции. Докажи declaration → import/registration/DI/build → production entry point; tests/stories/seeds/dev adapters без production import не являются утечкой. Ничего не правь. Формат: declaration/consumer `file:line`, rule ID, evidence, reachability/guard, root cause, severity, confidence и конкретная replacement boundary. По значимым находкам — `add_task`. Делегируй специализированной роли `integrity`.

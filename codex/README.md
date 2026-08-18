@@ -1,18 +1,18 @@
 # Agent-Vorcl-Flow — адаптер для GPT Codex
 
-Те же роли и навыки, что и в плагине Claude Code, но в форматах Codex CLI.
+Те же роли и навыки, что и в плагине Claude Code, в форматах Codex CLI. Корень репозитория также содержит нативный manifest `.codex-plugin/plugin.json`; этот адаптер остаётся совместимым способом установки через npm и ручного мёржа.
 
 ## Что внутри
 ```
 codex/
 ├── skills/<name>/SKILL.md   # навыки Codex (.agents/skills): персоны ролей + доменные + задачи
 ├── config.toml              # MCP-серверы [mcp_servers.*] + профили ролей [profiles.*]
-├── AGENTS.md                # роутинг ролей (architect, principal-architect, backend, frontend, expo-mobile, analyzer, swagger, firecrawl, render, database, resilience, screenshot, design-studio, pinpoint, drawio, mermaid, archmap, testing, gitflow, security, docs, devops, liveboard)
+├── AGENTS.md                # роутинг ролей (architect, principal-architect, backend, frontend, expo-mobile, analyzer, integrity, swagger, firecrawl, render, database, resilience, screenshot, design-studio, pinpoint, drawio, mermaid, archmap, testing, gitflow, security, docs, devops, liveboard)
 └── scripts/install.sh       # установка в ~/.agents/skills и ~/.codex
 ```
 
 ## Роли
-`$architect` · `$principal-architect` · `$backend` · `$frontend` · `$expo-mobile` · `$analyzer` · `$swagger` · `$firecrawl` · `$render` · `$database` · `$resilience` · `$screenshot` · `$design-studio` · `$pinpoint` · `$drawio` · `$mermaid` · `$archmap` · `$testing` · `$gitflow` · `$security` · `$docs` · `$devops` · `$liveboard`. Все работают через Task Master (`$workflow` + `$task-master`); единая точка входа — `$vorcl`, у каждой роли свой `$<role>-vorcl`. `$principal-architect-create` и `$principal-architect-update` строят полный code-grounded архитектурный пакет текущего репозитория. `$liveboard-start` запускает локальное in-memory табло worktree/агентов/задач на свободном порту. У `render`, `database` и `archmap` персона и доменный скилл совпадают; остальные доменные маршруты перечислены в `AGENTS.md`.
+`$architect` · `$principal-architect` · `$backend` · `$frontend` · `$expo-mobile` · `$analyzer` · `$integrity` · `$swagger` · `$firecrawl` · `$render` · `$database` · `$resilience` · `$screenshot` · `$design-studio` · `$pinpoint` · `$drawio` · `$mermaid` · `$archmap` · `$testing` · `$gitflow` · `$security` · `$docs` · `$devops` · `$liveboard`. Все работают через Task Master (`$workflow` + `$task-master`); единая точка входа — `$vorcl`, у каждой роли свой `$<role>-vorcl`. `$integrity-audit` выполняет zero-dependency cross-language scan и требует доказать production reachability каждого hardcode/mock finding. `$principal-architect-create` и `$principal-architect-update` строят полный code-grounded архитектурный пакет текущего репозитория. `$liveboard-start` запускает локальное in-memory табло worktree/агентов/задач на свободном порту.
 
 ## Маппинг Claude Code → Codex
 | Claude Code | Codex |
@@ -25,7 +25,7 @@ codex/
 | `.mcp.json` (task-master) | `[mcp_servers.task-master]` в `config.toml` |
 | хук SessionStart | роутинг ролей в `AGENTS.md` |
 
-> У Codex нет субагентов и слэш-команд как в Claude Code — всё выражено через **skills** (вызов `$name`), **profiles** и **AGENTS.md**.
+> В Codex роли и команды этого набора выражены через **skills** (вызов `$name`), **profiles** и **AGENTS.md**; `.codex-plugin/plugin.json` публикует тот же каталог skills как плагин.
 
 ## Установка
 ```bash
@@ -58,6 +58,7 @@ codex
 > $expo-mobile-compatibility  ./apps/mobile Reanimated upgrade
 > $analyzer-audit                            # полный read-only аудит
 > $analyzer-mocks  src/features              # mockup-данные на фронте
+> $integrity-audit  .                         # hardcode + mocks во frontend/backend, polyglot
 > $render-vorcl  подними api-сервис и дай ему доступ к БД   # инфра-цель → задачи → цикл
 > $render-deploy  api  --clear-cache        # деплой на Render (сначала выбери workspace)
 > $render-logs  api                         # диагностика логов до первопричины (build vs runtime)
@@ -77,6 +78,7 @@ codex
 > $devops-dockerfile  node-api               # multistage Dockerfile + реальный docker build
 
 codex --profile analyzer    # роль аудита с повышенным reasoning
+codex --profile integrity   # hardcode/mock-data аудит разных языков
 codex --profile expo-mobile # React Native + Expo роль
 codex --profile render      # роль хостинга/деплоя на Render
 codex --profile security    # security-аудит с повышенным reasoning

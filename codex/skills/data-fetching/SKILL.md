@@ -1,6 +1,6 @@
 ---
 name: data-fetching
-description: Серверное состояние на TanStack Query (React Query) поверх реального API бэкенда. Источник истины — OpenAPI-спека бэка (Fastify/NestJS/Express и др.): типы генерируются из спеки (openapi-typescript), запросы идут типобезопасным openapi-fetch. Ключи, кэш, инвалидация, мутации, оптимистичные обновления, RSC/Server Actions. Моков в прод-пути нет. Use при загрузке/мутации серверных данных во фронтенде.
+description: "Серверное состояние на TanStack Query поверх типобезопасного клиента из OpenAPI; кэш, мутации и инвалидация без production mocks."
 ---
 
 # Навык: Data fetching (TanStack Query + OpenAPI)

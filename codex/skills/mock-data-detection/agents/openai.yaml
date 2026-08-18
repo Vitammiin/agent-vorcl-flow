@@ -1,0 +1,4 @@
+interface:
+  display_name: "Mock Data Detection"
+  short_description: "Find mocks and fake data in production"
+  default_prompt: "Use $mock-data-detection to find mock data and test infrastructure leaking into production."

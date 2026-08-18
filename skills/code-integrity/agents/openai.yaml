@@ -1,0 +1,4 @@
+interface:
+  display_name: "Code Integrity"
+  short_description: "Cross-language hardcode and mock auditor"
+  default_prompt: "Use $code-integrity to audit production code for hardcoded user data and leaked mocks."

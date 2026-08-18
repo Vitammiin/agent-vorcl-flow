@@ -1,6 +1,6 @@
 ---
 name: principal-architect-create
-description: Создать полный code-grounded архитектурный пакет текущего репозитория: ARCHITECTURE.md, JSON, HTML, draw.io, Mermaid и PDF. Use для первого анализа; существующий пакет обновляет $principal-architect-update.
+description: "Создать полный multi-language code-grounded пакет текущей архитектуры в MD, JSON, HTML, draw.io, Mermaid и PDF."
 ---
 
 # Создать архитектурный пакет

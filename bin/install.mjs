@@ -35,6 +35,13 @@ const PLUGIN = 'agent-vorcl-flow' // .claude-plugin/plugin.json → name
 const PLUGIN_ID = `${PLUGIN}@${MARKET}`
 const MARK_S = '# >>> agent-vorcl-flow >>>'
 const MARK_E = '# <<< agent-vorcl-flow <<<'
+const SKILL_DESCRIPTION_MARK_S = '<!-- >>> agent-vorcl-flow project-description >>>'
+const SKILL_DESCRIPTION_MARK_E = '<!-- <<< agent-vorcl-flow project-description <<< -->'
+const SKILL_DESCRIPTION_CONTRACT = `${SKILL_DESCRIPTION_MARK_S}
+## Project description maintenance
+
+If this skill changes code, configuration, tests, schemas, deployment, environment, integrations, runtime, or data state and \`PROJECT_DESCRIPTION.md\` exists in task scope: read it before the change. Afterward use \`$init-code\`'s \`check-impact.mjs\` with this task's changed paths and any \`--external\` mutations. Update only materially affected sections, validate the document, and never create it automatically when absent. A proven stale description blocks completion. Read-only skills and Checker report drift but do not edit the document.
+${SKILL_DESCRIPTION_MARK_E}`
 
 const argv = process.argv.slice(2)
 const wantClaude = argv.includes('--claude')
@@ -132,17 +139,47 @@ function copySkillsPreservingUpstream(srcSkills, skillsDir) {
       continue
     }
     fs.cpSync(path.join(srcSkills, entry.name), target, { recursive: true })
+    const prompt = path.join(target, 'SKILL.md')
+    if (fs.existsSync(prompt)) injectProjectDescriptionContract(prompt)
     copied++
   }
   return { copied, preserved }
 }
 
-// Liveboard carries its dependency-free runtime beside the canonical skill.
-// Codex/Cursor mirrors keep prompts; installation overlays the executable assets.
-function installLiveboardRuntime(skillsDir) {
-  const source = path.join(PKG_ROOT, 'skills', 'liveboard')
+function injectProjectDescriptionContract(file) {
+  const source = fs.readFileSync(file, 'utf8')
+  if (source.includes(SKILL_DESCRIPTION_MARK_S)) return
+  const frontmatter = source.match(/^---\r?\n[\s\S]*?\r?\n---\r?\n/)
+  if (!frontmatter) throw new Error(`неверный SKILL.md без frontmatter: ${file}`)
+  const insertAt = frontmatter[0].length
+  writeFileAtomic(file, `${source.slice(0, insertAt)}\n${SKILL_DESCRIPTION_CONTRACT}\n${source.slice(insertAt)}`)
+}
+
+// Adapter-specific SKILL.md prompts stay under codex/skills. Heavy runtime,
+// references and assets live once under canonical skills and are overlaid here.
+function installCanonicalSkillAssets(skillsDir) {
+  const canonical = path.join(PKG_ROOT, 'skills')
+  if (!fs.existsSync(canonical)) return
+  for (const skill of fs.readdirSync(canonical, { withFileTypes: true })) {
+    if (!skill.isDirectory()) continue
+    const target = path.join(skillsDir, skill.name)
+    if (!fs.existsSync(target)) continue
+    const source = path.join(canonical, skill.name)
+    for (const entry of fs.readdirSync(source, { withFileTypes: true })) {
+      if (entry.name === 'SKILL.md' || entry.name === 'tests') continue
+      fs.cpSync(path.join(source, entry.name), path.join(target, entry.name), { recursive: true })
+    }
+  }
+}
+
+// Scoped-run helper is shared by the workflow prompt and installed beside it,
+// so every adapter executes the same orchestration contract.
+function installWorkflowRuntime(skillsDir) {
+  const source = path.join(PKG_ROOT, 'scripts', 'vorcl-run.mjs')
   if (!fs.existsSync(source)) return
-  fs.cpSync(source, path.join(skillsDir, 'liveboard'), { recursive: true })
+  const target = path.join(skillsDir, 'workflow', 'scripts', 'vorcl-run.mjs')
+  fs.mkdirSync(path.dirname(target), { recursive: true })
+  fs.cpSync(source, target)
 }
 
 // ---------- Claude Code ----------
@@ -179,11 +216,19 @@ function writeClaudeSettings() {
       return
     }
   }
-  s.extraKnownMarketplaces ||= {}
+  if (!s.extraKnownMarketplaces || typeof s.extraKnownMarketplaces !== 'object' || Array.isArray(s.extraKnownMarketplaces)) {
+    if (s.extraKnownMarketplaces != null) warn(`поле extraKnownMarketplaces в ${file} повреждено — пересоздаю его как объект`)
+    s.extraKnownMarketplaces = {}
+  }
   s.extraKnownMarketplaces[MARKET] = { source: { source: 'github', repo: REPO }, autoUpdate: true }
-  s.enabledPlugins ||= []
-  if (!s.enabledPlugins.includes(PLUGIN_ID)) s.enabledPlugins.push(PLUGIN_ID)
-  fs.writeFileSync(file, JSON.stringify(s, null, 2) + '\n')
+  if (Array.isArray(s.enabledPlugins)) {
+    s.enabledPlugins = Object.fromEntries(s.enabledPlugins.filter((id) => typeof id === 'string').map((id) => [id, true]))
+  } else if (!s.enabledPlugins || typeof s.enabledPlugins !== 'object') {
+    if (s.enabledPlugins != null) warn(`поле enabledPlugins в ${file} повреждено — пересоздаю его как объект`)
+    s.enabledPlugins = {}
+  }
+  s.enabledPlugins[PLUGIN_ID] = true
+  writeFileAtomic(file, JSON.stringify(s, null, 2) + '\n')
   ok(`зарегистрировано в ${file}`)
   log(`    marketplace ${MARKET} (github:${REPO}) + enabledPlugins ${PLUGIN_ID}`)
   log('    активация: перезапусти Claude или выполни /reload-plugins')
@@ -203,34 +248,98 @@ function installCodex() {
     return
   }
   const copied = copySkillsPreservingUpstream(srcSkills, skillsDir)
-  installLiveboardRuntime(skillsDir)
+  installCanonicalSkillAssets(skillsDir)
+  installWorkflowRuntime(skillsDir)
   ok(`скиллы → ${skillsDir} (${copied.copied} скопировано${copied.preserved ? `, ${copied.preserved} upstream Firecrawl сохранено` : ''})`)
 
   fs.mkdirSync(codexHome, { recursive: true })
-  mergeBlock(path.join(codexHome, 'config.toml'), withLauncher(fs.readFileSync(srcConfig, 'utf8')), 'config.toml (mcp_servers + profiles)')
+  mergeBlock(path.join(codexHome, 'config.toml'), withLauncher(fs.readFileSync(srcConfig, 'utf8')), 'config.toml (mcp_servers + profiles)', { toml: true })
   mergeBlock(path.join(codexHome, 'AGENTS.md'), fs.readFileSync(srcAgents, 'utf8'), 'AGENTS.md')
 }
 
-function mergeBlock(file, content, label) {
-  const cur = fs.existsSync(file) ? fs.readFileSync(file, 'utf8') : ''
-  if (cur.includes(MARK_S)) {
-    log(`  ${label}: уже установлено — пропуск`)
-    return
+function writeFileAtomic(file, content) {
+  fs.mkdirSync(path.dirname(file), { recursive: true })
+  const temporary = path.join(path.dirname(file), `.${path.basename(file)}.avf-${process.pid}-${Math.random().toString(16).slice(2)}.tmp`)
+  const mode = fs.existsSync(file) ? fs.statSync(file).mode & 0o777 : undefined
+  try {
+    fs.writeFileSync(temporary, content, mode == null ? undefined : { mode })
+    fs.renameSync(temporary, file)
+  } catch (error) {
+    try { fs.unlinkSync(temporary) } catch { /* файл мог не успеть появиться */ }
+    throw error
   }
-  const block = `\n${MARK_S}\n${content.replace(/\s*$/, '')}\n${MARK_E}\n`
-  fs.writeFileSync(file, cur + block)
-  ok(`${label} → ${file}`)
 }
 
-function mergeMarkedBlock(file, content, label, start, end) {
+function markedBlockState(current, start, end, file) {
+  const starts = current.split(start).length - 1
+  const ends = current.split(end).length - 1
+  if (starts !== ends || starts > 1) {
+    throw new Error(`повреждён marked block в ${file}: ожидалась одна пара маркеров; файл не изменён`)
+  }
+  if (starts === 0) return { unmanaged: current, range: null }
+  const from = current.indexOf(start)
+  const to = current.indexOf(end, from + start.length)
+  if (to < from) throw new Error(`повреждён порядок маркеров в ${file}; файл не изменён`)
+  return {
+    unmanaged: current.slice(0, from) + current.slice(to + end.length),
+    range: { from, to: to + end.length },
+  }
+}
+
+function tomlTableNames(content) {
+  const names = new Set()
+  for (const match of content.matchAll(/^\s*\[([^\[\]\r\n]+)\]\s*(?:#.*)?$/gm)) names.add(match[1].trim())
+  return names
+}
+
+// TOML запрещает повторно объявлять таблицу. Пользовательские таблицы имеют приоритет:
+// AVF пропускает конфликтующую секцию, но продолжает обновлять остальные owned-секции.
+function omitConflictingTomlTables(content, unmanaged, label) {
+  const occupied = tomlTableNames(unmanaged)
+  if (occupied.size === 0) return content
+  const lines = content.split(/(?<=\n)/)
+  const kept = []
+  const omitted = []
+  let skip = false
+  for (const line of lines) {
+    const header = line.match(/^\s*\[([^\[\]\r\n]+)\]\s*(?:#.*)?(?:\r?\n)?$/)
+    if (header) {
+      const name = header[1].trim()
+      skip = occupied.has(name)
+      if (skip) omitted.push(name)
+    }
+    if (!skip) kept.push(line)
+  }
+  if (omitted.length) warn(`${label}: пользовательские TOML-таблицы сохранены, AVF-секции пропущены: ${omitted.join(', ')}`)
+  return kept.join('').replace(/\s*$/, '')
+}
+
+function upsertMarkedBlock(file, content, label, start, end, { toml = false } = {}) {
   const cur = fs.existsSync(file) ? fs.readFileSync(file, 'utf8') : ''
-  if (cur.includes(start)) {
-    log(`  ${label}: уже установлено — пропуск`)
+  const state = markedBlockState(cur, start, end, file)
+  const prepared = toml ? omitConflictingTomlTables(content, state.unmanaged, label) : content.replace(/\s*$/, '')
+  const block = `${start}\n${prepared}\n${end}`
+  let next
+  if (state.range) {
+    next = cur.slice(0, state.range.from) + block + cur.slice(state.range.to)
+  } else {
+    const separator = cur.length === 0 ? '' : cur.endsWith('\n\n') ? '' : cur.endsWith('\n') ? '\n' : '\n\n'
+    next = cur + separator + block + '\n'
+  }
+  if (next === cur) {
+    log(`  ${label}: уже актуально`)
     return
   }
-  fs.mkdirSync(path.dirname(file), { recursive: true })
-  fs.writeFileSync(file, cur + `\n${start}\n${content.replace(/\s*$/, '')}\n${end}\n`)
-  ok(`${label} → ${file}`)
+  writeFileAtomic(file, next)
+  ok(`${label} ${state.range ? 'обновлён' : 'установлен'} → ${file}`)
+}
+
+function mergeBlock(file, content, label, options) {
+  upsertMarkedBlock(file, content, label, MARK_S, MARK_E, options)
+}
+
+function mergeMarkedBlock(file, content, label, start, end, options) {
+  upsertMarkedBlock(file, content, label, start, end, options)
 }
 
 // ---------- Cursor ----------
@@ -248,7 +357,8 @@ function installCursor() {
 
   const skillsDir = path.join(cursorHome, 'skills')
   const copied = copySkillsPreservingUpstream(srcSkills, skillsDir)
-  installLiveboardRuntime(skillsDir)
+  installCanonicalSkillAssets(skillsDir)
+  installWorkflowRuntime(skillsDir)
   ok(`скиллы → ${skillsDir} (${copied.copied} скопировано${copied.preserved ? `, ${copied.preserved} upstream Firecrawl сохранено` : ''})`)
 
   const agentsDir = path.join(cursorHome, 'agents')
@@ -332,7 +442,8 @@ function installKimi() {
 
   const skillsDir = path.join(kimiHome, 'skills')
   const copied = copySkillsPreservingUpstream(srcSkills, skillsDir)
-  installLiveboardRuntime(skillsDir)
+  installCanonicalSkillAssets(skillsDir)
+  installWorkflowRuntime(skillsDir)
   ok(`скиллы → ${skillsDir} (${copied.copied} скопировано${copied.preserved ? `, ${copied.preserved} upstream Firecrawl сохранено` : ''})`)
 
   if (fs.existsSync(srcAgents)) {
@@ -354,6 +465,7 @@ function installKimi() {
       'Expo architecture/UI hooks',
       '# >>> agent-vorcl-flow expo-mobile >>>',
       '# <<< agent-vorcl-flow expo-mobile <<<',
+      { toml: true },
     )
   }
 

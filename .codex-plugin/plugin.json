@@ -1,0 +1,28 @@
+{
+  "name": "agent-vorcl-flow",
+  "version": "2.4.0",
+  "description": "Role-based engineering workflows plus cross-language read-only hardcode and mock-data integrity audits.",
+  "author": {
+    "name": "Christian Avis",
+    "url": "https://github.com/Vitammiin"
+  },
+  "homepage": "https://github.com/Vitammiin/agent-vorcl-flow",
+  "repository": "https://github.com/Vitammiin/agent-vorcl-flow",
+  "license": "MIT",
+  "keywords": ["agents", "code-integrity", "hardcode", "mock-data", "frontend", "backend", "polyglot"],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Agent Vorcl Flow",
+    "shortDescription": "Role workflows and polyglot code integrity audits.",
+    "longDescription": "Adds role-based Task Master workflows and evidence-based read-only audits for hardcoded values and mock or fake data leaking into production frontend and backend code.",
+    "developerName": "Christian Avis",
+    "category": "Developer Tools",
+    "capabilities": ["Read"],
+    "websiteURL": "https://github.com/Vitammiin/agent-vorcl-flow",
+    "defaultPrompt": [
+      "Audit this repository for production hardcode.",
+      "Find mocks or fake data leaking into production.",
+      "Run a cross-language code integrity audit."
+    ]
+  }
+}

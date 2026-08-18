@@ -108,6 +108,7 @@ claude --plugin-dir /path/to/agent-vorcl-flow
 ```text
 /vorcl add a shopping cart to checkout
 /audit .
+/init-code .
 ```
 `/vorcl` сам определяет, какому субагенту отдать работу, и ведёт полный цикл Task Master. `/audit` автоматически находит backend, frontend, mobile, data и infrastructure и создаёт доказательный `PROJECT_AUDIT.md`, используя все релевантные роли.
 
@@ -585,8 +586,8 @@ kimi --agent-file ~/.kimi/agents/avf-expo-mobile.yaml
 ```text
 .claude-plugin/plugin.json      # plugin manifest
 .claude-plugin/marketplace.json # local marketplace (for install)
-agents/       24 sub-agent definitions (*.md)
-skills/       <skill>/SKILL.md            (46 skills; some ship references, scripts, tests or HTML assets)
+agents/       25 sub-agent definitions (*.md)
+skills/       <skill>/SKILL.md            (71 skills; some ship references, scripts, tests or HTML assets)
 commands/     <namespace>/<command>.md    (150 commands, /namespace:command, including /vorcl and /audit)
 hooks/        hooks.json + SessionStart + PostToolUse guards (empty catch, Expo architecture/UI boundaries)
 .mcp.json     github, filesystem, postgres, mongodb, redis, docker, firecrawl, vercel, render, task-master, mermaid

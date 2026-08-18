@@ -1,6 +1,6 @@
 ---
 name: mermaid
-description: Персона «Mermaid Diagram Engineer» — из описания, исходника (код/схема БД/структура/`.drawio`) или существующего `.mmd` строит валидный Mermaid: flowchart, sequence, class, state, ER, gantt, pie, gitGraph, mindmap, timeline и др. Всегда проверяет результат реальным рендером (`mcp-mermaid`/`mmdc`), а не «на глаз». Use для создания/конвертации/валидации/правки Mermaid-диаграмм.
+description: "Mermaid Diagram Engineer: создаёт, конвертирует, валидирует и реально рендерит Mermaid-диаграммы."
 ---
 
 # Роль: Mermaid Diagram Engineer

@@ -19,6 +19,14 @@ pass() { OK=$((OK + 1)); }
 warn() { printf 'WARN: %s\n' "$1"; WARN=$((WARN + 1)); }
 fail() { printf 'FAIL: %s\n' "$1"; FAIL=$((FAIL + 1)); }
 
+# Registry is the deterministic inventory; validator also parses every Markdown
+# frontmatter and checks role/profile/router completeness.
+if node scripts/generate-role-skills.mjs && node scripts/validate-registry.mjs; then
+  pass
+else
+  fail "role registry/frontmatter validation failed"
+fi
+
 # ---------- 1. Персоны: agents/<x>.md → codex/skills/<x>/SKILL.md ----------
 for f in agents/*.md; do
   [ -e "$f" ] || continue
@@ -65,7 +73,7 @@ for d in skills/*/; do
   fi
 done
 
-# ---------- 4. Каждый агент упомянут в AGENTS.md, config.toml, session-start.js ----------
+# ---------- 4. Каждый агент доступен через compact Codex router и profile ----------
 for f in agents/*.md; do
   [ -e "$f" ] || continue
   x=$(basename "$f" .md)
@@ -82,11 +90,6 @@ for f in agents/*.md; do
     fail "нет [profiles.$x] в codex/config.toml"
   fi
 
-  if grep -q "$x" scripts/session-start.js 2>/dev/null; then
-    pass
-  else
-    fail "агент $x не упомянут в scripts/session-start.js"
-  fi
 done
 
 # ---------- 5. Остатки устаревшего имени /goal (переименовано в /vorcl) ----------
@@ -161,6 +164,21 @@ do
   fi
 done
 
+# ---------- 8. Code Integrity skills + deterministic scanner ----------
+for skill in code-integrity hardcode-detection mock-data-detection; do
+  if [ -d "skills/$skill" ] && [ -d "codex/skills/$skill" ] && diff -qr "skills/$skill" "codex/skills/$skill" >/dev/null; then
+    pass
+  else
+    fail "Code Integrity skill отсутствует или разошёлся: skills/$skill ↔ codex/skills/$skill"
+  fi
+done
+
+if [ -f .codex-plugin/plugin.json ] && grep -q '"skills": "./skills/"' .codex-plugin/plugin.json; then
+  pass
+else
+  fail "Codex plugin manifest отсутствует или не публикует ./skills/"
+fi
+
 if [ -d skills/principal-architecture/assets/parsers ] && [ -d codex/skills/principal-architecture/assets/parsers ] && diff -qr skills/principal-architecture/assets/parsers codex/skills/principal-architecture/assets/parsers >/dev/null; then
   pass
 else
@@ -199,6 +217,12 @@ do
     fail "Expo UI/motion resource отсутствует или разошёлся: $canonical ↔ $mirror"
   fi
 done
+
+if [ -d skills/apple-design ] && [ -d codex/skills/apple-design ] && diff -qr skills/apple-design codex/skills/apple-design >/dev/null; then
+  pass
+else
+  fail "Apple Design skill отсутствует или разошёлся: skills/apple-design ↔ codex/skills/apple-design"
+fi
 
 if [ -f kimi/agents/expo-mobile.yaml ] && grep -q 'expo-mobile' kimi/agents/expo-mobile.yaml; then pass; else fail "нет Kimi Expo custom agent"; fi
 if [ -f kimi/hooks.toml ] && grep -q '__AVF_EXPO_GUARD__' kimi/hooks.toml && grep -q '__AVF_EXPO_UI_GUARD__' kimi/hooks.toml && grep -q '__AVF_EXPO_COMPATIBILITY__' kimi/hooks.toml; then pass; else fail "нет полного Kimi Expo hook template"; fi

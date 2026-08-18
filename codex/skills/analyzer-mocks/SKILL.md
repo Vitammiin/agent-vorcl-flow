@@ -1,10 +1,10 @@
 ---
 name: analyzer-mocks
-description: Поиск mockup/фейковых данных на фронтенде (роль analyzer, read-only). Use when подозрение, что UI живёт на заглушках — MSW-хендлеры, faker, хардкод вместо API; проверка типов — $analyzer-types.
+description: Совместимый маршрут поиска mockup/фейковых данных во frontend/backend (роль analyzer → integrity, read-only). Use когда UI/API может жить на MSW/faker/fixtures/static responses; глубокий кросс-языковой маршрут — $integrity-mocks.
 ---
 
-# Задача: поиск mockup на фронте
+# Поиск mockup во frontend/backend
 
-Найди mockup/фейковые данные на **фронтенде** (**read-only**) в указанной области.
+Используй `$code-integrity` (`--mode mocks`) и `$mock-data-detection`. Ищи mock frameworks, faker, fixture/demo imports, static UI/API records, placeholder content и отключённые реальные интеграции. Докажи declaration → import/registration/DI/build → production entry point; tests/stories/seeds/dev adapters без production import не являются утечкой.
 
-Ищи заглушки в прод-пути: хардкод-массивы/объекты вместо API (`const MOCK_*`, `fakeData`, статические списки в компонентах), `lorem ipsum`/placeholder-тексты и картинки, `TODO`/`FIXME`/`hardcoded`, замоканные хендлеры (MSW `setupWorker`/`handlers`, `jest.mock`), генераторы фейков (`faker`/`casual`) в прод-коде, закомментированные реальные вызовы, значения-заглушки (`example.com`, `test@test`). Отличай легитимные фикстуры (`__tests__`/`*.stories.*`/`mocks/`) от утечки в прод — помечай. Ничего не правь. Формат: `file:line`, что нашли, первопричина, конкретная починка (реальный запрос через `api`/TanStack Query); severity: mockup в прод-пути = `critical/high`. По значимым находкам — `add_task`. Опирайся на `$frontend-architecture`, `$react`, `$nextjs`.
+Ничего не правь. Формат: declaration/consumer `file:line`, rule ID, evidence, reachability/guard, root cause, severity, confidence и replacement boundary. Значимые findings оформи через `add_task`; используй специализированную роль `$integrity`.

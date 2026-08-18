@@ -1,0 +1,4 @@
+interface:
+  display_name: "Hardcode Detection"
+  short_description: "Find production hardcode across languages"
+  default_prompt: "Use $hardcode-detection to find user-visible and environment-specific hardcode."

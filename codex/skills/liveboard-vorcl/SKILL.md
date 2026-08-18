@@ -1,6 +1,6 @@
 ---
 name: liveboard-vorcl
-description: Изменять или расширять сам liveboard через Task Master workflow: задача, реализация, live-проверка и done (роль liveboard). Use для нетривиальной разработки liveboard.
+description: "Изменить liveboard через Task Master: задача, реализация, live-проверка и done."
 ---
 
 # Liveboard через Task Master

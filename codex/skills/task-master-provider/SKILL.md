@@ -1,6 +1,6 @@
 ---
 name: task-master-provider
-description: Выбрать AI-провайдера и модель Task Master: OpenAI по OPENAI_API_KEY, Claude по ANTHROPIC_API_KEY или Codex CLI по OAuth; проверить main/research/fallback без раскрытия ключей. Use когда нужно переключить модель Task Master.
+description: "Выбрать и проверить AI provider/model Task Master для main, research и fallback без раскрытия ключей."
 ---
 
 # Выбор провайдера Task Master

@@ -1,6 +1,6 @@
 ---
 name: archmap-map
-description: Полная карта архитектуры репозитория — extraction в architecture.json, LLM-аннотация и все форматы: интерактивный HTML, draw.io, Mermaid, ARCHITECTURE.md, PDF (роль archmap). Use when нужен весь набор артефактов разом; только JSON → $archmap-extract, только HTML → $archmap-html, только диаграммы → $archmap-diagram, крупная цель с этапами → $archmap-vorcl.
+description: "Lightweight TS/JS architecture map: architecture.json, interactive HTML and optional diagrams."
 ---
 
 # Задача: полная карта архитектуры репозитория (archmap)

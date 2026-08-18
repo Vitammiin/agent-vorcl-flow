@@ -6,10 +6,10 @@ allowed-tools: Read, Grep, Glob, Bash
 
 Проведи аудит и оформи его в Task Master workflow: **$ARGUMENTS**.
 
-1. Убедись, что Task Master инициализирован (`.taskmaster/`); если нет — `task-master init`.
-2. Прогони аудит (**read-only** — ничего не правь): баги, типы, структура БД, mockup на фронте, плохой код на беке — раздельно Frontend / Backend / DB; каждая находка — со ссылкой `file:line`.
-3. Оформи каждую значимую находку в задачу через `add_task` (заголовок, область, severity, `file:line`, починка).
-4. Отдай приоритет: `next_task` → `get_task`; исправления делегируй доменному субагенту (`backend`/`frontend`), сам аудит правок не вносит.
-5. После починки автор изменения проверяет `testStrategy` и ставит `set_task_status --status=done`.
+1. Этот маршрут означает явно выбранный `track-only`: аудит остаётся read-only, но Task Master writes разрешены. Для одного отчёта используй `/analyzer:audit` без Task Master.
+2. Прогони аудит раздельно Frontend / Backend / DB; каждая находка — `file:line` + severity + root cause.
+3. Создай задачи через `add_task`, сохрани только возвращённые IDs и создай scoped run через `workflow`.
+4. Для каждого ID: atomic claim → `get_task` → `in-progress`; remediation делегируй `backend`/`frontend`, сам analyzer код не меняет. Bare `next_task` запрещён.
+5. Независимый `testing` проверяет `testStrategy`; только Orchestrator ставит `done`.
 
 Опирайся на навыки `workflow`, `task-master` и профильные аудита. Сам аудит веди как субагент `analyzer` (только чтение).
