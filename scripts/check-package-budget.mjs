@@ -5,7 +5,7 @@ import os from 'node:os'
 import path from 'node:path'
 import process from 'node:process'
 
-const limits = { files: 850, unpackedSize: 35_000_000 }
+const limits = { files: 870, unpackedSize: 35_000_000 }
 const cache = fs.mkdtempSync(path.join(os.tmpdir(), 'avf-npm-pack-'))
 
 try {

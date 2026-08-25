@@ -7,6 +7,12 @@ and this project follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [2.6.1] - 2026-08-25
+
+### Fixed
+
+- Raised the published package file budget so the new logging role can ship on npm.
+
 ## [2.6.0] - 2026-08-25
 
 ### Added
@@ -68,7 +74,8 @@ and this project follows [Semantic Versioning](https://semver.org/).
 
 - Extended the installer and synchronization checks to distribute mobile hooks, compatibility tooling, shared audit skills, and Kimi-native role files consistently.
 
-[Unreleased]: https://github.com/Vitammiin/agent-vorcl-flow/compare/v2.6.0...HEAD
+[Unreleased]: https://github.com/Vitammiin/agent-vorcl-flow/compare/v2.6.1...HEAD
+[2.6.1]: https://github.com/Vitammiin/agent-vorcl-flow/compare/v2.6.0...v2.6.1
 [2.6.0]: https://github.com/Vitammiin/agent-vorcl-flow/compare/v2.5.1...v2.6.0
 [2.5.1]: https://github.com/Vitammiin/agent-vorcl-flow/compare/v2.5.0...v2.5.1
 [2.5.0]: https://github.com/Vitammiin/agent-vorcl-flow/compare/v2.4.0...v2.5.0
