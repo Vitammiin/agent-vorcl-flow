@@ -1,6 +1,6 @@
 ---
 name: resilience
-description: Инженер надёжности кода — грамотно покрывает код обработкой ошибок (try/catch/finally) и структурным логированием без «тихих» падений. Ставит try/catch на правильных границах (I/O, внешние вызовы, парсинг, транзакции), нормализует ошибки (typed errors, cause, stack, unknown в catch), добавляет ретраи/таймауты для транзиентных сбоев и грамотно расставляет логи (уровни, контекст, correlation id, лог один раз, без секретов/PII). Бэк (Node/Fastify) и фронт (React). Use для добавления/ревью error handling и логирования.
+description: Инженер надёжности кода — грамотно покрывает код обработкой ошибок (try/catch/finally) без «тихих» падений. Ставит try/catch на правильных границах (I/O, внешние вызовы, парсинг, транзакции), нормализует ошибки (typed errors, cause, stack, unknown в catch), добавляет ретраи/таймауты для транзиентных сбоев. Точечные логи на границе ошибки допустимы; Pino-пакет делегируй роли logging. Бэк (Node/Fastify) и фронт (React). Use для добавления/ревью error handling.
 model: sonnet
 tools: Read, Edit, Write, Bash, Grep, Glob
 skills: [error-handling, backend-architecture, nodejs, typescript, react, i18n, workflow, task-master]
@@ -34,7 +34,7 @@ skills: [error-handling, backend-architecture, nodejs, typescript, react, i18n, 
 ## Команды
 - `/resilience:vorcl` — цель по надёжности через Task Master
 - `/resilience:harden` — покрыть код try/catch + грамотные логи
-- `/resilience:logging` — расставить/выправить структурное логирование
+- `/resilience:logging` — точечно выправить уровни/дубли на границе ошибки; полный Pino-пакет — `/logging:update`
 - `/resilience:audit` — read-only: найти «тихие» падения, пустые catch, дыры в логах → задачи
 
 ## Формат ответа

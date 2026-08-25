@@ -25,7 +25,7 @@
 <sub>English is canonical; every link above opens a repository-local README file.</sub>
 </details>
 
-<!-- Generated from README.md by scripts/readme-locales.mjs; source-sha256: 3321a7089b3f749787125626da692c98b8a2d556b237e1ba36bbf67afc34dc3d. -->
+<!-- Generated from README.md by scripts/readme-locales.mjs; source-sha256: 9355589f63c9c6f1864a9546654e99404123446db024ad9e2ddb892517d8b2c1. -->
 <p dir="rtl">هذه ترجمة عربية محفوظة داخل المستودع.</p>
 
 </div>
@@ -319,6 +319,15 @@ goal → tasks (parse_prd / add_task) → next_task → get_task → expand_task
 | `/resilience:logging <target>` | إضافة/إصلاح التسجيل المنظم - المستويات والسياق وعدم وجود أسرار/معلومات تحديد الهوية الشخصية. |
 | `/resilience:audit` | للقراءة فقط: ابحث عن حالات الفشل الصامتة، وعناصر الصيد الفارغة، وفجوات التسجيل. |
 
+### 🪵 logging — Pino structured logging
+| Command | What it does |
+| --- | --- |
+| `/logging:vorcl <goal>` | Logging goal via Task Master — cover or update the Pino package. |
+| `/logging:audit [path]` | Read-only: one root logger, child context, redact, no console/Loki sink. |
+| `/logging:cover <target>` | Create `infrastructure/logging` and cover a module/worker/route. |
+| `/logging:update <target>` | Bring legacy `pino()`/`console.log` to the canonical package. |
+
+
 ### 🖼️ screenshot — screenshot UI → code
 | الأمر | ماذا يفعل |
 | --- | --- |
@@ -592,10 +601,10 @@ Kimi CLI لا يحتوي على توسيع `${VAR}` في `mcp.json`، لذا ت�
 ```text
 .claude-plugin/plugin.json      # plugin manifest
 .claude-plugin/marketplace.json # local marketplace (for install)
-agents/       25 sub-agent definitions (*.md)
-skills/       <skill>/SKILL.md            (73 skills; some ship references, scripts, tests or HTML assets)
-commands/     <namespace>/<command>.md    (150 commands, /namespace:command, including /vorcl and /audit)
-hooks/        hooks.json + SessionStart + PostToolUse guards (empty catch, Expo architecture/UI boundaries)
+agents/       26 sub-agent definitions (*.md)
+skills/       <skill>/SKILL.md            (75 skills; some ship references, scripts, tests or HTML assets)
+commands/     <namespace>/<command>.md    (154 commands, /namespace:command, including /vorcl and /audit)
+hooks/        hooks.json + SessionStart + PostToolUse guards (empty catch, Pino logging, Expo architecture/UI boundaries)
 .mcp.json     github, filesystem, postgres, mongodb, redis, docker, firecrawl, vercel, render, task-master, mermaid
 .env.example  template for ~/.config/agent-vorcl-flow/.env (single key file for all runtimes)
 translations/ localized README files (21 translations)

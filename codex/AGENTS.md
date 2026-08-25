@@ -23,7 +23,8 @@ If `PROJECT_DESCRIPTION.md` exists in task scope, every modifying role reads it 
 | Web research/extraction | `$firecrawl` | Local repository analysis |
 | Render deploy/status/logs | `$render` | Generic CI/CD |
 | PostgreSQL/MongoDB/Redis | `$database` | App business logic |
-| Error handling/logging | `$resilience` | Security audit |
+| Error handling/failure boundaries | `$resilience` | Pino logging architecture |
+| Pino structured logging architecture | `$logging` | Error handling try/catch |
 | Screenshot → new UI | `$screenshot` | Locate existing UI source |
 | Product/visual design artifacts | `$design-studio` | Source-code location |
 | Screenshot identification + live web evidence | `$visual-research` | Code generation |

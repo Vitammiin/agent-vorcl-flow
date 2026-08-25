@@ -38,7 +38,7 @@ description: "Безопасный scoped Task Master workflow: captured task ID
 5. Если material impact отсутствует, документ не редактируй; передай Checker краткое evidence-based объяснение `description impact: none`.
 6. Изменение контекста при оставшемся stale `PROJECT_DESCRIPTION.md` означает **НЕ ГОТОВО**. Report-only роли и Checker сами этот файл не исправляют.
 
-Роли для маршрутизации: `architect`, `principal-architect`, `backend`, `frontend`, `expo-mobile`, `analyzer`, `integrity`, `swagger`, `firecrawl`, `render`, `database`, `resilience`, `screenshot`, `design-studio`, `visual-research`, `pinpoint`, `drawio`, `archmap`, `mermaid`, `testing`, `gitflow`, `security`, `docs`, `devops`, `liveboard`. Канонические ownership/negative criteria находятся в registry пакета.
+Роли для маршрутизации: `architect`, `principal-architect`, `backend`, `frontend`, `expo-mobile`, `analyzer`, `integrity`, `swagger`, `firecrawl`, `render`, `database`, `resilience`, `logging`, `screenshot`, `design-studio`, `visual-research`, `pinpoint`, `drawio`, `archmap`, `mermaid`, `testing`, `gitflow`, `security`, `docs`, `devops`, `liveboard`. Канонические ownership/negative criteria находятся в registry пакета.
 
 ## Запреты
 

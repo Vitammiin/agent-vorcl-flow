@@ -31,9 +31,9 @@ One `npx` command installs them. No remote backend or cloud hosting: your coding
 
 ## What is this?
 
-Agent-Vorcl-Flow turns a supported coding agent into a **structured engineering team**. Instead of one general assistant, you get **25 focused sub-agents** (architect, code-grounded principal architect, backend, frontend, Expo mobile engineer, product and visual design engineer, DB engineer, cross-language integrity auditor, architecture cartographer, liveboard operator, and more), each with its own domain **skills**, quick **slash commands**, and the **MCP tools** it needs. Every non-trivial task runs through a disciplined **Task Master** loop — *goal → tasks → implement → verify → done* — so work is planned, tracked, and survives interruptions.
+Agent-Vorcl-Flow turns a supported coding agent into a **structured engineering team**. Instead of one general assistant, you get **26 focused sub-agents** (architect, code-grounded principal architect, backend, frontend, Expo mobile engineer, product and visual design engineer, DB engineer, cross-language integrity auditor, architecture cartographer, liveboard operator, logging engineer, and more), each with its own domain **skills**, quick **slash commands**, and the **MCP tools** it needs. Every non-trivial task runs through a disciplined **Task Master** loop — *goal → tasks → implement → verify → done* — so work is planned, tracked, and survives interruptions.
 
-- 🧩 **25 sub-agents**, 73 skills, 155 slash commands
+- 🧩 **26 sub-agents**, 75 skills, 159 slash commands
 - ⚡ **One-command install** for Claude Code, Codex, Cursor, and/or Kimi CLI — `npx`
 - 🔌 **11 MCP servers** wired in (GitHub, Postgres, MongoDB, Redis, Docker, Firecrawl, Vercel, Render, filesystem, Task Master, Mermaid)
 - 🔑 **One `.env` file for all runtimes** — keys read by a launcher, not `~/.zshrc`, so they work even from GUI/IDE launches; no remote AVF service; liveboard is localhost-only and ephemeral
@@ -163,7 +163,8 @@ This keeps work planned, checkpointed, and resumable — nothing is declared "do
 | 🔴 **firecrawl** | Web researcher | Live CLI/MCP/REST, app integration and finished web-data workflows |
 | 🟤 **render** | Hosting & deploy (Render) | Deploys, log-driven diagnostics, metrics, env vars, Render Postgres |
 | 🟦 **database** | DB engineer / DBA | Schema, queries & plans, indexes, N+1, safe reversible migrations, cache |
-| ⚪ **resilience** | Reliability: errors + logging | try/catch at the right boundaries, typed errors, retries/timeouts, structured logs |
+| ⚪ **resilience** | Reliability: error handling | try/catch at the right boundaries, typed errors, retries/timeouts |
+| 🪵 **logging** | Pino structured logging | One root logger in `infrastructure/logging`, child context, redact, requestId, JSON on stdout |
 | 🖼️ **screenshot** | Screenshot UI → code | Turns a UI screenshot into production-ready, responsive, accessible code |
 | 🎨 **design-studio** | Product & visual design studio | Local HTML artifacts, prototypes, wireframes, decks/PPTX, documents, animation, 3D, design systems and Figma/GitHub/HTML import; adapted from MIT `JimLiu/baoyu-design` |
 | 🔎 **visual-research** | Screenshot → verified answer | Identifies the site/page, finds official docs, checks live data and answers with URLs and confidence |
@@ -182,6 +183,7 @@ This keeps work planned, checkpointed, and resumable — nothing is declared "do
 - **Frontend always talks to a real API.** The backend's OpenAPI spec is the single source of truth; types are generated from it (`openapi-typescript` + `openapi-fetch`). No mocks in the production path.
 - **`database` mutations require explicit confirmation.** Analytics are read-only; schema/data changes (DDL/DML/migrations) never run without your go-ahead.
 - **`resilience` ships a safety hook.** A non-blocking `PostToolUse` hook (`catch-guard.js`) gently flags empty `catch {}` blocks in files you just edited.
+- **`logging` owns the Pino package.** A second `PostToolUse` hook (`pino-logging/scripts/scan.mjs`) flags local `pino()`, production `console.log`, secrets in payloads, and direct Loki sinks. Full architecture lives in `pino-logging`.
 - **`archmap` never draws from imagination.** Extraction and rendering are strictly separated: zero-dependency scripts walk the repo into `architecture.json` (databases with real FK cardinality, API routes, AI agents with their models/tools/memory, import graph, env), and every diagram is rendered from that JSON only. Anything the LLM adds without a verifiable `file:line` is force-marked `inferred:true` and drawn dashed.
 - **`principal-architect` is the full architecture publication workflow.** It works in whichever repository launches the agent, ignores Markdown claims as topology evidence, uses bundled offline Tree-sitter WASM for TS/JS, Python, Go, Java, C#, Rust, PHP, Ruby, Kotlin and Swift, writes `ARCHITECTURE.md` first, then produces the shared JSON model, self-contained HTML, PDF, native draw.io and copyable Mermaid L0–L4. `update` performs a full rescan and preserves annotations and unmanaged files.
 - **`pinpoint` finds, never creates.** Given a screenshot of a running app, it maps the screen to the real code — component, route, the exact control and the logic behind it — and hands the edit to `frontend`/`backend`. It works on what already exists (the inverse of `screenshot`).
@@ -326,6 +328,14 @@ The bundled zero-dependency scanner supports TS/JS, Python, Go, Java/Kotlin, C#,
 | `/resilience:harden <target>` | Wrap code in try/catch/finally with solid logging, no silent failures. |
 | `/resilience:logging <target>` | Add/fix structured logging — levels, context, no secrets/PII. |
 | `/resilience:audit` | Read-only: find silent failures, empty catches, logging gaps. |
+
+### 🪵 logging — Pino structured logging
+| Command | What it does |
+| --- | --- |
+| `/logging:vorcl <goal>` | Logging goal via Task Master — cover or update the Pino package. |
+| `/logging:audit [path]` | Read-only: one root logger, child context, redact, no console/Loki sink. |
+| `/logging:cover <target>` | Create `infrastructure/logging` and cover a module/worker/route. |
+| `/logging:update <target>` | Bring legacy `pino()`/`console.log` to the canonical package. |
 
 ### 🖼️ screenshot — screenshot UI → code
 | Command | What it does |
@@ -606,10 +616,10 @@ Kimi CLI has no `${VAR}` expansion in `mcp.json`, so keys come from the shared `
 ```text
 .claude-plugin/plugin.json      # plugin manifest
 .claude-plugin/marketplace.json # local marketplace (for install)
-agents/       25 sub-agent definitions (*.md)
-skills/       <skill>/SKILL.md            (73 skills; some ship references, scripts, tests or HTML assets)
-commands/     <namespace>/<command>.md    (150 commands, /namespace:command, including /vorcl and /audit)
-hooks/        hooks.json + SessionStart + PostToolUse guards (empty catch, Expo architecture/UI boundaries)
+agents/       26 sub-agent definitions (*.md)
+skills/       <skill>/SKILL.md            (75 skills; some ship references, scripts, tests or HTML assets)
+commands/     <namespace>/<command>.md    (154 commands, /namespace:command, including /vorcl and /audit)
+hooks/        hooks.json + SessionStart + PostToolUse guards (empty catch, Pino logging, Expo architecture/UI boundaries)
 .mcp.json     github, filesystem, postgres, mongodb, redis, docker, firecrawl, vercel, render, task-master, mermaid
 .env.example  template for ~/.config/agent-vorcl-flow/.env (single key file for all runtimes)
 translations/ localized README files (21 translations)

@@ -20,3 +20,10 @@ event = "PostToolUse"
 matcher = "WriteFile|StrReplaceFile"
 command = "node \"__AVF_EXPO_UI_GUARD__\" --hook"
 timeout = 30
+
+# Agent-Vorcl-Flow Pino logging guard.
+[[hooks]]
+event = "PostToolUse"
+matcher = "WriteFile|StrReplaceFile"
+command = "node \"__AVF_LOGGING_GUARD__\" --hook"
+timeout = 30

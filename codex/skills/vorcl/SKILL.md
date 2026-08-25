@@ -15,6 +15,6 @@ description: "Универсальный scoped Task Master orchestrator: фик
 4. Отдельный Checker выполняет `testStrategy`, не редактируя implementation/acceptance tests.
 5. Только Orchestrator ставит `done`; цикл ограничен IDs run.
 
-Короткий router: architecture — `$architect`, `$principal-architect`, `$archmap`; implementation — `$backend`, `$frontend`, `$expo-mobile`; audits/contracts — `$analyzer`, `$integrity`, `$security`, `$resilience`, `$swagger`; data/platform — `$database`, `$render`, `$devops`; visual/source — `$screenshot`, `$design-studio`, `$visual-research`, `$pinpoint`; artifacts — `$drawio`, `$mermaid`, `$docs`; verification/release — `$testing`, `$gitflow`; research/operations — `$firecrawl`, `$liveboard`.
+Короткий router: architecture — `$architect`, `$principal-architect`, `$archmap`; implementation — `$backend`, `$frontend`, `$expo-mobile`; audits/contracts — `$analyzer`, `$integrity`, `$security`, `$resilience`, `$logging`, `$swagger`; data/platform — `$database`, `$render`, `$devops`; visual/source — `$screenshot`, `$design-studio`, `$visual-research`, `$pinpoint`; artifacts — `$drawio`, `$mermaid`, `$docs`; verification/release — `$testing`, `$gitflow`; research/operations — `$firecrawl`, `$liveboard`.
 
 Targeted hardcode/mock → `$integrity`; broad code-quality audit → `$analyzer`. Полный multi-language architecture package → `$principal-architect`; лёгкая TS/JS dependency map → `$archmap`. Неочевидную междоменную архитектуру начинает `$architect`.

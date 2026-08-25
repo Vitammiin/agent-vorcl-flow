@@ -227,7 +227,8 @@ for skill in apple-design animate animate-expo; do
 done
 
 if [ -f kimi/agents/expo-mobile.yaml ] && grep -q 'expo-mobile' kimi/agents/expo-mobile.yaml; then pass; else fail "нет Kimi Expo custom agent"; fi
-if [ -f kimi/hooks.toml ] && grep -q '__AVF_EXPO_GUARD__' kimi/hooks.toml && grep -q '__AVF_EXPO_UI_GUARD__' kimi/hooks.toml && grep -q '__AVF_EXPO_COMPATIBILITY__' kimi/hooks.toml; then pass; else fail "нет полного Kimi Expo hook template"; fi
+if [ -f kimi/agents/logging.yaml ] && grep -q 'pino-logging' kimi/agents/logging.yaml; then pass; else fail "нет Kimi logging custom agent"; fi
+if [ -f kimi/hooks.toml ] && grep -q '__AVF_EXPO_GUARD__' kimi/hooks.toml && grep -q '__AVF_EXPO_UI_GUARD__' kimi/hooks.toml && grep -q '__AVF_EXPO_COMPATIBILITY__' kimi/hooks.toml && grep -q '__AVF_LOGGING_GUARD__' kimi/hooks.toml; then pass; else fail "нет полного Kimi Expo/logging hook template"; fi
 if grep -q 'srcAgents.*kimi.*agents' bin/install.mjs && grep -q 'srcHooks.*kimi.*hooks.toml' bin/install.mjs; then
   pass
 else

@@ -1,12 +1,12 @@
 {
   "name": "agent-vorcl-flow",
-  "version": "2.5.1",
+  "version": "2.6.0",
   "description": "Agent-Vorcl-Flow для Claude Code, GPT Codex, Cursor и Kimi CLI: роли, skills, команды, MCP и эфемерное локальное live-табло.",
   "bin": {
     "agent-vorcl-flow": "bin/install.mjs"
   },
   "scripts": {
-    "test": "node scripts/readme-locales.mjs --check && node --test tests/*.test.mjs skills/code-integrity/tests/*.test.mjs skills/design-studio/agents/tests/*.test.mjs skills/expo-mobile-architecture/tests/*.test.mjs skills/expo-ui-design-motion/tests/*.test.mjs skills/init-code/tests/*.test.mjs skills/project-audit/tests/*.test.mjs skills/principal-architecture/tests/*.test.mjs",
+    "test": "node scripts/readme-locales.mjs --check && node --test tests/*.test.mjs skills/code-integrity/tests/*.test.mjs skills/design-studio/agents/tests/*.test.mjs skills/expo-mobile-architecture/tests/*.test.mjs skills/expo-ui-design-motion/tests/*.test.mjs skills/init-code/tests/*.test.mjs skills/project-audit/tests/*.test.mjs skills/principal-architecture/tests/*.test.mjs skills/pino-logging/tests/*.test.mjs",
     "docs:locales": "node scripts/readme-locales.mjs --check",
     "docs:locales:generate": "node scripts/readme-locales.mjs --generate",
     "generate:roles": "node scripts/generate-role-skills.mjs --write",

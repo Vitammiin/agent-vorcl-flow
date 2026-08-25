@@ -153,7 +153,8 @@ goal → tasks (parse_prd / add_task) → next_task → get_task → expand_task
 | 🔴 **firecrawl** | Веб-исследователь | Live CLI/MCP/REST, интеграция в приложения и готовые web-workflows |
 | 🟤 **render** | Хостинг и деплой (Render) | Деплои, диагностика по логам, метрики, env-переменные, Render Postgres |
 | 🟦 **database** | Инженер БД / DBA | Схема, запросы и планы, индексы, N+1, безопасные обратимые миграции, кэш |
-| ⚪ **resilience** | Надёжность: ошибки + логи | try/catch на нужных границах, типизированные ошибки, ретраи/таймауты, структурные логи |
+| ⚪ **resilience** | Надёжность: обработка ошибок | try/catch на нужных границах, типизированные ошибки, ретраи/таймауты |
+| 🪵 **logging** | Pino structured logging | Один root logger в `infrastructure/logging`, child context, redact, requestId, JSON в stdout |
 | 🖼️ **screenshot** | Скриншот UI → код | Превращает скриншот интерфейса в production-ready, адаптивный, доступный код |
 | 🎨 **design-studio** | Продуктовый и визуальный дизайн | Локальные HTML-артефакты, прототипы, wireframe, deck/PPTX, документы, animation, 3D, design systems и импорт Figma/GitHub/HTML; адаптировано из MIT `JimLiu/baoyu-design` |
 | 🔎 **visual-research** | Скриншот → проверенный ответ | Определяет сайт/страницу, находит официальную документацию, проверяет live data и отвечает с URL и уверенностью |
@@ -172,6 +173,7 @@ goal → tasks (parse_prd / add_task) → next_task → get_task → expand_task
 - **Фронт всегда ходит в реальный API.** Источник истины — OpenAPI-спека бэка; типы генерируются из неё (`openapi-typescript` + `openapi-fetch`). Моков в прод-пути нет.
 - **Мутации `database` — только с явным подтверждением.** Аналитика read-only; изменения схемы/данных (DDL/DML/миграции) без твоего «да» не выполняются. Миграции — безопасные и обратимые (expand → backfill → contract).
 - **`resilience` ставит защитный хук.** Неблокирующий `PostToolUse`-хук (`catch-guard.js`) мягко подсвечивает пустые `catch {}` в только что отредактированных файлах.
+- **`logging` владеет Pino-пакетом.** Второй `PostToolUse`-хук (`pino-logging/scripts/scan.mjs`) ловит локальный `pino()`, production `console.log`, секреты в payload и прямые Loki sink. Канон — скилл `pino-logging`.
 - **`pinpoint` находит, а не создаёт.** По скриншоту работающего приложения строит карту «скриншот → исходники» — компонент, маршрут, конкретный контрол и логика за ним — и передаёт правку `frontend`/`backend`. Работает с тем, что уже есть (обратная задача к `screenshot`). В мультиязычном проекте помнит: текст на экране — **значение перевода**, в коде лежит **ключ** (`t('...')`), — и грепает по обоим.
 - **`visual-research` проверяет, а не угадывает.** Считает скриншот доказательством, подтверждает официальный домен и документацию, сверяет текущие данные сайта и предупреждает о phishing или устаревших значениях.
 - **`render` помнит про инфраструктурные детали.** Доступ к БД по IP-allowlist (outbound-IP сервиса → allowlist базы; для Render Postgres — internal URL), диагностика по логам до первопричины.
@@ -306,6 +308,14 @@ goal → tasks (parse_prd / add_task) → next_task → get_task → expand_task
 | `/resilience:harden <цель>` | Обернуть код в try/catch/finally с грамотными логами, без «тихих» падений. |
 | `/resilience:logging <цель>` | Расставить/выправить структурное логирование — уровни, контекст, без секретов/PII. |
 | `/resilience:audit` | Read-only: найти «тихие» падения, пустые catch, дыры в логах. |
+
+### 🪵 logging — Pino structured logging
+| Команда | Что делает |
+| --- | --- |
+| `/logging:vorcl <цель>` | Цель по логированию через Task Master — покрыть или обновить Pino-пакет. |
+| `/logging:audit [путь]` | Read-only: один root logger, child context, redact, без console/Loki sink. |
+| `/logging:cover <цель>` | Создать `infrastructure/logging` и покрыть модуль/worker/route. |
+| `/logging:update <цель>` | Привести легаси `pino()`/`console.log` к канону. |
 
 ### 🖼️ screenshot — скриншот UI → код
 | Команда | Что делает |
@@ -586,10 +596,10 @@ kimi --agent-file ~/.kimi/agents/avf-expo-mobile.yaml
 ```text
 .claude-plugin/plugin.json      # plugin manifest
 .claude-plugin/marketplace.json # local marketplace (for install)
-agents/       25 sub-agent definitions (*.md)
-skills/       <skill>/SKILL.md            (73 skills; some ship references, scripts, tests or HTML assets)
-commands/     <namespace>/<command>.md    (150 commands, /namespace:command, including /vorcl and /audit)
-hooks/        hooks.json + SessionStart + PostToolUse guards (empty catch, Expo architecture/UI boundaries)
+agents/       26 sub-agent definitions (*.md)
+skills/       <skill>/SKILL.md            (75 skills; some ship references, scripts, tests or HTML assets)
+commands/     <namespace>/<command>.md    (154 commands, /namespace:command, including /vorcl and /audit)
+hooks/        hooks.json + SessionStart + PostToolUse guards (empty catch, Pino logging, Expo architecture/UI boundaries)
 .mcp.json     github, filesystem, postgres, mongodb, redis, docker, firecrawl, vercel, render, task-master, mermaid
 .env.example  template for ~/.config/agent-vorcl-flow/.env (single key file for all runtimes)
 translations/ localized README files (21 translations)

@@ -73,6 +73,7 @@ let STABLE_LAUNCHER = ''
 let STABLE_EXPO_GUARD = ''
 let STABLE_EXPO_UI_GUARD = ''
 let STABLE_EXPO_COMPATIBILITY = ''
+let STABLE_LOGGING_GUARD = ''
 const withLauncher = (content) => content.split('__AVF_LAUNCHER__').join(STABLE_LAUNCHER)
 
 // Общий слой для всех рантаймов: стабильная копия launcher'а + единый файл секретов .env.
@@ -109,6 +110,14 @@ function installShared() {
     fs.cpSync(expoCompatibilitySource, expoCompatibilityDest)
     STABLE_EXPO_COMPATIBILITY = expoCompatibilityDest.split(path.sep).join('/')
     ok(`Expo compatibility preflight → ${expoCompatibilityDest}`)
+  }
+
+  const loggingGuardSource = path.join(PKG_ROOT, 'skills', 'pino-logging', 'scripts', 'scan.mjs')
+  if (fs.existsSync(loggingGuardSource)) {
+    const loggingGuardDest = path.join(binDir, 'pino-logging-guard.mjs')
+    fs.cpSync(loggingGuardSource, loggingGuardDest)
+    STABLE_LOGGING_GUARD = loggingGuardDest.split(path.sep).join('/')
+    ok(`Pino logging guard → ${loggingGuardDest}`)
   }
 
   const envFile = path.join(home, '.env')
@@ -454,11 +463,12 @@ function installKimi() {
     ok(`${agentFiles.length} Kimi agent-файлов → ${agentsDir}`)
   }
 
-  if (fs.existsSync(srcHooks) && STABLE_EXPO_GUARD && STABLE_EXPO_UI_GUARD && STABLE_EXPO_COMPATIBILITY) {
+  if (fs.existsSync(srcHooks) && STABLE_EXPO_GUARD && STABLE_EXPO_UI_GUARD && STABLE_EXPO_COMPATIBILITY && STABLE_LOGGING_GUARD) {
     const hookConfig = fs.readFileSync(srcHooks, 'utf8')
       .split('__AVF_EXPO_GUARD__').join(STABLE_EXPO_GUARD)
       .split('__AVF_EXPO_UI_GUARD__').join(STABLE_EXPO_UI_GUARD)
       .split('__AVF_EXPO_COMPATIBILITY__').join(STABLE_EXPO_COMPATIBILITY)
+      .split('__AVF_LOGGING_GUARD__').join(STABLE_LOGGING_GUARD)
     mergeMarkedBlock(
       path.join(kimiHome, 'config.toml'),
       hookConfig,
