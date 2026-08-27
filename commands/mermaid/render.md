@@ -11,7 +11,11 @@ allowed-tools: Read, Write, Edit, Bash
 npx -p @mermaid-js/mermaid-cli mmdc -i <файл>.mmd -o <файл>.<fmt> \
   --theme <тема> --backgroundColor transparent
 ```
-Альтернативы: **Kroki** (`https://kroki.io/mermaid/svg/<base64>`) или **Mermaid.ink** (`https://mermaid.ink/img/<base64>`) для быстрого HTTP-рендера без установки — но для приватных диаграмм используй локальный `mmdc` (публичные URL передают содержимое во внешний сервис).
+Полезные флаги: `-c config.json` (тема/`themeVariables`/`securityLevel`), `-w`/`-H`/`-s` (размер и ретина для PNG), `-f` (вписать в страницу PDF), `--iconPacks @iconify-json/logos` (иконки для `architecture-beta`), `-p puppeteer.json` с `{"args":["--no-sandbox"]}` (Docker/CI). Markdown на входе (`-i README.md -o out.md`) отрендерит все mermaid-блоки файла разом.
+
+Если `mmdc` падает с `Could not find Chrome` — это **окружение**, а не диаграмма: `npx puppeteer browsers install chrome-headless-shell` (браузер `mmdc` с собой не носит) либо иди через `mcp-mermaid`.
+
+Альтернативы: **Kroki** (`curl -X POST --data-binary @diagram.mmd https://kroki.io/mermaid/svg`) или **Mermaid.ink** (`https://mermaid.ink/img/<base64>`) для быстрого HTTP-рендера без установки. У Kroki для Mermaid **нет PDF** (только PNG/SVG — `/mermaid/pdf` вернёт HTTP 400), и он бывает недоступен: проверяй HTTP-код ответа, иначе `curl -o` запишет тело ошибки прямо в `.svg`. Для приватных диаграмм используй локальный `mmdc` — публичные URL передают содержимое во внешний сервис.
 
 Перед рендером убедись, что `.mmd` валиден (иначе рендер упадёт — см. `/mermaid:validate`). Зафиксируй версию Mermaid для воспроизводимости.
 

@@ -7,6 +7,19 @@ and this project follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Added
+
+- Mermaid reference library under `skills/mermaid-diagrams/references/`: per-type syntax guides distilled from the official `mermaid-js/mermaid` documentation, with every example verified by a real render on mermaid 11.16.1. The skill's SKILL.md became a router (task to diagram type to reference), so the deep syntax loads on demand instead of living in the prompt.
+- Coverage for every current Mermaid diagram type, including the ones the role previously did not know: `architecture-beta`, `block`, `kanban`, `treeView-beta`, `radar-beta`, `treemap-beta`, `venn-beta`, `packet`, `swimlane-beta`, `eventmodeling`, `cynefin-beta`, `ishikawa-beta`, `wardley-beta`, `railroad-ebnf-beta`, `zenuml`.
+- `skills/mermaid-rendering/scripts/mmd-validate.mjs`: a zero-dependency render validator that extracts every ```mermaid block from Markdown and reports `file:line` plus the parser message, with `--list` and `--json` modes for CI. It separates a broken render environment from a broken diagram — a missing headless browser is reported as `SETUP` with exit code 3, never as a diagram failure.
+- Operational rules for driving a render, verified against the tools themselves: the diagram must also be looked at after the syntax passes (truncated labels, cramped density, edge spaghetti, aspect, contrast, wrong type, capped at two rounds), edits go back into the same file instead of `-v2` copies, and `usecase-beta` is documented as a 32nd type gated on mermaid 11.17+.
+
+### Changed
+
+- The `mermaid` role, its Codex mirror, and the `/mermaid:*` commands now take syntax from the reference library instead of from memory, and document the verified render-check pitfalls (the `.error-icon` CSS class exists in every Mermaid SVG and must not be used as an error marker; `securityLevel` cannot be raised by an in-diagram directive).
+- Raised the published package file budget to fit the new reference library.
+- Documented verified render-environment traps: `mmdc --version` passes with no browser installed while every export then fails with the same exit code as a syntax error, so a correct `.mmd` must not be rewritten in response; Kroki serves Mermaid as PNG/SVG only (a PDF request returns HTTP 400) and its response code must be checked because `curl -o` will happily write an error body into the output file.
+
 ## [2.6.1] - 2026-08-25
 
 ### Fixed
