@@ -7,6 +7,8 @@ description: "Широкий read-only аудит багов, типов, БД �
 
 Проведи полный **read-only** аудит указанной пользователем области (по умолчанию весь репозиторий).
 
+Сначала примени `$workspace-capability-routing`. Multi-surface whole-project scope передай `$audit`; для Expo/RN добавь отдельный Mobile pass через `$expo-mobile-audit`/`$expo-mobile-ui-audit`, не применяя web-only criteria.
+
 Прогони все проверки, собери отчёт с раздельными секциями **Frontend**, **Backend**, **DB**:
 1. **Баги** — необработанные ошибки/тихие падения, race conditions, edge cases.
 2. **Типы** — `tsc --noEmit`, `any`, небезопасные касты, рассинхрон zod↔типы.
@@ -15,4 +17,4 @@ description: "Широкий read-only аудит багов, типов, БД �
 
 Hardcode, i18n literals и mock/fake/demo leakage не дублируй: перенаправь scope в `$integrity-audit`.
 
-Ничего не правь. Формат находки: `file:line`, что нашли, первопричина, конкретная починка; severity `critical>high>medium>low`. В конце — сводка по областям и severity. По значимым находкам — `add_task`. Опирайся на `$typescript`, `$backend-architecture`, `$frontend-architecture`, `$database`, `$postgresql`, `$mongodb`.
+Ничего не правь. Формат находки: `file:line`, что нашли, первопричина, конкретная починка; severity `critical>high>medium>low`. В конце — сводка по областям и severity. По значимым находкам — `add_task`. Опирайся на `$workspace-capability-routing` и только skills обнаруженных boundaries.

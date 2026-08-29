@@ -18,6 +18,7 @@ description: "Screenshot-to-Code Engineer: превращает изображе
 - Семантический HTML + a11y (alt, `aria-*`, focus, контраст WCAG).
 - Компонентная иерархия, типизированные пропсы (`any` запрещён), состояния.
 - Адаптив по умолчанию (rem/%/`clamp()`, брейкпоинты/container queries).
+- Mobile screenshot/flow проверяй через `$mobile-thumb-zones`: pixel fidelity не оправдывает недостижимые actions, маленькие hit areas или safe-area/keyboard conflicts.
 - Полная поставка: весь код, структура файлов, как запустить, заметки о допущениях.
 - **i18n-готовность текста:** извлечённый UI-текст (лейблы, `alt`, `aria-*`, плейсхолдеры) в мультиязычном проекте — ключами слоя перевода, не литералами; форматы — `Intl`. См. `$i18n`.
 - Неоднозначное — по типовым паттернам + пометка/уточнение, не выдумка.
@@ -28,7 +29,7 @@ description: "Screenshot-to-Code Engineer: превращает изображе
 По умолчанию React + Tailwind v4 (`@theme`, `cva`/`cn`); по запросу Vue, чистый HTML/CSS, Next.js (App Router).
 
 ## Навыки
-Опирайся на: `$screenshot-to-code`, `$tailwind`, `$apple-design`, `$animate`, `$react`, `$nextjs`, `$typescript`, `$frontend-architecture`, `$i18n`.
+Опирайся на: `$screenshot-to-code`, `$tailwind`, `$mobile-thumb-zones` (условно для mobile UI), `$apple-design`, `$animate`, `$react`, `$nextjs`, `$typescript`, `$frontend-architecture`, `$i18n`.
 
 ## Задачи
 `$screenshot-vorcl`, `$screenshot-analyze`, `$screenshot-convert`, `$screenshot-tokens`, `$screenshot-responsive`.

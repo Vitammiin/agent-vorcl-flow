@@ -6,7 +6,7 @@ allowed-tools: Read, Write, Bash, Grep, Glob, WebFetch, WebSearch, Task
 
 Проведи полный аудит **$ARGUMENTS** через `project-audit` и Task Master. Сам production code не изменяй: разрешены только итоговый Markdown и audit tasks.
 
-1. Найди установленный `$project-audit` и запусти `<skill-root>/scripts/inventory.mjs --root <scope> --format json`; проверь inference по manifests/entrypoints/native config и перенеси `coverageGaps` в отчёт.
+1. Найди `$workspace-capability-routing` и `$project-audit`; получи prompt+workspace route через `route.mjs`, затем запусти audit `inventory.mjs --root <scope> --format json`. Проверь inference по manifests/entrypoints/native config, перенеси `coverageGaps` в отчёт и сохрани выбранные/исключённые roles/skills с evidence.
 2. По inventory подключи обязательные роли `architect`, `analyzer`, `security`, `resilience`, `testing` и только релевантные `backend`, `frontend`, `expo-mobile`, `database`, `swagger`, `devops`, `docs`. На платформе с subagents передай каждой отдельный read-only scope без write tools; в Codex/Kimi выполни те же named-skill passes последовательно и честно укажи execution model.
 3. Недоверенный project code/plugins не исполняй. Typecheck/lint/tests запускай только для доверенного repo или после явного approval точной команды; никаких fix/install/migration/codegen scripts. Уязвимости зависимостей проверь online по lockfile через официальный scanner/advisory source; сохрани source и UTC date. Отсутствующий scanner = coverage gap, не «чисто».
 4. Не требуй try/catch в каждой функции: проверь I/O/transaction/job/process/native boundaries и существующий centralized error propagation.

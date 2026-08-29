@@ -1,0 +1,745 @@
+{
+  "schemaVersion": 1,
+  "generatedFrom": [
+    "scripts/roles.json",
+    "agents/*.md",
+    "skills/*/SKILL.md"
+  ],
+  "roles": [
+    {
+      "id": "architect",
+      "route": "system design and technology choices",
+      "owns": "target architecture",
+      "notFor": "code-grounded full repository package",
+      "skills": [
+        "workspace-capability-routing",
+        "system-design",
+        "database",
+        "api-design",
+        "i18n",
+        "web-scraping",
+        "vercel",
+        "render",
+        "workflow",
+        "task-master"
+      ]
+    },
+    {
+      "id": "principal-architect",
+      "route": "complete multi-language current architecture package",
+      "owns": "MD/JSON/HTML/PDF/draw.io/Mermaid package",
+      "notFor": "lightweight TS/JS dependency map",
+      "skills": [
+        "principal-architecture",
+        "system-design",
+        "database",
+        "api-design",
+        "backend-architecture",
+        "error-handling",
+        "security-audit",
+        "docker",
+        "ci-cd",
+        "drawio-diagrams",
+        "mermaid-rendering",
+        "workflow",
+        "task-master"
+      ]
+    },
+    {
+      "id": "backend",
+      "route": "server APIs and business logic",
+      "owns": "backend implementation",
+      "notFor": "frontend UI",
+      "skills": [
+        "backend-architecture",
+        "nodejs",
+        "typescript",
+        "postgresql",
+        "mongodb",
+        "redis",
+        "swagger-coverage",
+        "i18n",
+        "hardcode-detection",
+        "mock-data-detection",
+        "vercel",
+        "render",
+        "workflow",
+        "task-master"
+      ]
+    },
+    {
+      "id": "frontend",
+      "route": "React/Next.js UI and client state",
+      "owns": "web frontend implementation",
+      "notFor": "backend APIs",
+      "skills": [
+        "frontend-architecture",
+        "react",
+        "nextjs",
+        "typescript",
+        "tailwind",
+        "mobile-thumb-zones",
+        "apple-design",
+        "animate",
+        "state-management",
+        "data-fetching",
+        "i18n",
+        "hardcode-detection",
+        "mock-data-detection",
+        "react-testing",
+        "vercel",
+        "workflow",
+        "task-master"
+      ]
+    },
+    {
+      "id": "expo-mobile",
+      "route": "React Native and Expo",
+      "owns": "mobile implementation",
+      "notFor": "web-only UI",
+      "skills": [
+        "expo-mobile-architecture",
+        "expo-ui-design-motion",
+        "mobile-thumb-zones",
+        "react-native-liquid-glass",
+        "apple-design",
+        "animate-expo",
+        "react",
+        "typescript",
+        "state-management",
+        "data-fetching",
+        "i18n",
+        "react-testing",
+        "error-handling",
+        "workflow",
+        "task-master"
+      ]
+    },
+    {
+      "id": "analyzer",
+      "route": "broad read-only code quality audit",
+      "owns": "bugs, types, DB and structural review",
+      "notFor": "targeted hardcode or mock-data audit",
+      "skills": [
+        "workspace-capability-routing",
+        "typescript",
+        "backend-architecture",
+        "frontend-architecture",
+        "database",
+        "postgresql",
+        "mongodb",
+        "swagger-coverage",
+        "react",
+        "nextjs",
+        "workflow",
+        "task-master"
+      ]
+    },
+    {
+      "id": "integrity",
+      "route": "targeted hardcode and mock-data audit",
+      "owns": "cross-language hardcode/mock production reachability",
+      "notFor": "general code-quality audit",
+      "skills": [
+        "code-integrity",
+        "hardcode-detection",
+        "mock-data-detection",
+        "i18n",
+        "frontend-architecture",
+        "backend-architecture",
+        "workflow",
+        "task-master"
+      ]
+    },
+    {
+      "id": "swagger",
+      "route": "OpenAPI coverage",
+      "owns": "API specification coverage",
+      "notFor": "general API implementation",
+      "skills": [
+        "swagger-coverage",
+        "backend-architecture",
+        "api-design",
+        "typescript",
+        "nodejs",
+        "workflow",
+        "task-master"
+      ]
+    },
+    {
+      "id": "firecrawl",
+      "route": "web research and extraction",
+      "owns": "live web evidence",
+      "notFor": "local repository analysis",
+      "skills": [
+        "web-scraping",
+        "workflow",
+        "task-master"
+      ]
+    },
+    {
+      "id": "render",
+      "route": "Render hosting, deploys and logs",
+      "owns": "Render operations",
+      "notFor": "generic CI/CD",
+      "skills": [
+        "render",
+        "postgresql",
+        "redis",
+        "backend-architecture",
+        "workflow",
+        "task-master"
+      ]
+    },
+    {
+      "id": "database",
+      "route": "Postgres, MongoDB and Redis",
+      "owns": "schema, query, migration and cache work",
+      "notFor": "application business logic",
+      "skills": [
+        "database",
+        "postgresql",
+        "mongodb",
+        "redis",
+        "backend-architecture",
+        "workflow",
+        "task-master"
+      ]
+    },
+    {
+      "id": "resilience",
+      "route": "error handling and failure boundaries",
+      "owns": "runtime failure boundaries",
+      "notFor": "Pino logging architecture",
+      "skills": [
+        "error-handling",
+        "backend-architecture",
+        "nodejs",
+        "typescript",
+        "react",
+        "i18n",
+        "workflow",
+        "task-master"
+      ]
+    },
+    {
+      "id": "logging",
+      "route": "Pino structured logging architecture",
+      "owns": "application logger, child loggers, redaction and request context",
+      "notFor": "error handling try/catch boundaries",
+      "skills": [
+        "pino-logging",
+        "error-handling",
+        "backend-architecture",
+        "nodejs",
+        "typescript",
+        "nextjs",
+        "workflow",
+        "task-master"
+      ]
+    },
+    {
+      "id": "screenshot",
+      "route": "screenshot to new UI code",
+      "owns": "new UI reconstruction",
+      "notFor": "locating existing source",
+      "skills": [
+        "screenshot-to-code",
+        "react",
+        "nextjs",
+        "typescript",
+        "tailwind",
+        "mobile-thumb-zones",
+        "apple-design",
+        "animate",
+        "frontend-architecture",
+        "i18n",
+        "workflow",
+        "task-master"
+      ]
+    },
+    {
+      "id": "design-studio",
+      "route": "product and visual design artifacts",
+      "owns": "prototype, deck, document and design system",
+      "notFor": "source-code location",
+      "skills": [
+        "design-studio",
+        "mobile-thumb-zones",
+        "apple-design",
+        "animate",
+        "visual-evidence",
+        "web-scraping",
+        "workflow",
+        "task-master"
+      ]
+    },
+    {
+      "id": "visual-research",
+      "route": "identify screenshot with web evidence",
+      "owns": "visual identification and live verification",
+      "notFor": "code generation",
+      "skills": [
+        "visual-evidence",
+        "web-scraping",
+        "workflow",
+        "task-master"
+      ]
+    },
+    {
+      "id": "pinpoint",
+      "route": "screenshot to existing source",
+      "owns": "UI-to-file trace",
+      "notFor": "new UI generation",
+      "skills": [
+        "ui-source-mapping",
+        "screenshot-to-code",
+        "frontend-architecture",
+        "react",
+        "nextjs",
+        "typescript",
+        "i18n",
+        "data-fetching",
+        "state-management",
+        "workflow",
+        "task-master"
+      ]
+    },
+    {
+      "id": "drawio",
+      "route": "draw.io and PMP diagrams",
+      "owns": "native draw.io artifacts",
+      "notFor": "repository extraction",
+      "skills": [
+        "drawio-diagrams",
+        "pmp-diagrams",
+        "system-design",
+        "workflow",
+        "task-master"
+      ]
+    },
+    {
+      "id": "archmap",
+      "route": "lightweight TS/JS architecture map",
+      "owns": "architecture.json and interactive dependency map",
+      "notFor": "complete multi-language architecture package",
+      "skills": [
+        "archmap",
+        "system-design",
+        "drawio-diagrams",
+        "mermaid-diagrams",
+        "workflow",
+        "task-master"
+      ]
+    },
+    {
+      "id": "mermaid",
+      "route": "Mermaid diagrams and rendering",
+      "owns": "validated Mermaid artifacts",
+      "notFor": "repository extraction",
+      "skills": [
+        "mermaid-diagrams",
+        "mermaid-rendering",
+        "system-design",
+        "workflow",
+        "task-master"
+      ]
+    },
+    {
+      "id": "testing",
+      "route": "unit, integration, E2E and verification",
+      "owns": "independent test verdict",
+      "notFor": "feature implementation",
+      "skills": [
+        "testing-strategy",
+        "e2e-playwright",
+        "react-testing",
+        "error-handling",
+        "typescript",
+        "nodejs",
+        "workflow",
+        "task-master"
+      ]
+    },
+    {
+      "id": "gitflow",
+      "route": "commits, PRs and releases",
+      "owns": "git and release workflow",
+      "notFor": "product code",
+      "skills": [
+        "git-workflow",
+        "workflow",
+        "task-master"
+      ]
+    },
+    {
+      "id": "security",
+      "route": "read-only security audit",
+      "owns": "secrets, OWASP, CVE and PII findings",
+      "notFor": "security remediation",
+      "skills": [
+        "security-audit",
+        "secrets-detection",
+        "error-handling",
+        "backend-architecture",
+        "frontend-architecture",
+        "workflow",
+        "task-master"
+      ]
+    },
+    {
+      "id": "docs",
+      "route": "README, API and architecture documentation",
+      "owns": "documentation lifecycle",
+      "notFor": "architecture extraction",
+      "skills": [
+        "technical-writing",
+        "api-design",
+        "swagger-coverage",
+        "system-design",
+        "workflow",
+        "task-master"
+      ]
+    },
+    {
+      "id": "devops",
+      "route": "Docker and CI/CD",
+      "owns": "container and pipeline implementation",
+      "notFor": "Render-specific operations",
+      "skills": [
+        "docker",
+        "ci-cd",
+        "nodejs",
+        "render",
+        "backend-architecture",
+        "workflow",
+        "task-master"
+      ]
+    },
+    {
+      "id": "liveboard",
+      "route": "local live work dashboard",
+      "owns": "ephemeral project status UI",
+      "notFor": "persistent reporting",
+      "skills": [
+        "liveboard",
+        "workflow",
+        "task-master"
+      ]
+    }
+  ],
+  "skills": [
+    {
+      "name": "analyzer",
+      "description": "broad read-only code quality audit. Primary owner: bugs, types, DB and structural review. Do not use for: targeted hardcode or mock-data audit. Use when this role is selected by the Agent-Vorcl-Flow router."
+    },
+    {
+      "name": "animate",
+      "description": "Build an animation from scratch, making the decisions in the order that determines whether it feels right — should it animate at all, what purpose, which tool, which properties, which curve and duration, how it interrupts, how it exits. Writes the implementation. Use when asked to animate something, add motion, make a component feel alive, or build a transition. For critiquing existing motion use review-animations; for auditing a whole codebase use improve-animations."
+    },
+    {
+      "name": "animate-expo",
+      "description": "Build animations in React Native and Expo, making the decisions in the order that determines whether they feel right — should it animate, which thread it runs on, which properties, spring or timing, how the gesture hands off, how it degrades. Writes the implementation with Reanimated, Gesture Handler, Expo Router and expo-haptics. Use when animating anything in an Expo app, adding gestures, sheets, screen transitions, press feedback or haptics, or fixing motion that stutters on device. For web animation use `animate`."
+    },
+    {
+      "name": "api-design",
+      "description": "Проектирование HTTP API — REST-конвенции (ресурсы, методы, статус-коды), пагинация (cursor vs offset), версионирование, идемпотентность (Idempotency-Key), формат ошибок RFC 7807 (problem+json), безопасность и rate limiting. Use при проектировании, ревью или версионировании API и эндпоинтов, выборе кодов ошибок, пагинации, лимитов или формата ответа."
+    },
+    {
+      "name": "apple-design",
+      "description": "Apple's approach to interface design and fluid, physical motion, translated for the web. Use when building or reviewing gesture-driven UI, spring animations, drag/swipe/sheet interactions, momentum and interruptible transitions, translucent materials and depth, typography (optical sizing, tracking, leading), reduced-motion, or the design foundations (feedback, spatial consistency, restraint) behind Apple-style interfaces."
+    },
+    {
+      "name": "architect",
+      "description": "system design and technology choices. Primary owner: target architecture. Do not use for: code-grounded full repository package. Use when this role is selected by the Agent-Vorcl-Flow router."
+    },
+    {
+      "name": "archmap",
+      "description": "Карта архитектуры кода из любого TS/JS-репозитория — детерминированный extraction скриптами в architecture.json (каждый узел с source:{file,line}) и rendering в интерактивный HTML, draw.io, Mermaid, ARCHITECTURE.md и PDF. Use when нужно построить карту архитектуры, ERD, граф связей «кто к чему имеет доступ» (базы, роуты, AI-агенты, память, env, технологии) или интерактивную схему по коду. Триггеры — карта архитектуры, architecture map, ERD по коду, граф зависимостей, визуализировать проект, architecture.json."
+    },
+    {
+      "name": "backend",
+      "description": "server APIs and business logic. Primary owner: backend implementation. Do not use for: frontend UI. Use when this role is selected by the Agent-Vorcl-Flow router."
+    },
+    {
+      "name": "backend-architecture",
+      "description": "Обязательные правила модульной архитектуры бэкенда — src/modules/* со слоями controller/service/repository/routes/schemas/dto/types/middleware/index. Use ВСЕГДА при создании или изменении структуры backend-кода, новых модулей, эндпоинтов и файлов внутри модуля."
+    },
+    {
+      "name": "ci-cd",
+      "description": "CI/CD на GitHub Actions — эталонный PR-workflow (lint+typecheck+test с кэшем npm/pnpm), deploy-workflow с environment и secrets, concurrency (отмена устаревших прогонов), matrix, безопасность (минимальные permissions, опасность pull_request_target, секреты и fork-PR), интеграция с Render (deploy hook / auto-deploy). Use when настраиваешь или чинишь GitHub Actions, pipeline, кэширование CI или деплой по пушу."
+    },
+    {
+      "name": "code-integrity",
+      "description": "Cross-language read-only audit engine for production hardcode and leaked mocks/fake data in frontend, backend, mobile, templates, and shared code. Use when Codex must scan TS/JS, Python, Go, Java/Kotlin, C#, PHP, Ruby, Rust, Vue/Svelte/HTML, or mixed repositories and produce evidence-based file:line findings while separating tests, fixtures, stories, seeds, examples, generated files, and vendored code."
+    },
+    {
+      "name": "data-fetching",
+      "description": "Серверное состояние на TanStack Query (React Query) поверх реального API бэкенда. Источник истины — OpenAPI-спека бэка (Fastify/NestJS/Express и др.): типы генерируются из спеки (openapi-typescript), запросы идут типобезопасным openapi-fetch. Ключи, кэш, инвалидация, мутации, оптимистичные обновления, RSC/Server Actions. Моков в прод-пути нет. Use при загрузке/мутации серверных данных во фронтенде."
+    },
+    {
+      "name": "database",
+      "description": "Моделирование данных и выбор хранилищ — реляционные/документные/KV, индексы, транзакции, партиционирование, миграции без простоя. Use при проектировании схемы БД или выборе хранилища."
+    },
+    {
+      "name": "design-studio",
+      "description": "Полная локальная дизайн-студия Agent-Vorcl-Flow: создаёт self-contained HTML-макеты, интерактивные прототипы, wireframe, лендинги, dashboards, mobile screens, презентации, документы, анимации, 3D, визуализации, email и печатные материалы; импортирует Figma, GitHub и HTML/CSS; создаёт и применяет design systems; экспортирует собственные deck-stage проекты в PDF/PPTX/MP4. Use когда нужно спроектировать, визуализировать, прототипировать, собрать deck/PPT, дизайн-систему или визуальный артефакт, даже если слово «дизайн» не указано. Для нетривиальной работы обязательно вести цель через Task Master и роль design-studio. Основано на MIT-проекте JimLiu/baoyu-design с сохранённой лицензией."
+    },
+    {
+      "name": "devops",
+      "description": "Docker and CI/CD. Primary owner: container and pipeline implementation. Do not use for: Render-specific operations. Use when this role is selected by the Agent-Vorcl-Flow router."
+    },
+    {
+      "name": "docker",
+      "description": "Docker для Node-проектов — эталонный multistage Dockerfile (node-slim, npm ci --omit=dev, non-root, HEALTHCHECK), оптимизация слоёв и размера, безопасность (.dockerignore, секреты не в слои), docker-compose для локальной разработки (healthcheck, volumes, env), критичное правило force-recreate vs restart, типовые ошибки (ECONNREFUSED между сервисами). Use when пишешь/ревьюишь Dockerfile или docker-compose, чинишь сборку/поднятие контейнеров или применяешь env-изменения."
+    },
+    {
+      "name": "docs",
+      "description": "README, API and architecture documentation. Primary owner: documentation lifecycle. Do not use for: architecture extraction. Use when this role is selected by the Agent-Vorcl-Flow router."
+    },
+    {
+      "name": "drawio",
+      "description": "draw.io and PMP diagrams. Primary owner: native draw.io artifacts. Do not use for: repository extraction. Use when this role is selected by the Agent-Vorcl-Flow router."
+    },
+    {
+      "name": "drawio-diagrams",
+      "description": "Создание диаграмм в нативном XML-формате draw.io / diagrams.net — структура файла (`mxfile`/`mxGraphModel`/`mxCell`/`mxGeometry`), ID-менеджмент, стили (`key=value;`), каталог фигур и рёбер, типы диаграмм (flowchart, cross-functional/swimlane, BPMN, UML, network/cloud, ERD, org chart, mind map), подключение custom-библиотек (`?clibs=`), правила качества и валидность XML. Use при создании, конвертации или правке диаграмм draw.io/diagrams.net."
+    },
+    {
+      "name": "e2e-playwright",
+      "description": "E2E-тестирование на Playwright — приоритет селекторов (getByRole > testid > css), fixtures и переиспользование auth-state (storageState), web-first assertions без sleep, trace/screenshot при падении, параллельность и шардинг в CI, паттерн Page Object. Use при написании, ревью или стабилизации браузерных e2e-тестов."
+    },
+    {
+      "name": "error-handling",
+      "description": "Грамотное покрытие кода обработкой ошибок (try/catch/finally) и структурным логированием без «тихих» падений. Куда ставить try/catch (границы I/O/внешних вызовов/парсинга/транзакций) и куда НЕ ставить, нормализация ошибок (typed errors, cause, stack, unknown в catch), async/finally/cleanup, ретраи/таймауты для транзиентных сбоев; грамотная расстановка логов — уровни, контекст, correlation id, лог один раз на границе, без секретов/PII. Use при добавлении/ревью error handling и логирования в бэке (Node/Fastify) и фронте (React)."
+    },
+    {
+      "name": "expo-mobile",
+      "description": "React Native and Expo. Primary owner: mobile implementation. Do not use for: web-only UI. Use when this role is selected by the Agent-Vorcl-Flow router."
+    },
+    {
+      "name": "expo-mobile-architecture",
+      "description": "Обязательные правила production-архитектуры React Native + Expo для приложений с большой бизнес-логикой: Expo Router только для маршрутов, Modular Vertical Slice в src/modules/*, shared infrastructure в src/shared/*, TanStack Query для server state, Zustand для shared client state, domain/application/data/ui для сложных сценариев. Use ВСЕГДА при создании или изменении экранов, модулей, API, stores, бизнес-логики, навигации, storage, forms, hooks, offline sync, native integrations и структуры Expo/React Native проекта."
+    },
+    {
+      "name": "expo-ui-design-motion",
+      "description": "Обязательные production-правила Design System, Motion System и Interaction System для React Native + Expo. Используй ВСЕГДА при создании или изменении Expo/React Native экранов, UI-компонентов, навигационных переходов, sheets/modals, gestures, animations, haptics, изображений, skeleton/loading/empty states, charts, optimistic UI, accessibility/reduced motion и theme/design tokens."
+    },
+    {
+      "name": "firecrawl",
+      "description": "web research and extraction. Primary owner: live web evidence. Do not use for: local repository analysis. Use when this role is selected by the Agent-Vorcl-Flow router."
+    },
+    {
+      "name": "frontend",
+      "description": "React/Next.js UI and client state. Primary owner: web frontend implementation. Do not use for: backend APIs. Use when this role is selected by the Agent-Vorcl-Flow router."
+    },
+    {
+      "name": "frontend-architecture",
+      "description": "Обязательные правила feature-based архитектуры фронтенда (по bulletproof-react) — src/features/* со слоями api/components/hooks/stores/types, общие components/ui и lib, однонаправленные зависимости. Use ВСЕГДА при создании или изменении структуры frontend-кода, новых фич и компонентов."
+    },
+    {
+      "name": "git-workflow",
+      "description": "Git-гигиена и релизная дисциплина — Conventional Commits (таблица типов, BREAKING CHANGE), semver-правила бампа, поимённые коммиты и запрет `git add .`/`git add -A` при параллельных сессиях, ловушка squash-merge долгоживущей ветки (`git merge-base --is-ancestor`, рецепт `git merge -s ours`), worktree для параллельной работы, запрет force-push и push без явного подтверждения. Use для коммитов, PR, changelog, версионирования и релизов."
+    },
+    {
+      "name": "gitflow",
+      "description": "commits, PRs and releases. Primary owner: git and release workflow. Do not use for: product code. Use when this role is selected by the Agent-Vorcl-Flow router."
+    },
+    {
+      "name": "hardcode-detection",
+      "description": "Evidence-based read-only detection of production hardcode across frontend and backend languages: user-visible strings bypassing i18n, fixed API responses, endpoints/hosts, tenant or environment values, placeholder content, and static business data. Use for requests to find hardcoded text/data/config, i18n bypasses, magic production values, or backend/frontend literals without treating every string literal as a bug."
+    },
+    {
+      "name": "i18n",
+      "description": "Интернационализация и локализация (i18n/l10n) прикладного кода — запрет языкового хардкода пользовательских строк в мультиязычных проектах. Определить, мультиязычен ли репозиторий (i18n-инфраструктура, несколько локалей), и адаптироваться. Ключи и словари, плюрализация/род (ICU MessageFormat), интерполяция, форматирование дат/чисел/валют (Intl API), RTL и логические CSS-свойства. Библиотеки по стеку — next-intl (Next.js App Router), react-i18next (React SPA), i18next + Accept-Language (Node-бэкенд). Use ВСЕГДА при генерации/рефакторинге кода с пользовательским текстом (UI, сообщения об ошибках/валидации, письма, уведомления) и при аудите на языковой хардкод."
+    },
+    {
+      "name": "init-code",
+      "description": "Статически исследует существующий репозиторий и создаёт evidence-based PROJECT_DESCRIPTION.md: назначение, запуск, стек, структуру, runtime/data flow, тестирование, конфигурацию, интеграции и явно неизвестные области. Use при первом знакомстве с кодовой базой, onboarding, инициализации project context или обновлении устаревшего описания; не исполняет недоверенный код и не создаёт CLAUDE.md/AGENTS.md."
+    },
+    {
+      "name": "integrity",
+      "description": "targeted hardcode and mock-data audit. Primary owner: cross-language hardcode/mock production reachability. Do not use for: general code-quality audit. Use when this role is selected by the Agent-Vorcl-Flow router."
+    },
+    {
+      "name": "liveboard",
+      "description": "Эфемерное локальное live-табло проекта на 43 языках: обнаруживает Git worktree, активные процессы Claude/Codex/Cursor и задачи Task Master, запускает красивую HTML-панель на свободном localhost-порту, обновляет её через SSE и ничего не сохраняет после остановки. Use когда нужно увидеть, кто над чем работает, состояние параллельных worktree и прогресс задач в реальном времени."
+    },
+    {
+      "name": "logging",
+      "description": "Pino structured logging architecture. Primary owner: application logger, child loggers, redaction and request context. Do not use for: error handling try/catch boundaries. Use when this role is selected by the Agent-Vorcl-Flow router."
+    },
+    {
+      "name": "mermaid",
+      "description": "Mermaid diagrams and rendering. Primary owner: validated Mermaid artifacts. Do not use for: repository extraction. Use when this role is selected by the Agent-Vorcl-Flow router."
+    },
+    {
+      "name": "mermaid-diagrams",
+      "description": "Создание диаграмм на языке Mermaid — выбор типа под задачу и точный синтаксис по каждому из 32 типов (flowchart, sequence, class, state, ER, gantt, gitGraph, C4, architecture, block, mindmap, treeView, timeline, kanban, pie, xychart, radar, quadrant, sankey, treemap, venn, packet, requirement, journey, swimlane, eventmodeling, cynefin, ishikawa, wardley, railroad, zenuml, usecase), группировка и стили, конфигурация и темы, экранирование подписей, частые AI-ошибки. Глубокие справочники лежат в references/ и подгружаются по требованию. Use при создании, конвертации или правке Mermaid-диаграмм."
+    },
+    {
+      "name": "mermaid-rendering",
+      "description": "Валидация, рендеринг и экспорт Mermaid — готовый рендер-валидатор scripts/mmd-validate.mjs, mcp-mermaid (MCP), @mermaid-js/mermaid-cli (mmdc) с полным набором флагов, Kroki, Mermaid.ink, Maid-линтер, официальный mermaid npm SDK и Mermaid Chart MCP; фиксация версии, CI-проверка рендером, экспорт SVG/PNG/PDF, темы и конфиг при рендере, security (securityLevel), приватность (локальный рендер против публичных URL). Use для проверки синтаксиса Mermaid, генерации изображений и настройки CI."
+    },
+    {
+      "name": "mobile-thumb-zones",
+      "description": "Проектирует и проверяет эргономику mobile web и React Native/Expo интерфейсов: досягаемость действий большим пальцем, touch targets, нижнюю навигацию, формы, safe areas и mobile anti-patterns. Use для создания или аудита мобильных экранов; не применять к desktop-only UI."
+    },
+    {
+      "name": "mock-data-detection",
+      "description": "Read-only detection of mock infrastructure, fixtures, fake generators, demo records, static API responses, and placeholder assets leaking into production frontend or backend paths across TS/JS, Python, Go, Java/Kotlin, C#, PHP, Ruby, Rust, Vue/Svelte/HTML. Use when UI or API may run on mocks, fake data, stubs, MSW/faker/WireMock/Mockito-style tooling, or hardcoded sample records; distinguish legitimate tests, stories, seeds, demos, and dev-only adapters from production leaks."
+    },
+    {
+      "name": "mongodb",
+      "description": "Работа с MongoDB — моделирование документов (embed vs reference), паттерны схем, индексы (составные/multikey/text/TTL/wildcard), aggregation pipeline, транзакции, replica set и sharding, антипаттерны. Use при работе с MongoDB/документной БД, проектировании коллекций или оптимизации запросов и агрегаций."
+    },
+    {
+      "name": "nextjs",
+      "description": "Next.js (App Router) — маршрутизация, Server/Client Components, Server Actions, кэширование и ревалидация, метаданные, деплой. Use при работе со страницами, роутингом, серверной загрузкой данных и мутациями в Next.js."
+    },
+    {
+      "name": "nodejs",
+      "description": "Серверная разработка на Node.js — событийный цикл (что блокирует, микро/макротаски), async-паттерны (Promise.all vs allSettled, AbortController-таймауты), поиск утечек памяти (--inspect, heap snapshot), worker_threads vs cluster, стримы и backpressure. Use при написании или отладке серверного кода на Node.js, зависании event loop, росте памяти, выборе воркеров/кластеризации."
+    },
+    {
+      "name": "pino-logging",
+      "description": "Модульная Pino-архитектура для Node.js / Fastify / Next.js: один root logger в infrastructure/logging, child loggers, redaction, requestId, event-поля, JSON в stdout. Use когда внедряешь, аудируешь или обновляешь structured logging, pino, request context, background jobs или Next.js server logs."
+    },
+    {
+      "name": "pinpoint",
+      "description": "screenshot to existing source. Primary owner: UI-to-file trace. Do not use for: new UI generation. Use when this role is selected by the Agent-Vorcl-Flow router."
+    },
+    {
+      "name": "pmp-diagrams",
+      "description": "Проектные диаграммы PMP/PMBOK в нативном XML draw.io / diagrams.net — WBS (иерархия работ), Project Network PERT/CPM (AON-ноды, critical path), Gantt (таймлайн, вехи, зависимости), RACI-матрица, Risk Matrix 5×5 (probability-impact), Stakeholder power-interest grid, плюс resource histogram, communication plan, process groups и knowledge areas. Готовые style-сниппеты и уровни/цвета. Use при построении проектных/PM-диаграмм в draw.io."
+    },
+    {
+      "name": "postgresql",
+      "description": "Глубокая работа с PostgreSQL — проектирование схемы и типов, индексы (btree/GIN/GiST/BRIN/partial/covering), чтение планов EXPLAIN ANALYZE и оптимизация запросов, транзакции/изоляция/блокировки, JSONB и полнотекстовый поиск, партиционирование, репликация, пулы соединений и миграции без простоя. Use при работе с Postgres, проектировании схемы или оптимизации SQL."
+    },
+    {
+      "name": "principal-architect",
+      "description": "complete multi-language current architecture package. Primary owner: MD/JSON/HTML/PDF/draw.io/Mermaid package. Do not use for: lightweight TS/JS dependency map. Use when this role is selected by the Agent-Vorcl-Flow router."
+    },
+    {
+      "name": "principal-architecture",
+      "description": "Создавать и обновлять production-grade архитектурный пакет текущего репозитория строго по исходному коду, конфигурации, схемам БД, manifests, CI/CD и IaC: сначала ARCHITECTURE.md с file:line evidence, затем JSON, self-contained HTML, PDF, draw.io и копируемые Mermaid L0-L4. Use when нужно нарисовать реальную архитектуру существующего проекта, провести code-aware architecture review, показать data/event/AI/MCP/deployment/security flows или обновить ранее созданные архитектурные артефакты. Не использовать Markdown-описания как доказательство фактической topology."
+    },
+    {
+      "name": "project-audit",
+      "description": "Глубокий read-only аудит любого репозитория с автоматическим определением frontend, backend, mobile, database, API и infrastructure boundaries; оркестрирует профильные роли для архитектуры, багов, security/CVE/secrets/PII, error handling/try-catch/logging, типов, тестов, зависимостей и документации и материализует единый PROJECT_AUDIT.md. Use когда просят проверить весь проект, найти что не так, оценить архитектуру/безопасность/надёжность, составить remediation plan или технический due diligence."
+    },
+    {
+      "name": "react",
+      "description": "React 19 — функциональные компоненты, хуки, правила состояния, мемоизация, Server/Client Components, error boundaries. Use при написании или рефакторинге React-компонентов и хуков."
+    },
+    {
+      "name": "react-native-liquid-glass",
+      "description": "Выбирает и безопасно интегрирует Liquid Glass в React Native/Expo: сравнивает @callstack/liquid-glass, expo-glass-effect и обычный View fallback, проверяет SDK/RN/Xcode/runtime, accessibility и native build. Use только для iOS glass surfaces или их cross-platform fallback; не применять как общий visual style."
+    },
+    {
+      "name": "react-testing",
+      "description": "Тестирование React-компонентов — Testing Library + Vitest/Jest, поведенческие проверки от лица пользователя, MSW для мокинга сети. Use при написании или ревью тестов фронтенда."
+    },
+    {
+      "name": "redis",
+      "description": "Redis для Node.js/TypeScript (node-redis) — структуры данных и когда что, кэш-стратегии (cache-aside, TTL+jitter, защита от stampede), eviction/maxmemory, атомарность (одиночные команды, MULTI/WATCH, Lua), rate limiting, distributed lock, Pub/Sub vs Streams (consumer groups), персистентность. Use при проектировании кэша, очередей, rate limiting или блокировок."
+    },
+    {
+      "name": "render",
+      "description": "Работа с Render через официальный MCP (mcp.render.com) — сервисы (web/static/cron), деплои, логи, метрики, Render Postgres и Key Value. Use при деплое/редеплое на Render, разборе упавших сборок и логов, анализе метрик, управлении env-переменными или read-only SQL по Render Postgres."
+    },
+    {
+      "name": "resilience",
+      "description": "error handling and failure boundaries. Primary owner: runtime failure boundaries. Do not use for: Pino logging architecture. Use when this role is selected by the Agent-Vorcl-Flow router."
+    },
+    {
+      "name": "screenshot",
+      "description": "screenshot to new UI code. Primary owner: new UI reconstruction. Do not use for: locating existing source. Use when this role is selected by the Agent-Vorcl-Flow router."
+    },
+    {
+      "name": "screenshot-to-code",
+      "description": "Превращение скриншота UI в production-ready код с точной вёрсткой, стилями и структурой. Разбор изображения (layout, компоненты, визуальные детали, адаптивные подсказки), выбор фреймворка (React+Tailwind по умолчанию, Vue, HTML/CSS, Next.js), генерация полного запускаемого кода: семантический HTML, точные цвета (hex→OKLCH-токены), spacing и пропорции, адаптивность (rem/%/clamp), доступность (a11y). Use при конвертации скриншота/дизайна в код и извлечении дизайн-токенов."
+    },
+    {
+      "name": "secrets-detection",
+      "description": "Обнаружение секретов в коде и git-истории — паттерны ключей (sk-, ghp_, AKIA, xox., private keys, user:pass@), поиск в рабочем дереве и git log -p --all, gitleaks/trufflehog и grep-альтернативы, фильтр ложных срабатываний (env-подстановки, плейсхолдеры), протокол реагирования с обязательной ротацией. Use для поиска утёкших ключей/токенов/паролей и проверки перед пушем."
+    },
+    {
+      "name": "security",
+      "description": "read-only security audit. Primary owner: secrets, OWASP, CVE and PII findings. Do not use for: security remediation. Use when this role is selected by the Agent-Vorcl-Flow router."
+    },
+    {
+      "name": "security-audit",
+      "description": "Практический security-аудит Node/React — OWASP Top 10 с grep-паттернами и точками поиска, разбор npm audit (severity, false positives, overrides), чек-лист заголовков/CORS/cookie, severity-шкала и принципы доказательного отчёта. Use для аудита уязвимостей кода, проверки зависимостей на CVE и оформления security-findings."
+    },
+    {
+      "name": "state-management",
+      "description": "Клиентское состояние на Zustand — слайсы, селекторы, персист, экшены; граница «что НЕ поднимать в глобальный стор». Use при проектировании или правке клиентских сторов состояния во фронтенде."
+    },
+    {
+      "name": "swagger",
+      "description": "OpenAPI coverage. Primary owner: API specification coverage. Do not use for: general API implementation. Use when this role is selected by the Agent-Vorcl-Flow router."
+    },
+    {
+      "name": "swagger-coverage",
+      "description": "Полное покрытие OpenAPI/Swagger для всех роутов бэкенда — детект стека (Fastify/Express/NestJS/Koa/Hapi/tRPC, статические спеки, не-JS), аудит непокрытых/частичных эндпоинтов и их корректное покрытие. Универсальный чек-лист операции; дефолт-пример — Fastify + zod как единый источник. Use при добавлении/ревью роутов, аудите документации API и перед генерацией фронт-клиента."
+    },
+    {
+      "name": "system-design",
+      "description": "Проектирование распределённых систем — декомпозиция монолита на модули/сервисы (критерии границ), синхронное vs асинхронное взаимодействие (очереди, события), уровни масштабирования 100 → 10k RPS (кэш → реплики → шардинг), отказоустойчивость, наблюдаемость, что рисовать на архитектурной диаграмме. Use при проектировании архитектуры, обсуждении границ сервисов, очередей, масштабирования, отказоустойчивости."
+    },
+    {
+      "name": "tailwind",
+      "description": "Tailwind CSS v4 (CSS-first) — установка (Vite `@tailwindcss/vite`, PostCSS, CLI), конфигурация через `@import \"tailwindcss\"` + `@theme` (дизайн-токены как CSS-переменные, OKLCH), utility-first, варианты через cva/cn, адаптивность и container queries, тёмная тема, доступность. Use при стилизации UI и настройке дизайн-системы на Tailwind."
+    },
+    {
+      "name": "task-master",
+      "description": "Справочник Task Master (task-master-ai) — MCP-сервер и CLI для управления задачами: PRD → задачи → подзадачи → реализация → статусы. Use при работе с задачами, планировании из PRD, разбиении на подзадачи и отслеживании прогресса. Дисциплину задаёт скилл workflow."
+    },
+    {
+      "name": "technical-writing",
+      "description": "Инженерная документация — структура README, копипастабельные примеры, таблицы vs проза, многоязычный паритет (RU/EN), ADR-формат, Keep a Changelog, стиль без воды. Use при написании/обновлении README, docs/*, CONTRIBUTING, ARCHITECTURE, CHANGELOG, release notes и при аудите дрейфа документации."
+    },
+    {
+      "name": "testing",
+      "description": "unit, integration, E2E and verification. Primary owner: independent test verdict. Do not use for: feature implementation. Use when this role is selected by the Agent-Vorcl-Flow router."
+    },
+    {
+      "name": "testing-strategy",
+      "description": "Стратегия тестирования — пирамида unit/integration/e2e (что каким уровнем проверять), что мокать а что нет (границы I/O — да, домен — нет), осмысленные пороги покрытия (критичные пути ~100%, UI-обвязка ниже), структура AAA/given-when-then, критерии хорошего теста, причины flaky и их фиксы. Use при проектировании тестов, ревью тестового набора, выборе уровня теста и лечении нестабильных тестов."
+    },
+    {
+      "name": "typescript",
+      "description": "Строгая типизация серверного кода на TypeScript — tagged unions и Result<T,E>, generics для типобезопасных API-клиентов, strictNullChecks и optional chaining, exhaustive switch с never-проверкой, вывод типов из zod (z.infer). Use при написании или улучшении типов, обработке ошибок через Result, синхронизации zod-схем и типов, борьбе с any и небезопасными кастами."
+    },
+    {
+      "name": "ui-source-mapping",
+      "description": "Обратное сопоставление: скриншот работающего UI → точное место в СУЩЕСТВУЮЩЕМ коде. Определение «существующий проект vs новый», извлечение якорей со скриншота (видимый текст, ключи i18n, иконки, структура), grep-стратегия поиска компонента, трассировка маршрута (Next.js App/Pages Router, React Router), вычисление конкретного контрола и его обработчика, разбор логики (состояние/стор, data-fetch, API), вывод как карта file:line + делегирование правки. Use когда по скриншоту надо найти и понять уже существующий UI, а не сгенерировать новый."
+    },
+    {
+      "name": "vercel",
+      "description": "Работа с Vercel через официальный MCP (mcp.vercel.com) — деплойменты, логи, проекты и веб-аналитика, поиск по докам Vercel. Use при деплое на Vercel, разборе упавших сборок и логов, управлении проектами или анализе трафика."
+    },
+    {
+      "name": "visual-evidence",
+      "description": "Анализирует скриншот сайта или приложения как визуальное доказательство, определяет вероятный продукт и страницу, ищет официальную документацию, сверяет с живым сайтом и отвечает с URL и оценкой уверенности. Use для идентификации сайта, поиска функции, подсказок по интерфейсу и вопросов о содержимом экрана; не для генерации UI-кода."
+    },
+    {
+      "name": "visual-research",
+      "description": "identify screenshot with web evidence. Primary owner: visual identification and live verification. Do not use for: code generation. Use when this role is selected by the Agent-Vorcl-Flow router."
+    },
+    {
+      "name": "web-scraping",
+      "description": "Маршрутизирует веб-поиск, scrape, map, crawl, extract, interact, parse, monitor, research и support через Firecrawl CLI, MCP или REST. Use для live web data, интеграции Firecrawl в приложение и повторяемых deliverables с URL-источниками."
+    },
+    {
+      "name": "workflow",
+      "description": "Безопасный scoped Task Master workflow: captured task IDs, atomic claim, независимый Checker и явные report-only/track-only/remediation режимы. Use для нетривиальной реализации или persistent task tracking."
+    },
+    {
+      "name": "workspace-capability-routing",
+      "description": "Анализирует одновременно пользовательскую цель и фактический workspace, затем выбирает минимальный набор Agent-Vorcl-Flow ролей и доменных скиллов с evidence и negative criteria. Use для architect/analyzer/audit/vorcl маршрутизации; не использовать вместо реализации выбранной роли."
+    }
+  ]
+}

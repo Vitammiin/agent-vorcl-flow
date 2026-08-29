@@ -1,0 +1,4 @@
+interface:
+  display_name: "Mobile Thumb Zones"
+  short_description: "Design thumb-friendly mobile web and native UI"
+  default_prompt: "Use $mobile-thumb-zones to design or audit this mobile interface for reachability and touch ergonomics."

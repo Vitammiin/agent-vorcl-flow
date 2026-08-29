@@ -1,0 +1,4 @@
+interface:
+  display_name: "Workspace Capability Routing"
+  short_description: "Route work from prompt and repository evidence"
+  default_prompt: "Use $workspace-capability-routing to inspect this workspace and select the smallest correct set of roles and skills."

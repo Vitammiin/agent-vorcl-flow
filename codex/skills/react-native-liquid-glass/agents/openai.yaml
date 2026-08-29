@@ -1,0 +1,4 @@
+interface:
+  display_name: "React Native Liquid Glass"
+  short_description: "Choose and integrate Liquid Glass safely"
+  default_prompt: "Use $react-native-liquid-glass to choose and integrate the appropriate Liquid Glass provider with production fallbacks."

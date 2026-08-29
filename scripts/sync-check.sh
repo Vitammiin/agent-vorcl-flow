@@ -21,11 +21,19 @@ fail() { printf 'FAIL: %s\n' "$1"; FAIL=$((FAIL + 1)); }
 
 # Registry is the deterministic inventory; validator also parses every Markdown
 # frontmatter and checks role/profile/router completeness.
-if node scripts/generate-role-skills.mjs && node scripts/validate-registry.mjs; then
+if node scripts/generate-role-skills.mjs && node scripts/generate-capability-catalog.mjs && node scripts/validate-registry.mjs; then
   pass
 else
   fail "role registry/frontmatter validation failed"
 fi
+
+for skill in mobile-thumb-zones react-native-liquid-glass workspace-capability-routing; do
+  if [ -d "skills/$skill" ] && [ -d "codex/skills/$skill" ] && diff -qr "skills/$skill" "codex/skills/$skill" >/dev/null; then
+    pass
+  else
+    fail "new routing/mobile skill missing or drifted: skills/$skill ↔ codex/skills/$skill"
+  fi
+done
 
 # ---------- 1. Персоны: agents/<x>.md → codex/skills/<x>/SKILL.md ----------
 for f in agents/*.md; do

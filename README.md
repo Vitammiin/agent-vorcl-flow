@@ -33,7 +33,7 @@ One `npx` command installs them. No remote backend or cloud hosting: your coding
 
 Agent-Vorcl-Flow turns a supported coding agent into a **structured engineering team**. Instead of one general assistant, you get **26 focused sub-agents** (architect, code-grounded principal architect, backend, frontend, Expo mobile engineer, product and visual design engineer, DB engineer, cross-language integrity auditor, architecture cartographer, liveboard operator, logging engineer, and more), each with its own domain **skills**, quick **slash commands**, and the **MCP tools** it needs. Every non-trivial task runs through a disciplined **Task Master** loop — *goal → tasks → implement → verify → done* — so work is planned, tracked, and survives interruptions.
 
-- 🧩 **26 sub-agents**, 75 skills, 159 slash commands
+- 🧩 **26 sub-agents**, 78 skills, 159 slash commands
 - ⚡ **One-command install** for Claude Code, Codex, Cursor, and/or Kimi CLI — `npx`
 - 🔌 **11 MCP servers** wired in (GitHub, Postgres, MongoDB, Redis, Docker, Firecrawl, Vercel, Render, filesystem, Task Master, Mermaid)
 - 🔑 **One `.env` file for all runtimes** — keys read by a launcher, not `~/.zshrc`, so they work even from GUI/IDE launches; no remote AVF service; liveboard is localhost-only and ephemeral
@@ -180,6 +180,9 @@ This keeps work planned, checkpointed, and resumable — nothing is declared "do
 | 📡 **liveboard** | Local operations board | Live Git worktrees, agent processes and Task Master tasks on an ephemeral localhost dashboard |
 
 **A few things worth knowing:**
+- **Routing is prompt + workspace aware.** `workspace-capability-routing` combines the requested artifact with manifests, entrypoints and configs, then selects one owner and only evidence-backed supporting skills. Incidental Node/React packages do not override a video, mobile or audit deliverable.
+- **Mobile ergonomics are cross-platform, not one magic pixel number.** `mobile-thumb-zones` separates WCAG web targets from Apple points and Android dp, and covers reachability, safe areas, keyboards, navigation and real-device checks.
+- **Liquid Glass is provider-selected.** `react-native-liquid-glass` compares Callstack, Expo and ordinary-view fallbacks using the project's actual SDK/RN/Xcode/runtime and accessibility settings.
 - **Frontend always talks to a real API.** The backend's OpenAPI spec is the single source of truth; types are generated from it (`openapi-typescript` + `openapi-fetch`). No mocks in the production path.
 - **`database` mutations require explicit confirmation.** Analytics are read-only; schema/data changes (DDL/DML/migrations) never run without your go-ahead.
 - **`resilience` ships a safety hook.** A non-blocking `PostToolUse` hook (`catch-guard.js`) gently flags empty `catch {}` blocks in files you just edited.
@@ -617,7 +620,7 @@ Kimi CLI has no `${VAR}` expansion in `mcp.json`, so keys come from the shared `
 .claude-plugin/plugin.json      # plugin manifest
 .claude-plugin/marketplace.json # local marketplace (for install)
 agents/       26 sub-agent definitions (*.md)
-skills/       <skill>/SKILL.md            (75 skills; some ship references, scripts, tests or HTML assets)
+skills/       <skill>/SKILL.md            (78 skills; some ship references, scripts, tests or HTML assets)
 commands/     <namespace>/<command>.md    (154 commands, /namespace:command, including /vorcl and /audit)
 hooks/        hooks.json + SessionStart + PostToolUse guards (empty catch, Pino logging, Expo architecture/UI boundaries)
 .mcp.json     github, filesystem, postgres, mongodb, redis, docker, firecrawl, vercel, render, task-master, mermaid

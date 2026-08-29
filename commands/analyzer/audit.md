@@ -6,6 +6,8 @@ allowed-tools: Read, Grep, Glob, Bash
 
 Проведи полный **read-only** аудит: **$ARGUMENTS**.
 
+Сначала примени `workspace-capability-routing`: определи фактические systems/boundaries и scope. Multi-surface whole-project запрос перенаправь в `/audit`; если обнаружен Expo/RN, добавь отдельную секцию **Mobile** и профильный read-only pass `expo-mobile:audit`/`expo-mobile:ui-audit`, не применяя web-only правила.
+
 Прогони все проверки и собери единый отчёт с раздельными секциями **Frontend**, **Backend**, **DB**:
 1. **Баги** — необработанные ошибки/тихие падения, race conditions, edge cases, неверная логика.
 2. **Типы** — `tsc --noEmit` (read-only), `any`, небезопасные касты, рассинхрон zod↔типы.
@@ -14,4 +16,4 @@ allowed-tools: Read, Grep, Glob, Bash
 
 Hardcode, i18n literals и mock/fake/demo leakage не дублируй: перенаправь этот scope в `/integrity:audit`.
 
-Ничего не правь. Каждая находка — `file:line`, что нашли, первопричина, конкретная починка; severity `critical>high>medium>low`. В конце — сводка по областям и severity. По значимым находкам заведи задачи через `add_task` (Task Master). Опирайся на навыки `typescript`, `backend-architecture`, `frontend-architecture`, `database`, `postgresql`, `mongodb`. Делегируй субагенту `analyzer`.
+Ничего не правь. Каждая находка — `file:line`, что нашли, первопричина, конкретная починка; severity `critical>high>medium>low`. В конце — сводка по областям и severity. По значимым находкам заведи задачи через `add_task` (Task Master). Опирайся на `workspace-capability-routing` и только профильные навыки обнаруженных boundaries. Делегируй субагенту `analyzer`.

@@ -10,6 +10,8 @@ If `PROJECT_DESCRIPTION.md` exists in task scope, every modifying role reads it 
 
 ## Routing
 
+Before selecting a role for an ambiguous, architectural, audit, or orchestrated request, use `$workspace-capability-routing`: combine the requested outcome with manifests, entrypoints and configs from the current workspace. Select one primary owner and only evidence-backed supporting skills. The requested artifact wins over incidental runtime signals.
+
 | Need | Primary role | Do not use for |
 | --- | --- | --- |
 | Target system design, technology choice | `$architect` | Full current-repository artifact package |
@@ -40,6 +42,8 @@ If `PROJECT_DESCRIPTION.md` exists in task scope, every modifying role reads it 
 | Ephemeral local work dashboard | `$liveboard` | Persistent reporting |
 
 Each role has `$<role>-vorcl` and focused task skills discoverable by name. Relevant domain skills are loaded after routing. If no route clearly matches, use `$architect-analyze`.
+
+For mobile UI, `$mobile-thumb-zones` covers cross-platform reachability and target ergonomics. For React Native/Expo Liquid Glass, `$react-native-liquid-glass` compares Callstack, Expo and ordinary-view fallbacks; load either only when prompt/workspace evidence matches.
 
 Mutation safeguards: database, hosting, publishing, push/release, external messages, and destructive operations require the authorization stated by the selected role. Read-only roles never edit production code.
 

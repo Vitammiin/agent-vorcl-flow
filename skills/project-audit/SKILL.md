@@ -16,7 +16,7 @@ description: Глубокий read-only аудит любого репозито
    node <skill-root>/scripts/inventory.mjs --root <repo> --format json
    ```
 
-3. Полностью прочитай [references/audit-playbook.md](references/audit-playbook.md). По inventory выбери роли; не запускай нерелевантные доменные проходы.
+3. Примени `$workspace-capability-routing`, затем полностью прочитай [references/audit-playbook.md](references/audit-playbook.md). Сопоставь requested audit scope с inventory, выбери роли/skills и зафиксируй evidence; не запускай нерелевантные доменные проходы.
 4. Сними baseline статическим чтением manifests/lockfiles, build/typecheck/lint/test configs, CI, migrations/schema, routes/API specs, error boundaries и dependency graph. Код и plugins недоверенного репозитория не исполняй. Project-native typecheck/lint/tests разрешены только после установления доверия, review команды/config и отсутствия install/migration/fix side effects.
 5. На платформе с subagents параллельно делегируй независимые проходы профильным ролям в read-only sandbox/режиме без write tools, если он доступен. В Codex/Kimi без native role-agents выполни те же scopes последовательно, явно загружая каждый named skill; не заявляй несуществующую параллельную делегацию. Передай каждому проходу один scope и общий finding contract.
 6. Выполни online advisory check для каждого обнаруженного package ecosystem. Если scanner отсутствует, не устанавливай его скрытно: проверь official advisory/registry source доступным способом и пометь coverage gap.
@@ -46,7 +46,7 @@ description: Глубокий read-only аудит любого репозито
 | --- | --- |
 | Web frontend | `$frontend`, `$frontend-architecture`, `$react`/`$nextjs`, `$state-management`, `$data-fetching`, `$i18n` |
 | Server/API | `$backend`, `$backend-architecture`, `$api-design`, `$typescript`/runtime skill |
-| Expo/React Native | `$expo-mobile`, `$expo-mobile-architecture`, `$expo-ui-design-motion`; version-sensitive выводы только после live compatibility preflight |
+| Expo/React Native | `$expo-mobile`, `$expo-mobile-architecture`, `$expo-ui-design-motion`; `$mobile-thumb-zones` только для UI/reachability scope; `$react-native-liquid-glass` только при package/intent evidence; version-sensitive выводы только после live compatibility preflight |
 | SQL/Mongo/Redis/schema | `$database`, `$postgresql`/`$mongodb`/`$redis`; только read-only inspection |
 | HTTP routes/OpenAPI | `$swagger`, `$swagger-coverage` |
 | Docker/CI/IaC/deploy | `$devops`, `$docker`, `$ci-cd` |

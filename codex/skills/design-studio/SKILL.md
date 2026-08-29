@@ -31,6 +31,7 @@ For any non-trivial design goal, use `$design-studio-vorcl` and the mandatory `$
 
 **3. Load the right built-in skill(s).** When starting a design project, read from `built-in-skills/` (same directory):
 - For Apple-style interfaces, gesture-driven prototypes, fluid springs, translucent materials, typography, or reduced-motion review, also load `$apple-design` and treat it as an interaction/craft constraint without overriding the selected brand or design system.
+- For mobile web/app artifacts, load `$mobile-thumb-zones`; desktop-only design does not need it.
 - For motion implementation in HTML/web prototypes, load `$animate`; use its decision gate and matching `RECIPES.md` implementation instead of inventing parallel curves or timings.
 - The canonical 13-type routing table is in [`project-types.json`](project-types.json). Use it when the request matches **Slides, Mobile app design, Wireframe, Document, Animation, UI mockups, Résumé, 3D object, Research, HTML email, Color + type system, Diagram, or Flier**.
 - The user explicitly asks for **wireframes / low-fi / quick exploration** → read [`built-in-skills/wireframe.md`](built-in-skills/wireframe.md).

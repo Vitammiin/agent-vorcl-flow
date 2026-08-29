@@ -47,6 +47,9 @@ for (const role of registry.roles) {
     `codex/skills/${role.id}-vorcl/SKILL.md`,
   ];
   for (const rel of required) if (!exists(rel)) errors.push(`${role.id}: missing ${rel}`);
+  const agentSource = read(`agents/${role.id}.md`);
+  const attachedSkills = (agentSource.match(/^skills:\s*\[([^\]]*)\]\s*$/m)?.[1] ?? '').split(',').map((value) => value.trim()).filter(Boolean);
+  for (const skill of attachedSkills) if (!exists(`skills/${skill}/SKILL.md`)) errors.push(`${role.id}: attached skill does not exist: ${skill}`);
   if (!config.includes(`[profiles.${role.id}]`)) errors.push(`${role.id}: missing Codex profile`);
   if (!claudeRouter.includes(`\`${role.id}\``)) errors.push(`${role.id}: missing commands/vorcl.md route`);
   if (!codexRouter.includes(`\`$${role.id}\``)) errors.push(`${role.id}: missing Codex vorcl route`);

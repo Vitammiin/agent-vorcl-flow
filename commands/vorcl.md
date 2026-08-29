@@ -6,11 +6,13 @@ allowed-tools: Read, Write, Edit, Bash, Grep, Glob
 
 Возьми цель: **$ARGUMENTS**. Сначала выбери режим из `workflow`: report-only пишет только явно запрошенный report artifact, но не `.taskmaster`/product state; track-only не меняет product code; remediation разрешает изменения только в границах запроса.
 
+До создания задач примени `workspace-capability-routing`: сопоставь requested outcome с manifests/entrypoints/configs текущего workspace, выбери одного primary owner и только необходимые supporting roles/skills. Сохрани evidence и не маршрутизируй по incidental runtime (например, Node не означает backend, если результат — видео/дизайн).
+
 Для persistent режима:
 
 1. `add_task`/`parse_prd`; сохрани только возвращённые IDs.
 2. Создай scoped run через `scripts/vorcl-run.mjs`; для каждого ID выполни atomic claim, затем `get_task` и `set_task_status in-progress`. Bare `next_task` запрещён.
-3. Делегируй Executor по registry `scripts/roles.json`. Он работает только над claimed ID.
+3. Делегируй Executor по `workspace-capability-routing` и registry `scripts/roles.json`. Он работает только над claimed ID.
 4. Отдельный Checker выполняет `testStrategy`, не редактируя implementation/acceptance tests.
 5. Только Orchestrator ставит `done`; остановись, когда терминальны IDs run, а не весь backlog.
 

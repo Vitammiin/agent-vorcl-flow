@@ -10,6 +10,7 @@
     "docs:locales": "node scripts/readme-locales.mjs --check",
     "docs:locales:generate": "node scripts/readme-locales.mjs --generate",
     "generate:roles": "node scripts/generate-role-skills.mjs --write",
+    "generate:capabilities": "node scripts/generate-capability-catalog.mjs --write",
     "test:expo-architecture": "node --test skills/expo-mobile-architecture/tests/*.test.mjs",
     "test:expo-compatibility": "node --test skills/expo-mobile-architecture/tests/compatibility-preflight.test.mjs",
     "test:expo-ui": "node --test skills/expo-ui-design-motion/tests/*.test.mjs",
