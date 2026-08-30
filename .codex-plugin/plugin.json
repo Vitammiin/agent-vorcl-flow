@@ -1,6 +1,6 @@
 {
   "name": "agent-vorcl-flow",
-  "version": "2.6.1",
+  "version": "2.7.0",
   "description": "Role-based engineering workflows plus cross-language read-only hardcode and mock-data integrity audits.",
   "author": {
     "name": "Christian Avis",

@@ -1,6 +1,6 @@
 {
   "name": "agent-vorcl-flow",
-  "version": "2.6.1",
+  "version": "2.7.0",
   "description": "Agent-Vorcl-Flow для Claude Code, GPT Codex, Cursor и Kimi CLI: роли, skills, команды, MCP и эфемерное локальное live-табло.",
   "bin": {
     "agent-vorcl-flow": "bin/install.mjs"

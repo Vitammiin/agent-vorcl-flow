@@ -7,8 +7,13 @@ and this project follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [2.7.0] - 2026-08-29
+
 ### Added
 
+- Mobile thumb-zone ergonomics guidance for responsive web and Expo/React Native interfaces, with platform-specific touch-target, reachability, safe-area, keyboard, and device-validation rules.
+- React Native Liquid Glass integration guidance that selects between Callstack, Expo Glass Effect, and accessible fallbacks using live compatibility evidence.
+- Deterministic workspace-aware capability routing and a generated catalog covering all 26 roles and 78 skills, including Expo audit handoffs and outcome-first routing for video workspaces.
 - Mermaid reference library under `skills/mermaid-diagrams/references/`: per-type syntax guides distilled from the official `mermaid-js/mermaid` documentation, with every example verified by a real render on mermaid 11.16.1. The skill's SKILL.md became a router (task to diagram type to reference), so the deep syntax loads on demand instead of living in the prompt.
 - Coverage for every current Mermaid diagram type, including the ones the role previously did not know: `architecture-beta`, `block`, `kanban`, `treeView-beta`, `radar-beta`, `treemap-beta`, `venn-beta`, `packet`, `swimlane-beta`, `eventmodeling`, `cynefin-beta`, `ishikawa-beta`, `wardley-beta`, `railroad-ebnf-beta`, `zenuml`.
 - `skills/mermaid-rendering/scripts/mmd-validate.mjs`: a zero-dependency render validator that extracts every ```mermaid block from Markdown and reports `file:line` plus the parser message, with `--list` and `--json` modes for CI. It separates a broken render environment from a broken diagram — a missing headless browser is reported as `SETUP` with exit code 3, never as a diagram failure.
@@ -87,7 +92,8 @@ and this project follows [Semantic Versioning](https://semver.org/).
 
 - Extended the installer and synchronization checks to distribute mobile hooks, compatibility tooling, shared audit skills, and Kimi-native role files consistently.
 
-[Unreleased]: https://github.com/Vitammiin/agent-vorcl-flow/compare/v2.6.1...HEAD
+[Unreleased]: https://github.com/Vitammiin/agent-vorcl-flow/compare/v2.7.0...HEAD
+[2.7.0]: https://github.com/Vitammiin/agent-vorcl-flow/compare/v2.6.1...v2.7.0
 [2.6.1]: https://github.com/Vitammiin/agent-vorcl-flow/compare/v2.6.0...v2.6.1
 [2.6.0]: https://github.com/Vitammiin/agent-vorcl-flow/compare/v2.5.1...v2.6.0
 [2.5.1]: https://github.com/Vitammiin/agent-vorcl-flow/compare/v2.5.0...v2.5.1
