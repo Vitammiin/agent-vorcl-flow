@@ -108,6 +108,13 @@
         "-y",
         "mcp-mermaid"
       ]
+    },
+    "avf-runtime": {
+      "type": "http",
+      "url": "http://127.0.0.1:19790/mcp",
+      "headers": {
+        "Authorization": "Bearer ${AVF_RUNTIME_TOKEN}"
+      }
     }
   }
 }

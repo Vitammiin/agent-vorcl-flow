@@ -1,5 +1,13 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
+  "defaults": {
+    "executionMode": ["external", "autonomous"],
+    "permissions": ["read", "workspace_write"],
+    "inputContract": "ExecutionEnvelope@1",
+    "outputContract": "ToolReceipt@1",
+    "checker": "testing",
+    "testStrategy": "Run the task testStrategy and record an independent READY or NOT_READY receipt before completion."
+  },
   "roles": [
     {"id":"architect","route":"system design and technology choices","owns":"target architecture","notFor":"code-grounded full repository package"},
     {"id":"principal-architect","route":"complete multi-language current architecture package","owns":"MD/JSON/HTML/PDF/draw.io/Mermaid package","notFor":"lightweight TS/JS dependency map"},

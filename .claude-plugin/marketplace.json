@@ -2,13 +2,13 @@
   "name": "agent-vorcl-flow",
   "owner": { "name": "Avis" },
   "metadata": {
-    "description": "Маркетплейс Agent-Vorcl-Flow: специализированные субагенты, единый Task Master workflow, MCP и эфемерное локальное liveboard-табло. Лицензия: MIT."
+    "description": "Маркетплейс Agent-Vorcl-Flow: специализированные субагенты, Task Master workflow и локальный MCP runtime v3. Лицензия: MIT."
   },
   "plugins": [
     {
       "name": "agent-vorcl-flow",
       "source": "./",
-      "description": "Специализированные субагенты со скиллами, командами, Task Master workflow (/vorcl), MCP и локальным liveboard. Лицензия: MIT."
+      "description": "Специализированные субагенты, Task Master workflow (/vorcl), локальный MCP runtime с approvals/receipts и liveboard. Лицензия: MIT."
     }
   ]
 }

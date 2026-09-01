@@ -62,6 +62,11 @@ env = { TASK_MASTER_TOOLS = "parse_prd,get_tasks,get_task,next_task,expand_task,
 command = "node"
 args = ["__AVF_LAUNCHER__", "--", "npx", "-y", "mcp-mermaid"]
 
+# Agent-Vorcl-Flow v3 — единый локальный control plane.
+[mcp_servers.avf-runtime]
+url = "http://127.0.0.1:19790/mcp"
+http_headers = { Authorization = "Bearer %%AVF_RUNTIME_TOKEN%%" }
+
 # ===== Профили под роли (codex --profile architect | principal-architect | backend | frontend | expo-mobile | analyzer | integrity | swagger | firecrawl | render | database | resilience | screenshot | design-studio | pinpoint | drawio | mermaid | archmap | testing | gitflow | security | docs | devops | liveboard) =====
 [profiles.architect]
 model_reasoning_effort = "high"

@@ -46,6 +46,13 @@
     "mermaid": {
       "command": "node",
       "args": ["__AVF_LAUNCHER__", "--", "npx", "-y", "mcp-mermaid"]
+    },
+    "avf-runtime": {
+      "url": "http://127.0.0.1:19790/mcp",
+      "transport": "http",
+      "headers": {
+        "Authorization": "Bearer %%AVF_RUNTIME_TOKEN%%"
+      }
     }
   }
 }

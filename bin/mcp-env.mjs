@@ -67,7 +67,7 @@ function parseDotenv(text) {
     let val = line.slice(eq + 1).trim()
     if ((val.startsWith('"') && val.endsWith('"')) || (val.startsWith("'") && val.endsWith("'"))) {
       val = val.slice(1, -1)
-    }
+    } else val = val.replace(/(?:^|\s+)#.*$/, '').trim()
     out[key] = val
   }
   return out

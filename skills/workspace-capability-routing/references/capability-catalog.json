@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "generatedFrom": [
     "scripts/roles.json",
     "agents/*.md",
@@ -7,6 +7,18 @@
   ],
   "roles": [
     {
+      "executionMode": [
+        "external",
+        "autonomous"
+      ],
+      "permissions": [
+        "read",
+        "workspace_write"
+      ],
+      "inputContract": "ExecutionEnvelope@1",
+      "outputContract": "ToolReceipt@1",
+      "checker": "testing",
+      "testStrategy": "Run the task testStrategy and record an independent READY or NOT_READY receipt before completion.",
       "id": "architect",
       "route": "system design and technology choices",
       "owns": "target architecture",
@@ -25,6 +37,18 @@
       ]
     },
     {
+      "executionMode": [
+        "external",
+        "autonomous"
+      ],
+      "permissions": [
+        "read",
+        "workspace_write"
+      ],
+      "inputContract": "ExecutionEnvelope@1",
+      "outputContract": "ToolReceipt@1",
+      "checker": "testing",
+      "testStrategy": "Run the task testStrategy and record an independent READY or NOT_READY receipt before completion.",
       "id": "principal-architect",
       "route": "complete multi-language current architecture package",
       "owns": "MD/JSON/HTML/PDF/draw.io/Mermaid package",
@@ -46,6 +70,18 @@
       ]
     },
     {
+      "executionMode": [
+        "external",
+        "autonomous"
+      ],
+      "permissions": [
+        "read",
+        "workspace_write"
+      ],
+      "inputContract": "ExecutionEnvelope@1",
+      "outputContract": "ToolReceipt@1",
+      "checker": "testing",
+      "testStrategy": "Run the task testStrategy and record an independent READY or NOT_READY receipt before completion.",
       "id": "backend",
       "route": "server APIs and business logic",
       "owns": "backend implementation",
@@ -68,6 +104,18 @@
       ]
     },
     {
+      "executionMode": [
+        "external",
+        "autonomous"
+      ],
+      "permissions": [
+        "read",
+        "workspace_write"
+      ],
+      "inputContract": "ExecutionEnvelope@1",
+      "outputContract": "ToolReceipt@1",
+      "checker": "testing",
+      "testStrategy": "Run the task testStrategy and record an independent READY or NOT_READY receipt before completion.",
       "id": "frontend",
       "route": "React/Next.js UI and client state",
       "owns": "web frontend implementation",
@@ -93,6 +141,18 @@
       ]
     },
     {
+      "executionMode": [
+        "external",
+        "autonomous"
+      ],
+      "permissions": [
+        "read",
+        "workspace_write"
+      ],
+      "inputContract": "ExecutionEnvelope@1",
+      "outputContract": "ToolReceipt@1",
+      "checker": "testing",
+      "testStrategy": "Run the task testStrategy and record an independent READY or NOT_READY receipt before completion.",
       "id": "expo-mobile",
       "route": "React Native and Expo",
       "owns": "mobile implementation",
@@ -116,6 +176,18 @@
       ]
     },
     {
+      "executionMode": [
+        "external",
+        "autonomous"
+      ],
+      "permissions": [
+        "read",
+        "workspace_write"
+      ],
+      "inputContract": "ExecutionEnvelope@1",
+      "outputContract": "ToolReceipt@1",
+      "checker": "testing",
+      "testStrategy": "Run the task testStrategy and record an independent READY or NOT_READY receipt before completion.",
       "id": "analyzer",
       "route": "broad read-only code quality audit",
       "owns": "bugs, types, DB and structural review",
@@ -136,6 +208,18 @@
       ]
     },
     {
+      "executionMode": [
+        "external",
+        "autonomous"
+      ],
+      "permissions": [
+        "read",
+        "workspace_write"
+      ],
+      "inputContract": "ExecutionEnvelope@1",
+      "outputContract": "ToolReceipt@1",
+      "checker": "testing",
+      "testStrategy": "Run the task testStrategy and record an independent READY or NOT_READY receipt before completion.",
       "id": "integrity",
       "route": "targeted hardcode and mock-data audit",
       "owns": "cross-language hardcode/mock production reachability",
@@ -152,6 +236,18 @@
       ]
     },
     {
+      "executionMode": [
+        "external",
+        "autonomous"
+      ],
+      "permissions": [
+        "read",
+        "workspace_write"
+      ],
+      "inputContract": "ExecutionEnvelope@1",
+      "outputContract": "ToolReceipt@1",
+      "checker": "testing",
+      "testStrategy": "Run the task testStrategy and record an independent READY or NOT_READY receipt before completion.",
       "id": "swagger",
       "route": "OpenAPI coverage",
       "owns": "API specification coverage",
@@ -167,6 +263,18 @@
       ]
     },
     {
+      "executionMode": [
+        "external",
+        "autonomous"
+      ],
+      "permissions": [
+        "read",
+        "workspace_write"
+      ],
+      "inputContract": "ExecutionEnvelope@1",
+      "outputContract": "ToolReceipt@1",
+      "checker": "testing",
+      "testStrategy": "Run the task testStrategy and record an independent READY or NOT_READY receipt before completion.",
       "id": "firecrawl",
       "route": "web research and extraction",
       "owns": "live web evidence",
@@ -178,6 +286,18 @@
       ]
     },
     {
+      "executionMode": [
+        "external",
+        "autonomous"
+      ],
+      "permissions": [
+        "read",
+        "workspace_write"
+      ],
+      "inputContract": "ExecutionEnvelope@1",
+      "outputContract": "ToolReceipt@1",
+      "checker": "testing",
+      "testStrategy": "Run the task testStrategy and record an independent READY or NOT_READY receipt before completion.",
       "id": "render",
       "route": "Render hosting, deploys and logs",
       "owns": "Render operations",
@@ -192,6 +312,18 @@
       ]
     },
     {
+      "executionMode": [
+        "external",
+        "autonomous"
+      ],
+      "permissions": [
+        "read",
+        "workspace_write"
+      ],
+      "inputContract": "ExecutionEnvelope@1",
+      "outputContract": "ToolReceipt@1",
+      "checker": "testing",
+      "testStrategy": "Run the task testStrategy and record an independent READY or NOT_READY receipt before completion.",
       "id": "database",
       "route": "Postgres, MongoDB and Redis",
       "owns": "schema, query, migration and cache work",
@@ -207,6 +339,18 @@
       ]
     },
     {
+      "executionMode": [
+        "external",
+        "autonomous"
+      ],
+      "permissions": [
+        "read",
+        "workspace_write"
+      ],
+      "inputContract": "ExecutionEnvelope@1",
+      "outputContract": "ToolReceipt@1",
+      "checker": "testing",
+      "testStrategy": "Run the task testStrategy and record an independent READY or NOT_READY receipt before completion.",
       "id": "resilience",
       "route": "error handling and failure boundaries",
       "owns": "runtime failure boundaries",
@@ -223,6 +367,18 @@
       ]
     },
     {
+      "executionMode": [
+        "external",
+        "autonomous"
+      ],
+      "permissions": [
+        "read",
+        "workspace_write"
+      ],
+      "inputContract": "ExecutionEnvelope@1",
+      "outputContract": "ToolReceipt@1",
+      "checker": "testing",
+      "testStrategy": "Run the task testStrategy and record an independent READY or NOT_READY receipt before completion.",
       "id": "logging",
       "route": "Pino structured logging architecture",
       "owns": "application logger, child loggers, redaction and request context",
@@ -239,6 +395,18 @@
       ]
     },
     {
+      "executionMode": [
+        "external",
+        "autonomous"
+      ],
+      "permissions": [
+        "read",
+        "workspace_write"
+      ],
+      "inputContract": "ExecutionEnvelope@1",
+      "outputContract": "ToolReceipt@1",
+      "checker": "testing",
+      "testStrategy": "Run the task testStrategy and record an independent READY or NOT_READY receipt before completion.",
       "id": "screenshot",
       "route": "screenshot to new UI code",
       "owns": "new UI reconstruction",
@@ -259,6 +427,18 @@
       ]
     },
     {
+      "executionMode": [
+        "external",
+        "autonomous"
+      ],
+      "permissions": [
+        "read",
+        "workspace_write"
+      ],
+      "inputContract": "ExecutionEnvelope@1",
+      "outputContract": "ToolReceipt@1",
+      "checker": "testing",
+      "testStrategy": "Run the task testStrategy and record an independent READY or NOT_READY receipt before completion.",
       "id": "design-studio",
       "route": "product and visual design artifacts",
       "owns": "prototype, deck, document and design system",
@@ -275,6 +455,18 @@
       ]
     },
     {
+      "executionMode": [
+        "external",
+        "autonomous"
+      ],
+      "permissions": [
+        "read",
+        "workspace_write"
+      ],
+      "inputContract": "ExecutionEnvelope@1",
+      "outputContract": "ToolReceipt@1",
+      "checker": "testing",
+      "testStrategy": "Run the task testStrategy and record an independent READY or NOT_READY receipt before completion.",
       "id": "visual-research",
       "route": "identify screenshot with web evidence",
       "owns": "visual identification and live verification",
@@ -287,6 +479,18 @@
       ]
     },
     {
+      "executionMode": [
+        "external",
+        "autonomous"
+      ],
+      "permissions": [
+        "read",
+        "workspace_write"
+      ],
+      "inputContract": "ExecutionEnvelope@1",
+      "outputContract": "ToolReceipt@1",
+      "checker": "testing",
+      "testStrategy": "Run the task testStrategy and record an independent READY or NOT_READY receipt before completion.",
       "id": "pinpoint",
       "route": "screenshot to existing source",
       "owns": "UI-to-file trace",
@@ -306,6 +510,18 @@
       ]
     },
     {
+      "executionMode": [
+        "external",
+        "autonomous"
+      ],
+      "permissions": [
+        "read",
+        "workspace_write"
+      ],
+      "inputContract": "ExecutionEnvelope@1",
+      "outputContract": "ToolReceipt@1",
+      "checker": "testing",
+      "testStrategy": "Run the task testStrategy and record an independent READY or NOT_READY receipt before completion.",
       "id": "drawio",
       "route": "draw.io and PMP diagrams",
       "owns": "native draw.io artifacts",
@@ -319,6 +535,18 @@
       ]
     },
     {
+      "executionMode": [
+        "external",
+        "autonomous"
+      ],
+      "permissions": [
+        "read",
+        "workspace_write"
+      ],
+      "inputContract": "ExecutionEnvelope@1",
+      "outputContract": "ToolReceipt@1",
+      "checker": "testing",
+      "testStrategy": "Run the task testStrategy and record an independent READY or NOT_READY receipt before completion.",
       "id": "archmap",
       "route": "lightweight TS/JS architecture map",
       "owns": "architecture.json and interactive dependency map",
@@ -333,6 +561,18 @@
       ]
     },
     {
+      "executionMode": [
+        "external",
+        "autonomous"
+      ],
+      "permissions": [
+        "read",
+        "workspace_write"
+      ],
+      "inputContract": "ExecutionEnvelope@1",
+      "outputContract": "ToolReceipt@1",
+      "checker": "testing",
+      "testStrategy": "Run the task testStrategy and record an independent READY or NOT_READY receipt before completion.",
       "id": "mermaid",
       "route": "Mermaid diagrams and rendering",
       "owns": "validated Mermaid artifacts",
@@ -346,6 +586,18 @@
       ]
     },
     {
+      "executionMode": [
+        "external",
+        "autonomous"
+      ],
+      "permissions": [
+        "read",
+        "workspace_write"
+      ],
+      "inputContract": "ExecutionEnvelope@1",
+      "outputContract": "ToolReceipt@1",
+      "checker": "testing",
+      "testStrategy": "Run the task testStrategy and record an independent READY or NOT_READY receipt before completion.",
       "id": "testing",
       "route": "unit, integration, E2E and verification",
       "owns": "independent test verdict",
@@ -362,6 +614,18 @@
       ]
     },
     {
+      "executionMode": [
+        "external",
+        "autonomous"
+      ],
+      "permissions": [
+        "read",
+        "workspace_write"
+      ],
+      "inputContract": "ExecutionEnvelope@1",
+      "outputContract": "ToolReceipt@1",
+      "checker": "testing",
+      "testStrategy": "Run the task testStrategy and record an independent READY or NOT_READY receipt before completion.",
       "id": "gitflow",
       "route": "commits, PRs and releases",
       "owns": "git and release workflow",
@@ -373,6 +637,18 @@
       ]
     },
     {
+      "executionMode": [
+        "external",
+        "autonomous"
+      ],
+      "permissions": [
+        "read",
+        "workspace_write"
+      ],
+      "inputContract": "ExecutionEnvelope@1",
+      "outputContract": "ToolReceipt@1",
+      "checker": "testing",
+      "testStrategy": "Run the task testStrategy and record an independent READY or NOT_READY receipt before completion.",
       "id": "security",
       "route": "read-only security audit",
       "owns": "secrets, OWASP, CVE and PII findings",
@@ -388,6 +664,18 @@
       ]
     },
     {
+      "executionMode": [
+        "external",
+        "autonomous"
+      ],
+      "permissions": [
+        "read",
+        "workspace_write"
+      ],
+      "inputContract": "ExecutionEnvelope@1",
+      "outputContract": "ToolReceipt@1",
+      "checker": "testing",
+      "testStrategy": "Run the task testStrategy and record an independent READY or NOT_READY receipt before completion.",
       "id": "docs",
       "route": "README, API and architecture documentation",
       "owns": "documentation lifecycle",
@@ -402,6 +690,18 @@
       ]
     },
     {
+      "executionMode": [
+        "external",
+        "autonomous"
+      ],
+      "permissions": [
+        "read",
+        "workspace_write"
+      ],
+      "inputContract": "ExecutionEnvelope@1",
+      "outputContract": "ToolReceipt@1",
+      "checker": "testing",
+      "testStrategy": "Run the task testStrategy and record an independent READY or NOT_READY receipt before completion.",
       "id": "devops",
       "route": "Docker and CI/CD",
       "owns": "container and pipeline implementation",
@@ -417,6 +717,18 @@
       ]
     },
     {
+      "executionMode": [
+        "external",
+        "autonomous"
+      ],
+      "permissions": [
+        "read",
+        "workspace_write"
+      ],
+      "inputContract": "ExecutionEnvelope@1",
+      "outputContract": "ToolReceipt@1",
+      "checker": "testing",
+      "testStrategy": "Run the task testStrategy and record an independent READY or NOT_READY receipt before completion.",
       "id": "liveboard",
       "route": "local live work dashboard",
       "owns": "ephemeral project status UI",

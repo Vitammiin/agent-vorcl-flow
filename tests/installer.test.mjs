@@ -47,6 +47,8 @@ test('Claude fallback normalizes array-form enabledPlugins to the supported obje
     'existing@example': true,
     'agent-vorcl-flow@agent-vorcl-flow': true,
   })
+  assert.match(settings.env.AVF_RUNTIME_TOKEN, /^[A-Za-z0-9_-]{43}$/)
+  assert.equal(fs.statSync(path.join(claudeDir, 'settings.json')).mode & 0o777, 0o600)
 })
 
 test('Claude fallback repairs malformed enabledPlugins without losing unrelated settings', (t) => {
@@ -102,6 +104,12 @@ test('Codex install replaces stale AVF blocks and stays idempotent', (t) => {
   assert.match(firstConfig, /^model = "user-model"/)
   assert.doesNotMatch(firstConfig, /old = true/)
   assert.match(firstConfig, /\[mcp_servers\.github\]/)
+  assert.match(firstConfig, /\[mcp_servers\.avf-runtime\]/)
+  assert.doesNotMatch(firstConfig, /%%AVF_RUNTIME_TOKEN%%/)
+  assert.equal(fs.statSync(config).mode & 0o777, 0o600)
+  const runtimeConfig = JSON.parse(fs.readFileSync(path.join(root, 'avf', 'runtime.json'), 'utf8'))
+  assert.equal(runtimeConfig.token.length >= 43, true)
+  assert.equal(fs.statSync(path.join(root, 'avf', 'runtime.json')).mode & 0o777, 0o600)
   assert.match(firstAgents, /^# User rules/)
   assert.doesNotMatch(firstAgents, /\nstale\n/)
   assert.equal((firstConfig.match(/# >>> agent-vorcl-flow >>>/g) || []).length, 1)
@@ -157,6 +165,12 @@ test('Cursor and Kimi receive the same role set and shared workflow/runtime asse
   }
   assert.ok(fs.existsSync(path.join(root, '.cursor', 'agents', 'avf-backend.md')))
   assert.ok(fs.existsSync(path.join(root, '.kimi', 'agents', 'avf-expo-mobile.yaml')))
+  for (const file of [path.join(root, '.cursor', 'mcp.json'), path.join(root, '.kimi', 'mcp.json')]) {
+    const config = JSON.parse(fs.readFileSync(file, 'utf8'))
+    assert.equal(config.mcpServers['avf-runtime'].url, 'http://127.0.0.1:19790/mcp')
+    assert.match(config.mcpServers['avf-runtime'].headers.Authorization, /^Bearer [A-Za-z0-9_-]{43}$/)
+    assert.equal(fs.statSync(file).mode & 0o777, 0o600)
+  }
 })
 
 test('Codex install omits AVF TOML tables already owned by the user', (t) => {

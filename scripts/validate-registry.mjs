@@ -25,7 +25,10 @@ else {
   if (plugin.interface.defaultPrompt == null && plugin.interface.default_prompt == null) errors.push("plugin interface defaultPrompt is required");
 }
 
-if (registry.schemaVersion !== 1) errors.push("unsupported roles registry schema");
+if (registry.schemaVersion !== 2) errors.push("unsupported roles registry schema");
+for (const key of ["executionMode", "permissions", "inputContract", "outputContract", "checker", "testStrategy"]) {
+  if (registry.defaults?.[key] == null) errors.push(`roles registry defaults missing ${key}`);
+}
 if (unique.size !== ids.length) errors.push("duplicate role id in scripts/roles.json");
 if (JSON.stringify([...ids].sort()) !== JSON.stringify(list("agents", ".md"))) {
   errors.push("scripts/roles.json roles do not exactly match agents/*.md");
@@ -38,6 +41,10 @@ for (const role of registry.roles) {
   for (const key of ["route", "owns", "notFor"]) {
     if (typeof role[key] !== "string" || !role[key].trim()) errors.push(`${role.id}: missing ${key}`);
   }
+  const compiled = { ...registry.defaults, ...role };
+  if (!Array.isArray(compiled.executionMode) || !compiled.executionMode.every((value) => ["external", "autonomous"].includes(value))) errors.push(`${role.id}: invalid executionMode`);
+  if (!Array.isArray(compiled.permissions) || !compiled.permissions.length) errors.push(`${role.id}: invalid permissions`);
+  for (const key of ["inputContract", "outputContract", "checker", "testStrategy"]) if (typeof compiled[key] !== "string" || !compiled[key].trim()) errors.push(`${role.id}: missing ${key}`);
   const required = [
     `agents/${role.id}.md`,
     `skills/${role.id}/SKILL.md`,

@@ -7,6 +7,14 @@ and this project follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Added
+
+- Opt-in Agent-Vorcl-Flow Runtime v3 beta: a loopback-only authenticated Streamable HTTP MCP control plane with workspace-bound sessions, durable run events, approval-bound actions, background jobs, structured receipts, provider normalization, and compatibility-preserving role/skill routing.
+
+### Changed
+
+- Role registry schema v2 now compiles execution, permission, checker, and input/output contracts while preserving every existing public role, skill, and slash-command name.
+
 ## [2.7.0] - 2026-08-29
 
 ### Added

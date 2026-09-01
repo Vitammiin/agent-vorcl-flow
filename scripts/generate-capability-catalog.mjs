@@ -40,13 +40,13 @@ function agentSkills(roleId) {
 
 function buildCatalog() {
   const registry = JSON.parse(fs.readFileSync(path.join(root, 'scripts/roles.json'), 'utf8'))
-  const roles = registry.roles.map((role) => ({ ...role, skills: agentSkills(role.id) }))
+  const roles = registry.roles.map((role) => ({ ...registry.defaults, ...role, skills: agentSkills(role.id) }))
   const skills = fs.readdirSync(path.join(root, 'skills'), { withFileTypes: true })
     .filter((entry) => entry.isDirectory() && fs.existsSync(path.join(root, 'skills', entry.name, 'SKILL.md')))
     .map((entry) => frontmatter(path.join(root, 'skills', entry.name, 'SKILL.md')))
     .map(({ name, description }) => ({ name, description }))
     .sort((a, b) => a.name.localeCompare(b.name))
-  return { schemaVersion: 1, generatedFrom: ['scripts/roles.json', 'agents/*.md', 'skills/*/SKILL.md'], roles, skills }
+  return { schemaVersion: 2, generatedFrom: ['scripts/roles.json', 'agents/*.md', 'skills/*/SKILL.md'], roles, skills }
 }
 
 const rendered = `${JSON.stringify(buildCatalog(), null, 2)}\n`

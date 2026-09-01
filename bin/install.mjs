@@ -20,6 +20,7 @@ import { fileURLToPath } from 'node:url'
 import fs from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
+import { ensureRuntimeConfig } from '../src/config/runtime-config.mjs'
 
 // Node >= 18: fs.cpSync и синтаксис ||= старее не работают.
 const nodeMajor = Number(process.versions.node.split('.')[0])
@@ -44,6 +45,10 @@ If this skill changes code, configuration, tests, schemas, deployment, environme
 ${SKILL_DESCRIPTION_MARK_E}`
 
 const argv = process.argv.slice(2)
+if (argv[0] === 'runtime') {
+  const result = spawnSync(process.execPath, [path.join(PKG_ROOT, 'bin', 'runtime.mjs'), ...argv.slice(1)], { stdio: 'inherit' })
+  process.exit(result.status ?? 1)
+}
 const wantClaude = argv.includes('--claude')
 const wantCodex = argv.includes('--codex')
 const wantCursor = argv.includes('--cursor')
@@ -74,19 +79,28 @@ let STABLE_EXPO_GUARD = ''
 let STABLE_EXPO_UI_GUARD = ''
 let STABLE_EXPO_COMPATIBILITY = ''
 let STABLE_LOGGING_GUARD = ''
-const withLauncher = (content) => content.split('__AVF_LAUNCHER__').join(STABLE_LAUNCHER)
+let RUNTIME_TOKEN = ''
+const withLauncher = (content) => content
+  .split('__AVF_LAUNCHER__').join(STABLE_LAUNCHER)
+  .split('%%AVF_RUNTIME_TOKEN%%').join(RUNTIME_TOKEN)
 
 // Общий слой для всех рантаймов: стабильная копия launcher'а + единый файл секретов .env.
 // Claude берёт launcher из своего плагина (${CLAUDE_PLUGIN_ROOT}), но .env общий для всех.
 function installShared() {
   log('\n▸ Общий слой (launcher + .env)')
   const home = avfHome()
+  const runtime = ensureRuntimeConfig()
+  RUNTIME_TOKEN = runtime.token
   const binDir = path.join(home, 'bin')
   fs.mkdirSync(binDir, { recursive: true })
   const dest = path.join(binDir, 'mcp-env.mjs')
   fs.cpSync(path.join(PKG_ROOT, 'bin', 'mcp-env.mjs'), dest)
   STABLE_LAUNCHER = dest.split(path.sep).join('/')
   ok(`launcher → ${dest}`)
+
+  const service = spawnSync(process.execPath, [path.join(PKG_ROOT, 'bin', 'runtime.mjs'), 'install-service'], { encoding: 'utf8' })
+  if (service.status === 0) ok(`Runtime service manifest → ${service.stdout.trim()}`)
+  else warn(`Runtime service manifest не создан: ${service.stderr.trim()}`)
 
   const expoGuardSource = path.join(PKG_ROOT, 'skills', 'expo-mobile-architecture', 'scripts', 'guard.mjs')
   if (fs.existsSync(expoGuardSource)) {
@@ -201,6 +215,7 @@ function installClaude() {
         ? spawnSync('claude', ['plugin', 'install', PLUGIN_ID, '--scope', 'user'], { stdio: 'inherit' })
         : add
     if (inst.status === 0) {
+      writeClaudeRuntimeEnv()
       ok(`плагин установлен через CLI: ${PLUGIN_ID}`)
       log('    активация: перезапусти Claude или выполни /reload-plugins')
       return
@@ -237,10 +252,32 @@ function writeClaudeSettings() {
     s.enabledPlugins = {}
   }
   s.enabledPlugins[PLUGIN_ID] = true
+  s.env ||= {}
+  if (typeof s.env !== 'object' || Array.isArray(s.env)) {
+    warn(`поле env в ${file} повреждено — runtime token не добавлен`)
+  } else {
+    s.env.AVF_RUNTIME_TOKEN = RUNTIME_TOKEN
+  }
   writeFileAtomic(file, JSON.stringify(s, null, 2) + '\n')
   ok(`зарегистрировано в ${file}`)
   log(`    marketplace ${MARKET} (github:${REPO}) + enabledPlugins ${PLUGIN_ID}`)
   log('    активация: перезапусти Claude или выполни /reload-plugins')
+}
+
+function writeClaudeRuntimeEnv() {
+  const dir = path.join(os.homedir(), '.claude')
+  const file = path.join(dir, 'settings.json')
+  fs.mkdirSync(dir, { recursive: true })
+  let settings = {}
+  if (fs.existsSync(file)) {
+    try { settings = JSON.parse(fs.readFileSync(file, 'utf8')) }
+    catch (error) { warn(`runtime token не добавлен в битый ${file}: ${error.message}`); return }
+  }
+  if (settings.env != null && (typeof settings.env !== 'object' || Array.isArray(settings.env))) { warn(`runtime token не добавлен: env в ${file} не является объектом`); return }
+  settings.env ||= {}
+  settings.env.AVF_RUNTIME_TOKEN = RUNTIME_TOKEN
+  writeFileAtomic(file, JSON.stringify(settings, null, 2) + '\n')
+  ok(`Claude runtime token env → ${file}`)
 }
 
 // ---------- Codex ----------
@@ -269,10 +306,12 @@ function installCodex() {
 function writeFileAtomic(file, content) {
   fs.mkdirSync(path.dirname(file), { recursive: true })
   const temporary = path.join(path.dirname(file), `.${path.basename(file)}.avf-${process.pid}-${Math.random().toString(16).slice(2)}.tmp`)
-  const mode = fs.existsSync(file) ? fs.statSync(file).mode & 0o777 : undefined
+  const containsRuntimeToken = Boolean(RUNTIME_TOKEN && content.includes(RUNTIME_TOKEN))
+  const mode = containsRuntimeToken ? 0o600 : fs.existsSync(file) ? fs.statSync(file).mode & 0o777 : undefined
   try {
     fs.writeFileSync(temporary, content, mode == null ? undefined : { mode })
     fs.renameSync(temporary, file)
+    if (containsRuntimeToken) fs.chmodSync(file, 0o600)
   } catch (error) {
     try { fs.unlinkSync(temporary) } catch { /* файл мог не успеть появиться */ }
     throw error
@@ -429,7 +468,7 @@ function mergeCursorMcp(file, sourceFile) {
     current.mcpServers[name] = config
     added++
   }
-  fs.writeFileSync(file, JSON.stringify(current, null, 2) + '\n')
+  writeFileAtomic(file, JSON.stringify(current, null, 2) + '\n')
   ok(`MCP → ${file} (${added} добавлено${kept ? `, ${kept} существующих сохранено` : ''})`)
 }
 

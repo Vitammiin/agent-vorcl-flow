@@ -1,7 +1,7 @@
 {
   "name": "agent-vorcl-flow",
-  "version": "2.7.0",
-  "description": "Agent-Vorcl-Flow для Claude Code, GPT Codex, Cursor и Kimi CLI: роли, skills, команды, MCP и эфемерное локальное live-табло.",
+  "version": "3.0.0-beta.0",
+  "description": "Agent-Vorcl-Flow runtime для Claude Code, GPT Codex, Cursor и Kimi CLI: роли, skills, Task Master и локальный HTTP MCP control plane.",
   "bin": {
     "agent-vorcl-flow": "bin/install.mjs"
   },
@@ -21,15 +21,19 @@
     "test:package": "node scripts/check-package-budget.mjs",
     "test:code-integrity": "node --test skills/code-integrity/tests/*.test.mjs",
     "test:design-studio": "node --test skills/design-studio/agents/tests/*.test.mjs",
-    "test:principal-architecture": "node --test skills/principal-architecture/tests/*.test.mjs"
+    "test:principal-architecture": "node --test skills/principal-architecture/tests/*.test.mjs",
+    "runtime": "node bin/runtime.mjs",
+    "runtime:test": "node --test tests/runtime-*.test.mjs"
   },
   "files": [
     "bin/",
     "agents/",
     "skills/",
     "commands/",
+    "docs/",
     "hooks/",
     "scripts/",
+    "src/",
     ".mcp.json",
     ".env.example",
     ".claude-plugin/",
@@ -78,5 +82,9 @@
   },
   "publishConfig": {
     "access": "public"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "1.30.0",
+    "zod": "4.5.4"
   }
 }
