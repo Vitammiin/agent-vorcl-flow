@@ -7,6 +7,7 @@ import fs from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { ArgumentError, buildInstallCatalog, parseOptions, selectComponents } from '../scripts/install-catalog.mjs'
 
 const PKG_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const MANIFEST = '.agent-vorcl-flow-install.json'
@@ -19,12 +20,19 @@ If this skill changes code, configuration, tests, schemas, deployment, environme
 
 const HELP = `Agent-Vorcl-Flow — local skills and agents installer
 
-Usage: agent-vorcl-flow <adapter...> [--dry-run]
+Usage: agent-vorcl-flow <adapter...> [--role NAME | --skill NAME] [--dry-run]
+       agent-vorcl-flow --list [--json]
+       agent-vorcl-flow <adapter...> --check [--json]
   --claude       Install skills and avf-* agents under CLAUDE_HOME or ~/.claude
   --codex        Install skills under AVF_SKILLS_DIR or ~/.agents/skills
   --cursor       Install skills and avf-* agents under CURSOR_HOME or ~/.cursor
   --kimi         Install skills and avf-* agents under KIMI_HOME or ~/.kimi
   --all          Explicitly select all four adapters
+  --role NAME    Select a role bundle and core workflow (repeatable)
+  --skill NAME   Select a standalone skill with its assets (repeatable)
+  --list         List packaged skills and role bundles; no installation
+  --check        Check selected components against ownership and package hashes
+  --json         Machine-readable --list or --check output
   --dry-run      Preview the installation without writing any files
   --check-legacy Report possible legacy AVF settings without modifying them
   --help, -h     Show this help without writing any files
@@ -33,6 +41,12 @@ Usage: agent-vorcl-flow <adapter...> [--dry-run]
 No adapters selected: show help. Repeating an installation is safe: existing
 unowned components and user-modified AVF components are preserved. Only unchanged
 components recorded in ${MANIFEST} may be updated.
+Without filters, all packaged skills and available native agents are installed.
+Filters combine by union. Role bundles include core skills, role commands and
+direct hints, plus selected native agents and the testing Checker where available.
+Standalone skills include only explicit technical dependencies and no native agents. Task Master
+is excluded from filtered bundles unless --skill task-master is explicit.
+Check exits 0 when current, 1 for attention, and 2 for invalid arguments.
 
 The installer never registers MCP servers, edits client settings/configuration,
 installs services/hooks, creates credentials, or initializes Task Master.
@@ -41,17 +55,14 @@ Path overrides must be absolute. No external commands or downloads are run.
 `
 
 const args = process.argv.slice(2)
-const flags = new Set(['--claude', '--codex', '--cursor', '--kimi', '--all', '--dry-run', '--check-legacy', '--help', '-h', '--banner-only'])
-const unknown = args.filter((arg) => !flags.has(arg))
-if (unknown.length) {
-  console.error(`Unknown option: ${unknown.join(', ')}. Use --help.`)
-  process.exit(1)
-}
-if (args.includes('--help') || args.includes('-h')) {
+let options
+try { options = parseOptions(args) }
+catch (error) { console.error(error.message); process.exit(2) }
+if (options.help) {
   console.log(HELP)
   process.exit(0)
 }
-if (args.includes('--banner-only')) {
+if (options.banner) {
   console.log('Agent-Vorcl-Flow — local skills and agents')
   process.exit(0)
 }
@@ -60,8 +71,8 @@ if (Number(process.versions.node.split('.')[0]) < 20) {
   process.exit(1)
 }
 
-const dryRun = args.includes('--dry-run')
-const selected = ['claude', 'codex', 'cursor', 'kimi'].filter((adapter) => args.includes('--all') || args.includes(`--${adapter}`))
+const dryRun = options.dryRun
+const selected = options.adapters
 const log = (message) => console.log(message)
 const warn = (message) => console.error(`Preserved: ${message}`)
 
@@ -297,11 +308,67 @@ function legacyReport() {
   log(found ? 'Review these files in your client settings. No settings or values were changed or printed.' : 'No recognizable legacy AVF client configuration found.')
 }
 
-try {
-  if (args.includes('--check-legacy')) legacyReport()
-  if (!selected.length) {
-    if (!args.includes('--check-legacy')) log(HELP)
-    process.exit(0)
+function checkComponents(plans, selection) {
+  const components = []
+  for (const [root, incoming, adapter, kind] of plans) {
+    let manifest
+    let unsafeReason = null
+    try { assertSafePath(root) }
+    catch { unsafeReason = 'symbolic-link or unreadable destination root' }
+    if (!unsafeReason) {
+      try { manifest = readManifest(root) }
+      catch { unsafeReason = 'invalid or unreadable ownership manifest' }
+    }
+    for (const [name, files] of incoming) {
+      const target = path.join(root, name)
+      let status = 'unsafe'
+      let reason = unsafeReason
+      if (!reason) {
+        try {
+          assertSafePath(target)
+          if (!exists(target)) status = 'missing'
+          else {
+            const actual = digest(collectFiles(target))
+            if (!Object.hasOwn(manifest.components, name)) status = 'unowned'
+            else if (actual !== manifest.components[name]) status = 'modified'
+            else status = actual === digest(files) ? 'current' : 'update-available'
+          }
+        } catch { reason = 'symbolic-link, unsupported or unreadable component' }
+      }
+      components.push({ adapter, kind, name, path: target, status, ...(reason ? { reason } : {}) })
+    }
+  }
+  const summary = Object.fromEntries(['current', 'update-available', 'modified', 'unowned', 'missing', 'unsafe'].map((status) => [status, components.filter((entry) => entry.status === status).length]))
+  const needsAttention = components.some(({ status }) => status !== 'current')
+  if (options.json) log(JSON.stringify({ schemaVersion: 1, selection, summary, components, needsAttention }, null, 2))
+  else {
+    for (const item of components) log(`${item.status}: ${item.adapter} ${item.kind} ${item.name}${item.reason ? ` (${item.reason})` : ''}`)
+    log(`Check: ${Object.entries(summary).map(([status, count]) => `${count} ${status}`).join(', ')}. No files changed.`)
+  }
+  process.exitCode = needsAttention ? 1 : 0
+}
+
+function runInstaller() {
+  if (options.legacy) legacyReport()
+  if (!selected.length && !options.list) {
+    if (!options.legacy) log(HELP)
+    return
+  }
+  const catalog = buildInstallCatalog(PKG_ROOT)
+  const selection = selectComponents(catalog, options)
+  if (options.list) {
+    if (options.json) log(JSON.stringify({ ...catalog, selection }, null, 2))
+    else {
+      log(`Agent-Vorcl-Flow: ${catalog.skills.length} packaged skills, ${catalog.roles.length} role bundles`)
+      log(`Standalone: ${catalog.semantics.skill}`)
+      log(`Role bundle: ${catalog.semantics.role}`)
+      log(catalog.semantics.taskMaster)
+      log(`Core: ${catalog.coreSkills.join(', ')}`)
+      for (const role of catalog.roles) log(`--role ${role.name}: ${role.description}`)
+      for (const skill of catalog.skills) log(`--skill ${skill.name} [${skill.kind}]: ${skill.description}`)
+      if (selection.mode === 'filtered') log(`Selected ${selection.skills.length} skills: ${selection.skills.join(', ')}`)
+    }
+    return
   }
   const home = os.homedir()
   // Validate all selected paths and ownership manifests before writing anywhere.
@@ -309,21 +376,25 @@ try {
     const clientHome = adapter === 'codex' ? null : location(`${adapter.toUpperCase()}_HOME`, path.join(home, `.${adapter}`))
     return { adapter, skills: adapter === 'codex' ? location('AVF_SKILLS_DIR', path.join(home, '.agents', 'skills')) : path.join(clientHome, 'skills'), agents: clientHome && path.join(clientHome, 'agents') }
   })
-  const skillNames = fs.readdirSync(path.join(PKG_ROOT, 'codex', 'skills'), { withFileTypes: true }).filter((entry) => entry.isDirectory()).map((entry) => entry.name).sort()
-  const skills = new Map(skillNames.map((name) => [name, skillFiles(name)]))
+  const skills = new Map(selection.skills.map((name) => [name, skillFiles(name)]))
   const plans = []
   for (const { adapter, skills: skillsRoot, agents: agentsRoot } of adapters) {
-    plans.push([skillsRoot, skills])
+    plans.push([skillsRoot, skills, adapter, 'skill'])
     if (agentsRoot) {
       const source = path.join(PKG_ROOT, ...(adapter === 'kimi' ? ['kimi', 'agents'] : ['agents']))
-      const files = fs.readdirSync(source).filter((file) => adapter === 'kimi' ? /\.ya?ml$/.test(file) : file.endsWith('.md')).sort()
-      plans.push([agentsRoot, new Map(files.map((file) => [`avf-${file}`, agentFiles(path.join(source, file), adapter)]))])
+      const files = fs.readdirSync(source).filter((file) => adapter === 'kimi' ? /\.ya?ml$/.test(file) : file.endsWith('.md'))
+        .filter((file) => selection.mode === 'all' || selection.agentRoles.includes(file.replace(/\.(?:md|ya?ml)$/, ''))).sort()
+      if (files.length) plans.push([agentsRoot, new Map(files.map((file) => [`avf-${file}`, agentFiles(path.join(source, file), adapter)])), adapter, 'agent'])
     }
   }
+  if (options.check) { checkComponents(plans, selection); return }
   for (const [root] of plans) { assertSafePath(root); readManifest(root) }
   for (const [root, components] of plans) installComponents(root, components)
   log('MCP connections, Task Master state and client configuration were not modified.')
-} catch (error) {
-  console.error(`Installation failed: ${error.message}`)
-  process.exitCode = 1
+}
+
+try { runInstaller() }
+catch (error) {
+  console.error(`${options.check ? 'Check' : options.list ? 'Discovery' : 'Installation'} failed: ${error.message}`)
+  process.exitCode = error instanceof ArgumentError ? 2 : 1
 }

@@ -12,9 +12,22 @@ Requires Node.js 20 or newer and a supported coding client. Choose the client ex
 
 ```bash
 node bin/install.mjs --help
-node bin/install.mjs --codex --dry-run
-node bin/install.mjs --codex
+node bin/install.mjs --list --json
+node bin/install.mjs --codex --role backend --dry-run
+node bin/install.mjs --codex --role backend
 ```
+
+Start with the roles you need. Repeat `--role` or `--skill` to combine selections. A role bundle includes the selected role and its commands, direct domain hints, and seven shared skills: `vorcl`, `workflow`, `workspace-capability-routing`, `init-code`, `project-audit`, `testing`, and `testing-strategy`. Native agents are limited to selected roles plus the testing Checker where available. Hints are not expanded recursively. A standalone `--skill` includes its assets and explicit technical dependencies (`init-code` needs `project-audit`), without native agents or a role bundle. Task Master is excluded from filtered selections unless `--skill task-master` is explicit.
+
+Without role/skill filters, installation includes all packaged skills and available native agents. A filtered update is additive: it never removes earlier components. Select the same filters when checking or updating a partial installation.
+
+```bash
+node bin/install.mjs --codex --role backend --role database
+node bin/install.mjs --codex --skill init-code
+node bin/install.mjs --codex --role backend --check --json
+```
+
+`--list` discovers the packaged catalog without reading client configuration. `--check` compares selected components with the ownership ledger and current package: `current`, `update-available`, `modified`, `unowned`, `missing`, or `unsafe`. It makes no changes, including when a destination does not exist. Exit codes: `0` current, `1` attention required, `2` invalid arguments. Unrelated user skills are outside the check. To resolve a reported difference, inspect it and use the normal installer; locally modified/unowned content is still preserved.
 
 Use `--claude`, `--cursor`, or `--kimi` for another client, or `--all` to explicitly select all four. For a GitHub/npm installation, use the same adapter flag:
 
@@ -49,7 +62,11 @@ $backend-refactor simplify invoice validation
 
 The optional Claude plugin exposes `/vorcl`, `/audit .`, and `/backend:refactor`; the local installer exposes the corresponding skills and agents. Restart/reload your client after installation if its skill discovery requires it.
 
+Examples require the corresponding installed skill. Role bundles include `vorcl` and `init-code`; add `--skill audit` for the broad audit entrypoint or select additional roles explicitly. Router recommendations can refer to skills outside a partial installation; they never trigger automatic installation.
+
 `vorcl` reads the requested outcome and workspace evidence, selects one primary role, and loads only relevant skills. The executor implements the change; a separate checker verifies the agreed acceptance criteria. Findings and limitations accompany completion.
+
+Routing prioritizes the deliverable: README work in a Next.js repository belongs to `docs`; a database index in an Expo project belongs to `database`; Expo button animation stays with `expo-mobile`. The router explains its matched rule and flags uncertain fallbacks. Its hints do not grant permission to mutate external systems. See the [bounded handoff](./skills/workflow/references/handoff.md) for acceptance-to-evidence review.
 
 The default workflow uses a plan in the current session. A report-only audit does not create tasks, change product state, or silently upgrade itself into remediation. `init-code` creates a project description only when requested. If `PROJECT_DESCRIPTION.md` already exists, modifying work checks its impact and updates only materially affected sections.
 
@@ -83,11 +100,14 @@ Legacy skills without the new ownership ledger are intentionally preserved. Comp
 | Domain skills | Reusable knowledge, scripts, references | `skills/` |
 | Generated Codex prompts | Client-facing skill entrypoints | `codex/skills/` |
 | Local installer | Copy/update only owned components | `bin/install.mjs` |
+| Installation catalog | Explicit role/skill selections and technical dependencies | `scripts/install-catalog.mjs` |
 | Optional experimental runtime | Local runs, receipts, routing | `src/`, `bin/runtime.mjs` |
 
 Generated prompts are checked against canonical sources. The installer supplies canonical skill assets without duplicating them in the published Codex mirror. Host tools own execution, connector configuration, and user authorization. AVF does not replace those facilities.
 
 The experimental runtime is a separate manual entrypoint. It is not needed by any installed role, does not register itself with a client, and never reads or updates Task Master. Its state is `.agent-vorcl/runtime/`. See [runtime limits and manual startup](./docs/RUNTIME_V3.md) and the [architecture review](./docs/ARCHITECTURE_REVIEW.md).
+
+The [ecosystem review](./docs/ECOSYSTEM_REVIEW.md) records the popular GitHub projects studied, pinned sources, and which patterns were adopted or rejected.
 
 ## Development and verification
 
@@ -100,6 +120,8 @@ AVF_E2E_NETWORK=1 npm run runtime:test
 ```
 
 The last command enables a loopback HTTP integration test; it needs permission to bind a local port. Other tests use fixtures and temporary homes. Installer tests check preservation of user settings and components, repeatability, and side-effect-free inspection. Runtime tests cover concurrency, Task Master isolation, and receipt checks.
+
+The `Validate` GitHub workflow runs registry, tests with loopback HTTP, package budget, and syntax checks on Node.js 20 and 24 for pull requests and dev/main pushes. Publishing remains a separate tag workflow.
 
 ```bash
 npm run generate:roles

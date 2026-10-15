@@ -23,6 +23,9 @@ description: Анализирует одновременно пользоват�
 ## Decision rules
 
 - Requested deliverable важнее incidental technology signal.
+- Явный выбор роли (`$docs`, `/backend:refactor`) учитывается до эвристик, но не меняет её permission boundaries. README в Next.js → `docs`; SQL indexes в Expo → `database`; Docker/CI в Express → `devops`.
+- Полный пакет CURRENT architecture → `principal-architect`; выбор target architecture → `architect`; лёгкая карта TS/JS → `archmap`.
+- Hardcode/mock leakage → `integrity`, security findings → `security`, общий read-only audit → `analyzer`. Запрос исправления не даёт read-only роли права менять implementation.
 - Existing system: сначала фактические boundaries/versions/conventions; greenfield: требования и ограничения.
 - Mobile/Expo screen work добавляет ergonomics/design/compatibility skills; version-sensitive native library — только после live preflight.
 - Multi-surface audit использует профильные read-only passes; targeted audit не расширяй до всего каталога.
@@ -41,8 +44,12 @@ description: Анализирует одновременно пользоват�
   "supportingRoles": [],
   "skillHints": ["expo-mobile-architecture", "expo-ui-design-motion", "mobile-thumb-zones"],
   "checkerRole": "testing",
+  "matchedRule": "mobile-implementation",
+  "routingReason": "The request targets native mobile implementation.",
   "uncertainties": []
 }
 ```
 
 Script output — hints, не окончательное решение. Исправляй route по более сильному evidence и кратко объясняй divergence. Перед handoff укажи scope каждого участника и что намеренно не подключено.
+
+Router — ограниченная эвристика с EN/RU regression cases. `workspace-fallback` означает предварительный выбор: стек сам по себе не доказывает цель. Манифесты других языков проверяй вручную; неизвестный или malformed manifest не становится отрицательным доказательством. Каталог описывает возможности пакета, а не установленные MCP или разрешения. При выборочной установке используй доступные skills; отсутствующий hint не разрешает автоматическую установку.

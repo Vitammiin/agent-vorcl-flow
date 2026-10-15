@@ -7,6 +7,17 @@ and this project follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Added
+
+- Read-only installation catalog and integrity checks, plus explicit role/skill selection with bounded dependencies and preserved ownership safeguards.
+- A bounded implementation/review handoff with acceptance-to-evidence mapping and separate requirement and quality passes.
+- Pull request and branch validation on Node.js 20 and 24, including the real loopback MCP integration test.
+- A dated ecosystem review with GitHub popularity snapshots, pinned sources, licensing notes, and adopted/rejected patterns.
+
+### Fixed
+
+- Workspace routing now prioritizes the requested deliverable over incidental dependencies, with English/Russian regression cases for documentation, APIs, databases, infrastructure, audits, and mobile motion.
+
 ## [3.0.0] - 2026-10-15
 
 ### Breaking changes
