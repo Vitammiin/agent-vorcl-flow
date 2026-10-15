@@ -10,3 +10,6 @@ node_modules/
 .vscode/
 .idea/
 *.swp
+
+# Optional AVF state is independent of task providers.
+.agent-vorcl/

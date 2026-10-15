@@ -1,7 +1,6 @@
 ---
 description: Release notes версии из CHANGELOG/git-истории — готовый текст для GitHub release, в связке с gitflow. Use when готовится релиз и нужны заметки версии (docs)
 argument-hint: "[версия или диапазон тегов; по умолчанию последний тег..HEAD]"
-allowed-tools: Read, Write, Edit, Bash, Grep, Glob
 ---
 
 Собери release notes: **$ARGUMENTS**.

@@ -1,14 +1,12 @@
 ---
-description: Ресёрч-цель через Task Master workflow — сбор данных из веба до готового результата (firecrawl). Use when цель многошаговая — несколько источников/этапов/форм результата; разовый поиск → /firecrawl:search, одна страница → /firecrawl:scrape
+description: "Цель роли firecrawl: session-first план, реализация в разрешённом scope и независимая проверка; Task Master только по явному выбору."
 argument-hint: "<цель ресёрча / вопрос>"
-allowed-tools: Read, Write, Bash, Grep, Glob, WebFetch
 ---
 
-Возьми ресёрч-цель в работу через Task Master: **$ARGUMENTS**.
+Возьми цель **$ARGUMENTS** как роль `firecrawl`. Если цель уже понятна из контекста, продолжай; иначе уточни scope.
 
-1. Убедись, что Task Master инициализирован (`.taskmaster/`); если нет — `task-master init`.
-2. Разложи цель на задачи (`add_task`; крупный ресёрч — PRD + `parse_prd`): что найти, какие источники/сайты, какая форма результата.
-3. `next_task` → `get_task`; собери данные по маршруту CLI → MCP → REST/keyless и дешёвым путём: search/map → scrape → ограниченный crawl/structured extract. Ход фиксируй через `update_subtask`, артефакты — в `.firecrawl/`.
-4. Проверь `testStrategy` (данные собраны, источники указаны, структура валидна) → `set_task_status --status=done`; вернись к шагу 3, пока есть задачи.
-
-Каждое утверждение — с URL-источником; ключевое сверяй по ≥2 источникам. Опирайся на навыки `web-scraping`, `workflow`, `task-master`. Делегируй субагенту `firecrawl`.
+1. Прочитай роль `firecrawl` и `workflow`; примени `workspace-capability-routing` для неоднозначного scope. Загрузи только необходимые domain/task skills и сохрани workspace evidence.
+2. По умолчанию используй session-first: зафиксируй scope, план, acceptance criteria и `testStrategy` в сессии. Не создавай `.taskmaster/`, не запускай init и не меняй MCP/provider/model configuration.
+3. Task Master подключай только по явному выбору пользователя и доступным в сессии capabilities. Тогда прочитай `task-master`, сохрани возвращённые IDs в allowlist, создай scoped run и сделай atomic claim перед `in-progress`. Bare `next_task` запрещён. Отсутствие Task Master не блокирует работу; не заявляй о сохранении статуса в недоступном трекере.
+4. Executor выполняет только согласованный scope. Независимый Checker проверяет `testStrategy`, не меняет implementation/acceptance tests и возвращает evidence. Только Orchestrator завершает задачу; не продолжай посторонний backlog.
+5. Если существует `PROJECT_DESCRIPTION.md`, соблюдай maintenance contract из `workflow`. Выдай результат, проверки и оставшиеся ограничения.

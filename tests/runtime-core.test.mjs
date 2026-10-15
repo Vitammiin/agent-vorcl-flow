@@ -13,7 +13,6 @@ import { RegistryService } from '../src/modules/runtime/registry-service.mjs'
 import { RuntimeService } from '../src/modules/runtime/runtime-service.mjs'
 import { SessionService } from '../src/modules/runtime/session-service.mjs'
 import { SkillCatalogService } from '../src/modules/runtime/skill-catalog-service.mjs'
-import { TaskMasterBridge } from '../src/modules/runtime/task-master-bridge.mjs'
 import { ToolReceiptSchema } from '../src/modules/runtime/schemas.mjs'
 import { createId, isoNow } from '../src/shared/runtime-utils.mjs'
 import { loadRuntimeEnvironment } from '../src/config/runtime-config.mjs'
@@ -38,7 +37,7 @@ test('registry v2 preserves public roles and compiles runtime contracts', () => 
 test('runtime environment parser strips inline comments and preserves quoted hashes', () => {
   const home = temporaryWorkspace(); fs.writeFileSync(path.join(home, '.env'), 'AVF_TEST_EMPTY= # comment\nAVF_TEST_QUOTED="value # kept"\n')
   delete process.env.AVF_TEST_EMPTY; delete process.env.AVF_TEST_QUOTED
-  loadRuntimeEnvironment(home)
+  loadRuntimeEnvironment(path.join(home, '.env'))
   assert.equal(process.env.AVF_TEST_EMPTY, '')
   assert.equal(process.env.AVF_TEST_QUOTED, 'value # kept')
   delete process.env.AVF_TEST_EMPTY; delete process.env.AVF_TEST_QUOTED
@@ -62,7 +61,7 @@ test('event replay restores durable run state without duplicate effects', async 
   const second = new EventStore(root)
   assert.deepEqual(second.get('runs', 'run-1'), { runId: 'run-1', status: 'running' })
   assert.equal(second.events('run-1').length, 1)
-  fs.appendFileSync(path.join(root, '.taskmaster', 'avf-runtime', 'events.jsonl'), '{"partial":')
+  fs.appendFileSync(path.join(root, '.agent-vorcl', 'runtime', 'events.jsonl'), '{"partial":')
   const repaired = new EventStore(root)
   assert.equal(repaired.events('run-1').length, 1)
   await repaired.put('runs', 'run-1', { runId: 'run-1', status: 'completed' }, 'run-1', 'run.completed')
@@ -98,9 +97,7 @@ test('approval is digest-bound, single-use and required for writes', async () =>
   assert.equal(result.receipt.status, 'success')
   await assert.rejects(() => runtime.executeAction('session', { actionId: action.actionId, digest: action.digest, operation: 'apply_patch', payload: approvedPayload }), /not approved/)
 
-  const disguised = await context.permissions.request({ runId: run.runId, sessionId: 'session', actionClass: 'workspace_write', operation: 'exec', description: 'pretend local write', targets: ['origin'], reversible: false, payload: { argv: ['git', 'push'] } })
-  await context.permissions.decide(disguised.actionId, disguised.digest, true, 'session')
-  await assert.rejects(() => runtime.executeAction('session', { actionId: disguised.actionId, digest: disguised.digest, operation: 'exec', payload: { argv: ['git', 'push'] } }), /cannot execute publish/)
+  await assert.rejects(() => runtime.executeAction('session', { operation: 'exec', payload: { argv: ['git', 'push'] } }), /host execution tools/)
 
   const concurrentPayload = { file: 'once.txt', content: 'once' }
   const concurrent = await context.permissions.request({ runId: run.runId, sessionId: 'session', actionClass: 'workspace_write', operation: 'apply_patch', description: 'write once', targets: ['once.txt'], reversible: true, payload: concurrentPayload })
@@ -182,24 +179,66 @@ test('runtime restart marks interrupted durable jobs failed', async () => {
   assert.equal(replayed.get('jobs', 'job-interrupted').error, 'Interrupted by runtime restart')
 })
 
-test('skill ledger updates builtin copies but preserves local modifications', () => {
-  const home = temporaryWorkspace(); const catalog = new SkillCatalogService(packageRoot, home)
-  const installed = catalog.syncBuiltin('workflow'); assert.equal(installed.status, 'installed')
-  const file = path.join(home, 'skills', 'workflow', 'SKILL.md'); fs.appendFileSync(file, '\nlocal change\n')
-  const preserved = catalog.syncBuiltin('workflow'); assert.equal(preserved.status, 'preserved_local_modified')
-  assert.match(catalog.read('workflow').content, /local change/)
-  assert.equal(catalog.list()[0].origin, 'local_modified')
+test('runtime skill catalog reads packaged skills without creating or changing installed skills', () => {
+  const root = temporaryWorkspace(); const home = path.join(root, 'absent')
+  const catalog = new SkillCatalogService(packageRoot, home)
+  assert.match(catalog.read('workflow').content, /Workflow/)
+  assert.ok(catalog.list().some((entry) => entry.id === 'workflow'))
+  assert.equal(fs.existsSync(home), false)
+  assert.throws(() => catalog.read('../private'), /Unsafe skill ID/)
 })
 
-test('Task Master bridge reads task truth and updates through CLI instead of editing JSON', async () => {
-  const root = temporaryWorkspace(); const tasksDir = path.join(root, '.taskmaster', 'tasks'); fs.mkdirSync(tasksDir, { recursive: true })
-  const tasksFile = path.join(tasksDir, 'tasks.json'); const original = JSON.stringify({ master: { tasks: [{ id: 12, title: 'Runtime', status: 'in-progress' }] } }, null, 2)
+test('runtime task completion leaves existing Task Master files byte-for-byte unchanged', async () => {
+  const root = temporaryWorkspace()
+  const tasksDir = path.join(root, '.taskmaster', 'tasks'); fs.mkdirSync(tasksDir, { recursive: true })
+  const tasksFile = path.join(tasksDir, 'tasks.json')
+  const original = JSON.stringify({ master: { tasks: [{ id: 12, title: 'User task', status: 'in-progress' }] } })
   fs.writeFileSync(tasksFile, original)
-  const command = path.join(root, 'fake-task-master.cjs'); const capture = path.join(root, 'args.json')
-  fs.writeFileSync(command, `#!/usr/bin/env node\nrequire('node:fs').writeFileSync(${JSON.stringify(capture)}, JSON.stringify(process.argv.slice(2)))\n`); fs.chmodSync(command, 0o700)
-  const bridge = new TaskMasterBridge(root, { command })
-  assert.equal(bridge.getTask('12').title, 'Runtime')
-  await bridge.setDone('12')
+  const sessions = new SessionService({ allowedRoots: [root] }); sessions.bind('session', root, 'test')
+  const runtime = new RuntimeService({ sessions, registry: new RegistryService(packageRoot) })
+  const run = await runtime.createRun('session', { goal: 'local work', taskIds: ['12'], mode: 'external' })
+  await runtime.claim('session', { runId: run.runId, taskId: '12', leaseSeconds: 60 })
+  const receipt = { schemaVersion: 1, receiptId: createId('rcpt'), runId: run.runId, taskId: '12', tool: 'testing.verify', status: 'success', checkerVerdict: 'READY', startedAt: isoNow(), finishedAt: isoNow() }
+  await runtime.recordReceipt('session', receipt)
+  assert.equal((await runtime.completeTask('session', { runId: run.runId, taskId: '12', checkerReceiptId: receipt.receiptId })).status, 'completed')
   assert.equal(fs.readFileSync(tasksFile, 'utf8'), original)
-  assert.ok(JSON.parse(fs.readFileSync(capture, 'utf8')).includes('--status=done'))
+  assert.deepEqual(fs.readdirSync(path.join(root, '.taskmaster')), ['tasks'])
+  assert.equal(runtime.dataRoot('session'), path.join('.agent-vorcl', 'runtime'))
+})
+
+test('concurrent runs cannot both claim the same task', async () => {
+  const root = temporaryWorkspace(); const sessions = new SessionService({ allowedRoots: [root] })
+  sessions.bind('one', root, 'test'); sessions.bind('two', root, 'test')
+  const runtime = new RuntimeService({ sessions, registry: new RegistryService(packageRoot) })
+  const [one, two] = await Promise.all(['one', 'two'].map((id) => runtime.createRun(id, { goal: 'work', taskIds: ['1'], mode: 'external' })))
+  const results = await Promise.allSettled([runtime.claim('one', { runId: one.runId, taskId: '1', leaseSeconds: 60 }), runtime.claim('two', { runId: two.runId, taskId: '1', leaseSeconds: 60 })])
+  assert.equal(results.filter((result) => result.status === 'fulfilled').length, 1)
+  assert.equal(results.filter((result) => result.status === 'rejected').length, 1)
+  assert.equal(fs.existsSync(path.join(root, '.taskmaster')), false)
+})
+
+test('runtime inspection, help, and rejected service commands never create configuration', () => {
+  for (const command of ['--help', 'status', 'doctor', 'install-service', 'typo']) {
+    const root = temporaryWorkspace(); const home = path.join(root, 'absent')
+    const result = spawnSync(process.execPath, [path.join(packageRoot, 'bin', 'runtime.mjs'), command], { encoding: 'utf8', env: { ...process.env, AGENT_VORCL_HOME: home } })
+    assert.equal(result.status, ['install-service', 'typo'].includes(command) ? 1 : 0, result.stderr)
+    assert.equal(fs.existsSync(home), false, command)
+  }
+})
+
+test('concurrent completions retain every completed task', async () => {
+  const root = temporaryWorkspace(); const sessions = new SessionService({ allowedRoots: [root] }); sessions.bind('session', root, 'test')
+  const runtime = new RuntimeService({ sessions, registry: new RegistryService(packageRoot) })
+  const run = await runtime.createRun('session', { goal: 'work', taskIds: ['1', '2'], mode: 'external' })
+  const inputs = []
+  for (const taskId of run.taskIds) {
+    await runtime.claim('session', { runId: run.runId, taskId, leaseSeconds: 60 })
+    const receipt = { schemaVersion: 1, receiptId: createId('rcpt'), runId: run.runId, taskId, tool: 'testing.verify', status: 'success', checkerVerdict: 'READY', startedAt: isoNow(), finishedAt: isoNow() }
+    await runtime.recordReceipt('session', receipt)
+    inputs.push({ runId: run.runId, taskId, checkerReceiptId: receipt.receiptId })
+  }
+  await Promise.all(inputs.map((input) => runtime.completeTask('session', input)))
+  const result = runtime.getRun('session', run.runId)
+  assert.deepEqual(result.completedTaskIds.sort(), ['1', '2'])
+  assert.equal(result.status, 'completed')
 })

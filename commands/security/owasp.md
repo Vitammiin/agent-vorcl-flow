@@ -1,7 +1,6 @@
 ---
 description: OWASP Top 10 в коде — injection, XSS, broken auth, sensitive exposure, CORS, cookie-флаги в Node/React-проекте. Use when нужен аудит уязвимостей кода; секреты — /security:secrets, зависимости — /security:deps (security)
 argument-hint: "[путь/область; по умолчанию весь репозиторий]"
-allowed-tools: Read, Grep, Glob, Bash
 ---
 
 Проведи аудит OWASP Top 10 (**read-only**): **$ARGUMENTS**.
@@ -13,6 +12,6 @@ allowed-tools: Read, Grep, Glob, Bash
 5. **CORS и cookie:** `origin: '*'` вместе с `credentials: true`, отражение `req.headers.origin` без allowlist; cookie без `httpOnly`/`secure`/`sameSite`; отсутствие `helmet`/security-заголовков.
 6. Каждая находка: `file:line` + цитата, категория OWASP, severity, конкретная починка. Проверяй контекст — валидация может жить слоем выше, не репорти вслепую.
 
-Пустой **$ARGUMENTS** — весь репозиторий, фронт и бэк раздельно. Ничего не правь: значимые находки — в `add_task` на `backend`/`frontend`.
+Пустой **$ARGUMENTS** — весь репозиторий, фронт и бэк раздельно. Ничего не правь: значимые находки — в отчёт с владельцами `backend`/`frontend`.
 
 Опирайся на навыки `security-audit`, `error-handling`, `backend-architecture`, `frontend-architecture`. Делегируй субагенту `security`.

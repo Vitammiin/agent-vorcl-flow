@@ -1,7 +1,6 @@
 ---
 description: "Создать и реально прогнать Expo mobile tests: domain unit, React Native Testing Library и Maestro critical flows."
 argument-hint: "<module / screen / flow>"
-allowed-tools: Read, Write, Edit, Bash, Grep, Glob
 ---
 
 Проверь Expo mobile код: **$ARGUMENTS**.

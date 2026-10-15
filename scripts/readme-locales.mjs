@@ -1,359 +1,75 @@
 #!/usr/bin/env node
-
+// Offline locale navigation. Only English and Russian are full maintained guides.
 import fs from 'node:fs'
 import path from 'node:path'
-import process from 'node:process'
-import { createHash } from 'node:crypto'
 import { fileURLToPath } from 'node:url'
 
-const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
-const CANONICAL = path.join(ROOT, 'README.md')
-const TRANSLATIONS_DIR = 'translations'
-const GENERATED_MARKER_PATTERN = /<!-- Generated from README\.md by scripts\/readme-locales\.mjs(?:; source-sha256: [a-f0-9]{64})?\. -->/
-
-const LOCALES = [
-  { code: 'en', label: 'English', file: 'README.md', source: true },
-  { code: 'ru', label: 'Русский', file: `${TRANSLATIONS_DIR}/README.ru.md`, source: true },
-  { code: 'uk', label: 'Українська', file: `${TRANSLATIONS_DIR}/README.uk.md` },
-  { code: 'de', label: 'Deutsch', file: `${TRANSLATIONS_DIR}/README.de.md` },
-  { code: 'fr', label: 'Français', file: `${TRANSLATIONS_DIR}/README.fr.md` },
-  { code: 'es', label: 'Español', file: `${TRANSLATIONS_DIR}/README.es.md` },
-  { code: 'pt', label: 'Português', file: `${TRANSLATIONS_DIR}/README.pt.md` },
-  { code: 'it', label: 'Italiano', file: `${TRANSLATIONS_DIR}/README.it.md` },
-  { code: 'pl', label: 'Polski', file: `${TRANSLATIONS_DIR}/README.pl.md` },
-  { code: 'tr', label: 'Türkçe', file: `${TRANSLATIONS_DIR}/README.tr.md` },
-  { code: 'zh-CN', label: '中文', file: `${TRANSLATIONS_DIR}/README.zh-CN.md` },
-  { code: 'ja', label: '日本語', file: `${TRANSLATIONS_DIR}/README.ja.md` },
-  { code: 'ko', label: '한국어', file: `${TRANSLATIONS_DIR}/README.ko.md` },
-  { code: 'ar', label: 'العربية', file: `${TRANSLATIONS_DIR}/README.ar.md`, rtl: true },
-  { code: 'nl', label: 'Nederlands', file: `${TRANSLATIONS_DIR}/README.nl.md` },
-  { code: 'cs', label: 'Čeština', file: `${TRANSLATIONS_DIR}/README.cs.md` },
-  { code: 'ro', label: 'Română', file: `${TRANSLATIONS_DIR}/README.ro.md` },
-  { code: 'hu', label: 'Magyar', file: `${TRANSLATIONS_DIR}/README.hu.md` },
-  { code: 'bg', label: 'Български', file: `${TRANSLATIONS_DIR}/README.bg.md` },
-  { code: 'sr', label: 'Српски', file: `${TRANSLATIONS_DIR}/README.sr.md` },
-  { code: 'hi', label: 'हिन्दी', file: `${TRANSLATIONS_DIR}/README.hi.md` },
-  { code: 'vi', label: 'Tiếng Việt', file: `${TRANSLATIONS_DIR}/README.vi.md` },
+const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
+const locales = [
+  ['en', 'English'], ['ru', 'Русский'],
+  ['uk', 'Українська', 'Актуальна документація доступна англійською та російською. Ця сторінка містить посилання, а не повний переклад.'],
+  ['de', 'Deutsch', 'Die aktuelle Dokumentation ist auf Englisch und Russisch verfügbar. Diese Seite enthält Links, keine vollständige Übersetzung.'],
+  ['fr', 'Français', 'La documentation actuelle est disponible en anglais et en russe. Cette page contient des liens, pas une traduction complète.'],
+  ['es', 'Español', 'La documentación actual está disponible en inglés y ruso. Esta página contiene enlaces, no una traducción completa.'],
+  ['pt', 'Português', 'A documentação atual está disponível em inglês e russo. Esta página contém links, não uma tradução completa.'],
+  ['it', 'Italiano', 'La documentazione aggiornata è disponibile in inglese e russo. Questa pagina contiene collegamenti, non una traduzione completa.'],
+  ['pl', 'Polski', 'Aktualna dokumentacja jest dostępna w języku angielskim i rosyjskim. Ta strona zawiera odnośniki, a nie pełne tłumaczenie.'],
+  ['tr', 'Türkçe', 'Güncel belgeler İngilizce ve Rusça olarak mevcuttur. Bu sayfa tam çeviri değil, bağlantılar içerir.'],
+  ['zh-CN', '中文', '最新文档提供英文和俄文版本。本页仅提供链接，并非完整翻译。'],
+  ['ja', '日本語', '最新のドキュメントは英語とロシア語で提供されています。このページはリンク集であり、完全な翻訳ではありません。'],
+  ['ko', '한국어', '최신 문서는 영어와 러시아어로 제공됩니다. 이 페이지는 전체 번역이 아닌 링크 안내입니다.'],
+  ['ar', 'العربية', 'الوثائق الحالية متاحة بالإنجليزية والروسية. تحتوي هذه الصفحة على روابط وليست ترجمة كاملة.'],
+  ['nl', 'Nederlands', 'De actuele documentatie is beschikbaar in het Engels en Russisch. Deze pagina bevat links, geen volledige vertaling.'],
+  ['cs', 'Čeština', 'Aktuální dokumentace je dostupná v angličtině a ruštině. Tato stránka obsahuje odkazy, nikoli úplný překlad.'],
+  ['ro', 'Română', 'Documentația actuală este disponibilă în engleză și rusă. Această pagină conține linkuri, nu o traducere completă.'],
+  ['hu', 'Magyar', 'Az aktuális dokumentáció angol és orosz nyelven érhető el. Ez az oldal hivatkozásokat tartalmaz, nem teljes fordítást.'],
+  ['bg', 'Български', 'Актуалната документация е на английски и руски. Тази страница съдържа връзки, а не пълен превод.'],
+  ['sr', 'Српски', 'Актуелна документација је доступна на енглеском и руском. Ова страница садржи везе, а не потпун превод.'],
+  ['hi', 'हिन्दी', 'वर्तमान दस्तावेज़ अंग्रेज़ी और रूसी में उपलब्ध हैं। इस पृष्ठ में लिंक हैं, पूरा अनुवाद नहीं।'],
+  ['vi', 'Tiếng Việt', 'Tài liệu hiện tại có bằng tiếng Anh và tiếng Nga. Trang này cung cấp liên kết, không phải bản dịch đầy đủ.'],
 ]
+const fileFor = (code) => code === 'en' ? 'README.md' : `translations/README.${code}.md`
+const links = (active) => locales.map(([code, label]) => {
+  const target = active === 'en' ? `./${fileFor(code)}` : code === 'en' ? '../README.md' : `./README.${code}.md`
+  return `[${label}](${target})`
+}).join(' · ')
+const navigation = (code) => `<!-- languages:start -->\n${links(code)}\n<!-- languages:end -->`
+const notice = ([code, label, message]) => `# Agent-Vorcl-Flow — ${label}\n\n<!-- Localized navigation only; generated offline by scripts/readme-locales.mjs. -->\n\n${code === 'ar' ? `<p dir="rtl">${message}</p>` : message}\n\n[English guide](../README.md) · [Русское руководство](./README.ru.md) · [Migration](../docs/MIGRATION.md)\n\n${navigation(code)}\n`
+const fences = (text) => text.match(/```[\s\S]*?```/g) ?? []
 
-const REQUIRED_TOKENS = [
-  'npx github:Vitammiin/agent-vorcl-flow',
-  'npx --yes agent-vorcl-flow@latest',
-  '/audit .',
-]
-
-const SCRIPT_PATTERNS = new Map([
-  ['ru', /\p{Script=Cyrillic}/u],
-  ['uk', /\p{Script=Cyrillic}/u],
-  ['bg', /\p{Script=Cyrillic}/u],
-  ['sr', /\p{Script=Cyrillic}/u],
-  ['zh-CN', /\p{Script=Han}/u],
-  ['ja', /[\p{Script=Hiragana}\p{Script=Katakana}]/u],
-  ['ko', /\p{Script=Hangul}/u],
-  ['ar', /\p{Script=Arabic}/u],
-  ['hi', /\p{Script=Devanagari}/u],
-])
-
-const PROTECTED_TERMS = [
-  'Agent-Vorcl-Flow', 'Claude Code', 'GPT Codex', 'Kimi CLI', 'Task Master',
-  'TanStack Query', 'React Native', 'Expo Router', 'Node.js', 'Next.js',
-  'PostgreSQL', 'MongoDB', 'SecureStore', 'TypeScript', 'JavaScript',
-  'Firecrawl', 'Playwright', 'OpenAPI', 'Tailwind', 'Swagger', 'Zustand',
-  'SQLite', 'Maestro', 'Mermaid', 'GitHub', 'Docker', 'Vercel', 'Postgres',
-  'Redis', 'React', 'Expo', 'Codex', 'Cursor', 'Kimi', 'Claude', 'Liveboard',
-  'OIDC', 'MCP', 'CLI', 'API', 'JSON', 'YAML', 'HTML', 'PDF', 'SVG', 'PNG',
-  'npm', 'npx', 'Git', 'CI', 'UI', 'DB',
-].sort((left, right) => right.length - left.length)
-
-function protectedToken(index, ascii) {
-  if (ascii) return `V9K${index.toString(36).toUpperCase()}X7M`
-  if (index >= 0x1900) throw new Error('too many protected Markdown segments')
-  return String.fromCodePoint(0xE000 + index)
-}
-
-function languageBlock(active) {
-  const links = LOCALES.map((locale) => {
-    const label = locale.code === active ? `**${locale.label}**` : locale.label
-    const href = active === 'en'
-      ? `./${locale.file}`
-      : locale.code === 'en' ? '../README.md' : `./${path.basename(locale.file)}`
-    return `[${label}](${href})`
-  })
-  const rows = []
-  for (let index = 0; index < links.length; index += 6) rows.push(links.slice(index, index + 6).join(' · '))
-  return [
-    '<details>',
-    `<summary>🌐 <strong>Languages (${LOCALES.length})</strong> — translations live in \`translations/\`</summary>`,
-    '',
-    rows.join('<br>\n'),
-    '',
-    '<sub>English is canonical; every link above opens a repository-local README file.</sub>',
-    '</details>',
-  ].join('\n')
-}
-
-function relocateRepositoryLinks(source) {
-  return source.replace(/(!?\[[^\]\n]*\]\()\.\//g, '$1../')
-}
-
-function generatedMarker(canonical) {
-  const hash = createHash('sha256').update(canonical).digest('hex')
-  return `<!-- Generated from README.md by scripts/readme-locales.mjs; source-sha256: ${hash}. -->`
-}
-
-function syncGeneratedMarker(source, canonical) {
-  if (!GENERATED_MARKER_PATTERN.test(source)) throw new Error('generated README marker was not found')
-  return source.replace(GENERATED_MARKER_PATTERN, generatedMarker(canonical))
-}
-
-function replaceLanguageBlock(source, replacement) {
-  const start = source.indexOf('<details>')
-  const end = source.indexOf('</details>', start)
-  if (start < 0 || end < 0) throw new Error('README language switcher was not found')
-  return `${source.slice(0, start)}${replacement}${source.slice(end + '</details>'.length)}`
-}
-
-function protectMarkdown(source, { asciiTokens = false } = {}) {
-  const values = []
-  const protect = (value) => {
-    const token = protectedToken(values.length, asciiTokens)
-    values.push(value)
-    return token
-  }
-  let text = source
-  text = text.replace(/```[\s\S]*?```/g, protect)
-  // Keep complete headings stable. Translators sometimes split or merge heading
-  // lines, which changes GitHub anchors and can silently break the TOC.
-  text = text.replace(/^\s{0,3}#{1,6}\s+.*$/gm, protect)
-  text = text.replace(/`[^`\n]+`/g, protect)
-  text = text.replace(/!?\[[^\]\n]*\]\((?:[^()\n]|\([^)]*\))+\)/g, protect)
-  text = text.replace(/\]\((?:[^()\n]|\([^)]*\))+\)/g, protect)
-  text = text.replace(/<[^>\n]+>/g, protect)
-  text = text.replace(/https?:\/\/[^\s)>]+/g, protect)
-  const terms = PROTECTED_TERMS.map((term) => term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|')
-  text = text.replace(new RegExp(`(?<![\\p{Letter}\\p{Number}])(?:${terms})(?![\\p{Letter}\\p{Number}])`, 'gu'), protect)
-  return {
-    text,
-    restore(translated) {
-      let output = translated
-      for (let index = values.length - 1; index >= 0; index--) {
-        const token = protectedToken(index, asciiTokens)
-        const first = output.indexOf(token)
-        if (first < 0) {
-          if (values[index].startsWith('```')) throw new Error(`translation removed protected fenced block ${index}`)
-          continue
-        }
-        const tail = output.slice(first + token.length).split(token).join('')
-        output = output.slice(0, first + token.length) + tail
-        output = output.split(token).join(values[index])
-      }
-      const leaked = asciiTokens ? output.match(/V9K[0-9A-Z]+X7M/i) : output.match(/[\uE000-\uF8FF]/u)
-      if (leaked) throw new Error(`translation changed protected token ${leaked[0]}`)
-      return output
-    },
+function generate() {
+  for (const locale of locales) {
+    const [code] = locale; const file = path.join(root, fileFor(code))
+    if (code === 'en' || code === 'ru') {
+      const before = fs.readFileSync(file, 'utf8')
+      if (!/<!-- languages:start -->[\s\S]*?<!-- languages:end -->/.test(before)) throw new Error(`Missing navigation markers: ${fileFor(code)}`)
+      fs.writeFileSync(file, before.replace(/<!-- languages:start -->[\s\S]*?<!-- languages:end -->/, navigation(code)))
+    } else fs.writeFileSync(file, notice(locale))
   }
 }
-
-function chunks(source, limit = 3400) {
-  const paragraphs = source.split(/(\n\n+)/)
-  const result = []
-  let current = ''
-  for (const paragraph of paragraphs) {
-    if (current && current.length + paragraph.length > limit) {
-      result.push(current)
-      current = ''
-    }
-    if (paragraph.length <= limit) {
-      current += paragraph
-      continue
-    }
-    const lines = paragraph.split(/(?<=\n)/)
-    for (const line of lines) {
-      if (current && current.length + line.length > limit) {
-        result.push(current)
-        current = ''
-      }
-      if (line.length > limit) {
-        for (let offset = 0; offset < line.length; offset += limit) result.push(line.slice(offset, offset + limit))
-      } else current += line
-    }
-  }
-  if (current) result.push(current)
-  return result
-}
-
-async function translateChunk(text, locale) {
-  if (!text.trim()) return text
-  const query = new URLSearchParams({ client: 'gtx', sl: 'en', tl: locale, dt: 't', q: text })
-  let lastError
-  for (let attempt = 1; attempt <= 4; attempt++) {
-    try {
-      const response = await fetch(`https://translate.googleapis.com/translate_a/single?${query}`, {
-        signal: AbortSignal.timeout(30_000),
-        headers: { 'user-agent': 'agent-vorcl-flow-readme-localizer/1.0' },
-      })
-      if (!response.ok) throw new Error(`HTTP ${response.status}`)
-      const body = await response.json()
-      return body[0].map((segment) => segment[0]).join('')
-    } catch (error) {
-      lastError = error
-      if (attempt < 4) await new Promise((resolve) => setTimeout(resolve, attempt * 750))
-    }
-  }
-  throw new Error(`translation failed for ${locale}: ${lastError?.message ?? 'unknown error'}`)
-}
-
-async function mapPool(items, concurrency, worker) {
-  const output = new Array(items.length)
-  let cursor = 0
-  await Promise.all(Array.from({ length: Math.min(concurrency, items.length) }, async () => {
-    while (cursor < items.length) {
-      const index = cursor++
-      output[index] = await worker(items[index], index)
-    }
-  }))
-  return output
-}
-
-function replaceFencedBlocks(source, canonicalBlocks) {
-  let index = 0
-  const output = source.replace(/```[\s\S]*?```/g, () => canonicalBlocks[index++])
-  if (index !== canonicalBlocks.length) throw new Error(`source README has ${index} fenced blocks; expected ${canonicalBlocks.length}`)
-  return output
-}
-
-function updateSourceSwitchers(canonical) {
-  const canonicalBlocks = fencedBlocks(canonical)
-  for (const locale of LOCALES.filter((item) => item.source)) {
-    const file = path.join(ROOT, locale.file)
-    let source = fs.readFileSync(file, 'utf8')
-    source = replaceLanguageBlock(source, languageBlock(locale.code))
-    if (locale.code !== 'en') source = replaceFencedBlocks(source, canonicalBlocks)
-    fs.writeFileSync(file, source)
-  }
-}
-
-async function generateLocale(locale, canonical) {
-  const languageToken = '<avf-language-switcher></avf-language-switcher>'
-  const withoutSwitcher = replaceLanguageBlock(canonical, languageToken)
-  const protectedSource = protectMarkdown(withoutSwitcher, { asciiTokens: locale.code === 'zh-CN' })
-  const translatedChunks = await mapPool(chunks(protectedSource.text), 3, (chunk) => translateChunk(chunk, locale.code))
-  let output = protectedSource.restore(translatedChunks.join(''))
-  output = relocateRepositoryLinks(output)
-  output = output.replace(languageToken, languageBlock(locale.code))
-  output = localizeAnchorLinks(canonical, output)
-  const marker = generatedMarker(canonical)
-  output = output.replace('</details>', `</details>\n\n${marker}`, 1)
-  if (locale.rtl) output = output.replace(marker, `${marker}\n<p dir="rtl">هذه ترجمة عربية محفوظة داخل المستودع.</p>`)
-  output = output.replace(/[ \t]+$/gm, '')
-  if (!output.endsWith('\n')) output += '\n'
-  fs.writeFileSync(path.join(ROOT, locale.file), output)
-  process.stdout.write(`generated ${locale.file}\n`)
-}
-
-function count(source, pattern) {
-  return [...source.matchAll(pattern)].length
-}
-
-function fencedBlocks(source) {
-  return source.match(/```[\s\S]*?```/g) ?? []
-}
-
-function githubSlugs(source) {
-  const seen = new Map()
-  return [...source.matchAll(/^#{2,6}\s+(.+)$/gm)].map((match) => {
-    let slug = match[1]
-      .replace(/!?\[([^\]]*)\]\([^)]*\)/g, '$1')
-      .replace(/<[^>]+>/g, '')
-      .replace(/[`*_~]/g, '')
-      .toLocaleLowerCase('en-US')
-      .replace(/[^\p{Letter}\p{Number}\p{Mark}\s_-]/gu, '')
-      .trim()
-      .replace(/\s/g, '-')
-    const duplicate = seen.get(slug) ?? 0
-    seen.set(slug, duplicate + 1)
-    if (duplicate) slug = `${slug}-${duplicate}`
-    return slug
-  })
-}
-
-function localizeAnchorLinks(canonical, translated) {
-  const canonicalSlugs = githubSlugs(canonical)
-  const translatedSlugs = githubSlugs(translated)
-  if (canonicalSlugs.length !== translatedSlugs.length) throw new Error('translated heading count differs from README.md')
-  const mapping = new Map(canonicalSlugs.map((slug, index) => [slug, translatedSlugs[index]]))
-  return translated.replace(/\]\(#([^)]+)\)/g, (match, slug) => `](#${mapping.get(slug) ?? slug})`)
-}
-
 function check() {
   const errors = []
-  const canonical = fs.readFileSync(CANONICAL, 'utf8')
-  const canonicalFences = fencedBlocks(canonical)
-  const canonicalH2 = count(canonical, /^## /gm)
-  for (const locale of LOCALES) {
-    const file = path.join(ROOT, locale.file)
-    if (!fs.existsSync(file)) {
-      errors.push(`missing ${locale.file}`)
-      continue
-    }
+  for (const locale of locales) {
+    const [code] = locale; const file = path.join(root, fileFor(code))
+    if (!fs.existsSync(file)) { errors.push(`Missing ${fileFor(code)}`); continue }
     const source = fs.readFileSync(file, 'utf8')
-    if (source.includes('translate.google.com')) errors.push(`${locale.file}: external translation link remains`)
-    for (const target of LOCALES) {
-      const href = locale.code === 'en'
-        ? `./${target.file}`
-        : target.code === 'en' ? '../README.md' : `./${path.basename(target.file)}`
-      if (!source.includes(`](${href})`)) errors.push(`${locale.file}: missing local link to ${target.file}`)
+    if (!source.includes(navigation(code))) errors.push(`Stale navigation: ${fileFor(code)}`)
+    if (!['en', 'ru'].includes(code) && source !== notice(locale)) errors.push(`Stale localized pointer: ${fileFor(code)}`)
+    for (const match of source.matchAll(/\]\(([^)]+)\)/g)) {
+      const target = match[1].split('#')[0]
+      if (target && !/^[a-z]+:/i.test(target) && !fs.existsSync(path.resolve(path.dirname(file), target))) errors.push(`Broken local link in ${fileFor(code)}: ${target}`)
     }
-    if (!locale.source && !source.includes(generatedMarker(canonical))) errors.push(`${locale.file}: generated source hash differs from README.md`)
-    if (JSON.stringify(fencedBlocks(source)) !== JSON.stringify(canonicalFences)) errors.push(`${locale.file}: fenced code blocks differ from README.md`)
-    if (count(source, /^## /gm) !== canonicalH2) errors.push(`${locale.file}: H2 section count differs from README.md`)
-    const availableAnchors = new Set(githubSlugs(source))
-    for (const match of source.matchAll(/\]\(#([^)]+)\)/g)) if (!availableAnchors.has(match[1])) errors.push(`${locale.file}: broken local anchor #${match[1]}`)
-    for (const token of REQUIRED_TOKENS) if (!source.includes(token)) errors.push(`${locale.file}: missing required token ${token}`)
-    if (SCRIPT_PATTERNS.has(locale.code) && !SCRIPT_PATTERNS.get(locale.code).test(source)) errors.push(`${locale.file}: expected ${locale.code} writing system was not detected`)
-    if (locale.rtl && !source.includes('dir="rtl"')) errors.push(`${locale.file}: missing RTL marker`)
   }
-  if (errors.length) {
-    process.stderr.write(`${errors.join('\n')}\nREADME locale check: ${errors.length} error(s)\n`)
-    return 1
-  }
-  process.stdout.write(`README locale check: ${LOCALES.length} local files are in parity\n`)
-  return 0
+  const en = fs.readFileSync(path.join(root, 'README.md'), 'utf8')
+  const ru = fs.readFileSync(path.join(root, 'translations/README.ru.md'), 'utf8')
+  if (JSON.stringify(fences(en)) !== JSON.stringify(fences(ru))) errors.push('English and Russian command examples differ')
+  if ((en.match(/^## /gm) ?? []).length !== (ru.match(/^## /gm) ?? []).length) errors.push('English and Russian section counts differ')
+  if (errors.length) throw new Error(errors.join('\n'))
+  console.log(`README check: 2 maintained guides, ${locales.length - 2} localized pointers; links and command examples verified`)
 }
-
-async function main() {
-  const argv = process.argv.slice(2)
-  const localeOption = argv.find((argument) => argument.startsWith('--locale='))
-  const requestedLocale = localeOption?.slice('--locale='.length)
-  const args = new Set(argv.filter((argument) => argument !== localeOption))
-  if (args.has('--help')) {
-    process.stdout.write('Usage: readme-locales.mjs --check | --generate [--locale=<code>] | --sync-anchors\n')
-    return
-  }
-  if (args.has('--generate')) {
-    const canonical = fs.readFileSync(CANONICAL, 'utf8')
-    updateSourceSwitchers(canonical)
-    const generatedLocales = LOCALES.filter((locale) => !locale.source && (!requestedLocale || locale.code === requestedLocale))
-    if (!generatedLocales.length) throw new Error(`unknown generated locale: ${requestedLocale}`)
-    await mapPool(generatedLocales, 2, (locale) => generateLocale(locale, canonical))
-    process.exitCode = check()
-    return
-  }
-  if (args.has('--sync-anchors')) {
-    const canonical = fs.readFileSync(CANONICAL, 'utf8')
-    for (const locale of LOCALES.filter((item) => !item.source)) {
-      const file = path.join(ROOT, locale.file)
-      const source = localizeAnchorLinks(canonical, fs.readFileSync(file, 'utf8'))
-      fs.writeFileSync(file, syncGeneratedMarker(source, canonical))
-    }
-    process.exitCode = check()
-    return
-  }
-  if (args.size && !args.has('--check')) throw new Error(`unknown argument: ${[...args][0]}`)
-  process.exitCode = check()
-}
-
-main().catch((error) => {
-  process.stderr.write(`README locale generation failed: ${error.message}\n`)
-  process.exitCode = 2
-})
+try {
+  const args = process.argv.slice(2)
+  if (args.length > 1 || args.some((arg) => !['--check', '--generate', '--help'].includes(arg))) throw new Error('Usage: readme-locales.mjs --check | --generate | --help')
+  if (args[0] === '--help') console.log('Offline locale navigation: --check | --generate')
+  else { if (args[0] === '--generate') generate(); check() }
+} catch (error) { console.error(error.message); process.exitCode = 1 }

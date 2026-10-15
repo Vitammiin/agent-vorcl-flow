@@ -1,7 +1,6 @@
 ---
 description: Только фаза Extraction — детерминированные скрипты обходят репо и пишут architecture.json с source:{file,line} у каждого узла, без рендеров (archmap). Use when нужен машиночитаемый граф для своих инструментов или перед точечным рендером; полный набор форматов → /archmap:map, обогатить готовый JSON → /archmap:annotate
 argument-hint: "[путь к репо (default: текущий)] [--full: не схлопывать модули]"
-allowed-tools: Read, Write, Bash, Grep, Glob
 ---
 
 Извлеки граф архитектуры репозитория в `architecture.json`: **$ARGUMENTS**.

@@ -2,7 +2,7 @@ import { z } from 'zod/v4'
 
 export const actionClasses = ['read', 'workspace_write', 'destructive', 'external', 'publish', 'costly']
 export const executionModes = ['external', 'autonomous']
-export const operations = ['search', 'read', 'apply_patch', 'exec']
+export const operations = ['search', 'read', 'apply_patch']
 
 export const ExecutionEnvelopeSchema = z.object({
   schemaVersion: z.literal(1),

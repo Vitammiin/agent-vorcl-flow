@@ -11,7 +11,7 @@ export class EventStore {
   #writeChain = Promise.resolve()
 
   constructor(workspaceRoot) {
-    this.#root = path.join(workspaceRoot, '.taskmaster', 'avf-runtime')
+    this.#root = path.join(workspaceRoot, '.agent-vorcl', 'runtime')
     this.#eventsFile = path.join(this.#root, 'events.jsonl')
     this.#snapshotFile = path.join(this.#root, 'snapshot.json')
     fs.mkdirSync(this.#root, { recursive: true })

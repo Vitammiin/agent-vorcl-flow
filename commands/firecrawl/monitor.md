@@ -1,7 +1,6 @@
 ---
 description: Просмотр или настройка периодического мониторинга страниц/сайтов/поиска через Firecrawl с diff и уведомлениями.
 argument-hint: "<list|checks|create|update|delete> <цель>"
-allowed-tools: Read, Write, Bash, Grep, Glob, WebFetch
 ---
 
 Обработай monitor-запрос: **$ARGUMENTS**.

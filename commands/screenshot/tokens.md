@@ -1,7 +1,6 @@
 ---
 description: Извлечь дизайн-токены из скриншота (цвета OKLCH, типографика, spacing, радиусы, тени) в Tailwind @theme (screenshot). Use when нужны только токены без вёрстки; полный код экрана → /screenshot:convert
 argument-hint: "<путь к скриншоту>"
-allowed-tools: Read, Write, Edit, Bash
 ---
 
 Извлеки из скриншота единую систему дизайн-токенов: **$ARGUMENTS**.

@@ -1,7 +1,6 @@
 ---
 description: Спроектировать coherent navigation, motion, gestures и haptics для Expo user flow.
 argument-hint: "<flow или interaction>"
-allowed-tools: Read, Write, Edit, Bash, Grep, Glob
 ---
 
 Спроектируй interaction flow: **$ARGUMENTS**.

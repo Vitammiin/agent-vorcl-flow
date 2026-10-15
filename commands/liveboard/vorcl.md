@@ -1,9 +1,14 @@
 ---
-description: Развивать или исправлять сам liveboard через обязательный Task Master workflow: задача, реализация, live-проверка, done. Use для нетривиальных изменений агента и его табло.
+description: "Цель роли liveboard: session-first план, реализация в разрешённом scope и независимая проверка; Task Master только по явному выбору."
 argument-hint: "<цель изменения liveboard>"
-allowed-tools: Read, Write, Edit, Bash, Grep, Glob
 ---
 
-Возьми изменение liveboard в работу через Task Master: **$ARGUMENTS**.
+Возьми цель **$ARGUMENTS** как роль `liveboard`. Если цель уже понятна из контекста, продолжай; иначе уточни scope.
 
-Следуй `$workflow` + `$task-master`: `add_task`/`parse_prd` → `next_task` → `get_task` → при сложности `expand_task` → реализация → реальный запуск сервера и проверка `testStrategy` → `set_task_status done`. Опирайся на `$liveboard`; runtime обязан оставаться эфемерным и localhost-only.
+1. Прочитай роль `liveboard` и `workflow`; примени `workspace-capability-routing` для неоднозначного scope. Загрузи только необходимые domain/task skills и сохрани workspace evidence.
+2. По умолчанию используй session-first: зафиксируй scope, план, acceptance criteria и `testStrategy` в сессии. Не создавай `.taskmaster/`, не запускай init и не меняй MCP/provider/model configuration.
+3. Task Master подключай только по явному выбору пользователя и доступным в сессии capabilities. Тогда прочитай `task-master`, сохрани возвращённые IDs в allowlist, создай scoped run и сделай atomic claim перед `in-progress`. Bare `next_task` запрещён. Отсутствие Task Master не блокирует работу; не заявляй о сохранении статуса в недоступном трекере.
+4. Executor выполняет только согласованный scope. Независимый Checker проверяет `testStrategy`, не меняет implementation/acceptance tests и возвращает evidence. Только Orchestrator завершает задачу; не продолжай посторонний backlog.
+5. Если существует `PROJECT_DESCRIPTION.md`, соблюдай maintenance contract из `workflow`. Выдай результат, проверки и оставшиеся ограничения.
+
+Запуск dashboard — наблюдение в режиме report-only; разработка самого dashboard — отдельный modifying scope.

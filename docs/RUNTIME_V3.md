@@ -1,54 +1,42 @@
-# Agent-Vorcl-Flow Runtime v3 beta
+# Optional experimental runtime
 
-Runtime v3 is an opt-in local control plane shared by Claude Code, Codex, Cursor, and Kimi. Existing role, skill, and slash-command names remain compatible; `AVF_RUNTIME_MODE=legacy` keeps the v2 execution path available through v3.1.
+The installed roles and skills do not require a daemon. This runtime is a separate experiment for local routing, run receipts, and coordination. The installer does not start it, register an MCP connection, create a token, or install a service.
 
-## Start and inspect
+## Explicit startup
 
-```bash
-agent-vorcl-flow runtime install-service
-agent-vorcl-flow runtime start
-agent-vorcl-flow runtime status
-agent-vorcl-flow runtime doctor
-agent-vorcl-flow runtime stop
-```
-
-The daemon listens only on `127.0.0.1:19790`. Its MCP endpoint is `/mcp`; `/health` exposes readiness without project data. The installer creates `~/.config/agent-vorcl-flow/runtime.json` with mode `0600` and injects its bearer token into supported client configurations. Clients that cannot send an authorization header stay on the legacy adapter.
-
-Set `AVF_ALLOWED_ROOTS` to a platform-delimited list of directories to restrict which workspaces may be bound. Every MCP session is fixed to the canonical real path of one workspace. Rebinding is rejected while a mutation is active.
-
-## Durable state
-
-Each bound project stores runtime state under `.taskmaster/avf-runtime/`:
-
-- `events.jsonl` is an append-only normalized event stream;
-- `snapshot.json` is an atomically replaced projection of runs, claims, approvals, jobs, and receipts.
-
-Task Master remains the task source of truth. Runtime task completion additionally requires a successful `ToolReceipt@1` with `checkerVerdict: "READY"`.
-
-## Permission model
-
-Actions are classified as `read`, `workspace_write`, `destructive`, `external`, `publish`, or `costly`. Every class except `read` requires a single-use approval bound to the session, run, targets, payload digest, and a ten-minute expiry. Generic chat acknowledgements are not approvals.
-
-The autonomous workspace backend accepts argv arrays, never shell strings. It confines cwd and file paths to the bound real workspace, rejects symlink escapes, allowlists environment variables, caps output at 1 MiB, and enforces a ten-minute command timeout.
-
-## MCP tools
-
-The stable `avf_*` tools cover workspace binding, capability routing, run lifecycle, atomic task claims, approvals and execution, external receipts, durable jobs, event reads, and skill provenance. Obtain the authoritative list with MCP `tools/list`; schemas are validated by Zod at the boundary.
-
-## Providers
-
-`OpenAIResponsesAdapter` and `AnthropicMessagesAdapter` isolate provider wire formats and map their stream events to the common runtime vocabulary. API keys are read from environment variables and redacted from logs and events. Provider contract tests use local fixtures; live tests must be explicitly enabled in a secret-bearing CI job.
-
-## Skill updates
-
-Installed skills have a SHA-256 ledger and an origin of `builtin`, `upstream`, `local`, or `local_modified`. Atomic updates replace only an unchanged builtin copy. A locally modified skill is preserved and marked as having an available update.
-
-## Migration and rollback
-
-Runtime indexes existing Task Master workspaces without rewriting task records. Disable the v3 path with:
+From a stable checkout with dependencies installed:
 
 ```bash
-export AVF_RUNTIME_MODE=legacy
+node bin/runtime.mjs --help
+node bin/runtime.mjs status
+node bin/runtime.mjs doctor
+node bin/runtime.mjs serve
 ```
 
-With this flag, `runtime start` is a no-op and `runtime status` reports `legacy`; the existing v2 roles, skills, commands, and Task Master workflow remain available. Static client entries may show the optional v3 endpoint as unavailable. Remove the legacy path no earlier than v4, after all supported clients pass the HTTP/auth compatibility matrix.
+Stop the foreground process with Ctrl+C. `status`, `doctor`, and `--help` never create configuration. `serve` creates its private `runtime.json` with mode `0600` under `AGENT_VORCL_HOME`, the XDG config directory, or the platform default. No client configuration is edited. Any connection to `/mcp` and its bearer token is configured manually by the user.
+
+The listener is loopback-only (`127.0.0.1:19790` by default). `AVF_RUNTIME_PORT` selects the port; `AVF_ALLOWED_ROOTS` is a platform-delimited list of permitted workspace roots. Leaving that list unset allows the trusted local caller to bind any accessible directory. Set it when restricting workspaces matters.
+
+No project/global `.env` is discovered. Optional provider execution reads the environment inherited from its explicitly started process. `AGENT_VORCL_ENV_FILE` can explicitly select an environment file. Existing process variables take precedence, including intentionally empty values. Credentials are not shared with user MCP servers.
+
+## Ownership and persistence
+
+State is stored under `.agent-vorcl/runtime/` in the bound workspace: `events.jsonl` and `snapshot.json`. Runtime task IDs belong only to this ledger. The runtime never probes `.taskmaster`, reads its task store, invokes its CLI, or completes its tasks. Use the chosen host task provider separately if persistent tracking was explicitly requested.
+
+Claims and completion mutations are serialized in one runtime process. An independent caller supplies a successful `READY` receipt before a task can complete. This validates receipt structure and run/task matching; the service cannot establish that an external checker was actually independent. That responsibility remains with the host workflow. Run only one runtime process per workspace; the event store is not a distributed database or a cross-process lock service.
+
+Skill tools only read packaged skills. Installed skill ownership and updates belong to the standalone installer.
+
+## Trust boundary
+
+This is a trusted local-client API, not an operating-system sandbox or a human approval interface. The same authenticated client can propose and approve an action. Digest-bound, single-use approval records prevent payload substitution and accidental replay; they do not prove human consent. The host remains responsible for user authorization and sandboxing.
+
+The MCP API exposes bounded file reads/search and approved file writes. Generic command execution is not exposed. Internal search uses fixed `rg` arguments; it does not evaluate a shell string. Paths are checked against the bound workspace, but the runtime is not intended to handle a hostile process racing filesystem symlinks. Use the host's native execution tool for commands.
+
+Optional OpenAI/Anthropic provider loops can read/search and propose file changes. They do not execute their proposals. Providers are selected explicitly; no Task Master model or provider settings are touched. Live provider calls are outside the offline test suite.
+
+## Verification and compatibility
+
+`npm run runtime:test` runs deterministic fixture tests. `AVF_E2E_NETWORK=1 npm run runtime:test` additionally starts a temporary loopback HTTP server to verify MCP authentication, initialization, tool discovery, and workspace binding. It makes no external provider requests.
+
+The API is experimental and this beta removes implicit Task Master integration, arbitrary-command execution, installed-skill mutation, and service installation. See [migration](./MIGRATION.md) for legacy installations. `AVF_RUNTIME_MODE=legacy` remains a no-write disabled mode for callers already using that flag.

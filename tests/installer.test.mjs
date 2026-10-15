@@ -5,213 +5,312 @@ import path from 'node:path'
 import { spawnSync } from 'node:child_process'
 import test from 'node:test'
 
-const installer = path.resolve('bin/install.mjs')
+const realInstaller = path.resolve('bin/install.mjs')
+const MANIFEST = '.agent-vorcl-flow-install.json'
 
-function temporaryHome(t) {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'avf-installer-'))
-  t.after(() => fs.rmSync(root, { recursive: true, force: true }))
-  return root
+function put(file, content) {
+  fs.mkdirSync(path.dirname(file), { recursive: true })
+  fs.writeFileSync(file, content)
 }
 
-function runInstaller(root, adapter) {
-  const result = spawnSync(process.execPath, [installer, adapter], {
-    cwd: path.resolve('.'),
+function fixture(t) {
+  const root = fs.mkdtempSync(path.join(fs.realpathSync(os.tmpdir()), 'avf-installer-'))
+  t.after(() => fs.rmSync(root, { recursive: true, force: true }))
+  const home = path.join(root, 'home')
+  const pkg = path.join(root, 'package')
+  fs.mkdirSync(home)
+  put(path.join(pkg, 'bin', 'install.mjs'), fs.readFileSync(realInstaller))
+  for (const name of ['backend', 'firecrawl', 'workflow']) {
+    put(path.join(pkg, 'codex', 'skills', name, 'SKILL.md'), `---\nname: ${name}\ndescription: A fixture skill\n---\n# ${name}\n`)
+    put(path.join(pkg, 'skills', name, 'scripts', 'helper.mjs'), '// canonical helper\n')
+  }
+  put(path.join(pkg, 'scripts', 'vorcl-run.mjs'), '// workflow helper\n')
+  put(path.join(pkg, 'scripts', 'roles.json'), JSON.stringify({ roles: [{ id: 'backend', readonly: false }] }))
+  put(path.join(pkg, 'agents', 'backend.md'), '---\nname: backend\ndescription: Backend agent\nmodel: sonnet\ntools: Read, Edit, Write, Bash\n---\nUse /backend:vorcl.\n')
+  put(path.join(pkg, 'kimi', 'agents', 'backend.yaml'), 'version: 1\nagent:\n  name: backend\n')
+  return { root, home, pkg }
+}
+
+function run(f, args = [], overrides = {}, installer = path.join(f.pkg, 'bin', 'install.mjs'), interpreter = process.execPath) {
+  return spawnSync(interpreter, [installer, ...args], {
+    cwd: f.root,
     encoding: 'utf8',
     env: {
       ...process.env,
-      HOME: root,
-      USERPROFILE: root,
-      PATH: root,
-      AGENT_VORCL_HOME: path.join(root, 'avf'),
-      CODEX_HOME: path.join(root, 'codex'),
-      AVF_SKILLS_DIR: path.join(root, 'skills'),
+      HOME: f.home,
+      USERPROFILE: f.home,
+      PATH: f.root,
+      AGENT_VORCL_HOME: path.join(f.home, 'legacy-runtime'),
+      XDG_CONFIG_HOME: path.join(f.home, '.config'),
+      CLAUDE_HOME: path.join(f.home, '.claude'),
+      CODEX_HOME: path.join(f.home, '.codex'),
+      CURSOR_HOME: path.join(f.home, '.cursor'),
+      KIMI_HOME: path.join(f.home, '.kimi'),
+      AVF_SKILLS_DIR: path.join(f.home, '.agents', 'skills'),
       NO_COLOR: '1',
+      ...overrides,
     },
   })
-  assert.equal(result.status, 0, `${result.stdout}\n${result.stderr}`)
+}
+
+function success(result) { assert.equal(result.status, 0, `${result.stdout}\n${result.stderr}`); return result }
+
+function snapshot(root) {
+  const result = {}
+  if (!fs.existsSync(root)) return result
+  const visit = (dir) => {
+    for (const name of fs.readdirSync(dir).sort()) {
+      const file = path.join(dir, name)
+      const relative = path.relative(root, file)
+      const stat = fs.lstatSync(file)
+      result[relative] = stat.isDirectory() ? 'directory' : stat.isSymbolicLink() ? ['symlink', fs.readlinkSync(file)] : [fs.readFileSync(file).toString('base64'), stat.mode & 0o777, stat.mtimeMs]
+      if (stat.isDirectory()) visit(file)
+    }
+  }
+  visit(root)
   return result
 }
 
-test('Claude fallback normalizes array-form enabledPlugins to the supported object form', (t) => {
-  const root = temporaryHome(t)
-  const claudeDir = path.join(root, '.claude')
-  fs.mkdirSync(claudeDir, { recursive: true })
-  fs.writeFileSync(path.join(claudeDir, 'settings.json'), JSON.stringify({
-    enabledPlugins: ['existing@example'],
-  }))
-
-  runInstaller(root, '--claude')
-
-  const settings = JSON.parse(fs.readFileSync(path.join(claudeDir, 'settings.json'), 'utf8'))
-  assert.deepEqual(settings.enabledPlugins, {
-    'existing@example': true,
-    'agent-vorcl-flow@agent-vorcl-flow': true,
-  })
-  assert.match(settings.env.AVF_RUNTIME_TOKEN, /^[A-Za-z0-9_-]{43}$/)
-  assert.equal(fs.statSync(path.join(claudeDir, 'settings.json')).mode & 0o777, 0o600)
+test('help, empty invocation, banner and invalid options have no filesystem effects', (t) => {
+  const f = fixture(t)
+  for (const args of [[], ['--help'], ['-h'], ['--banner-only'], ['--codex', '--help']]) {
+    assert.match(success(run(f, args)).stdout, /Agent-Vorcl-Flow/)
+    assert.deepEqual(fs.readdirSync(f.home), [])
+  }
+  for (const args of [['--typo'], ['runtime', 'start'], ['--help', '--typo'], ['--codex', '--typo']]) {
+    const result = run(f, args)
+    assert.equal(result.status, 1)
+    assert.match(result.stderr, /Unknown option/)
+    assert.deepEqual(fs.readdirSync(f.home), [])
+  }
 })
 
-test('Claude fallback repairs malformed enabledPlugins without losing unrelated settings', (t) => {
-  const root = temporaryHome(t)
-  const claudeDir = path.join(root, '.claude')
-  fs.mkdirSync(claudeDir, { recursive: true })
-  fs.writeFileSync(path.join(claudeDir, 'settings.json'), JSON.stringify({
-    enabledPlugins: 'broken',
-    theme: 'dark',
-  }))
-
-  runInstaller(root, '--claude')
-
-  const settings = JSON.parse(fs.readFileSync(path.join(claudeDir, 'settings.json'), 'utf8'))
-  assert.deepEqual(settings.enabledPlugins, { 'agent-vorcl-flow@agent-vorcl-flow': true })
-  assert.equal(settings.theme, 'dark')
+test('all adapters preserve client settings, MCP, credentials, global rules and Task Master byte for byte', (t) => {
+  const f = fixture(t)
+  const files = [
+    '.claude/settings.json', '.claude/.mcp.json', '.codex/config.toml', '.codex/AGENTS.md',
+    '.cursor/mcp.json', '.kimi/mcp.json', '.kimi/config.toml',
+    '.taskmaster/tasks/tasks.json', '.taskmaster/config.json', 'legacy-runtime/.env', 'legacy-runtime/runtime.json',
+  ]
+  for (const file of files) put(path.join(f.home, file), `user-owned ${file}\ninvalid settings are still preserved\n`)
+  const before = snapshot(f.home)
+  success(run(f, ['--all']))
+  const after = snapshot(f.home)
+  for (const file of files) assert.deepEqual(after[file], before[file], file)
+  for (const client of ['.claude', '.cursor', '.kimi']) assert.ok(fs.existsSync(path.join(f.home, client, 'skills/backend/SKILL.md')))
+  assert.ok(fs.existsSync(path.join(f.home, '.agents/skills/backend/SKILL.md')))
+  assert.ok(fs.existsSync(path.join(f.home, '.claude/agents/avf-backend.md')))
+  assert.ok(fs.existsSync(path.join(f.home, '.cursor/agents/avf-backend.md')))
+  assert.ok(fs.existsSync(path.join(f.home, '.kimi/agents/avf-backend.yaml')))
+  assert.ok(!fs.existsSync(path.join(f.home, '.config')))
+  assert.ok(!fs.existsSync(path.join(f.home, 'Library')))
+  assert.ok(!fs.existsSync(path.join(f.home, 'legacy-runtime/bin')))
 })
 
-test('Claude fallback preserves object-form plugin choices and enables AVF', (t) => {
-  const root = temporaryHome(t)
-  const claudeDir = path.join(root, '.claude')
-  fs.mkdirSync(claudeDir, { recursive: true })
-  fs.writeFileSync(path.join(claudeDir, 'settings.json'), JSON.stringify({
-    enabledPlugins: { 'disabled@example': false, 'enabled@example': true },
-  }))
-
-  runInstaller(root, '--claude')
-
-  const settings = JSON.parse(fs.readFileSync(path.join(claudeDir, 'settings.json'), 'utf8'))
-  assert.deepEqual(settings.enabledPlugins, {
-    'disabled@example': false,
-    'enabled@example': true,
-    'agent-vorcl-flow@agent-vorcl-flow': true,
-  })
+test('dry run previews all components without even creating destination directories', (t) => {
+  const f = fixture(t)
+  const result = success(run(f, ['--all', '--dry-run']))
+  assert.match(result.stdout, /Preview/)
+  assert.deepEqual(fs.readdirSync(f.home), [])
 })
 
-test('Codex install replaces stale AVF blocks and stays idempotent', (t) => {
-  const root = temporaryHome(t)
-  const codexDir = path.join(root, 'codex')
-  fs.mkdirSync(codexDir, { recursive: true })
-  const config = path.join(codexDir, 'config.toml')
-  const agents = path.join(codexDir, 'AGENTS.md')
-  fs.writeFileSync(config, 'model = "user-model"\n# >>> agent-vorcl-flow >>>\nold = true\n# <<< agent-vorcl-flow <<<\n')
-  fs.writeFileSync(agents, '# User rules\n# >>> agent-vorcl-flow >>>\nstale\n# <<< agent-vorcl-flow <<<\n')
+test('unowned skill directories including upstream Firecrawl are never overlaid or adopted', (t) => {
+  const f = fixture(t)
+  const skills = path.join(f.home, '.agents/skills')
+  put(path.join(skills, 'backend/SKILL.md'), 'user backend')
+  put(path.join(skills, 'firecrawl/SKILL.md'), 'upstream firecrawl')
+  put(path.join(skills, 'firecrawl/scripts/helper.mjs'), 'upstream helper')
+  const beforeBackend = snapshot(path.join(skills, 'backend'))
+  const beforeFirecrawl = snapshot(path.join(skills, 'firecrawl'))
+  const result = success(run(f, ['--codex']))
+  assert.match(result.stderr, /not owned by this installer/)
+  assert.deepEqual(snapshot(path.join(skills, 'backend')), beforeBackend)
+  assert.deepEqual(snapshot(path.join(skills, 'firecrawl')), beforeFirecrawl)
+  const owned = JSON.parse(fs.readFileSync(path.join(skills, MANIFEST), 'utf8')).components
+  assert.deepEqual(Object.keys(owned), ['workflow'])
+})
 
-  runInstaller(root, '--codex')
-  const firstConfig = fs.readFileSync(config, 'utf8')
-  const firstAgents = fs.readFileSync(agents, 'utf8')
-  runInstaller(root, '--codex')
+test('agent name collisions are preserved and generated agents inherit the client model', (t) => {
+  const f = fixture(t)
+  const target = path.join(f.home, '.cursor/agents/avf-backend.md')
+  put(target, 'user agent')
+  success(run(f, ['--cursor', '--claude']))
+  assert.equal(fs.readFileSync(target, 'utf8'), 'user agent')
+  const claude = fs.readFileSync(path.join(f.home, '.claude/agents/avf-backend.md'), 'utf8')
+  assert.match(claude, /name: avf-backend/)
+  assert.match(claude, /model: inherit/)
+  assert.match(claude, /\/backend-vorcl/)
+})
 
-  assert.equal(fs.readFileSync(config, 'utf8'), firstConfig)
-  assert.equal(fs.readFileSync(agents, 'utf8'), firstAgents)
-  assert.match(firstConfig, /^model = "user-model"/)
-  assert.doesNotMatch(firstConfig, /old = true/)
-  assert.match(firstConfig, /\[mcp_servers\.github\]/)
-  assert.match(firstConfig, /\[mcp_servers\.avf-runtime\]/)
-  assert.doesNotMatch(firstConfig, /%%AVF_RUNTIME_TOKEN%%/)
-  assert.equal(fs.statSync(config).mode & 0o777, 0o600)
-  const runtimeConfig = JSON.parse(fs.readFileSync(path.join(root, 'avf', 'runtime.json'), 'utf8'))
-  assert.equal(runtimeConfig.token.length >= 43, true)
-  assert.equal(fs.statSync(path.join(root, 'avf', 'runtime.json')).mode & 0o777, 0o600)
-  assert.match(firstAgents, /^# User rules/)
-  assert.doesNotMatch(firstAgents, /\nstale\n/)
-  assert.equal((firstConfig.match(/# >>> agent-vorcl-flow >>>/g) || []).length, 1)
-  assert.equal(
-    fs.readFileSync(path.join(root, 'skills', 'workflow', 'scripts', 'vorcl-run.mjs'), 'utf8'),
-    fs.readFileSync(path.resolve('scripts/vorcl-run.mjs'), 'utf8'),
-  )
-  const installedLiveboard = fs.readFileSync(path.join(root, 'skills', 'liveboard', 'SKILL.md'), 'utf8')
-  const canonicalLiveboard = fs.readFileSync(path.resolve('codex/skills/liveboard/SKILL.md'), 'utf8')
-  assert.match(installedLiveboard, /agent-vorcl-flow project-description/)
-  assert.ok(installedLiveboard.endsWith(canonicalLiveboard.slice(canonicalLiveboard.indexOf('# Liveboard'))))
-  assert.equal(
-    fs.readFileSync(path.join(root, 'skills', 'liveboard', 'scripts', 'server.mjs'), 'utf8'),
-    fs.readFileSync(path.resolve('skills/liveboard/scripts/server.mjs'), 'utf8'),
-  )
-  assert.equal(
-    fs.readFileSync(path.join(root, 'skills', 'init-code', 'scripts', 'inspect.mjs'), 'utf8'),
-    fs.readFileSync(path.resolve('skills/init-code/scripts/inspect.mjs'), 'utf8'),
-  )
-  assert.equal(
-    fs.readFileSync(path.join(root, 'skills', 'init-code', 'scripts', 'check-impact.mjs'), 'utf8'),
-    fs.readFileSync(path.resolve('skills/init-code/scripts/check-impact.mjs'), 'utf8'),
-  )
-  const directSkill = fs.readFileSync(path.join(root, 'skills', 'backend-create-api', 'SKILL.md'), 'utf8')
-  assert.match(directSkill, /agent-vorcl-flow project-description/)
-  assert.match(directSkill, /PROJECT_DESCRIPTION\.md/)
-  assert.match(directSkill, /--external/)
+test('Cursor permissions come from explicit role metadata rather than a hardcoded tool list', (t) => {
+  const f = fixture(t)
+  const source = path.join(f.pkg, 'agents/backend.md')
+  fs.writeFileSync(source, fs.readFileSync(source, 'utf8').replace(/^tools:.*\n/m, ''))
+  success(run(f, ['--cursor']))
+  const target = path.join(f.home, '.cursor/agents/avf-backend.md')
+  assert.match(fs.readFileSync(target, 'utf8'), /readonly: false/)
+  put(path.join(f.pkg, 'scripts', 'roles.json'), JSON.stringify({ roles: [{ id: 'backend', readonly: true }] }))
+  success(run(f, ['--cursor']))
+  assert.match(fs.readFileSync(target, 'utf8'), /readonly: true/)
+})
+
+test('reinstall is byte and mtime idempotent; updates replace only unchanged owned components', (t) => {
+  const f = fixture(t)
+  success(run(f, ['--all']))
+  const first = snapshot(f.home)
+  success(run(f, ['--all']))
+  assert.deepEqual(snapshot(f.home), first)
+  const skill = path.join(f.home, '.agents/skills/backend')
+  put(path.join(skill, 'user-note.txt'), 'keep me')
+  put(path.join(f.pkg, 'codex/skills/backend/SKILL.md'), '---\nname: backend\ndescription: Updated\n---\nnew backend\n')
+  put(path.join(f.pkg, 'skills/workflow/scripts/helper.mjs'), '// updated\n')
+  // An obsolete package asset must disappear from an otherwise untouched skill.
+  fs.unlinkSync(path.join(f.pkg, 'skills/workflow/scripts/helper.mjs'))
+  const local = snapshot(skill)
+  const result = success(run(f, ['--codex']))
+  assert.match(result.stderr, /locally modified/)
+  assert.deepEqual(snapshot(skill), local)
+  assert.ok(!fs.existsSync(path.join(f.home, '.agents/skills/workflow/scripts/helper.mjs')))
+})
+
+test('an edited installed agent stays untouched during a package upgrade', (t) => {
+  const f = fixture(t)
+  success(run(f, ['--cursor']))
+  const target = path.join(f.home, '.cursor/agents/avf-backend.md')
+  fs.appendFileSync(target, '\nUser customization\n')
+  const before = fs.readFileSync(target, 'utf8')
+  fs.appendFileSync(path.join(f.pkg, 'agents/backend.md'), '\nNew package behavior\n')
+  success(run(f, ['--cursor']))
+  assert.equal(fs.readFileSync(target, 'utf8'), before)
+})
+
+test('skill assets and maintenance context are installed only in owned components', (t) => {
+  const f = fixture(t)
+  success(run(f, ['--codex']))
+  const skills = path.join(f.home, '.agents/skills')
+  const prompt = fs.readFileSync(path.join(skills, 'backend/SKILL.md'), 'utf8')
+  assert.match(prompt, /PROJECT_DESCRIPTION\.md/)
+  assert.match(prompt, /--external/)
+  assert.equal((prompt.match(/<!-- >>> agent-vorcl-flow project-description >>>/g) || []).length, 1)
+  assert.equal(fs.readFileSync(path.join(skills, 'backend/scripts/helper.mjs'), 'utf8'), '// canonical helper\n')
+  assert.equal(fs.readFileSync(path.join(skills, 'workflow/scripts/vorcl-run.mjs'), 'utf8'), '// workflow helper\n')
+})
+
+test('relative paths and corrupt ownership state fail before any selected adapter is installed', (t) => {
+  const f = fixture(t)
+  let result = run(f, ['--all'], { KIMI_HOME: 'relative' })
+  assert.equal(result.status, 1)
+  assert.match(result.stderr, /absolute path/)
+  assert.deepEqual(fs.readdirSync(f.home), [])
+  const file = path.join(f.home, '.kimi/agents', MANIFEST)
+  put(file, '{not json')
+  const before = snapshot(f.home)
+  result = run(f, ['--all'])
+  assert.equal(result.status, 1)
+  assert.deepEqual(snapshot(f.home), before)
+})
+
+test('destination symlinks are never followed; unowned symlink components are preserved', (t) => {
+  const f = fixture(t)
+  const external = path.join(f.root, 'external')
+  fs.mkdirSync(external)
+  fs.symlinkSync(external, path.join(f.home, '.cursor'))
+  assert.equal(run(f, ['--all']).status, 1)
+  assert.deepEqual(fs.readdirSync(external), [])
+  assert.ok(!fs.existsSync(path.join(f.home, '.claude')))
+  const skills = path.join(f.home, '.agents/skills')
+  fs.mkdirSync(skills, { recursive: true })
+  fs.symlinkSync(external, path.join(skills, 'backend'))
+  success(run(f, ['--codex']))
+  assert.deepEqual(fs.readdirSync(external), [])
+  assert.ok(fs.lstatSync(path.join(skills, 'backend')).isSymbolicLink())
+})
+
+test('legacy diagnostic is read only and never prints settings or credential values', (t) => {
+  const f = fixture(t)
+  put(path.join(f.home, '.codex/config.toml'), '# >>> agent-vorcl-flow >>>\nsecret = "unique-private-value"\n')
+  put(path.join(f.home, '.codex/AGENTS.md'), '# Agent-Vorcl-Flow\nLegacy rules\n')
+  put(path.join(f.home, 'Library/LaunchAgents/io.vorcl.agent-flow-runtime.plist'), 'private service definition')
+  put(path.join(f.home, '.config/systemd/user/agent-vorcl-flow-runtime.service'), 'private linux service definition')
+  put(path.join(f.home, 'legacy-runtime/.env'), 'private credentials')
+  const before = snapshot(f.home)
+  const result = success(run(f, ['--check-legacy']))
+  assert.match(result.stdout, /Possible legacy AVF configuration/)
+  assert.doesNotMatch(result.stdout + result.stderr, /unique-private-value/)
+  assert.doesNotMatch(result.stdout + result.stderr, /private credentials|private service definition/)
+  assert.match(result.stdout, /AGENTS\.md/)
+  assert.match(result.stdout, /io\.vorcl\.agent-flow-runtime\.plist/)
+  assert.match(result.stdout, /agent-vorcl-flow-runtime\.service/)
+  assert.match(result.stdout, /legacy-runtime/)
+  assert.deepEqual(snapshot(f.home), before)
+})
+
+test('an existing installer lock cannot be stolen or removed', (t) => {
+  const f = fixture(t)
+  const lock = path.join(f.home, '.agents/skills/.agent-vorcl-flow-install.lock')
+  put(lock, 'another process\n')
+  const before = snapshot(f.home)
+  const result = run(f, ['--codex'])
+  assert.equal(result.status, 1)
+  assert.match(result.stderr, /installation lock exists/)
+  assert.deepEqual(snapshot(f.home), before)
+})
+
+test('package adapters ship no MCP registrations', () => {
+  for (const file of ['.mcp.json', 'cursor/mcp.json', 'kimi/mcp.json']) assert.deepEqual(JSON.parse(fs.readFileSync(file, 'utf8')).mcpServers, {}, file)
+  for (const file of ['.claude-plugin/plugin.json', '.codex-plugin/plugin.json']) assert.ok(!Object.hasOwn(JSON.parse(fs.readFileSync(file, 'utf8')), 'mcpServers'), file)
+  assert.doesNotMatch(fs.readFileSync('codex/config.toml', 'utf8'), /\[(mcp_servers|profiles)\./)
 })
 
 test('manual Codex entrypoint delegates to the single installer implementation', () => {
-  const source = fs.readFileSync(path.resolve('codex/scripts/install.sh'), 'utf8')
-  assert.match(source, /exec node "\$PKG_ROOT\/bin\/install\.mjs" --codex/)
+  const source = fs.readFileSync('codex/scripts/install.sh', 'utf8')
+  assert.match(source, /exec node "\$PKG_ROOT\/bin\/install\.mjs" --codex "\$@"/)
   assert.doesNotMatch(source, /cp -R|config\.toml.*>>/)
 })
 
-test('Cursor and Kimi receive the same role set and shared workflow/runtime assets', (t) => {
-  const root = temporaryHome(t)
-  const roles = JSON.parse(fs.readFileSync(path.resolve('scripts/roles.json'), 'utf8')).roles.map(({ id }) => id)
-
-  runInstaller(root, '--cursor')
-  runInstaller(root, '--kimi')
-
-  for (const skillsDir of [path.join(root, '.cursor', 'skills'), path.join(root, '.kimi', 'skills')]) {
-    for (const role of roles) assert.ok(fs.existsSync(path.join(skillsDir, role, 'SKILL.md')), `${skillsDir}: missing ${role}`)
-    assert.ok(fs.existsSync(path.join(skillsDir, 'workflow', 'scripts', 'vorcl-run.mjs')))
-    assert.ok(fs.existsSync(path.join(skillsDir, 'liveboard', 'scripts', 'server.mjs')))
-    assert.ok(fs.existsSync(path.join(skillsDir, 'init-code', 'scripts', 'inspect.mjs')))
-    assert.ok(fs.existsSync(path.join(skillsDir, 'init-code', 'scripts', 'check-impact.mjs')))
-    assert.ok(fs.existsSync(path.join(skillsDir, 'init-code', 'scripts', 'validate-description.mjs')))
-    const directSkill = fs.readFileSync(path.join(skillsDir, 'frontend-create-component', 'SKILL.md'), 'utf8')
-    assert.match(directSkill, /agent-vorcl-flow project-description/)
-    assert.match(directSkill, /A proven stale description blocks completion/)
-  }
-  assert.ok(fs.existsSync(path.join(root, '.cursor', 'agents', 'avf-backend.md')))
-  assert.ok(fs.existsSync(path.join(root, '.kimi', 'agents', 'avf-expo-mobile.yaml')))
-  for (const file of [path.join(root, '.cursor', 'mcp.json'), path.join(root, '.kimi', 'mcp.json')]) {
-    const config = JSON.parse(fs.readFileSync(file, 'utf8'))
-    assert.equal(config.mcpServers['avf-runtime'].url, 'http://127.0.0.1:19790/mcp')
-    assert.match(config.mcpServers['avf-runtime'].headers.Authorization, /^Bearer [A-Za-z0-9_-]{43}$/)
-    assert.equal(fs.statSync(file).mode & 0o777, 0o600)
+test('manual Codex entrypoint forwards help and preview without installing', { skip: !fs.existsSync('/bin/bash') }, (t) => {
+  const f = fixture(t)
+  // The wrapper intentionally invokes node from PATH, as documented.
+  fs.symlinkSync(process.execPath, path.join(f.root, 'node'))
+  const script = path.join(f.pkg, 'codex/scripts/install.sh')
+  put(script, fs.readFileSync('codex/scripts/install.sh'))
+  for (const args of [['--help'], ['--dry-run'], ['--unknown']]) {
+    const result = run(f, args, { PATH: `${f.root}:/usr/bin:/bin` }, script, '/bin/bash')
+    assert.equal(result.status, args[0] === '--unknown' ? 1 : 0, result.stderr)
+    assert.deepEqual(fs.readdirSync(f.home), [])
   }
 })
 
-test('Codex install omits AVF TOML tables already owned by the user', (t) => {
-  const root = temporaryHome(t)
-  const codexDir = path.join(root, 'codex')
-  fs.mkdirSync(codexDir, { recursive: true })
-  const config = path.join(codexDir, 'config.toml')
-  fs.writeFileSync(config, '[mcp_servers.github]\ncommand = "custom-github"\n')
-
-  runInstaller(root, '--codex')
-
-  const installed = fs.readFileSync(config, 'utf8')
-  assert.equal((installed.match(/\[mcp_servers\.github\]/g) || []).length, 1)
-  assert.match(installed, /command = "custom-github"/)
-  assert.match(installed, /\[mcp_servers\.filesystem\]/)
+test('real package installs the role set and canonical helpers in an isolated home', (t) => {
+  const f = fixture(t)
+  success(run(f, ['--all'], {}, realInstaller))
+  const roles = JSON.parse(fs.readFileSync('scripts/roles.json', 'utf8')).roles.map(({ id }) => id)
+  for (const prefix of ['.agents', '.claude', '.cursor', '.kimi']) {
+    for (const role of roles) assert.ok(fs.existsSync(path.join(f.home, prefix, 'skills', role, 'SKILL.md')), `${prefix}: ${role}`)
+    for (const file of ['init-code/scripts/inspect.mjs', 'init-code/scripts/check-impact.mjs', 'liveboard/scripts/server.mjs']) assert.ok(fs.existsSync(path.join(f.home, prefix, 'skills', file)), `${prefix}: ${file}`)
+  }
+  assert.ok(!fs.existsSync(path.join(f.home, '.codex')))
+  assert.ok(!fs.existsSync(path.join(f.home, 'legacy-runtime')))
+  assert.ok(!fs.existsSync(path.join(f.home, '.taskmaster')))
+  for (const prefix of ['.claude', '.cursor', '.kimi']) assert.ok(!fs.existsSync(path.join(f.home, prefix, 'mcp.json')))
+  for (const role of ['analyzer', 'integrity', 'security', 'visual-research', 'pinpoint']) {
+    const installed = fs.readFileSync(path.join(f.home, '.cursor/agents', `avf-${role}.md`), 'utf8')
+    assert.match(installed, /readonly: true/, role)
+  }
+  for (const role of ['backend', 'frontend', 'testing', 'swagger']) {
+    const installed = fs.readFileSync(path.join(f.home, '.cursor/agents', `avf-${role}.md`), 'utf8')
+    assert.match(installed, /readonly: false/, role)
+  }
 })
 
-test('Codex install refuses a malformed marked block without changing the config', (t) => {
-  const root = temporaryHome(t)
-  const codexDir = path.join(root, 'codex')
-  fs.mkdirSync(codexDir, { recursive: true })
-  const config = path.join(codexDir, 'config.toml')
-  const malformed = 'model = "user-model"\n# >>> agent-vorcl-flow >>>\nunterminated = true\n'
-  fs.writeFileSync(config, malformed)
-
-  const result = spawnSync(process.execPath, [installer, '--codex'], {
-    cwd: path.resolve('.'),
-    encoding: 'utf8',
-    env: {
-      ...process.env,
-      HOME: root,
-      USERPROFILE: root,
-      PATH: root,
-      AGENT_VORCL_HOME: path.join(root, 'avf'),
-      CODEX_HOME: codexDir,
-      AVF_SKILLS_DIR: path.join(root, 'skills'),
-      NO_COLOR: '1',
-    },
-  })
-
-  assert.equal(result.status, 1)
-  assert.match(result.stderr, /повреждён marked block/)
-  assert.equal(fs.readFileSync(config, 'utf8'), malformed)
+test('Cursor agent descriptions decode YAML JSON quotes exactly once', (t) => {
+  const f = fixture(t)
+  const description = 'Backend: preserve "quoted text", C:\\example and Unicode — описание'
+  put(path.join(f.pkg, 'agents/backend.md'), `---\nname: backend\ndescription: ${JSON.stringify(description)}\n---\nBackend role.\n`)
+  success(run(f, ['--cursor', '--claude']))
+  for (const adapter of ['.cursor', '.claude']) {
+    const content = fs.readFileSync(path.join(f.home, adapter, 'agents/avf-backend.md'), 'utf8')
+    const scalar = content.match(/^description: (.*)$/m)[1]
+    assert.equal(JSON.parse(scalar), description, adapter)
+  }
 })

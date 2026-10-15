@@ -8,5 +8,4 @@
 
 The upstream skill tree was imported in full, including built-in skills, starter components,
 design-system utilities, Figma importer, PPTX/video exporters, tests, vendored runtime files,
-and upstream synchronization metadata. AVF changes are limited to naming, routing, Task Master
-workflow integration, command entry points, Codex packaging, and this provenance record.
+and upstream synchronization metadata. AVF changes are limited to naming, routing, session-first workflow integration with optional Task Master, command entry points, Codex packaging, and this provenance record.

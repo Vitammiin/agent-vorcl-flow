@@ -1,7 +1,6 @@
 ---
 description: Поиск научных работ и GitHub-контекста через Firecrawl research index с проверяемыми источниками.
 argument-hint: "<вопрос / paper / GitHub query>"
-allowed-tools: Read, Write, Bash, Grep, Glob, WebFetch
 ---
 
 Исследуй тему: **$ARGUMENTS**.

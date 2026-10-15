@@ -1,20 +1,12 @@
 ---
-description: Выбрать AI-провайдера и модель Task Master: OpenAI по OPENAI_API_KEY, Claude по ANTHROPIC_API_KEY или Codex CLI по OAuth. Use когда нужно переключить main/fallback model или уйти от Perplexity для обычной генерации задач.
-argument-hint: "<openai|anthropic|codex-cli> [model-id]"
-allowed-tools: Read, Bash, Grep, Glob
+description: "Явно запрошенное изменение provider/model Task Master с сохранением остальных настроек; не часть обычного workflow."
+argument-hint: "<project root> <provider/model и изменяемое поле>"
 ---
 
-Настрой провайдера Task Master для текущего проекта: **$ARGUMENTS**.
+Обработай явный запрос на настройку Task Master: **$ARGUMENTS**. Эта команда не является prerequisite разработки и не запускается для лечения недоступного MCP.
 
-1. Выполни `task-master models` и покажи текущие `main`, `research`, `fallback` и только факт наличия ключей — никогда их значения.
-2. Проверь выбранный способ:
-   - `openai` → требуется `OPENAI_API_KEY`;
-   - `anthropic`/`claude` → требуется `ANTHROPIC_API_KEY`;
-   - `codex-cli` → API-ключ не обязателен, нужна авторизация `codex login`.
-3. Если `model-id` не передан, получи доступный список через `task-master models` и попроси пользователя выбрать; не угадывай актуальный ID модели.
-4. Установи main-модель официальной CLI-командой:
-   - OpenAI/Anthropic: `task-master models --set-main=<model-id>` (провайдер определяется Task Master по модели);
-   - Codex CLI: `task-master models --set-main=<model-id> --codex-cli`.
-5. Снова выполни `task-master models` и докажи, что `main` переключён. Не меняй `research` и `fallback`, если пользователь явно не попросил.
-
-Выбор сохраняется самим Task Master в `.taskmaster/config.json`; ключи остаются только в окружении/MCP-конфиге и никогда не записываются в проект. `PERPLEXITY_API_KEY` относится к опциональной research-модели и не нужен, если обычные AI-команды обслуживает выбранный `main`.
+1. Определи конкретный проект, выбранный пользователем provider/model и поле (`main`, `research` или `fallback`). При отсутствии выбора сначала покажи доступные варианты без мутации.
+2. Прочитай `task-master`. Обнаружь уже доступный адаптер и его schema/CLI `--help`; не предполагается фиксированное имя MCP или списка providers/models.
+3. Прочитай текущие настройки read-only. Не показывай секреты. Используй существующий механизм авторизации пользователя; не создавай env-файлы, не переключай transport и не запускай login/init/install автоматически.
+4. Примени только явно запрошенное изменение поддерживаемой операцией адаптера. Не меняй другие поля, подключение, задачи или backlog; не редактируй JSON вручную.
+5. Прочитай результат и подтверди изменённое поле. Если адаптер/модель недоступны, сообщи ограничение, не подбирай замену самостоятельно.

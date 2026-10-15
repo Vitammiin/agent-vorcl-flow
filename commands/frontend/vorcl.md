@@ -1,15 +1,12 @@
 ---
-description: Точка входа в Task Master workflow для цели (frontend). Use when нужно довести UI-цель (экраны, фичи, компоненты) через цикл задач Task Master до реализованного и протестированного результата.
+description: "Цель роли frontend: session-first план, реализация в разрешённом scope и независимая проверка; Task Master только по явному выбору."
 argument-hint: "<цель / objective>"
-allowed-tools: Read, Write, Edit, Bash, Grep, Glob
 ---
 
-Возьми цель в работу через Task Master: **$ARGUMENTS**. Если `$ARGUMENTS` пуст — спроси цель одной фразой, не запускай init вслепую.
+Возьми цель **$ARGUMENTS** как роль `frontend`. Если цель уже понятна из контекста, продолжай; иначе уточни scope.
 
-1. Убедись, что Task Master инициализирован (`.taskmaster/`); если нет — `task-master init`.
-2. Преврати цель в задачи: крупная фича — оформи/дополни PRD в `.taskmaster/docs/prd.txt` и запусти `parse_prd`; точечная — `add_task`.
-3. `next_task` → `get_task`; при высокой сложности — `expand_task` (после `analyze_project_complexity`).
-4. Реализуй текущую задачу по feature-based структуре (`src/features/*`), фиксируя ход через `update_subtask`.
-5. Проверь `testStrategy` (прогони тесты компонентов); при успехе — `set_task_status --status=done`; вернись к шагу 3, пока есть задачи.
-
-Опирайся на навыки `workflow`, `task-master`, `frontend-architecture`. Делегируй реализацию субагенту `frontend`.
+1. Прочитай роль `frontend` и `workflow`; примени `workspace-capability-routing` для неоднозначного scope. Загрузи только необходимые domain/task skills и сохрани workspace evidence.
+2. По умолчанию используй session-first: зафиксируй scope, план, acceptance criteria и `testStrategy` в сессии. Не создавай `.taskmaster/`, не запускай init и не меняй MCP/provider/model configuration.
+3. Task Master подключай только по явному выбору пользователя и доступным в сессии capabilities. Тогда прочитай `task-master`, сохрани возвращённые IDs в allowlist, создай scoped run и сделай atomic claim перед `in-progress`. Bare `next_task` запрещён. Отсутствие Task Master не блокирует работу; не заявляй о сохранении статуса в недоступном трекере.
+4. Executor выполняет только согласованный scope. Независимый Checker проверяет `testStrategy`, не меняет implementation/acceptance tests и возвращает evidence. Только Orchestrator завершает задачу; не продолжай посторонний backlog.
+5. Если существует `PROJECT_DESCRIPTION.md`, соблюдай maintenance contract из `workflow`. Выдай результат, проверки и оставшиеся ограничения.

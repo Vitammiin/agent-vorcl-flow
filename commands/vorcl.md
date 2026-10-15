@@ -1,20 +1,13 @@
 ---
-description: "Универсальный scoped Task Master orchestrator: фиксирует IDs текущей цели, атомарно claim-ит их и делегирует реализацию и независимую проверку."
+description: "Session-first orchestrator: ограниченный план, делегирование и независимая проверка; Task Master только по явному выбору."
 argument-hint: "<цель / objective>"
-allowed-tools: Read, Write, Edit, Bash, Grep, Glob
 ---
 
-Возьми цель: **$ARGUMENTS**. Сначала выбери режим из `workflow`: report-only пишет только явно запрошенный report artifact, но не `.taskmaster`/product state; track-only не меняет product code; remediation разрешает изменения только в границах запроса.
+Возьми цель **$ARGUMENTS**. Прочитай `workflow`: по умолчанию session-first, план и evidence в сессии без Task Master или `.taskmaster/`. Режим report-only разрешает только запрошенный report artifact; track-only — только разрешённые metadata; remediation — изменения в scope запроса.
 
-До создания задач примени `workspace-capability-routing`: сопоставь requested outcome с manifests/entrypoints/configs текущего workspace, выбери одного primary owner и только необходимые supporting roles/skills. Сохрани evidence и не маршрутизируй по incidental runtime (например, Node не означает backend, если результат — видео/дизайн).
+Сначала примени `workspace-capability-routing`: requested outcome + manifests/entrypoints/configs → один primary owner и необходимые supporting skills. Зафиксируй acceptance criteria и `testStrategy`, делегируй Executor, затем независимому Checker. Только Orchestrator завершает задачу после evidence. Не меняй MCP, providers, модели или ключи пользователя.
 
-Для persistent режима:
-
-1. `add_task`/`parse_prd`; сохрани только возвращённые IDs.
-2. Создай scoped run через `scripts/vorcl-run.mjs`; для каждого ID выполни atomic claim, затем `get_task` и `set_task_status in-progress`. Bare `next_task` запрещён.
-3. Делегируй Executor по `workspace-capability-routing` и registry `scripts/roles.json`. Он работает только над claimed ID.
-4. Отдельный Checker выполняет `testStrategy`, не редактируя implementation/acceptance tests.
-5. Только Orchestrator ставит `done`; остановись, когда терминальны IDs run, а не весь backlog.
+Task Master подключается только по явному выбору пользователя. Тогда прочитай `task-master`, обнаружь доступные инструменты, сохрани возвращённые при создании задач IDs, создай scoped run и выполняй atomic claim перед `in-progress`. Bare `next_task` запрещён. Не запускай init автоматически; отсутствие Task Master не блокирует session-first работу. Заверши по текущему scope, не по всему backlog.
 
 Короткий router: architecture — `architect`, `principal-architect`, `archmap`; implementation — `backend`, `frontend`, `expo-mobile`; audits/contracts — `analyzer`, `integrity`, `security`, `resilience`, `logging`, `swagger`; data/platform — `database`, `render`, `devops`; visual/source — `screenshot`, `design-studio`, `visual-research`, `pinpoint`; artifacts — `drawio`, `mermaid`, `docs`; verification/release — `testing`, `gitflow`; research/operations — `firecrawl`, `liveboard`.
 

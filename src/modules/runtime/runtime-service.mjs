@@ -4,18 +4,23 @@ import { ExecutionEnvelopeSchema, ToolReceiptSchema } from './schemas.mjs'
 import { JobService } from './job-service.mjs'
 import { classifyOperation, LocalWorkspaceBackend } from './execution-service.mjs'
 import { PermissionService } from './permission-service.mjs'
-import { TaskMasterBridge } from './task-master-bridge.mjs'
 import { AnthropicMessagesAdapter, AutonomousRunner, OpenAIResponsesAdapter } from './provider-adapters.mjs'
 import { createId, isoNow } from '../../shared/runtime-utils.mjs'
 
 export class RuntimeService {
   #contexts = new Map()
+  #mutationChain = Promise.resolve()
+  mutate(operation) {
+    const result = this.#mutationChain.then(operation, operation)
+    this.#mutationChain = result.catch(() => {})
+    return result
+  }
   constructor({ sessions, registry }) { this.sessions = sessions; this.registry = registry }
   context(sessionId) {
     const session = this.sessions.require(sessionId)
     if (!this.#contexts.has(session.workspaceRoot)) {
       const store = new EventStore(session.workspaceRoot)
-      this.#contexts.set(session.workspaceRoot, { store, permissions: new PermissionService(store), jobs: new JobService(store), backend: new LocalWorkspaceBackend(session.workspaceRoot), taskMaster: new TaskMasterBridge(session.workspaceRoot) })
+      this.#contexts.set(session.workspaceRoot, { store, permissions: new PermissionService(store), jobs: new JobService(store), backend: new LocalWorkspaceBackend(session.workspaceRoot) })
     }
     return { session, ...this.#contexts.get(session.workspaceRoot) }
   }
@@ -30,7 +35,8 @@ export class RuntimeService {
     if (!run || run.workspaceId !== session.workspaceId || run.sessionId !== sessionId) throw new Error('Unknown run for this session')
     return run
   }
-  async cancelRun(sessionId, runId) {
+  cancelRun(sessionId, runId) { return this.mutate(() => this.cancelRunExclusive(sessionId, runId)) }
+  async cancelRunExclusive(sessionId, runId) {
     const { store, jobs } = this.context(sessionId); const run = this.getRun(sessionId, runId)
     if (run.status !== 'running') throw new Error(`Run cannot be cancelled while ${run.status}`)
     await Promise.all(jobs.list(runId).filter((job) => ['queued', 'running', 'waiting_approval'].includes(job.status)).map((job) => jobs.cancel(job.jobId)))
@@ -42,7 +48,9 @@ export class RuntimeService {
     if (run.status !== 'running') throw new Error(`Run cannot request actions while ${run.status}`)
     return context.permissions.request({ ...input, sessionId })
   }
-  async claim(sessionId, { runId, taskId, leaseSeconds }) {
+  claim(sessionId, input) { return this.mutate(() => this.claimExclusive(sessionId, input)) }
+  async claimExclusive(sessionId, { runId, taskId, leaseSeconds = 3600 }) {
+    if (!Number.isInteger(leaseSeconds) || leaseSeconds < 30 || leaseSeconds > 3600) throw new Error('Invalid claim lease')
     const { store } = this.context(sessionId); const run = this.getRun(sessionId, runId)
     if (run.status !== 'running') throw new Error(`Run cannot claim tasks while ${run.status}`)
     if (!run.taskIds.includes(taskId)) throw new Error('Task is outside the run allowlist')
@@ -51,20 +59,21 @@ export class RuntimeService {
     const claim = { taskId, runId, claimedAt: current?.claimedAt ?? isoNow(), renewedAt: isoNow(), expiresAt: new Date(now + leaseSeconds * 1000).toISOString() }
     await store.put('claims', taskId, claim, runId, 'tool.completed', sessionId); return claim
   }
-  async completeTask(sessionId, { runId, taskId, checkerReceiptId }) {
-    const { store, taskMaster } = this.context(sessionId); const run = this.getRun(sessionId, runId); const claim = store.get('claims', taskId); const receipt = store.get('receipts', checkerReceiptId)
+  completeTask(sessionId, input) { return this.mutate(() => this.completeTaskExclusive(sessionId, input)) }
+  async completeTaskExclusive(sessionId, { runId, taskId, checkerReceiptId }) {
+    const { store } = this.context(sessionId); const run = this.getRun(sessionId, runId); const claim = store.get('claims', taskId); const receipt = store.get('receipts', checkerReceiptId)
     if (run.status !== 'running') throw new Error(`Run cannot complete tasks while ${run.status}`)
     if (!claim || claim.runId !== runId) throw new Error('Task is not claimed by this run')
     if (Date.parse(claim.expiresAt) <= Date.now()) throw new Error('Task claim lease expired')
     if (!receipt) throw new Error('A READY checker receipt is required')
     if (receipt.taskId !== taskId) throw new Error('Checker receipt belongs to another task')
     if (receipt.runId !== runId || receipt.status !== 'success' || receipt.checkerVerdict !== 'READY') throw new Error('A READY checker receipt is required')
-    const taskMasterResult = await taskMaster.setDone(taskId)
     const completed = [...new Set([...(run.completedTaskIds ?? []), taskId])]
     const done = completed.length === run.taskIds.length; const next = { ...run, completedTaskIds: completed, status: done ? 'completed' : run.status, updatedAt: isoNow() }
-    await store.put('runs', runId, next, runId, done ? 'run.completed' : 'tool.completed', sessionId); return { ...next, taskMaster: taskMasterResult }
+    await store.put('runs', runId, next, runId, done ? 'run.completed' : 'tool.completed', sessionId); return next
   }
-  async recordReceipt(sessionId, receipt) {
+  recordReceipt(sessionId, receipt) { return this.mutate(() => this.recordReceiptExclusive(sessionId, receipt)) }
+  async recordReceiptExclusive(sessionId, receipt) {
     const { store } = this.context(sessionId); const parsed = ToolReceiptSchema.parse(receipt)
     this.getRun(sessionId, parsed.runId)
     const existing = store.get('receipts', parsed.receiptId)
@@ -91,11 +100,11 @@ export class RuntimeService {
       const toolDefinitions = provider === 'openai' ? [
         { type: 'function', name: 'workspace_read', description: 'Read a UTF-8 workspace file.', parameters: { type: 'object', properties: { file: { type: 'string' }, start: { type: 'number' }, end: { type: 'number' } }, required: ['file'], additionalProperties: false } },
         { type: 'function', name: 'workspace_search', description: 'Search text in the bound workspace.', parameters: { type: 'object', properties: { query: { type: 'string' }, directory: { type: 'string' } }, required: ['query'], additionalProperties: false } },
-        { type: 'function', name: 'propose_action', description: 'Propose one exact write/external action for explicit approval; does not execute it.', parameters: { type: 'object', properties: { actionClass: { type: 'string', enum: ['workspace_write', 'destructive', 'external', 'publish', 'costly'] }, operation: { type: 'string', enum: ['apply_patch', 'exec'] }, description: { type: 'string' }, targets: { type: 'array', items: { type: 'string' } }, reversible: { type: 'boolean' }, payload: { type: 'object' } }, required: ['actionClass', 'operation', 'description', 'targets', 'reversible', 'payload'], additionalProperties: false } },
+        { type: 'function', name: 'propose_action', description: 'Propose one exact write/external action for explicit approval; does not execute it.', parameters: { type: 'object', properties: { actionClass: { type: 'string', enum: ['workspace_write', 'destructive', 'external', 'publish', 'costly'] }, operation: { type: 'string', enum: ['apply_patch'] }, description: { type: 'string' }, targets: { type: 'array', items: { type: 'string' } }, reversible: { type: 'boolean' }, payload: { type: 'object' } }, required: ['actionClass', 'operation', 'description', 'targets', 'reversible', 'payload'], additionalProperties: false } },
       ] : [
         { name: 'workspace_read', description: 'Read a UTF-8 workspace file.', input_schema: { type: 'object', properties: { file: { type: 'string' }, start: { type: 'number' }, end: { type: 'number' } }, required: ['file'] } },
         { name: 'workspace_search', description: 'Search text in the bound workspace.', input_schema: { type: 'object', properties: { query: { type: 'string' }, directory: { type: 'string' } }, required: ['query'] } },
-        { name: 'propose_action', description: 'Propose one exact write/external action for explicit approval; does not execute it.', input_schema: { type: 'object', properties: { actionClass: { type: 'string', enum: ['workspace_write', 'destructive', 'external', 'publish', 'costly'] }, operation: { type: 'string', enum: ['apply_patch', 'exec'] }, description: { type: 'string' }, targets: { type: 'array', items: { type: 'string' } }, reversible: { type: 'boolean' }, payload: { type: 'object' } }, required: ['actionClass', 'operation', 'description', 'targets', 'reversible', 'payload'] } },
+        { name: 'propose_action', description: 'Propose one exact write/external action for explicit approval; does not execute it.', input_schema: { type: 'object', properties: { actionClass: { type: 'string', enum: ['workspace_write', 'destructive', 'external', 'publish', 'costly'] }, operation: { type: 'string', enum: ['apply_patch'] }, description: { type: 'string' }, targets: { type: 'array', items: { type: 'string' } }, reversible: { type: 'boolean' }, payload: { type: 'object' } }, required: ['actionClass', 'operation', 'description', 'targets', 'reversible', 'payload'] } },
       ]
       const executeTool = async ({ name, arguments: args }) => {
         if (name === 'workspace_read') return context.backend.execute('read', args, signal)
@@ -114,6 +123,7 @@ export class RuntimeService {
     }, sessionId)
   }
   async executeAction(sessionId, { actionId, digest, operation, payload }) {
+    if (operation === 'exec') throw new Error('Use the host execution tools; runtime does not execute arbitrary commands')
     const context = this.context(sessionId); const pending = context.permissions.requireExecution(actionId, digest, sessionId, operation, payload)
     const run = this.getRun(sessionId, pending.runId)
     if (run.status !== 'running') throw new Error(`Run cannot execute actions while ${run.status}`)

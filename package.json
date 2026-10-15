@@ -1,7 +1,7 @@
 {
   "name": "agent-vorcl-flow",
-  "version": "3.0.0-beta.0",
-  "description": "Agent-Vorcl-Flow runtime для Claude Code, GPT Codex, Cursor и Kimi CLI: роли, skills, Task Master и локальный HTTP MCP control plane.",
+  "version": "3.0.0",
+  "description": "Engineering roles, skills, and independent verification for coding agents. Preserves user MCP configuration; task tracking is optional.",
   "bin": {
     "agent-vorcl-flow": "bin/install.mjs"
   },
@@ -23,7 +23,8 @@
     "test:design-studio": "node --test skills/design-studio/agents/tests/*.test.mjs",
     "test:principal-architecture": "node --test skills/principal-architecture/tests/*.test.mjs",
     "runtime": "node bin/runtime.mjs",
-    "runtime:test": "node --test tests/runtime-*.test.mjs"
+    "runtime:test": "node --test tests/runtime-*.test.mjs",
+    "generate:codex": "node scripts/generate-codex-skills.mjs --write"
   },
   "files": [
     "bin/",
@@ -60,7 +61,7 @@
     "installer"
   ],
   "engines": {
-    "node": ">=18"
+    "node": ">=20"
   },
   "os": [
     "darwin",

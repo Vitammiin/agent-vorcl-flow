@@ -1,7 +1,6 @@
 ---
 description: Написать или отревьюить Dockerfile — multistage, node-slim, non-root, HEALTHCHECK, .dockerignore; проверка реальным docker build с размером образа (devops). Use when нужно докеризовать приложение или починить/улучшить Dockerfile.
 argument-hint: "[путь к проекту или Dockerfile] [пожелания]"
-allowed-tools: Read, Write, Edit, Bash, Grep, Glob
 ---
 
 Напиши или отревьюй Dockerfile: **$ARGUMENTS**.

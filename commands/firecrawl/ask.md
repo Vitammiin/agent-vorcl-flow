@@ -1,7 +1,6 @@
 ---
 description: Диагностика упавшего или неожиданного Firecrawl job по реальному jobId через support/ask.
 argument-hint: "<jobId> — <вопрос/ошибка>"
-allowed-tools: Read, Write, Bash, Grep, Glob, WebFetch
 ---
 
 Диагностируй Firecrawl job: **$ARGUMENTS**.

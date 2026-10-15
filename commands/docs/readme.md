@@ -1,7 +1,6 @@
 ---
 description: Создать/обновить README — what/quickstart/usage/config/troubleshooting, каждый пример проверен на запускаемость, языковые версии в паритете. Use when README отсутствует, устарел или разъехался с кодом (docs)
 argument-hint: "[путь к README или область; по умолчанию корневой README.md]"
-allowed-tools: Read, Write, Edit, Bash, Grep, Glob
 ---
 
 Создай или обнови README: **$ARGUMENTS**.

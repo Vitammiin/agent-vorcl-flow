@@ -1,7 +1,6 @@
 ---
 description: Релиз по semver — версия из коммитов → синхронизация манифестов → tag → GitHub release; push и публикация ТОЛЬКО с явного подтверждения. Use when нужно выпустить версию (gitflow)
 argument-hint: "[версия vX.Y.Z; пусто — вычислить по semver из коммитов]"
-allowed-tools: Read, Write, Edit, Bash, Grep, Glob
 ---
 
 Подготовь и выпусти релиз: **$ARGUMENTS**.

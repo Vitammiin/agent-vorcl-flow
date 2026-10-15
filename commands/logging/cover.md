@@ -1,7 +1,6 @@
 ---
 description: Покрыть модуль/пакет каноническим Pino logging — root logger, child logger, RequestContext, event-поля. Use when логгера нет или модуль нужно покрыть с нуля; легаси привести — /logging:update, только найти дыры — /logging:audit (logging)
 argument-hint: "<модуль/пакет/worker/route>"
-allowed-tools: Read, Edit, Write, Bash, Grep, Glob
 ---
 
 Покрой область каноническим Pino logging: **$ARGUMENTS**.

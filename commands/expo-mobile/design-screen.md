@@ -1,7 +1,6 @@
 ---
 description: Спроектировать и реализовать premium Expo screen через единый Design, Motion и Interaction System.
 argument-hint: "<экран, сценарий и brand/context>"
-allowed-tools: Read, Write, Edit, Bash, Grep, Glob
 ---
 
 Создай или улучши экран: **$ARGUMENTS**.

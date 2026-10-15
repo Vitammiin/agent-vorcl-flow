@@ -1,7 +1,6 @@
 ---
 description: Read-only запрос/аналитика по БД — Postgres/MongoDB/Redis. Use when нужно прочитать/посчитать данные без изменений; любая мутация — /database:migrate (database)
 argument-hint: "<хранилище> <запрос/вопрос>"
-allowed-tools: Read, Bash, Grep, Glob
 ---
 
 Выполни **read-only** запрос/аналитику по БД: **$ARGUMENTS**.

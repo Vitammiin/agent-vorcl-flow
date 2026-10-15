@@ -1,7 +1,6 @@
 ---
 description: ARCHITECTURE.md — модули, границы, data flow, схема БД; диаграммы через агентов mermaid/drawio, не вслепую. Use when нужна карта архитектуры проекта для новичка-инженера (docs)
 argument-hint: "[область/подсистема; по умолчанию весь репозиторий]"
-allowed-tools: Read, Write, Edit, Bash, Grep, Glob
 ---
 
 Создай или обнови `ARCHITECTURE.md`: **$ARGUMENTS**.

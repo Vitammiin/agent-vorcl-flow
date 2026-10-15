@@ -1,7 +1,6 @@
 ---
 description: Unit-тесты (Vitest/Jest) для файла/модуля — happy path + границы + ошибки, с реальным прогоном и выводом (testing). Use when нужно покрыть функцию/модуль модульными тестами.
 argument-hint: "<файл/модуль> [что важно покрыть]"
-allowed-tools: Read, Write, Edit, Bash, Grep, Glob
 ---
 
 Напиши unit-тесты для: **$ARGUMENTS**.

@@ -1,15 +1,12 @@
 ---
-description: Полное покрытие OpenAPI/Swagger через Task Master — аудит непокрытых роутов → задачи → покрытие → проверка. Use when доводим покрытие спеки до полного по многим роутам циклом задач; один роут — /swagger:cover, только найти дыры — /swagger:audit (swagger)
+description: "Цель роли swagger: session-first план, реализация в разрешённом scope и независимая проверка; Task Master только по явному выбору."
 argument-hint: "[модуль/область/путь; по умолчанию весь код бэка]"
-allowed-tools: Read, Write, Edit, Bash, Grep, Glob
 ---
 
-Доведи покрытие OpenAPI/Swagger до полного через Task Master: **$ARGUMENTS**.
+Возьми цель **$ARGUMENTS** как роль `swagger`. Если цель уже понятна из контекста, продолжай; иначе уточни scope.
 
-1. Убедись, что Task Master инициализирован (`.taskmaster/`); если нет — `task-master init`.
-2. **Определи стек** (не предполагай Fastify) и источник спеки по `package.json`/импортам/файлам: Fastify/Express/NestJS/Koa/Hapi/tRPC, статическая `openapi.{yaml,json}` или не-JS (FastAPI/Spring/DRF). Аудит (**read-only**) по скиллу `swagger-coverage`: собери роуты способом под стек и найди не полностью покрытые спекой (операции нет в спеке; нет `summary`/`description`/`tags`/`operationId`; `responses` без ошибок через общий Error-компонент; защищённый роут без `security`; роут скрыт из спеки; рассинхрон схемы ответа с хендлером; «дыры» против фактической спеки — `/documentation/json` · `/api-json` · `/openapi.json` · генератор).
-3. На каждую значимую дыру — `add_task` (метод+путь роута, модуль/тег, чего не хватает, `file:line`, severity).
-4. `next_task` → `get_task`; покрой роут по скиллу `swagger-coverage` механизмом стека (Fastify `schema`+zod / Nest `@Api*` / tsoa / JSDoc / Hapi `options` / статическая спека): вход + все ответы + общий Error-компонент, `summary`/`description`/`tags`/`operationId`, `security` для защищённых. Ход фиксируй через `update_subtask`.
-5. Проверь `testStrategy`: спека собирается/валидируется (`npx @redocly/cli lint`), `npx openapi-typescript` без ошибок, тесты проходят; при успехе — `set_task_status --status=done`; вернись к шагу 4, пока есть задачи.
-
-Опирайся на навыки `swagger-coverage`, `backend-architecture`, `workflow`, `task-master`. Делегируй субагенту `swagger`.
+1. Прочитай роль `swagger` и `workflow`; примени `workspace-capability-routing` для неоднозначного scope. Загрузи только необходимые domain/task skills и сохрани workspace evidence.
+2. По умолчанию используй session-first: зафиксируй scope, план, acceptance criteria и `testStrategy` в сессии. Не создавай `.taskmaster/`, не запускай init и не меняй MCP/provider/model configuration.
+3. Task Master подключай только по явному выбору пользователя и доступным в сессии capabilities. Тогда прочитай `task-master`, сохрани возвращённые IDs в allowlist, создай scoped run и сделай atomic claim перед `in-progress`. Bare `next_task` запрещён. Отсутствие Task Master не блокирует работу; не заявляй о сохранении статуса в недоступном трекере.
+4. Executor выполняет только согласованный scope. Независимый Checker проверяет `testStrategy`, не меняет implementation/acceptance tests и возвращает evidence. Только Orchestrator завершает задачу; не продолжай посторонний backlog.
+5. Если существует `PROJECT_DESCRIPTION.md`, соблюдай maintenance contract из `workflow`. Выдай результат, проверки и оставшиеся ограничения.

@@ -1,7 +1,6 @@
 ---
 description: GitHub Actions — PR-workflow (lint+typecheck+test с кэшем npm) и main-workflow (build+deploy), concurrency, минимальные permissions, секреты через GitHub secrets; валидация YAML (devops). Use when нужно настроить или починить CI/CD-pipeline.
 argument-hint: "[что настроить: pr|deploy|оба] [особенности проекта]"
-allowed-tools: Read, Write, Edit, Bash, Grep, Glob
 ---
 
 Настрой GitHub Actions: **$ARGUMENTS**.

@@ -1,7 +1,6 @@
 ---
 description: Интеграция Firecrawl API в приложение через официальные upstream firecrawl-build skills.
 argument-hint: "<что Firecrawl должен делать в продукте>"
-allowed-tools: Read, Write, Bash, Grep, Glob, WebFetch
 ---
 
 Интегрируй Firecrawl в продукт: **$ARGUMENTS**.

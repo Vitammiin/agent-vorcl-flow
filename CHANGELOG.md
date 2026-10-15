@@ -7,13 +7,33 @@ and this project follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [3.0.0] - 2026-10-15
+
+### Breaking changes
+
+- Node.js 20 or newer is required by the locked runtime dependency graph.
+
+- Installation requires an explicit client selection. It installs skills and agents only; MCP connections, credentials, models, hooks, services, and Task Master are no longer configured automatically.
+- Workflows use session planning by default. Task Master is an optional adapter selected explicitly by the user; its absence does not block implementation or verification.
+- AVF run coordination now belongs in `.agent-vorcl/`, separate from Task Master state. The optional runtime no longer bridges Task Master or exposes generic shell execution and installed-skill mutation.
+
 ### Added
 
-- Opt-in Agent-Vorcl-Flow Runtime v3 beta: a loopback-only authenticated Streamable HTTP MCP control plane with workspace-bound sessions, durable run events, approval-bound actions, background jobs, structured receipts, provider normalization, and compatibility-preserving role/skill routing.
+- Installer preview and legacy inspection, complete-tree ownership hashes, atomic replacement with rollback, and preservation of unowned or user-modified components.
+- Deterministic Codex prompt generation from canonical roles, commands, and domain skills.
+- Optional foreground runtime with authenticated loopback HTTP MCP, workspace-bound sessions, durable events, bounded actions, jobs, and independent checker receipts.
+- Migration guidance and an architecture review explaining installation ownership and integration boundaries.
 
-### Changed
+### Fixed
 
-- Role registry schema v2 now compiles execution, permission, checker, and input/output contracts while preserving every existing public role, skill, and slash-command name.
+- Removed bundled MCP registrations, forced tool/model overrides, global hooks, automatic services, and shared secret loading from default installation.
+- Serialized runtime task claims and completion, made status inspection read-only, and restricted the optional environment helper to explicitly requested files and keys.
+- Replaced conflicting setup descriptions with maintained English/Russian guides and offline localized navigation.
+- Read runtime version metadata from the package manifest so release versions stay consistent.
+
+### Migration
+
+- Existing settings and unowned skills are preserved. Follow `docs/MIGRATION.md` to review and remove legacy configuration; upgrading the package does not silently rewrite an earlier machine installation.
 
 ## [2.7.0] - 2026-08-29
 
@@ -100,7 +120,8 @@ and this project follows [Semantic Versioning](https://semver.org/).
 
 - Extended the installer and synchronization checks to distribute mobile hooks, compatibility tooling, shared audit skills, and Kimi-native role files consistently.
 
-[Unreleased]: https://github.com/Vitammiin/agent-vorcl-flow/compare/v2.7.0...HEAD
+[Unreleased]: https://github.com/Vitammiin/agent-vorcl-flow/compare/v3.0.0...HEAD
+[3.0.0]: https://github.com/Vitammiin/agent-vorcl-flow/compare/v2.7.0...v3.0.0
 [2.7.0]: https://github.com/Vitammiin/agent-vorcl-flow/compare/v2.6.1...v2.7.0
 [2.6.1]: https://github.com/Vitammiin/agent-vorcl-flow/compare/v2.6.0...v2.6.1
 [2.6.0]: https://github.com/Vitammiin/agent-vorcl-flow/compare/v2.5.1...v2.6.0

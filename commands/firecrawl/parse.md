@@ -1,7 +1,6 @@
 ---
 description: Парсинг локального или непубличного документа через Firecrawl в markdown/JSON; публичный URL документа обрабатывается scrape.
 argument-hint: "<локальный файл> [формат/вопрос]"
-allowed-tools: Read, Write, Bash, Grep, Glob, WebFetch
 ---
 
 Разбери документ: **$ARGUMENTS**.

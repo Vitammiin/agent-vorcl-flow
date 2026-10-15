@@ -1,7 +1,6 @@
 ---
 description: Покрыть роут/модуль OpenAPI/Swagger — параметры, ответы, описания, security + проверка. Use when роут/модуль надо задокументировать (править код/спеку); найти дыры без правок — /swagger:audit (swagger)
 argument-hint: "<роут/модуль для покрытия>"
-allowed-tools: Read, Write, Edit, Bash, Grep, Glob
 ---
 
 Полноценно покрой OpenAPI/Swagger: **$ARGUMENTS**.

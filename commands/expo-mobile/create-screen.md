@@ -1,7 +1,6 @@
 ---
 description: Создать Expo Router route и production module screen с полным набором UI-состояний.
 argument-hint: "<экран, route и пользовательский сценарий>"
-allowed-tools: Read, Write, Edit, Bash, Grep, Glob
 ---
 
 Создай экран: **$ARGUMENTS**.

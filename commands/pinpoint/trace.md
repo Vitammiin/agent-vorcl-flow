@@ -1,7 +1,6 @@
 ---
 description: Шаг 4 конвейера pinpoint (read-only) — проследить логику за элементом до первопричины, обработчик → состояние → data-fetch → API/бэкенд (pinpoint). Use when вопрос «почему так себя ведёт / откуда данные?»; просто найти элемент и хендлер → /pinpoint:control, организовать правку → /pinpoint:handoff
 argument-hint: "<путь к скриншоту или file:line контрола>"
-allowed-tools: Read, Grep, Glob, Bash
 ---
 
 Проследи логику за элементом до первопричины поведения: **$ARGUMENTS**.

@@ -1,7 +1,7 @@
 {
   "name": "agent-vorcl-flow",
-  "version": "3.0.0-beta.0",
-  "description": "Role-based engineering workflows with an authenticated local MCP runtime, Task Master coordination, and evidence-based audits.",
+  "version": "3.0.0",
+  "description": "Role-based engineering skills, independent verification, and evidence-based audits. Uses the capabilities already available in your environment.",
   "author": {
     "name": "Christian Avis",
     "url": "https://github.com/Vitammiin"
@@ -9,15 +9,25 @@
   "homepage": "https://github.com/Vitammiin/agent-vorcl-flow",
   "repository": "https://github.com/Vitammiin/agent-vorcl-flow",
   "license": "MIT",
-  "keywords": ["agents", "code-integrity", "hardcode", "mock-data", "frontend", "backend", "polyglot"],
+  "keywords": [
+    "agents",
+    "code-integrity",
+    "hardcode",
+    "mock-data",
+    "frontend",
+    "backend",
+    "polyglot"
+  ],
   "skills": "./skills/",
   "interface": {
     "displayName": "Agent Vorcl Flow",
-    "shortDescription": "Role workflows with a local MCP control plane.",
-    "longDescription": "Adds compatible role-based Task Master workflows, a workspace-bound local MCP runtime with approvals and receipts, and evidence-based code audits.",
+    "shortDescription": "Engineering roles and evidence-based workflows.",
+    "longDescription": "Adds focused engineering skills, adaptable workflows, and independent verification without configuring MCP servers, credentials, or task-management tools.",
     "developerName": "Christian Avis",
     "category": "Developer Tools",
-    "capabilities": ["Read", "MCP", "Task Management"],
+    "capabilities": [
+      "Read"
+    ],
     "websiteURL": "https://github.com/Vitammiin/agent-vorcl-flow",
     "defaultPrompt": [
       "Audit this repository for production hardcode.",

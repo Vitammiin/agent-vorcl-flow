@@ -1,14 +1,12 @@
 ---
-description: Цель (интерфейс/набор экранов из скриншотов) через Task Master — разбор → код до готового (screenshot). Use when экранов несколько или цель комплексная; один экран → /screenshot:convert, существующий UI в кодовой базе → /pinpoint:vorcl
+description: "Цель роли screenshot: session-first план, реализация в разрешённом scope и независимая проверка; Task Master только по явному выбору."
 argument-hint: "<цель: экран/набор экранов + путь(и) к скриншоту(ам)>"
-allowed-tools: Read, Edit, Write, Bash, Grep, Glob
 ---
 
-Возьми цель по конвертации скриншота(ов) в код в работу через Task Master: **$ARGUMENTS**.
+Возьми цель **$ARGUMENTS** как роль `screenshot`. Если цель уже понятна из контекста, продолжай; иначе уточни scope.
 
-1. Убедись, что Task Master инициализирован (`.taskmaster/`); если нет — `task-master init`.
-2. Открой скриншот(ы) через Read и разложи цель на задачи (`add_task`; целый интерфейс — PRD + `parse_prd`): какие экраны/компоненты воспроизвести, какие переиспользуемые компоненты выделить, какие дизайн-токены (`@theme`) извлечь, какой фреймворк.
-3. `next_task` → `get_task`; воспроизводи UI: семантический HTML, точные цвета (hex→OKLCH-токены), spacing/пропорции, состояния, адаптив, a11y. Ход фиксируй через `update_subtask`.
-4. Проверь `testStrategy` (вёрстка соответствует скриншоту, токены на месте, a11y и адаптив есть, тесты/сборка зелёные) → `set_task_status --status=done`; вернись к шагу 3.
-
-Воспроизводи точно, не «на глаз»; неоднозначное помечай допущением или уточняй. Опирайся на навыки `screenshot-to-code`, `tailwind`, `react`, `nextjs`, `typescript`, `frontend-architecture`, `workflow`, `task-master`. Делегируй субагенту `screenshot`.
+1. Прочитай роль `screenshot` и `workflow`; примени `workspace-capability-routing` для неоднозначного scope. Загрузи только необходимые domain/task skills и сохрани workspace evidence.
+2. По умолчанию используй session-first: зафиксируй scope, план, acceptance criteria и `testStrategy` в сессии. Не создавай `.taskmaster/`, не запускай init и не меняй MCP/provider/model configuration.
+3. Task Master подключай только по явному выбору пользователя и доступным в сессии capabilities. Тогда прочитай `task-master`, сохрани возвращённые IDs в allowlist, создай scoped run и сделай atomic claim перед `in-progress`. Bare `next_task` запрещён. Отсутствие Task Master не блокирует работу; не заявляй о сохранении статуса в недоступном трекере.
+4. Executor выполняет только согласованный scope. Независимый Checker проверяет `testStrategy`, не меняет implementation/acceptance tests и возвращает evidence. Только Orchestrator завершает задачу; не продолжай посторонний backlog.
+5. Если существует `PROJECT_DESCRIPTION.md`, соблюдай maintenance contract из `workflow`. Выдай результат, проверки и оставшиеся ограничения.

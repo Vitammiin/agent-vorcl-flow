@@ -1,10 +1,9 @@
 ---
-description: Глубокий multi-role аудит всего проекта: сам определяет backend/frontend/mobile/data/infra, проверяет архитектуру, bugs, security, try-catch/error handling, CVE и создаёт PROJECT_AUDIT.md с remediation roadmap.
+description: "Глубокий multi-role аудит всего проекта: сам определяет backend/frontend/mobile/data/infra, проверяет архитектуру, bugs, security, try-catch/error handling, CVE и создаёт PROJECT_AUDIT.md с remediation roadmap."
 argument-hint: "[путь; по умолчанию текущий репозиторий] [опциональный focus]"
-allowed-tools: Read, Write, Bash, Grep, Glob, WebFetch, WebSearch, Task
 ---
 
-Проведи полный аудит **$ARGUMENTS** через `project-audit` и Task Master. Сам production code не изменяй: разрешены только итоговый Markdown и audit tasks.
+Проведи полный аудит **$ARGUMENTS** через `project-audit` и session-first `workflow` в режиме report-only. Разрешён только запрошенный итоговый Markdown; Task Master и product/config/data state не меняются.
 
 1. Найди `$workspace-capability-routing` и `$project-audit`; получи prompt+workspace route через `route.mjs`, затем запусти audit `inventory.mjs --root <scope> --format json`. Проверь inference по manifests/entrypoints/native config, перенеси `coverageGaps` в отчёт и сохрани выбранные/исключённые roles/skills с evidence.
 2. По inventory подключи обязательные роли `architect`, `analyzer`, `security`, `resilience`, `testing` и только релевантные `backend`, `frontend`, `expo-mobile`, `database`, `swagger`, `devops`, `docs`. На платформе с subagents передай каждой отдельный read-only scope без write tools; в Codex/Kimi выполни те же named-skill passes последовательно и честно укажи execution model.
@@ -13,6 +12,6 @@ allowed-tools: Read, Write, Bash, Grep, Glob, WebFetch, WebSearch, Task
 5. Дедуплицируй findings по root cause, назначь severity по impact, а не keyword. Любая находка обязана иметь `file:line` или воспроизводимое external evidence, root cause, impact, exact fix, target layer и verification.
 6. Опиши current architecture и реалистичную target architecture: что переместить, разделить, заменить и добавить; permitted dependencies; incremental phases, prerequisites, rollback и tests. Не предлагай rewrite/микросервисы/DDD-абстракции без доказанной причины.
 7. Материализуй `PROJECT_AUDIT.md`; при существующем файле создай timestamped новый. Проверь `validate-report.mjs` и приложи его реальный вывод.
-8. Critical/high findings оформи Task Master tasks с dependencies/testStrategy. Не применяй исправления.
+8. Critical/high findings включи в remediation roadmap отчёта с dependencies/testStrategy. Не создавай tracker tasks и не применяй исправления.
 
-Финальный ответ содержит путь к отчёту, detected systems, число findings по severity, список использованных ролей, advisory status/date, validator result и созданные Task Master IDs.
+Финальный ответ содержит путь к отчёту, detected systems, число findings по severity, список использованных ролей, advisory status/date, validator result и ограничения покрытия.

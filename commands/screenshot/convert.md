@@ -1,7 +1,6 @@
 ---
 description: Сгенерировать полный запускаемый код по скриншоту — семантика, точные токены, адаптив, a11y (screenshot). Use when нужен НОВЫЙ UI по скриншоту; найти этот экран в существующем коде → /pinpoint:locate, только разбор без кода → /screenshot:analyze
 argument-hint: "<путь к скриншоту> [фреймворк: react|vue|html|next]"
-allowed-tools: Read, Write, Edit, Bash
 ---
 
 Сгенерируй полный код по скриншоту: **$ARGUMENTS**.

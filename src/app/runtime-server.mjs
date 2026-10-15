@@ -12,6 +12,7 @@ import { jsonText, redact, writeJsonAtomic } from '../shared/runtime-utils.mjs'
 import { RegistryService, RuntimeService, SessionService, SkillCatalogService, runtimeSchemas as schemas } from '../modules/runtime/index.mjs'
 
 const PACKAGE_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..')
+const PACKAGE_VERSION = JSON.parse(fs.readFileSync(path.join(PACKAGE_ROOT, 'package.json'), 'utf8')).version
 
 const safeEqual = (left, right) => {
   const a = Buffer.from(String(left)); const b = Buffer.from(String(right))
@@ -28,7 +29,6 @@ function registerTools(server, runtime, registry, skills) {
   server.registerTool('avf_run_cancel', { description: 'Cancel a run and emit a terminal event.', inputSchema: schemas.runIdInput }, async ({ runId }, extra) => jsonText(await runtime.cancelRun(sessionId(extra), runId)))
   server.registerTool('avf_task_claim', { description: 'Atomically claim an allowlisted task.', inputSchema: schemas.taskClaimInput }, async (input, extra) => jsonText(await runtime.claim(sessionId(extra), input)))
   server.registerTool('avf_task_renew', { description: 'Renew the caller run task lease.', inputSchema: schemas.taskClaimInput }, async (input, extra) => jsonText(await runtime.claim(sessionId(extra), input)))
-  server.registerTool('avf_task_get', { description: 'Read a task from the bound workspace Task Master source of truth.', inputSchema: { taskId: z.string().min(1) } }, async ({ taskId }, extra) => jsonText(runtime.context(sessionId(extra)).taskMaster.getTask(taskId)))
   server.registerTool('avf_task_complete', { description: 'Complete a task only with a READY checker receipt.', inputSchema: schemas.completeTaskInput }, async (input, extra) => jsonText(await runtime.completeTask(sessionId(extra), input)))
   server.registerTool('avf_action_request', { description: 'Create a digest-bound action and request approval when required.', inputSchema: schemas.requestActionInput }, async (input, extra) => jsonText(await runtime.requestAction(sessionId(extra), input)))
   server.registerTool('avf_action_approve', { description: 'Approve or reject one exact action digest.', inputSchema: schemas.approveActionInput }, async (input, extra) => jsonText(await runtime.context(sessionId(extra)).permissions.decide(input.actionId, input.digest, input.approve, sessionId(extra))))
@@ -41,12 +41,13 @@ function registerTools(server, runtime, registry, skills) {
   server.registerTool('avf_events_read', { description: 'Read normalized durable events after a sequence.', inputSchema: schemas.eventsInput }, async ({ runId, afterSequence }, extra) => jsonText(runtime.events(sessionId(extra), runId, afterSequence)))
   server.registerTool('avf_skill_list', { description: 'List installed skill provenance and hashes.' }, async () => jsonText(skills.list()))
   server.registerTool('avf_skill_read', { description: 'Load one installed skill body on demand.', inputSchema: schemas.skillIdInput }, async ({ skillId }) => jsonText(skills.read(skillId)))
-  server.registerTool('avf_skill_update', { description: 'Atomically install/update an unmodified builtin skill.', inputSchema: schemas.skillIdInput }, async ({ skillId }) => jsonText(skills.syncBuiltin(skillId)))
 }
 
 export async function startRuntimeServer(overrides = {}) {
+  if (overrides.host && overrides.host !== '127.0.0.1') throw new Error('Runtime must listen on loopback')
+  if (overrides.port != null && (!Number.isInteger(overrides.port) || overrides.port < 0 || overrides.port > 65535)) throw new Error('Invalid runtime listen port')
+  loadRuntimeEnvironment()
   const config = { ...ensureRuntimeConfig(), ...overrides }
-  loadRuntimeEnvironment(config.home)
   const allowedRoots = String(process.env.AVF_ALLOWED_ROOTS || '').split(path.delimiter).filter(Boolean)
   const sessions = new SessionService({ ttlMs: config.sessionTtlMs, maxSessions: config.maxSessions, allowedRoots })
   const registry = new RegistryService(PACKAGE_ROOT)
@@ -67,7 +68,7 @@ export async function startRuntimeServer(overrides = {}) {
     if (!authorization.startsWith('Bearer ') || !safeEqual(authorization.slice(7), config.token)) return res.status(401).json({ error: 'Unauthorized' })
     next()
   })
-  app.get('/health', (_req, res) => res.json({ ok: true, name: 'agent-vorcl-flow-runtime', version: '3.0.0-beta.0', sessions: transports.size }))
+  app.get('/health', (_req, res) => res.json({ ok: true, name: 'agent-vorcl-flow-runtime', version: PACKAGE_VERSION, sessions: transports.size }))
 
   const handler = async (req, res) => {
     try {
@@ -78,7 +79,7 @@ export async function startRuntimeServer(overrides = {}) {
         let created
         transport = new StreamableHTTPServerTransport({ sessionIdGenerator: () => sessions.createTransportSessionId(), onsessioninitialized: (id) => { transports.set(id, created); transportLastSeen.set(id, Date.now()) } })
         created = transport
-        const server = new McpServer({ name: 'agent-vorcl-flow-runtime', version: '3.0.0-beta.0' }, { capabilities: { logging: {} } })
+        const server = new McpServer({ name: 'agent-vorcl-flow-runtime', version: PACKAGE_VERSION }, { capabilities: { logging: {} } })
         registerTools(server, runtime, registry, skills)
         transport.onclose = () => { const id = transport.sessionId; if (id) { transports.delete(id); servers.delete(id); transportLastSeen.delete(id); sessions.remove(id) } }
         await server.connect(transport)
@@ -104,7 +105,7 @@ export async function startRuntimeServer(overrides = {}) {
     for (const [id, touchedAt] of transportLastSeen) if (touchedAt < cutoff) transports.get(id)?.close()
   }, 60_000)
   cleanup.unref()
-  writeJsonAtomic(config.daemonFile, { pid: process.pid, host: config.host, port: config.port, startedAt: new Date().toISOString(), version: '3.0.0-beta.0' })
+  writeJsonAtomic(config.daemonFile, { pid: process.pid, host: config.host, port: config.port, startedAt: new Date().toISOString(), version: PACKAGE_VERSION })
   const close = async () => {
     clearInterval(cleanup)
     const results = await Promise.allSettled([...transports.values()].map((transport) => transport.close()).concat([...servers.values()].map((server) => server.close())))

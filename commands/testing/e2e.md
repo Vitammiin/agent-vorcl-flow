@@ -1,7 +1,6 @@
 ---
 description: Playwright e2e-сценарии критического пути — селекторы по ролям, fixtures/auth-state, web-first assertions, trace при падении (testing). Use when нужно проверить пользовательский сценарий в реальном браузере.
 argument-hint: "<сценарий/критический путь> [URL]"
-allowed-tools: Read, Write, Edit, Bash, Grep, Glob
 ---
 
 Напиши Playwright e2e-тесты для сценария: **$ARGUMENTS**.

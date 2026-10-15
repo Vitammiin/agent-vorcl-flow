@@ -23,7 +23,7 @@ test('creates a run scoped to captured task IDs', (t) => {
 
   assert.equal(result.runId, 'feature-a')
   assert.deepEqual(result.taskIds, ['28', '29'])
-  const saved = JSON.parse(fs.readFileSync(path.join(root, '.taskmaster/runs/feature-a.json'), 'utf8'))
+  const saved = JSON.parse(fs.readFileSync(path.join(root, '.agent-vorcl/runs/feature-a.json'), 'utf8'))
   assert.equal(saved.owner, 'agent-a')
   assert.deepEqual(saved.taskIds, ['28', '29'])
 })
@@ -57,7 +57,7 @@ test('expired leases require an explicit compare-by-run reclaim', (t) => {
   run(root, 'create', '--run', 'feature-a', '--tasks', '28', '--owner', 'agent-a')
   run(root, 'create', '--run', 'feature-b', '--tasks', '28', '--owner', 'agent-b')
   run(root, 'claim', '--run', 'feature-a', '--task', '28')
-  const claimFile = path.join(root, '.taskmaster/claims/task-28.json')
+  const claimFile = path.join(root, '.agent-vorcl/claims/task-28.json')
   const expired = JSON.parse(fs.readFileSync(claimFile, 'utf8'))
   expired.expiresAt = '2000-01-01T00:00:00.000Z'
   fs.writeFileSync(claimFile, `${JSON.stringify(expired, null, 2)}\n`)
@@ -75,11 +75,37 @@ test('expired leases require an explicit compare-by-run reclaim', (t) => {
 test('an orphaned operation mutex has explicit expiry-checked recovery', (t) => {
   const root = fixture(t)
   run(root, 'create', '--run', 'feature-a', '--tasks', '28', '--owner', 'agent-a')
-  const lock = path.join(root, '.taskmaster/claim-locks/task-28.lock')
+  const lock = path.join(root, '.agent-vorcl/claim-locks/task-28.lock')
   fs.mkdirSync(lock, { recursive: true })
   fs.writeFileSync(path.join(lock, 'owner.json'), JSON.stringify({ lockId: 'deadbeef', expiresAt: '2000-01-01T00:00:00.000Z' }))
 
   const unlocked = run(root, 'unlock', '--task', '28', '--expected-lock', 'deadbeef')
   assert.equal(unlocked.unlocked, true)
   assert.equal(run(root, 'claim', '--run', 'feature-a', '--task', '28').claimed, true)
+})
+
+test('AVF run state leaves existing Task Master files and directories unchanged', (t) => {
+  const root = fixture(t)
+  const taskmaster = path.join(root, '.taskmaster')
+  fs.mkdirSync(path.join(taskmaster, 'tasks'), { recursive: true })
+  const config = '{"models":{"main":{"provider":"user-provider","modelId":"user-model"}}}\n'
+  const tasks = '{"tasks":[{"id":99,"title":"Unrelated user backlog","status":"pending"}]}\n'
+  fs.writeFileSync(path.join(taskmaster, 'config.json'), config)
+  fs.writeFileSync(path.join(taskmaster, 'tasks/tasks.json'), tasks)
+
+  run(root, 'create', '--run', 'feature-a', '--tasks', '28', '--owner', 'agent-a')
+  run(root, 'claim', '--run', 'feature-a', '--task', '28')
+  run(root, 'renew', '--run', 'feature-a', '--task', '28')
+
+  assert.deepEqual(fs.readdirSync(taskmaster).sort(), ['config.json', 'tasks'])
+  assert.equal(fs.readFileSync(path.join(taskmaster, 'config.json'), 'utf8'), config)
+  assert.equal(fs.readFileSync(path.join(taskmaster, 'tasks/tasks.json'), 'utf8'), tasks)
+  assert.ok(fs.existsSync(path.join(root, '.agent-vorcl/claims/task-28.json')))
+})
+
+test('AVF scoped run never initializes an absent Task Master workspace', (t) => {
+  const root = fixture(t)
+  run(root, 'create', '--run', 'feature-a', '--tasks', '28', '--owner', 'agent-a')
+  run(root, 'claim', '--run', 'feature-a', '--task', '28')
+  assert.equal(fs.existsSync(path.join(root, '.taskmaster')), false)
 })

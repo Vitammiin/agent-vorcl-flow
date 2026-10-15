@@ -23,6 +23,17 @@
       "route": "system design and technology choices",
       "owns": "target architecture",
       "notFor": "code-grounded full repository package",
+      "skillHints": [
+        "workspace-capability-routing",
+        "system-design",
+        "database",
+        "api-design",
+        "i18n",
+        "web-scraping",
+        "vercel",
+        "render"
+      ],
+      "readonly": false,
       "skills": [
         "workspace-capability-routing",
         "system-design",
@@ -31,9 +42,7 @@
         "i18n",
         "web-scraping",
         "vercel",
-        "render",
-        "workflow",
-        "task-master"
+        "render"
       ]
     },
     {
@@ -53,6 +62,20 @@
       "route": "complete multi-language current architecture package",
       "owns": "MD/JSON/HTML/PDF/draw.io/Mermaid package",
       "notFor": "lightweight TS/JS dependency map",
+      "skillHints": [
+        "principal-architecture",
+        "system-design",
+        "database",
+        "api-design",
+        "backend-architecture",
+        "error-handling",
+        "security-audit",
+        "docker",
+        "ci-cd",
+        "drawio-diagrams",
+        "mermaid-rendering"
+      ],
+      "readonly": false,
       "skills": [
         "principal-architecture",
         "system-design",
@@ -64,9 +87,7 @@
         "docker",
         "ci-cd",
         "drawio-diagrams",
-        "mermaid-rendering",
-        "workflow",
-        "task-master"
+        "mermaid-rendering"
       ]
     },
     {
@@ -86,6 +107,21 @@
       "route": "server APIs and business logic",
       "owns": "backend implementation",
       "notFor": "frontend UI",
+      "skillHints": [
+        "backend-architecture",
+        "nodejs",
+        "typescript",
+        "postgresql",
+        "mongodb",
+        "redis",
+        "swagger-coverage",
+        "i18n",
+        "hardcode-detection",
+        "mock-data-detection",
+        "vercel",
+        "render"
+      ],
+      "readonly": false,
       "skills": [
         "backend-architecture",
         "nodejs",
@@ -98,9 +134,7 @@
         "hardcode-detection",
         "mock-data-detection",
         "vercel",
-        "render",
-        "workflow",
-        "task-master"
+        "render"
       ]
     },
     {
@@ -120,6 +154,24 @@
       "route": "React/Next.js UI and client state",
       "owns": "web frontend implementation",
       "notFor": "backend APIs",
+      "skillHints": [
+        "frontend-architecture",
+        "react",
+        "nextjs",
+        "typescript",
+        "tailwind",
+        "mobile-thumb-zones",
+        "apple-design",
+        "animate",
+        "state-management",
+        "data-fetching",
+        "i18n",
+        "hardcode-detection",
+        "mock-data-detection",
+        "react-testing",
+        "vercel"
+      ],
+      "readonly": false,
       "skills": [
         "frontend-architecture",
         "react",
@@ -135,9 +187,7 @@
         "hardcode-detection",
         "mock-data-detection",
         "react-testing",
-        "vercel",
-        "workflow",
-        "task-master"
+        "vercel"
       ]
     },
     {
@@ -157,6 +207,22 @@
       "route": "React Native and Expo",
       "owns": "mobile implementation",
       "notFor": "web-only UI",
+      "skillHints": [
+        "expo-mobile-architecture",
+        "expo-ui-design-motion",
+        "mobile-thumb-zones",
+        "react-native-liquid-glass",
+        "apple-design",
+        "animate-expo",
+        "react",
+        "typescript",
+        "state-management",
+        "data-fetching",
+        "i18n",
+        "react-testing",
+        "error-handling"
+      ],
+      "readonly": false,
       "skills": [
         "expo-mobile-architecture",
         "expo-ui-design-motion",
@@ -170,9 +236,7 @@
         "data-fetching",
         "i18n",
         "react-testing",
-        "error-handling",
-        "workflow",
-        "task-master"
+        "error-handling"
       ]
     },
     {
@@ -192,6 +256,19 @@
       "route": "broad read-only code quality audit",
       "owns": "bugs, types, DB and structural review",
       "notFor": "targeted hardcode or mock-data audit",
+      "skillHints": [
+        "workspace-capability-routing",
+        "typescript",
+        "backend-architecture",
+        "frontend-architecture",
+        "database",
+        "postgresql",
+        "mongodb",
+        "swagger-coverage",
+        "react",
+        "nextjs"
+      ],
+      "readonly": true,
       "skills": [
         "workspace-capability-routing",
         "typescript",
@@ -202,9 +279,7 @@
         "mongodb",
         "swagger-coverage",
         "react",
-        "nextjs",
-        "workflow",
-        "task-master"
+        "nextjs"
       ]
     },
     {
@@ -224,15 +299,22 @@
       "route": "targeted hardcode and mock-data audit",
       "owns": "cross-language hardcode/mock production reachability",
       "notFor": "general code-quality audit",
+      "skillHints": [
+        "code-integrity",
+        "hardcode-detection",
+        "mock-data-detection",
+        "i18n",
+        "frontend-architecture",
+        "backend-architecture"
+      ],
+      "readonly": true,
       "skills": [
         "code-integrity",
         "hardcode-detection",
         "mock-data-detection",
         "i18n",
         "frontend-architecture",
-        "backend-architecture",
-        "workflow",
-        "task-master"
+        "backend-architecture"
       ]
     },
     {
@@ -252,14 +334,20 @@
       "route": "OpenAPI coverage",
       "owns": "API specification coverage",
       "notFor": "general API implementation",
+      "skillHints": [
+        "swagger-coverage",
+        "backend-architecture",
+        "api-design",
+        "typescript",
+        "nodejs"
+      ],
+      "readonly": false,
       "skills": [
         "swagger-coverage",
         "backend-architecture",
         "api-design",
         "typescript",
-        "nodejs",
-        "workflow",
-        "task-master"
+        "nodejs"
       ]
     },
     {
@@ -279,10 +367,12 @@
       "route": "web research and extraction",
       "owns": "live web evidence",
       "notFor": "local repository analysis",
+      "skillHints": [
+        "web-scraping"
+      ],
+      "readonly": false,
       "skills": [
-        "web-scraping",
-        "workflow",
-        "task-master"
+        "web-scraping"
       ]
     },
     {
@@ -302,13 +392,18 @@
       "route": "Render hosting, deploys and logs",
       "owns": "Render operations",
       "notFor": "generic CI/CD",
+      "skillHints": [
+        "render",
+        "postgresql",
+        "redis",
+        "backend-architecture"
+      ],
+      "readonly": false,
       "skills": [
         "render",
         "postgresql",
         "redis",
-        "backend-architecture",
-        "workflow",
-        "task-master"
+        "backend-architecture"
       ]
     },
     {
@@ -328,14 +423,20 @@
       "route": "Postgres, MongoDB and Redis",
       "owns": "schema, query, migration and cache work",
       "notFor": "application business logic",
+      "skillHints": [
+        "database",
+        "postgresql",
+        "mongodb",
+        "redis",
+        "backend-architecture"
+      ],
+      "readonly": false,
       "skills": [
         "database",
         "postgresql",
         "mongodb",
         "redis",
-        "backend-architecture",
-        "workflow",
-        "task-master"
+        "backend-architecture"
       ]
     },
     {
@@ -355,15 +456,22 @@
       "route": "error handling and failure boundaries",
       "owns": "runtime failure boundaries",
       "notFor": "Pino logging architecture",
+      "skillHints": [
+        "error-handling",
+        "backend-architecture",
+        "nodejs",
+        "typescript",
+        "react",
+        "i18n"
+      ],
+      "readonly": false,
       "skills": [
         "error-handling",
         "backend-architecture",
         "nodejs",
         "typescript",
         "react",
-        "i18n",
-        "workflow",
-        "task-master"
+        "i18n"
       ]
     },
     {
@@ -383,15 +491,22 @@
       "route": "Pino structured logging architecture",
       "owns": "application logger, child loggers, redaction and request context",
       "notFor": "error handling try/catch boundaries",
+      "skillHints": [
+        "pino-logging",
+        "error-handling",
+        "backend-architecture",
+        "nodejs",
+        "typescript",
+        "nextjs"
+      ],
+      "readonly": false,
       "skills": [
         "pino-logging",
         "error-handling",
         "backend-architecture",
         "nodejs",
         "typescript",
-        "nextjs",
-        "workflow",
-        "task-master"
+        "nextjs"
       ]
     },
     {
@@ -411,6 +526,19 @@
       "route": "screenshot to new UI code",
       "owns": "new UI reconstruction",
       "notFor": "locating existing source",
+      "skillHints": [
+        "screenshot-to-code",
+        "react",
+        "nextjs",
+        "typescript",
+        "tailwind",
+        "mobile-thumb-zones",
+        "apple-design",
+        "animate",
+        "frontend-architecture",
+        "i18n"
+      ],
+      "readonly": false,
       "skills": [
         "screenshot-to-code",
         "react",
@@ -421,9 +549,7 @@
         "apple-design",
         "animate",
         "frontend-architecture",
-        "i18n",
-        "workflow",
-        "task-master"
+        "i18n"
       ]
     },
     {
@@ -443,15 +569,22 @@
       "route": "product and visual design artifacts",
       "owns": "prototype, deck, document and design system",
       "notFor": "source-code location",
+      "skillHints": [
+        "design-studio",
+        "mobile-thumb-zones",
+        "apple-design",
+        "animate",
+        "visual-evidence",
+        "web-scraping"
+      ],
+      "readonly": false,
       "skills": [
         "design-studio",
         "mobile-thumb-zones",
         "apple-design",
         "animate",
         "visual-evidence",
-        "web-scraping",
-        "workflow",
-        "task-master"
+        "web-scraping"
       ]
     },
     {
@@ -471,11 +604,14 @@
       "route": "identify screenshot with web evidence",
       "owns": "visual identification and live verification",
       "notFor": "code generation",
+      "skillHints": [
+        "visual-evidence",
+        "web-scraping"
+      ],
+      "readonly": true,
       "skills": [
         "visual-evidence",
-        "web-scraping",
-        "workflow",
-        "task-master"
+        "web-scraping"
       ]
     },
     {
@@ -495,6 +631,18 @@
       "route": "screenshot to existing source",
       "owns": "UI-to-file trace",
       "notFor": "new UI generation",
+      "skillHints": [
+        "ui-source-mapping",
+        "screenshot-to-code",
+        "frontend-architecture",
+        "react",
+        "nextjs",
+        "typescript",
+        "i18n",
+        "data-fetching",
+        "state-management"
+      ],
+      "readonly": true,
       "skills": [
         "ui-source-mapping",
         "screenshot-to-code",
@@ -504,9 +652,7 @@
         "typescript",
         "i18n",
         "data-fetching",
-        "state-management",
-        "workflow",
-        "task-master"
+        "state-management"
       ]
     },
     {
@@ -526,12 +672,16 @@
       "route": "draw.io and PMP diagrams",
       "owns": "native draw.io artifacts",
       "notFor": "repository extraction",
+      "skillHints": [
+        "drawio-diagrams",
+        "pmp-diagrams",
+        "system-design"
+      ],
+      "readonly": false,
       "skills": [
         "drawio-diagrams",
         "pmp-diagrams",
-        "system-design",
-        "workflow",
-        "task-master"
+        "system-design"
       ]
     },
     {
@@ -551,13 +701,18 @@
       "route": "lightweight TS/JS architecture map",
       "owns": "architecture.json and interactive dependency map",
       "notFor": "complete multi-language architecture package",
+      "skillHints": [
+        "archmap",
+        "system-design",
+        "drawio-diagrams",
+        "mermaid-diagrams"
+      ],
+      "readonly": false,
       "skills": [
         "archmap",
         "system-design",
         "drawio-diagrams",
-        "mermaid-diagrams",
-        "workflow",
-        "task-master"
+        "mermaid-diagrams"
       ]
     },
     {
@@ -577,12 +732,16 @@
       "route": "Mermaid diagrams and rendering",
       "owns": "validated Mermaid artifacts",
       "notFor": "repository extraction",
+      "skillHints": [
+        "mermaid-diagrams",
+        "mermaid-rendering",
+        "system-design"
+      ],
+      "readonly": false,
       "skills": [
         "mermaid-diagrams",
         "mermaid-rendering",
-        "system-design",
-        "workflow",
-        "task-master"
+        "system-design"
       ]
     },
     {
@@ -602,15 +761,22 @@
       "route": "unit, integration, E2E and verification",
       "owns": "independent test verdict",
       "notFor": "feature implementation",
+      "skillHints": [
+        "testing-strategy",
+        "e2e-playwright",
+        "react-testing",
+        "error-handling",
+        "typescript",
+        "nodejs"
+      ],
+      "readonly": false,
       "skills": [
         "testing-strategy",
         "e2e-playwright",
         "react-testing",
         "error-handling",
         "typescript",
-        "nodejs",
-        "workflow",
-        "task-master"
+        "nodejs"
       ]
     },
     {
@@ -630,10 +796,12 @@
       "route": "commits, PRs and releases",
       "owns": "git and release workflow",
       "notFor": "product code",
+      "skillHints": [
+        "git-workflow"
+      ],
+      "readonly": false,
       "skills": [
-        "git-workflow",
-        "workflow",
-        "task-master"
+        "git-workflow"
       ]
     },
     {
@@ -653,14 +821,20 @@
       "route": "read-only security audit",
       "owns": "secrets, OWASP, CVE and PII findings",
       "notFor": "security remediation",
+      "skillHints": [
+        "security-audit",
+        "secrets-detection",
+        "error-handling",
+        "backend-architecture",
+        "frontend-architecture"
+      ],
+      "readonly": true,
       "skills": [
         "security-audit",
         "secrets-detection",
         "error-handling",
         "backend-architecture",
-        "frontend-architecture",
-        "workflow",
-        "task-master"
+        "frontend-architecture"
       ]
     },
     {
@@ -680,13 +854,18 @@
       "route": "README, API and architecture documentation",
       "owns": "documentation lifecycle",
       "notFor": "architecture extraction",
+      "skillHints": [
+        "technical-writing",
+        "api-design",
+        "swagger-coverage",
+        "system-design"
+      ],
+      "readonly": false,
       "skills": [
         "technical-writing",
         "api-design",
         "swagger-coverage",
-        "system-design",
-        "workflow",
-        "task-master"
+        "system-design"
       ]
     },
     {
@@ -706,14 +885,20 @@
       "route": "Docker and CI/CD",
       "owns": "container and pipeline implementation",
       "notFor": "Render-specific operations",
+      "skillHints": [
+        "docker",
+        "ci-cd",
+        "nodejs",
+        "render",
+        "backend-architecture"
+      ],
+      "readonly": false,
       "skills": [
         "docker",
         "ci-cd",
         "nodejs",
         "render",
-        "backend-architecture",
-        "workflow",
-        "task-master"
+        "backend-architecture"
       ]
     },
     {
@@ -733,10 +918,12 @@
       "route": "local live work dashboard",
       "owns": "ephemeral project status UI",
       "notFor": "persistent reporting",
+      "skillHints": [
+        "liveboard"
+      ],
+      "readonly": false,
       "skills": [
-        "liveboard",
-        "workflow",
-        "task-master"
+        "liveboard"
       ]
     }
   ],
@@ -795,7 +982,7 @@
     },
     {
       "name": "design-studio",
-      "description": "Полная локальная дизайн-студия Agent-Vorcl-Flow: создаёт self-contained HTML-макеты, интерактивные прототипы, wireframe, лендинги, dashboards, mobile screens, презентации, документы, анимации, 3D, визуализации, email и печатные материалы; импортирует Figma, GitHub и HTML/CSS; создаёт и применяет design systems; экспортирует собственные deck-stage проекты в PDF/PPTX/MP4. Use когда нужно спроектировать, визуализировать, прототипировать, собрать deck/PPT, дизайн-систему или визуальный артефакт, даже если слово «дизайн» не указано. Для нетривиальной работы обязательно вести цель через Task Master и роль design-studio. Основано на MIT-проекте JimLiu/baoyu-design с сохранённой лицензией."
+      "description": "Полная локальная дизайн-студия Agent-Vorcl-Flow: создаёт self-contained HTML-макеты, интерактивные прототипы, wireframe, лендинги, dashboards, mobile screens, презентации, документы, анимации, 3D, визуализации, email и печатные материалы; импортирует Figma, GitHub и HTML/CSS; создаёт и применяет design systems; экспортирует собственные deck-stage проекты в PDF/PPTX/MP4. Use когда нужно спроектировать, визуализировать, прототипировать, собрать deck/PPT, дизайн-систему или визуальный артефакт, даже если слово «дизайн» не указано. Для нетривиальной работы используй session-first workflow и роль design-studio. Основано на MIT-проекте JimLiu/baoyu-design с сохранённой лицензией."
     },
     {
       "name": "devops",
@@ -1007,7 +1194,7 @@
     },
     {
       "name": "task-master",
-      "description": "Справочник Task Master (task-master-ai) — MCP-сервер и CLI для управления задачами: PRD → задачи → подзадачи → реализация → статусы. Use при работе с задачами, планировании из PRD, разбиении на подзадачи и отслеживании прогресса. Дисциплину задаёт скилл workflow."
+      "description": "Опциональный адаптер Task Master для явно выбранного пользователем persistent tracking; существующие capabilities и настройки сохраняются, workflow задаёт scoped IDs и atomic claims."
     },
     {
       "name": "technical-writing",
@@ -1047,7 +1234,7 @@
     },
     {
       "name": "workflow",
-      "description": "Безопасный scoped Task Master workflow: captured task IDs, atomic claim, независимый Checker и явные report-only/track-only/remediation режимы. Use для нетривиальной реализации или persistent task tracking."
+      "description": "Session-first workflow: ограниченный план, acceptance criteria и независимая проверка; Task Master — только явно выбранный адаптер со scoped IDs и atomic claim."
     },
     {
       "name": "workspace-capability-routing",

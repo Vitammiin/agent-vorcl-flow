@@ -1,605 +1,329 @@
 #!/usr/bin/env node
-// Установщик Agent-Vorcl-Flow.
-//   Общий слой → launcher bin/mcp-env.mjs + единый ~/.config/agent-vorcl-flow/.env (секреты MCP).
-//   Claude Code → настоящий плагин (CLI, фолбэк — запись в ~/.claude/settings.json).
-//   Codex       → skills + config.toml + AGENTS.md, вмёрженные в ~/.codex / ~/.agents.
-//   Cursor      → skills + custom subagents + MCP, установленные в ~/.cursor.
-//   Kimi CLI    → mcpServers, вмёрженные в ~/.kimi/mcp.json.
-//
-// Запуск:
-//   npx github:Vitammiin/agent-vorcl-flow          # без публикации в npm
-//   npx agent-vorcl-flow                            # после npm publish
-//   … [--claude] [--codex] [--cursor] [--kimi]      # без флагов — все адаптеры
-//
-// Секреты установщик НЕ трогает: он лишь создаёт пустой .env из шаблона; ключи вписываешь сам.
-// Переопределения: AVF_REPO=<owner/repo>, CODEX_HOME=<path>, CURSOR_HOME=<path>, KIMI_HOME=<path>,
-//                  AVF_SKILLS_DIR=<path>, AGENT_VORCL_HOME=<path> (каталог launcher/.env).
-
-import { spawnSync } from 'node:child_process'
-import { fileURLToPath } from 'node:url'
+// Local, capability-neutral installation. The installer owns only the components
+// recorded below; client settings, MCP connections, credentials and task stores
+// are always owned by the user.
+import { createHash } from 'node:crypto'
 import fs from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
-import { ensureRuntimeConfig } from '../src/config/runtime-config.mjs'
-
-// Node >= 18: fs.cpSync и синтаксис ||= старее не работают.
-const nodeMajor = Number(process.versions.node.split('.')[0])
-if (nodeMajor < 18) {
-  console.error(`✖ Требуется Node.js >= 18, найден ${process.versions.node}. Обнови Node и запусти установку снова.`)
-  process.exit(1)
-}
+import { fileURLToPath } from 'node:url'
 
 const PKG_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
-const REPO = process.env.AVF_REPO || 'Vitammiin/agent-vorcl-flow'
-const MARKET = 'agent-vorcl-flow' // .claude-plugin/marketplace.json → name
-const PLUGIN = 'agent-vorcl-flow' // .claude-plugin/plugin.json → name
-const PLUGIN_ID = `${PLUGIN}@${MARKET}`
-const MARK_S = '# >>> agent-vorcl-flow >>>'
-const MARK_E = '# <<< agent-vorcl-flow <<<'
+const MANIFEST = '.agent-vorcl-flow-install.json'
 const SKILL_DESCRIPTION_MARK_S = '<!-- >>> agent-vorcl-flow project-description >>>'
-const SKILL_DESCRIPTION_MARK_E = '<!-- <<< agent-vorcl-flow project-description <<< -->'
 const SKILL_DESCRIPTION_CONTRACT = `${SKILL_DESCRIPTION_MARK_S}
 ## Project description maintenance
 
 If this skill changes code, configuration, tests, schemas, deployment, environment, integrations, runtime, or data state and \`PROJECT_DESCRIPTION.md\` exists in task scope: read it before the change. Afterward use \`$init-code\`'s \`check-impact.mjs\` with this task's changed paths and any \`--external\` mutations. Update only materially affected sections, validate the document, and never create it automatically when absent. A proven stale description blocks completion. Read-only skills and Checker report drift but do not edit the document.
-${SKILL_DESCRIPTION_MARK_E}`
+<!-- <<< agent-vorcl-flow project-description <<< -->`
 
-const argv = process.argv.slice(2)
-if (argv[0] === 'runtime') {
-  const result = spawnSync(process.execPath, [path.join(PKG_ROOT, 'bin', 'runtime.mjs'), ...argv.slice(1)], { stdio: 'inherit' })
-  process.exit(result.status ?? 1)
-}
-const wantClaude = argv.includes('--claude')
-const wantCodex = argv.includes('--codex')
-const wantCursor = argv.includes('--cursor')
-const wantKimi = argv.includes('--kimi')
-const all = !wantClaude && !wantCodex && !wantCursor && !wantKimi // без флагов — все поддерживаемые среды
+const HELP = `Agent-Vorcl-Flow — local skills and agents installer
 
-const log = (m) => console.log(m)
-const ok = (m) => console.log(`  ✔ ${m}`)
-const warn = (m) => console.error(`  ⚠ ${m}`) // предупреждения и ошибки — в stderr
+Usage: agent-vorcl-flow <adapter...> [--dry-run]
+  --claude       Install skills and avf-* agents under CLAUDE_HOME or ~/.claude
+  --codex        Install skills under AVF_SKILLS_DIR or ~/.agents/skills
+  --cursor       Install skills and avf-* agents under CURSOR_HOME or ~/.cursor
+  --kimi         Install skills and avf-* agents under KIMI_HOME or ~/.kimi
+  --all          Explicitly select all four adapters
+  --dry-run      Preview the installation without writing any files
+  --check-legacy Report possible legacy AVF settings without modifying them
+  --help, -h     Show this help without writing any files
+  --banner-only  Print the package name without installing
 
-function hasCmd(cmd) {
-  const r = spawnSync(cmd, ['--version'], { stdio: 'ignore' })
-  return !r.error // ENOENT → r.error задан
-}
+No adapters selected: show help. Repeating an installation is safe: existing
+unowned components and user-modified AVF components are preserved. Only unchanged
+components recorded in ${MANIFEST} may be updated.
 
-// Домашний каталог AVF (совпадает с логикой bin/mcp-env.mjs).
-function avfHome() {
-  if (process.env.AGENT_VORCL_HOME) return process.env.AGENT_VORCL_HOME
-  if (process.platform === 'win32' && process.env.APPDATA) return path.join(process.env.APPDATA, 'agent-vorcl-flow')
-  const xdg = process.env.XDG_CONFIG_HOME || path.join(os.homedir(), '.config')
-  return path.join(xdg, 'agent-vorcl-flow')
-}
+The installer never registers MCP servers, edits client settings/configuration,
+installs services/hooks, creates credentials, or initializes Task Master.
+Legacy installations are not removed automatically; use --check-legacy to inspect.
+Path overrides must be absolute. No external commands or downloads are run.
+`
 
-// Абсолютный путь к стабильной копии launcher'а (posix-слэши — валидно и в JSON, и в TOML,
-// и принимается node на Windows). Заполняется installShared().
-let STABLE_LAUNCHER = ''
-let STABLE_EXPO_GUARD = ''
-let STABLE_EXPO_UI_GUARD = ''
-let STABLE_EXPO_COMPATIBILITY = ''
-let STABLE_LOGGING_GUARD = ''
-let RUNTIME_TOKEN = ''
-const withLauncher = (content) => content
-  .split('__AVF_LAUNCHER__').join(STABLE_LAUNCHER)
-  .split('%%AVF_RUNTIME_TOKEN%%').join(RUNTIME_TOKEN)
-
-// Общий слой для всех рантаймов: стабильная копия launcher'а + единый файл секретов .env.
-// Claude берёт launcher из своего плагина (${CLAUDE_PLUGIN_ROOT}), но .env общий для всех.
-function installShared() {
-  log('\n▸ Общий слой (launcher + .env)')
-  const home = avfHome()
-  const runtime = ensureRuntimeConfig()
-  RUNTIME_TOKEN = runtime.token
-  const binDir = path.join(home, 'bin')
-  fs.mkdirSync(binDir, { recursive: true })
-  const dest = path.join(binDir, 'mcp-env.mjs')
-  fs.cpSync(path.join(PKG_ROOT, 'bin', 'mcp-env.mjs'), dest)
-  STABLE_LAUNCHER = dest.split(path.sep).join('/')
-  ok(`launcher → ${dest}`)
-
-  const service = spawnSync(process.execPath, [path.join(PKG_ROOT, 'bin', 'runtime.mjs'), 'install-service'], { encoding: 'utf8' })
-  if (service.status === 0) ok(`Runtime service manifest → ${service.stdout.trim()}`)
-  else warn(`Runtime service manifest не создан: ${service.stderr.trim()}`)
-
-  const expoGuardSource = path.join(PKG_ROOT, 'skills', 'expo-mobile-architecture', 'scripts', 'guard.mjs')
-  if (fs.existsSync(expoGuardSource)) {
-    const expoGuardDest = path.join(binDir, 'expo-mobile-architecture-guard.mjs')
-    fs.cpSync(expoGuardSource, expoGuardDest)
-    STABLE_EXPO_GUARD = expoGuardDest.split(path.sep).join('/')
-    ok(`Expo architecture guard → ${expoGuardDest}`)
-  }
-
-  const expoUiGuardSource = path.join(PKG_ROOT, 'skills', 'expo-ui-design-motion', 'scripts', 'guard.mjs')
-  if (fs.existsSync(expoUiGuardSource)) {
-    const expoUiGuardDest = path.join(binDir, 'expo-ui-design-motion-guard.mjs')
-    fs.cpSync(expoUiGuardSource, expoUiGuardDest)
-    STABLE_EXPO_UI_GUARD = expoUiGuardDest.split(path.sep).join('/')
-    ok(`Expo UI/motion guard → ${expoUiGuardDest}`)
-  }
-
-  const expoCompatibilitySource = path.join(PKG_ROOT, 'skills', 'expo-mobile-architecture', 'scripts', 'compatibility-preflight.mjs')
-  if (fs.existsSync(expoCompatibilitySource)) {
-    const expoCompatibilityDest = path.join(binDir, 'expo-mobile-compatibility-preflight.mjs')
-    fs.cpSync(expoCompatibilitySource, expoCompatibilityDest)
-    STABLE_EXPO_COMPATIBILITY = expoCompatibilityDest.split(path.sep).join('/')
-    ok(`Expo compatibility preflight → ${expoCompatibilityDest}`)
-  }
-
-  const loggingGuardSource = path.join(PKG_ROOT, 'skills', 'pino-logging', 'scripts', 'scan.mjs')
-  if (fs.existsSync(loggingGuardSource)) {
-    const loggingGuardDest = path.join(binDir, 'pino-logging-guard.mjs')
-    fs.cpSync(loggingGuardSource, loggingGuardDest)
-    STABLE_LOGGING_GUARD = loggingGuardDest.split(path.sep).join('/')
-    ok(`Pino logging guard → ${loggingGuardDest}`)
-  }
-
-  const envFile = path.join(home, '.env')
-  if (fs.existsSync(envFile)) {
-    log(`  .env уже есть — ${envFile} (не трогаю)`)
-    return
-  }
-  const example = path.join(PKG_ROOT, '.env.example')
-  if (fs.existsSync(example)) {
-    fs.copyFileSync(example, envFile)
-    try { fs.chmodSync(envFile, 0o600) } catch { /* Windows / нет прав — не критично */ }
-    ok(`создан ${envFile} — впиши сюда свои ключи`)
-  }
-}
-
-// Официальный Firecrawl installer ставит собственные firecrawl-* skills.
-// Они имеют приоритет: AVF добавляет только отсутствующие fallback-скиллы.
-function copySkillsPreservingUpstream(srcSkills, skillsDir) {
-  fs.mkdirSync(skillsDir, { recursive: true })
-  let copied = 0
-  let preserved = 0
-  for (const entry of fs.readdirSync(srcSkills, { withFileTypes: true })) {
-    if (!entry.isDirectory()) continue
-    const target = path.join(skillsDir, entry.name)
-    const upstreamOwned = entry.name === 'firecrawl' || entry.name.startsWith('firecrawl-')
-    if (upstreamOwned && fs.existsSync(target)) {
-      preserved++
-      continue
-    }
-    fs.cpSync(path.join(srcSkills, entry.name), target, { recursive: true })
-    const prompt = path.join(target, 'SKILL.md')
-    if (fs.existsSync(prompt)) injectProjectDescriptionContract(prompt)
-    copied++
-  }
-  return { copied, preserved }
-}
-
-function injectProjectDescriptionContract(file) {
-  const source = fs.readFileSync(file, 'utf8')
-  if (source.includes(SKILL_DESCRIPTION_MARK_S)) return
-  const frontmatter = source.match(/^---\r?\n[\s\S]*?\r?\n---\r?\n/)
-  if (!frontmatter) throw new Error(`неверный SKILL.md без frontmatter: ${file}`)
-  const insertAt = frontmatter[0].length
-  writeFileAtomic(file, `${source.slice(0, insertAt)}\n${SKILL_DESCRIPTION_CONTRACT}\n${source.slice(insertAt)}`)
-}
-
-// Adapter-specific SKILL.md prompts stay under codex/skills. Heavy runtime,
-// references and assets live once under canonical skills and are overlaid here.
-function installCanonicalSkillAssets(skillsDir) {
-  const canonical = path.join(PKG_ROOT, 'skills')
-  if (!fs.existsSync(canonical)) return
-  for (const skill of fs.readdirSync(canonical, { withFileTypes: true })) {
-    if (!skill.isDirectory()) continue
-    const target = path.join(skillsDir, skill.name)
-    if (!fs.existsSync(target)) continue
-    const source = path.join(canonical, skill.name)
-    for (const entry of fs.readdirSync(source, { withFileTypes: true })) {
-      if (entry.name === 'SKILL.md' || entry.name === 'tests') continue
-      fs.cpSync(path.join(source, entry.name), path.join(target, entry.name), { recursive: true })
-    }
-  }
-}
-
-// Scoped-run helper is shared by the workflow prompt and installed beside it,
-// so every adapter executes the same orchestration contract.
-function installWorkflowRuntime(skillsDir) {
-  const source = path.join(PKG_ROOT, 'scripts', 'vorcl-run.mjs')
-  if (!fs.existsSync(source)) return
-  const target = path.join(skillsDir, 'workflow', 'scripts', 'vorcl-run.mjs')
-  fs.mkdirSync(path.dirname(target), { recursive: true })
-  fs.cpSync(source, target)
-}
-
-// ---------- Claude Code ----------
-function installClaude() {
-  log('\n▸ Claude Code')
-  if (hasCmd('claude')) {
-    const add = spawnSync('claude', ['plugin', 'marketplace', 'add', REPO], { stdio: 'inherit' })
-    const inst =
-      add.status === 0
-        ? spawnSync('claude', ['plugin', 'install', PLUGIN_ID, '--scope', 'user'], { stdio: 'inherit' })
-        : add
-    if (inst.status === 0) {
-      writeClaudeRuntimeEnv()
-      ok(`плагин установлен через CLI: ${PLUGIN_ID}`)
-      log('    активация: перезапусти Claude или выполни /reload-plugins')
-      return
-    }
-    warn('CLI-установка не удалась — пишу в settings.json напрямую')
-  } else {
-    warn('claude CLI не найден в PATH — пишу в settings.json напрямую')
-  }
-  writeClaudeSettings()
-}
-
-function writeClaudeSettings() {
-  const dir = path.join(os.homedir(), '.claude')
-  const file = path.join(dir, 'settings.json')
-  fs.mkdirSync(dir, { recursive: true })
-  let s = {}
-  if (fs.existsSync(file)) {
-    try {
-      s = JSON.parse(fs.readFileSync(file, 'utf8'))
-    } catch {
-      warn(`битый JSON в ${file} — правка settings.json пропущена, остальная установка продолжается; поправь файл и запусти снова`)
-      return
-    }
-  }
-  if (!s.extraKnownMarketplaces || typeof s.extraKnownMarketplaces !== 'object' || Array.isArray(s.extraKnownMarketplaces)) {
-    if (s.extraKnownMarketplaces != null) warn(`поле extraKnownMarketplaces в ${file} повреждено — пересоздаю его как объект`)
-    s.extraKnownMarketplaces = {}
-  }
-  s.extraKnownMarketplaces[MARKET] = { source: { source: 'github', repo: REPO }, autoUpdate: true }
-  if (Array.isArray(s.enabledPlugins)) {
-    s.enabledPlugins = Object.fromEntries(s.enabledPlugins.filter((id) => typeof id === 'string').map((id) => [id, true]))
-  } else if (!s.enabledPlugins || typeof s.enabledPlugins !== 'object') {
-    if (s.enabledPlugins != null) warn(`поле enabledPlugins в ${file} повреждено — пересоздаю его как объект`)
-    s.enabledPlugins = {}
-  }
-  s.enabledPlugins[PLUGIN_ID] = true
-  s.env ||= {}
-  if (typeof s.env !== 'object' || Array.isArray(s.env)) {
-    warn(`поле env в ${file} повреждено — runtime token не добавлен`)
-  } else {
-    s.env.AVF_RUNTIME_TOKEN = RUNTIME_TOKEN
-  }
-  writeFileAtomic(file, JSON.stringify(s, null, 2) + '\n')
-  ok(`зарегистрировано в ${file}`)
-  log(`    marketplace ${MARKET} (github:${REPO}) + enabledPlugins ${PLUGIN_ID}`)
-  log('    активация: перезапусти Claude или выполни /reload-plugins')
-}
-
-function writeClaudeRuntimeEnv() {
-  const dir = path.join(os.homedir(), '.claude')
-  const file = path.join(dir, 'settings.json')
-  fs.mkdirSync(dir, { recursive: true })
-  let settings = {}
-  if (fs.existsSync(file)) {
-    try { settings = JSON.parse(fs.readFileSync(file, 'utf8')) }
-    catch (error) { warn(`runtime token не добавлен в битый ${file}: ${error.message}`); return }
-  }
-  if (settings.env != null && (typeof settings.env !== 'object' || Array.isArray(settings.env))) { warn(`runtime token не добавлен: env в ${file} не является объектом`); return }
-  settings.env ||= {}
-  settings.env.AVF_RUNTIME_TOKEN = RUNTIME_TOKEN
-  writeFileAtomic(file, JSON.stringify(settings, null, 2) + '\n')
-  ok(`Claude runtime token env → ${file}`)
-}
-
-// ---------- Codex ----------
-function installCodex() {
-  log('\n▸ Codex')
-  const codexHome = process.env.CODEX_HOME || path.join(os.homedir(), '.codex')
-  const skillsDir = process.env.AVF_SKILLS_DIR || path.join(os.homedir(), '.agents', 'skills')
-  const srcSkills = path.join(PKG_ROOT, 'codex', 'skills')
-  const srcConfig = path.join(PKG_ROOT, 'codex', 'config.toml')
-  const srcAgents = path.join(PKG_ROOT, 'codex', 'AGENTS.md')
-
-  if (!fs.existsSync(srcSkills)) {
-    warn(`нет ${srcSkills} — codex-адаптер в пакете отсутствует, пропуск`)
-    return
-  }
-  const copied = copySkillsPreservingUpstream(srcSkills, skillsDir)
-  installCanonicalSkillAssets(skillsDir)
-  installWorkflowRuntime(skillsDir)
-  ok(`скиллы → ${skillsDir} (${copied.copied} скопировано${copied.preserved ? `, ${copied.preserved} upstream Firecrawl сохранено` : ''})`)
-
-  fs.mkdirSync(codexHome, { recursive: true })
-  mergeBlock(path.join(codexHome, 'config.toml'), withLauncher(fs.readFileSync(srcConfig, 'utf8')), 'config.toml (mcp_servers + profiles)', { toml: true })
-  mergeBlock(path.join(codexHome, 'AGENTS.md'), fs.readFileSync(srcAgents, 'utf8'), 'AGENTS.md')
-}
-
-function writeFileAtomic(file, content) {
-  fs.mkdirSync(path.dirname(file), { recursive: true })
-  const temporary = path.join(path.dirname(file), `.${path.basename(file)}.avf-${process.pid}-${Math.random().toString(16).slice(2)}.tmp`)
-  const containsRuntimeToken = Boolean(RUNTIME_TOKEN && content.includes(RUNTIME_TOKEN))
-  const mode = containsRuntimeToken ? 0o600 : fs.existsSync(file) ? fs.statSync(file).mode & 0o777 : undefined
-  try {
-    fs.writeFileSync(temporary, content, mode == null ? undefined : { mode })
-    fs.renameSync(temporary, file)
-    if (containsRuntimeToken) fs.chmodSync(file, 0o600)
-  } catch (error) {
-    try { fs.unlinkSync(temporary) } catch { /* файл мог не успеть появиться */ }
-    throw error
-  }
-}
-
-function markedBlockState(current, start, end, file) {
-  const starts = current.split(start).length - 1
-  const ends = current.split(end).length - 1
-  if (starts !== ends || starts > 1) {
-    throw new Error(`повреждён marked block в ${file}: ожидалась одна пара маркеров; файл не изменён`)
-  }
-  if (starts === 0) return { unmanaged: current, range: null }
-  const from = current.indexOf(start)
-  const to = current.indexOf(end, from + start.length)
-  if (to < from) throw new Error(`повреждён порядок маркеров в ${file}; файл не изменён`)
-  return {
-    unmanaged: current.slice(0, from) + current.slice(to + end.length),
-    range: { from, to: to + end.length },
-  }
-}
-
-function tomlTableNames(content) {
-  const names = new Set()
-  for (const match of content.matchAll(/^\s*\[([^\[\]\r\n]+)\]\s*(?:#.*)?$/gm)) names.add(match[1].trim())
-  return names
-}
-
-// TOML запрещает повторно объявлять таблицу. Пользовательские таблицы имеют приоритет:
-// AVF пропускает конфликтующую секцию, но продолжает обновлять остальные owned-секции.
-function omitConflictingTomlTables(content, unmanaged, label) {
-  const occupied = tomlTableNames(unmanaged)
-  if (occupied.size === 0) return content
-  const lines = content.split(/(?<=\n)/)
-  const kept = []
-  const omitted = []
-  let skip = false
-  for (const line of lines) {
-    const header = line.match(/^\s*\[([^\[\]\r\n]+)\]\s*(?:#.*)?(?:\r?\n)?$/)
-    if (header) {
-      const name = header[1].trim()
-      skip = occupied.has(name)
-      if (skip) omitted.push(name)
-    }
-    if (!skip) kept.push(line)
-  }
-  if (omitted.length) warn(`${label}: пользовательские TOML-таблицы сохранены, AVF-секции пропущены: ${omitted.join(', ')}`)
-  return kept.join('').replace(/\s*$/, '')
-}
-
-function upsertMarkedBlock(file, content, label, start, end, { toml = false } = {}) {
-  const cur = fs.existsSync(file) ? fs.readFileSync(file, 'utf8') : ''
-  const state = markedBlockState(cur, start, end, file)
-  const prepared = toml ? omitConflictingTomlTables(content, state.unmanaged, label) : content.replace(/\s*$/, '')
-  const block = `${start}\n${prepared}\n${end}`
-  let next
-  if (state.range) {
-    next = cur.slice(0, state.range.from) + block + cur.slice(state.range.to)
-  } else {
-    const separator = cur.length === 0 ? '' : cur.endsWith('\n\n') ? '' : cur.endsWith('\n') ? '\n' : '\n\n'
-    next = cur + separator + block + '\n'
-  }
-  if (next === cur) {
-    log(`  ${label}: уже актуально`)
-    return
-  }
-  writeFileAtomic(file, next)
-  ok(`${label} ${state.range ? 'обновлён' : 'установлен'} → ${file}`)
-}
-
-function mergeBlock(file, content, label, options) {
-  upsertMarkedBlock(file, content, label, MARK_S, MARK_E, options)
-}
-
-function mergeMarkedBlock(file, content, label, start, end, options) {
-  upsertMarkedBlock(file, content, label, start, end, options)
-}
-
-// ---------- Cursor ----------
-function installCursor() {
-  log('\n▸ Cursor')
-  const cursorHome = process.env.CURSOR_HOME || path.join(os.homedir(), '.cursor')
-  const srcSkills = path.join(PKG_ROOT, 'codex', 'skills')
-  const srcAgents = path.join(PKG_ROOT, 'agents')
-  const srcMcp = path.join(PKG_ROOT, 'cursor', 'mcp.json')
-
-  if (!fs.existsSync(srcSkills) || !fs.existsSync(srcAgents) || !fs.existsSync(srcMcp)) {
-    warn('cursor-адаптер в пакете неполный — пропуск')
-    return
-  }
-
-  const skillsDir = path.join(cursorHome, 'skills')
-  const copied = copySkillsPreservingUpstream(srcSkills, skillsDir)
-  installCanonicalSkillAssets(skillsDir)
-  installWorkflowRuntime(skillsDir)
-  ok(`скиллы → ${skillsDir} (${copied.copied} скопировано${copied.preserved ? `, ${copied.preserved} upstream Firecrawl сохранено` : ''})`)
-
-  const agentsDir = path.join(cursorHome, 'agents')
-  fs.mkdirSync(agentsDir, { recursive: true })
-  const agentFiles = fs.readdirSync(srcAgents).filter((file) => file.endsWith('.md'))
-  for (const file of agentFiles) {
-    const source = fs.readFileSync(path.join(srcAgents, file), 'utf8')
-    fs.writeFileSync(path.join(agentsDir, `avf-${file}`), toCursorAgent(source, file))
-  }
-  ok(`${agentFiles.length} субагентов → ${agentsDir}`)
-
-  mergeCursorMcp(path.join(cursorHome, 'mcp.json'), srcMcp)
-  log('    активация: перезапусти Cursor или открой новое окно Agent')
-}
-
-function toCursorAgent(source, file) {
-  const match = source.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n([\s\S]*)$/)
-  if (!match) throw new Error(`неверный frontmatter агента ${file}`)
-  const frontmatter = match[1]
-  const field = (name) => frontmatter.match(new RegExp(`^${name}:\\s*(.+)$`, 'm'))?.[1]?.trim()
-  const name = field('name')
-  const description = field('description')
-  const tools = field('tools') || ''
-  if (!name || !description) throw new Error(`у агента ${file} нет name/description`)
-
-  const readonly = !/(^|,\s*)(Edit|Write)(,|$)/.test(tools)
-  const body = match[2].replace(/\/([a-z][a-z0-9-]*):([a-z0-9-]+)/g, '/$1-$2')
-  return `---\nname: avf-${name}\ndescription: ${JSON.stringify(description)}\nmodel: inherit\nreadonly: ${readonly}\n---\n${body}`
-}
-
-function mergeCursorMcp(file, sourceFile) {
-  fs.mkdirSync(path.dirname(file), { recursive: true })
-  let current = { mcpServers: {} }
-  if (fs.existsSync(file)) {
-    try {
-      current = JSON.parse(fs.readFileSync(file, 'utf8'))
-    } catch {
-      warn(`битый JSON в ${file} — MCP-конфиг Cursor пропущен; скиллы и агенты установлены`)
-      return
-    }
-  }
-  if (!current || typeof current !== 'object' || Array.isArray(current)) {
-    warn(`неверная структура ${file} — MCP-конфиг Cursor пропущен; скиллы и агенты установлены`)
-    return
-  }
-  const incoming = JSON.parse(withLauncher(fs.readFileSync(sourceFile, 'utf8')))
-  if (current.mcpServers != null && (typeof current.mcpServers !== 'object' || Array.isArray(current.mcpServers))) {
-    warn(`поле mcpServers в ${file} не является объектом — MCP-конфиг Cursor пропущен`)
-    return
-  }
-  current.mcpServers ||= {}
-  let added = 0
-  let kept = 0
-  for (const [name, config] of Object.entries(incoming.mcpServers || {})) {
-    if (Object.hasOwn(current.mcpServers, name)) {
-      kept++
-      continue
-    }
-    current.mcpServers[name] = config
-    added++
-  }
-  writeFileAtomic(file, JSON.stringify(current, null, 2) + '\n')
-  ok(`MCP → ${file} (${added} добавлено${kept ? `, ${kept} существующих сохранено` : ''})`)
-}
-
-// ---------- Kimi CLI ----------
-// Kimi CLI (MoonshotAI/kimi-cli) читает ~/.kimi/mcp.json в той же mcpServers-схеме,
-// что Claude/Cursor. Мёржим наши серверы, не затирая пользовательские.
-function installKimi() {
-  log('\n▸ Kimi CLI')
-  const kimiHome = process.env.KIMI_HOME || path.join(os.homedir(), '.kimi')
-  const srcMcp = path.join(PKG_ROOT, 'kimi', 'mcp.json')
-  const srcSkills = path.join(PKG_ROOT, 'codex', 'skills')
-  const srcAgents = path.join(PKG_ROOT, 'kimi', 'agents')
-  const srcHooks = path.join(PKG_ROOT, 'kimi', 'hooks.toml')
-  if (!fs.existsSync(srcMcp) || !fs.existsSync(srcSkills)) {
-    warn('kimi-адаптер в пакете отсутствует — пропуск')
-    return
-  }
-  fs.mkdirSync(kimiHome, { recursive: true })
-
-  const skillsDir = path.join(kimiHome, 'skills')
-  const copied = copySkillsPreservingUpstream(srcSkills, skillsDir)
-  installCanonicalSkillAssets(skillsDir)
-  installWorkflowRuntime(skillsDir)
-  ok(`скиллы → ${skillsDir} (${copied.copied} скопировано${copied.preserved ? `, ${copied.preserved} upstream Firecrawl сохранено` : ''})`)
-
-  if (fs.existsSync(srcAgents)) {
-    const agentsDir = path.join(kimiHome, 'agents')
-    fs.mkdirSync(agentsDir, { recursive: true })
-    const agentFiles = fs.readdirSync(srcAgents).filter((file) => /\.ya?ml$/.test(file))
-    for (const file of agentFiles) fs.cpSync(path.join(srcAgents, file), path.join(agentsDir, `avf-${file}`))
-    ok(`${agentFiles.length} Kimi agent-файлов → ${agentsDir}`)
-  }
-
-  if (fs.existsSync(srcHooks) && STABLE_EXPO_GUARD && STABLE_EXPO_UI_GUARD && STABLE_EXPO_COMPATIBILITY && STABLE_LOGGING_GUARD) {
-    const hookConfig = fs.readFileSync(srcHooks, 'utf8')
-      .split('__AVF_EXPO_GUARD__').join(STABLE_EXPO_GUARD)
-      .split('__AVF_EXPO_UI_GUARD__').join(STABLE_EXPO_UI_GUARD)
-      .split('__AVF_EXPO_COMPATIBILITY__').join(STABLE_EXPO_COMPATIBILITY)
-      .split('__AVF_LOGGING_GUARD__').join(STABLE_LOGGING_GUARD)
-    mergeMarkedBlock(
-      path.join(kimiHome, 'config.toml'),
-      hookConfig,
-      'Expo architecture/UI hooks',
-      '# >>> agent-vorcl-flow expo-mobile >>>',
-      '# <<< agent-vorcl-flow expo-mobile <<<',
-      { toml: true },
-    )
-  }
-
-  mergeCursorMcp(path.join(kimiHome, 'mcp.json'), srcMcp)
-  log(`    Expo role: kimi --agent-file "${path.join(kimiHome, 'agents', 'avf-expo-mobile.yaml')}"`)
-  log('    проверка: /skill:expo-mobile-audit или kimi mcp list')
-}
-
-// ---------- banner ----------
-// Цветное приветствие. Только для живого терминала: в CI/пайпах и при NO_COLOR — простой текст.
-function banner() {
-  const readCount = (fn) => { try { return fn() } catch { return null } }
-  const version = readCount(() => JSON.parse(fs.readFileSync(path.join(PKG_ROOT, 'package.json'), 'utf8')).version) || ''
-  const agents = readCount(() => fs.readdirSync(path.join(PKG_ROOT, 'agents')).filter((f) => f.endsWith('.md')).length)
-  const skills = readCount(() => fs.readdirSync(path.join(PKG_ROOT, 'skills'), { withFileTypes: true }).filter((d) => d.isDirectory()).length)
-  const commands = readCount(() => {
-    const root = path.join(PKG_ROOT, 'commands')
-    const entries = fs.readdirSync(root, { withFileTypes: true })
-    const topLevel = entries.filter((entry) => entry.isFile() && entry.name.endsWith('.md')).length
-    return topLevel + entries.filter((entry) => entry.isDirectory())
-      .reduce((n, entry) => n + fs.readdirSync(path.join(root, entry.name)).filter((f) => f.endsWith('.md')).length, 0)
-  })
-  const stats = agents ? `${agents} агентов · ${skills} скиллов · ${commands} команд` : ''
-  const useColor = !process.env.NO_COLOR && process.env.TERM !== 'dumb' && (process.stdout.isTTY || process.env.FORCE_COLOR)
-
-  if (!useColor) {
-    log(`Agent-Vorcl-Flow${version ? ` v${version}` : ''} — установщик${stats ? ` (${stats})` : ''}`)
-    return
-  }
-
-  const art = [
-    '██╗   ██╗ ██████╗ ██████╗  ██████╗██╗',
-    '██║   ██║██╔═══██╗██╔══██╗██╔════╝██║',
-    '██║   ██║██║   ██║██████╔╝██║     ██║',
-    '╚██╗ ██╔╝██║   ██║██╔══██╗██║     ██║',
-    ' ╚████╔╝ ╚██████╔╝██║  ██║╚██████╗███████╗',
-    '  ╚═══╝   ╚═════╝ ╚═╝  ╚═╝ ╚═════╝╚══════╝',
-  ]
-  const gradient = [51, 45, 39, 99, 135, 141] // 256-color: cyan → purple
-  const c = (code, s) => `\x1b[38;5;${code}m${s}\x1b[0m`
-  const dim = (s) => `\x1b[2m${s}\x1b[0m`
-  const bold = (s) => `\x1b[1m${s}\x1b[0m`
-
-  log('')
-  art.forEach((line, i) => log('  ' + c(gradient[i], line)))
-  log('')
-  log('  ' + bold(c(45, 'AGENT VORCL FLOW')) + (version ? ' ' + c(141, `v${version}`) : '') + (stats ? dim(`  —  ${stats}`) : ''))
-  log('  ' + dim('Специализированные AI-субагенты для Claude Code, GPT Codex, Cursor и Kimi CLI'))
-  log('')
-}
-
-// ---------- run ----------
-// Шаги независимы: сбой одного адаптера не должен блокировать остальные.
-let hadError = false
-function runStep(name, fn) {
-  try {
-    fn()
-  } catch (e) {
-    hadError = true
-    console.error(`  ✖ ${name}: ${e.message}`)
-  }
-}
-
-banner()
-if (argv.includes('--banner-only')) process.exit(0) // предпросмотр приветствия без установки
-// Общий слой (launcher + .env) нужен всем адаптерам — ставим всегда, до них.
-runStep('Общий слой', installShared)
-if (all || wantClaude) runStep('Claude Code', installClaude)
-if (all || wantCodex) runStep('Codex', installCodex)
-if (all || wantCursor) runStep('Cursor', installCursor)
-if (all || wantKimi) runStep('Kimi CLI', installKimi)
-
-const envPath = path.join(avfHome(), '.env')
-log('\n▸ Ключи — ОДИН файл на все рантаймы (Claude / Codex / Cursor / Kimi):')
-log(`    ${envPath}`)
-log('    Открой его и впиши только нужные ключи (пустые серверы просто не поднимаются):')
-log('      ANTHROPIC_API_KEY / OPENAI_API_KEY   # Task Master (выбери main provider)')
-log('      PERPLEXITY_API_KEY                    # Task Master: optional research')
-log('      FIRECRAWL_API_KEY                     # firecrawl')
-log('      GITHUB_TOKEN                          # github')
-log('      MONGODB_URI / REDIS_URL / POSTGRES_URL # агент database')
-log('    Секреты читает launcher bin/mcp-env.mjs — ~/.zshrc для них больше не нужен.')
-log('    task-master models --setup             # выбрать main / research / fallback')
-if (hadError) {
-  console.error('\nЗавершено с ошибками — см. ✖ выше. Установленные части рабочие, сбойные перезапусти после исправления.')
+const args = process.argv.slice(2)
+const flags = new Set(['--claude', '--codex', '--cursor', '--kimi', '--all', '--dry-run', '--check-legacy', '--help', '-h', '--banner-only'])
+const unknown = args.filter((arg) => !flags.has(arg))
+if (unknown.length) {
+  console.error(`Unknown option: ${unknown.join(', ')}. Use --help.`)
   process.exit(1)
 }
-log('\nГотово.')
+if (args.includes('--help') || args.includes('-h')) {
+  console.log(HELP)
+  process.exit(0)
+}
+if (args.includes('--banner-only')) {
+  console.log('Agent-Vorcl-Flow — local skills and agents')
+  process.exit(0)
+}
+if (Number(process.versions.node.split('.')[0]) < 20) {
+  console.error(`Node.js >= 20 is required; found ${process.versions.node}.`)
+  process.exit(1)
+}
+
+const dryRun = args.includes('--dry-run')
+const selected = ['claude', 'codex', 'cursor', 'kimi'].filter((adapter) => args.includes('--all') || args.includes(`--${adapter}`))
+const log = (message) => console.log(message)
+const warn = (message) => console.error(`Preserved: ${message}`)
+
+function location(variable, fallback) {
+  const result = process.env[variable] || fallback
+  if (!path.isAbsolute(result)) throw new Error(`${variable} must be an absolute path`)
+  return path.resolve(result)
+}
+
+function exists(file) {
+  try { fs.lstatSync(file); return true }
+  catch (error) { if (error.code === 'ENOENT') return false; throw error }
+}
+
+// Never follow a destination symlink, including ancestors and broken links.
+function assertSafePath(destination) {
+  let current = path.resolve(destination)
+  while (true) {
+    if (exists(current) && fs.lstatSync(current).isSymbolicLink()) throw new Error(`refusing symbolic-link destination: ${current}`)
+    const parent = path.dirname(current)
+    if (parent === current) return
+    current = parent
+  }
+}
+
+function injectProjectDescriptionContract(source, name) {
+  if (source.includes(SKILL_DESCRIPTION_MARK_S)) return source
+  const frontmatter = source.match(/^---\r?\n[\s\S]*?\r?\n---\r?\n/)
+  if (!frontmatter) throw new Error(`Invalid SKILL.md frontmatter: ${name}`)
+  const offset = frontmatter[0].length
+  return `${source.slice(0, offset)}\n${SKILL_DESCRIPTION_CONTRACT}\n${source.slice(offset)}`
+}
+
+// Represent each directory as files + modes. Empty directories are included so
+// locally added content is detected before any managed component is replaced.
+function collectFiles(source, prefix = '', result = new Map()) {
+  const stat = fs.lstatSync(source)
+  if (stat.isSymbolicLink() || (!stat.isFile() && !stat.isDirectory())) throw new Error(`unsupported file type: ${source}`)
+  if (stat.isFile()) result.set(prefix, { type: 'file', mode: stat.mode & 0o777, data: fs.readFileSync(source) })
+  else {
+    result.set(prefix, { type: 'directory', mode: stat.mode & 0o777 })
+    for (const entry of fs.readdirSync(source).sort()) collectFiles(path.join(source, entry), prefix ? `${prefix}/${entry}` : entry, result)
+  }
+  return result
+}
+
+function digest(files) {
+  const hash = createHash('sha256')
+  for (const [name, entry] of [...files].sort(([a], [b]) => a.localeCompare(b, 'en'))) {
+    hash.update(JSON.stringify([name, entry.type, entry.mode, entry.data?.length ?? 0]))
+    if (entry.data) hash.update(entry.data)
+  }
+  return hash.digest('hex')
+}
+
+function skillFiles(name) {
+  const files = collectFiles(path.join(PKG_ROOT, 'codex', 'skills', name))
+  const canonical = path.join(PKG_ROOT, 'skills', name)
+  if (exists(canonical)) {
+    for (const entry of fs.readdirSync(canonical).sort()) {
+      if (entry === 'SKILL.md' || entry === 'tests') continue
+      collectFiles(path.join(canonical, entry), entry, files)
+    }
+  }
+  const prompt = files.get('SKILL.md')
+  if (!prompt || prompt.type !== 'file') throw new Error(`Missing SKILL.md: ${name}`)
+  prompt.data = Buffer.from(injectProjectDescriptionContract(prompt.data.toString('utf8'), name))
+  if (name === 'workflow') {
+    const helper = path.join(PKG_ROOT, 'scripts', 'vorcl-run.mjs')
+    if (exists(helper)) {
+      if (!files.has('scripts')) files.set('scripts', { type: 'directory', mode: 0o755 })
+      collectFiles(helper, 'scripts/vorcl-run.mjs', files)
+    }
+  }
+  return files
+}
+
+function agentFiles(source, adapter) {
+  if (adapter === 'kimi') return collectFiles(source)
+  const content = fs.readFileSync(source, 'utf8')
+  const match = content.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n([\s\S]*)$/)
+  if (!match) throw new Error(`Invalid agent frontmatter: ${source}`)
+  const field = (name) => match[1].match(new RegExp(`^${name}:\\s*(.+)$`, 'm'))?.[1]?.trim()
+  if (!field('name') || !field('description')) throw new Error(`Missing agent name/description: ${source}`)
+  const rawDescription = field('description')
+  const description = rawDescription.startsWith('"') ? JSON.parse(rawDescription) : rawDescription
+  const body = match[2].replace(/\/([a-z][a-z0-9-]*):([a-z0-9-]+)/g, '/$1-$2')
+  const registry = path.join(PKG_ROOT, 'scripts', 'roles.json')
+  const role = exists(registry) ? JSON.parse(fs.readFileSync(registry, 'utf8')).roles.find((entry) => entry.id === field('name')) : null
+  const readonly = role?.readonly === true
+  const frontmatter = adapter === 'cursor'
+    ? `name: avf-${field('name')}\ndescription: ${JSON.stringify(description)}\nmodel: inherit\nreadonly: ${readonly}`
+    : match[1].replace(/^name:.*$/m, `name: avf-${field('name')}`).replace(/^model:.*$/m, 'model: inherit')
+  return new Map([['', { type: 'file', mode: 0o644, data: Buffer.from(`---\n${frontmatter}\n---\n${body}`) }]])
+}
+
+function readManifest(root) {
+  const file = path.join(root, MANIFEST)
+  if (!exists(file)) return { schemaVersion: 1, components: {} }
+  assertSafePath(file)
+  const manifest = JSON.parse(fs.readFileSync(file, 'utf8'))
+  if (manifest?.schemaVersion !== 1 || !manifest.components || typeof manifest.components !== 'object' || Array.isArray(manifest.components)) {
+    throw new Error(`Invalid ownership manifest: ${file}`)
+  }
+  for (const [name, value] of Object.entries(manifest.components)) {
+    if (!/^[a-z0-9][a-z0-9._-]*$/i.test(name) || name === '..' || !/^[a-f0-9]{64}$/.test(value)) throw new Error(`Invalid ownership record: ${file}`)
+  }
+  return manifest
+}
+
+function writeManifest(root, manifest) {
+  const file = path.join(root, MANIFEST)
+  const next = JSON.stringify(manifest, null, 2) + '\n'
+  if (exists(file) && fs.readFileSync(file, 'utf8') === next) return
+  const temp = path.join(root, `.avf-manifest-${process.pid}-${Math.random().toString(16).slice(2)}.tmp`)
+  try {
+    fs.writeFileSync(temp, next, { flag: 'wx', mode: 0o600 })
+    fs.renameSync(temp, file)
+  } finally { if (exists(temp)) fs.unlinkSync(temp) }
+}
+
+function materialize(files, target) {
+  for (const [relative, entry] of [...files].sort(([a], [b]) => a.length - b.length || a.localeCompare(b))) {
+    const destination = relative ? path.join(target, ...relative.split('/')) : target
+    if (entry.type === 'directory') fs.mkdirSync(destination, { recursive: true, mode: entry.mode })
+    else { fs.mkdirSync(path.dirname(destination), { recursive: true }); fs.writeFileSync(destination, entry.data, { mode: entry.mode }) }
+    fs.chmodSync(destination, entry.mode)
+  }
+}
+
+function installComponents(root, incoming) {
+  assertSafePath(root)
+  // Competing installer processes must not overwrite each other's ownership
+  // records. A crash leaves a visible lock for explicit operator inspection.
+  let lock = null
+  let lockFd = null
+  if (!dryRun) {
+    fs.mkdirSync(root, { recursive: true })
+    lock = path.join(root, '.agent-vorcl-flow-install.lock')
+    try { lockFd = fs.openSync(lock, 'wx', 0o600) }
+    catch (error) {
+      if (error.code === 'EEXIST') throw new Error(`installation lock exists; inspect before retrying: ${lock}`)
+      throw error
+    }
+    fs.writeFileSync(lockFd, `${process.pid}\n`)
+  }
+  try {
+  const manifest = readManifest(root)
+  const stats = { installed: 0, updated: 0, unchanged: 0, preserved: 0 }
+  for (const [name, files] of incoming) {
+    const target = path.join(root, name)
+    const present = exists(target)
+    let before = null
+    if (present) {
+      // A matching name does not establish ownership, even for legacy AVF files.
+      if (!Object.hasOwn(manifest.components, name)) { stats.preserved++; warn(`${target} (not owned by this installer)`); continue }
+      try { before = digest(collectFiles(target)) }
+      catch { stats.preserved++; warn(`${target} (unsupported local file or symlink)`); continue }
+      if (before !== manifest.components[name]) { stats.preserved++; warn(`${target} (locally modified)`); continue }
+    }
+    const after = digest(files)
+    if (before === after) { stats.unchanged++; continue }
+    if (!dryRun) {
+      fs.mkdirSync(root, { recursive: true })
+      const staging = fs.mkdtempSync(path.join(root, '.avf-stage-'))
+      const staged = path.join(staging, 'next')
+      const backup = path.join(staging, 'previous')
+      let committed = false
+      try {
+        materialize(files, staged)
+        // Recheck after staging so a concurrent edit is not silently replaced.
+        if (present ? !exists(target) || digest(collectFiles(target)) !== before : exists(target)) {
+          throw new Error(`destination changed during installation: ${target}`)
+        }
+        if (present) fs.renameSync(target, backup)
+        let published = false
+        try {
+          fs.renameSync(staged, target)
+          published = true
+          manifest.components[name] = after
+          // Persist ownership with each component; interrupted runs remain safe.
+          writeManifest(root, manifest)
+          committed = true
+        } catch (error) {
+          if (published) fs.rmSync(target, { recursive: true, force: true })
+          if (present) fs.renameSync(backup, target)
+          throw error
+        }
+      } finally {
+        // If rollback itself failed, retain the backup for recovery.
+        if (committed || !exists(backup)) fs.rmSync(staging, { recursive: true, force: true })
+      }
+    }
+    stats[present ? 'updated' : 'installed']++
+  }
+  log(`${dryRun ? 'Preview' : 'Installed'} ${root}: ${Object.entries(stats).map(([key, count]) => `${count} ${key}`).join(', ')}`)
+  } finally {
+    if (lockFd !== null) fs.closeSync(lockFd)
+    if (lock !== null) fs.unlinkSync(lock)
+  }
+}
+
+function legacyReport() {
+  const home = os.homedir()
+  const candidates = [
+    path.join(location('CLAUDE_HOME', path.join(home, '.claude')), 'settings.json'),
+    path.join(location('CODEX_HOME', path.join(home, '.codex')), 'config.toml'),
+    path.join(location('CODEX_HOME', path.join(home, '.codex')), 'AGENTS.md'),
+    path.join(location('CURSOR_HOME', path.join(home, '.cursor')), 'mcp.json'),
+    path.join(location('KIMI_HOME', path.join(home, '.kimi')), 'mcp.json'),
+    path.join(location('KIMI_HOME', path.join(home, '.kimi')), 'config.toml'),
+  ]
+  let found = 0
+  for (const file of candidates) {
+    if (!exists(file)) continue
+    if (/agent-vorcl-flow|AVF_RUNTIME_TOKEN|mcp-env\.mjs|127\.0\.0\.1:19790|__AVF_LAUNCHER__/i.test(fs.readFileSync(file, 'utf8'))) {
+      found++
+      log(`Possible legacy AVF configuration: ${file}`)
+    }
+  }
+  const configHome = location('XDG_CONFIG_HOME', path.join(home, '.config'))
+  const avfHome = location('AGENT_VORCL_HOME', process.platform === 'win32' && process.env.APPDATA ? path.join(process.env.APPDATA, 'agent-vorcl-flow') : path.join(configHome, 'agent-vorcl-flow'))
+  const legacyArtifacts = [
+    avfHome,
+    path.join(home, 'Library', 'LaunchAgents', 'io.vorcl.agent-flow-runtime.plist'),
+    path.join(home, '.config', 'systemd', 'user', 'agent-vorcl-flow-runtime.service'),
+  ]
+  for (const file of legacyArtifacts) {
+    if (!exists(file)) continue
+    found++
+    log(`Possible legacy AVF runtime artifact: ${file}`)
+  }
+  log(found ? 'Review these files in your client settings. No settings or values were changed or printed.' : 'No recognizable legacy AVF client configuration found.')
+}
+
+try {
+  if (args.includes('--check-legacy')) legacyReport()
+  if (!selected.length) {
+    if (!args.includes('--check-legacy')) log(HELP)
+    process.exit(0)
+  }
+  const home = os.homedir()
+  // Validate all selected paths and ownership manifests before writing anywhere.
+  const adapters = selected.map((adapter) => {
+    const clientHome = adapter === 'codex' ? null : location(`${adapter.toUpperCase()}_HOME`, path.join(home, `.${adapter}`))
+    return { adapter, skills: adapter === 'codex' ? location('AVF_SKILLS_DIR', path.join(home, '.agents', 'skills')) : path.join(clientHome, 'skills'), agents: clientHome && path.join(clientHome, 'agents') }
+  })
+  const skillNames = fs.readdirSync(path.join(PKG_ROOT, 'codex', 'skills'), { withFileTypes: true }).filter((entry) => entry.isDirectory()).map((entry) => entry.name).sort()
+  const skills = new Map(skillNames.map((name) => [name, skillFiles(name)]))
+  const plans = []
+  for (const { adapter, skills: skillsRoot, agents: agentsRoot } of adapters) {
+    plans.push([skillsRoot, skills])
+    if (agentsRoot) {
+      const source = path.join(PKG_ROOT, ...(adapter === 'kimi' ? ['kimi', 'agents'] : ['agents']))
+      const files = fs.readdirSync(source).filter((file) => adapter === 'kimi' ? /\.ya?ml$/.test(file) : file.endsWith('.md')).sort()
+      plans.push([agentsRoot, new Map(files.map((file) => [`avf-${file}`, agentFiles(path.join(source, file), adapter)]))])
+    }
+  }
+  for (const [root] of plans) { assertSafePath(root); readManifest(root) }
+  for (const [root, components] of plans) installComponents(root, components)
+  log('MCP connections, Task Master state and client configuration were not modified.')
+} catch (error) {
+  console.error(`Installation failed: ${error.message}`)
+  process.exitCode = 1
+}

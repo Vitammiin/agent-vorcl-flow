@@ -1,7 +1,6 @@
 ---
 description: Деплой/редеплой сервиса на Render (render). Use when нужно выкатить сервис или применить env-правки (мутация, требует явного подтверждения); только посмотреть состояние → /render:status, разобрать ошибки → /render:logs
 argument-hint: "<service> [--clear-cache]"
-allowed-tools: Read, Edit, Write, Bash, Grep, Glob, WebFetch
 ---
 
 Задеплой/редеплой сервис на Render: **$ARGUMENTS**.

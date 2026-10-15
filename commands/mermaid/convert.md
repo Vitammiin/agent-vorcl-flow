@@ -1,7 +1,6 @@
 ---
 description: Конвертировать исходник в Mermaid — схема БД → ERD, код → class/sequence, папки → flowchart, .drawio/CSV/JSON → mermaid (mermaid). Use when вход — существующий артефакт (код/схема/файл); описание словами → /mermaid:create, целевой формат draw.io → /drawio:convert
 argument-hint: "<путь к исходнику> [тип: er|class|sequence|flowchart]"
-allowed-tools: Read, Write, Edit, Bash, Grep, Glob
 ---
 
 Конвертируй исходник в Mermaid-диаграмму: **$ARGUMENTS**.

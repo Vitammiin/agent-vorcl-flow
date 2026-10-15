@@ -1,15 +1,12 @@
 ---
-description: Цель (набор диаграмм) через Task Master — построение Mermaid до готового, с рендер-проверкой (mermaid). Use when диаграмм несколько или схема комплексная; одиночная по описанию → /mermaid:create, из исходника → /mermaid:convert, формат draw.io → /drawio:vorcl
+description: "Цель роли mermaid: session-first план, реализация в разрешённом scope и независимая проверка; Task Master только по явному выбору."
 argument-hint: "<цель / objective>"
-allowed-tools: Read, Write, Edit, Bash, Grep, Glob
 ---
 
-Возьми цель по Mermaid-диаграммам в работу через Task Master: **$ARGUMENTS**.
+Возьми цель **$ARGUMENTS** как роль `mermaid`. Если цель уже понятна из контекста, продолжай; иначе уточни scope.
 
-1. Убедись, что Task Master инициализирован (`.taskmaster/`); если нет — `task-master init`.
-2. Преврати цель в задачи: набор диаграмм — оформи/дополни PRD в `.taskmaster/docs/prd.txt` и запусти `parse_prd`; точечная — `add_task`.
-3. `next_task` → `get_task`; при высокой сложности — `expand_task` (после `analyze_project_complexity`).
-4. Строй текущую диаграмму, фиксируя ход через `update_subtask`. Каждый `.mmd` прогоняй через реальный рендер (`mcp-mermaid` или `mmdc`) — это и есть `testStrategy`.
-5. Проверь `testStrategy` (рендер зелёный); при успехе — `set_task_status --status=done`; вернись к шагу 3, пока есть задачи.
-
-Опирайся на навыки `mermaid-diagrams`, `mermaid-rendering`, `workflow`, `task-master`. Делегируй построение субагенту `mermaid`.
+1. Прочитай роль `mermaid` и `workflow`; примени `workspace-capability-routing` для неоднозначного scope. Загрузи только необходимые domain/task skills и сохрани workspace evidence.
+2. По умолчанию используй session-first: зафиксируй scope, план, acceptance criteria и `testStrategy` в сессии. Не создавай `.taskmaster/`, не запускай init и не меняй MCP/provider/model configuration.
+3. Task Master подключай только по явному выбору пользователя и доступным в сессии capabilities. Тогда прочитай `task-master`, сохрани возвращённые IDs в allowlist, создай scoped run и сделай atomic claim перед `in-progress`. Bare `next_task` запрещён. Отсутствие Task Master не блокирует работу; не заявляй о сохранении статуса в недоступном трекере.
+4. Executor выполняет только согласованный scope. Независимый Checker проверяет `testStrategy`, не меняет implementation/acceptance tests и возвращает evidence. Только Orchestrator завершает задачу; не продолжай посторонний backlog.
+5. Если существует `PROJECT_DESCRIPTION.md`, соблюдай maintenance contract из `workflow`. Выдай результат, проверки и оставшиеся ограничения.

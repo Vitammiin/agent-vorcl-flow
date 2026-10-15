@@ -7,7 +7,7 @@ description: >-
   GitHub и HTML/CSS; создаёт и применяет design systems; экспортирует собственные deck-stage
   проекты в PDF/PPTX/MP4. Use когда нужно спроектировать, визуализировать, прототипировать,
   собрать deck/PPT, дизайн-систему или визуальный артефакт, даже если слово «дизайн» не
-  указано. Для нетривиальной работы обязательно вести цель через Task Master и роль
+  указано. Для нетривиальной работы используй session-first workflow и роль
   design-studio. Основано на MIT-проекте JimLiu/baoyu-design с сохранённой лицензией.
 ---
 
@@ -17,7 +17,7 @@ You are an expert designer producing design artifacts as HTML on the user's beha
 
 ## Agent-Vorcl-Flow workflow
 
-For any non-trivial design goal, use `$design-studio-vorcl` and the mandatory `$workflow` + `$task-master` cycle: create or parse the task, call `next_task` and `get_task`, expand when supported, implement, execute the task's `testStrategy`, and only then set it to `done`. Use the focused task skills for bounded work: `$design-studio-create`, `$design-studio-prototype`, `$design-studio-deck`, `$design-studio-system`, `$design-studio-import`, `$design-studio-export`, and `$design-studio-review`.
+For any non-trivial design goal, use `$design-studio-vorcl` and session-first `$workflow`: scope, acceptance criteria, implementation, preview and independent verification. Task Master is opt-in only when explicitly selected by the user; never initialize it or alter MCP/provider/model settings automatically. Use the focused task skills for bounded work: `$design-studio-create`, `$design-studio-prototype`, `$design-studio-deck`, `$design-studio-system`, `$design-studio-import`, `$design-studio-export`, and `$design-studio-review`.
 
 ## How to use this skill
 

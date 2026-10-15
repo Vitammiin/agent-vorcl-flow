@@ -1,7 +1,6 @@
 ---
 description: Запустить эфемерное локальное HTML-табло worktree, активных агентов и задач Task Master на автоматически выбранном свободном порту. Use when нужно увидеть состояние проекта в реальном времени.
 argument-hint: "[путь к проекту] [--port N] [--interval ms]"
-allowed-tools: Read, Bash, Grep, Glob
 ---
 
 Запусти роль `liveboard` для проекта **$ARGUMENTS** (пусто — текущий каталог).

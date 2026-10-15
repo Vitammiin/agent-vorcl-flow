@@ -1,7 +1,6 @@
 ---
 description: Кэш и Redis — TTL, инвалидация, lock, rate limiting, Streams. Use when проектируем кэширование или Redis-логику; read-only чтение ключей — /database:query (database)
 argument-hint: "<что кэшируем/задача>"
-allowed-tools: Read, Edit, Write, Bash, Grep, Glob
 ---
 
 Спроектируй кэширование/Redis-логику: **$ARGUMENTS**.

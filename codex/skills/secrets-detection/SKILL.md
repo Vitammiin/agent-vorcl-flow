@@ -1,33 +1,57 @@
 ---
 name: secrets-detection
-description: Обнаружение секретов в коде и git-истории — паттерны ключей (sk-, ghp_, AKIA, xox., private keys, user:pass@), git log -p --all, gitleaks/trufflehog и grep-альтернативы, фильтр ложных срабатываний, протокол с обязательной ротацией. Use для поиска утёкших ключей/токенов и чека перед пушем.
+description: Обнаружение секретов в коде и git-истории — паттерны ключей (sk-, ghp_, AKIA, xox., private keys, user:pass@), поиск в рабочем дереве и git log -p --all, gitleaks/trufflehog и grep-альтернативы, фильтр ложных срабатываний (env-подстановки, плейсхолдеры), протокол реагирования с обязательной ротацией. Use для поиска утёкших ключей/токенов/паролей и проверки перед пушем.
+version: 1.0.0
 ---
 
 # Навык: Обнаружение секретов
 
-**Найденный секрет = скомпрометирован**: ключ, побывавший в git-истории, утёк независимо от приватности репо; удаление из истории утечку не отменяет — обязательна ротация.
+Ключевой принцип: **найденный секрет = скомпрометирован**. Ключ, побывавший в git-истории, считается утёкшим независимо от приватности репозитория; удаление из истории утечку НЕ отменяет — обязательна ротация.
 
-## Паттерны
-`sk-[A-Za-z0-9_-]{20,}` (OpenAI/Anthropic) · `gh[pos]_…`/`github_pat_…` (GitHub) · `AKIA[0-9A-Z]{16}` (AWS) · `xox[bpoas]-…` (Slack) · `rnd_…` (Render) · `fc-…` (Firecrawl) · `AIza[0-9A-Za-z_-]{35}` (Google) · `Bearer\s+[A-Za-z0-9._~+/-]{20,}` литералом · длинный `eyJ…` (JWT) · `-----BEGIN … PRIVATE KEY-----` · `://user:pass@` в URL · `(?i)(password|secret|api_?key|token)\s*[:=]\s*['"][^'"]{8,}`.
+## 1. Паттерны секретов
+| Префикс/форма | Провайдер | Regex (rg) |
+|---|---|---|
+| `sk-`, `sk-ant-`, `sk-proj-` | OpenAI / Anthropic | `sk-[A-Za-z0-9_-]{20,}` |
+| `ghp_`, `github_pat_`, `gho_`, `ghs_` | GitHub token/PAT | `gh[pos]_[A-Za-z0-9]{36,}` · `github_pat_[A-Za-z0-9_]{22,}` |
+| `AKIA` (+ secret 40 симв.) | AWS access key | `AKIA[0-9A-Z]{16}` |
+| `xoxb-`/`xoxp-`/`xoxa-`/`xoxs-` | Slack | `xox[bpoas]-[A-Za-z0-9-]{10,}` |
+| `rnd_` | Render API | `rnd_[A-Za-z0-9]{20,}` |
+| `fc-` | Firecrawl | `fc-[a-f0-9]{24,}` |
+| `AIza` | Google API | `AIza[0-9A-Za-z_-]{35}` |
+| `Bearer <токен>` литералом | любой | `Bearer\s+[A-Za-z0-9._~+/-]{20,}` (не `Bearer \$\{`) |
+| `eyJ…` длинный | JWT (сам может быть секретом) | `eyJ[A-Za-z0-9_-]{10,}\.[A-Za-z0-9._-]{20,}` |
+| PEM-блоки | private keys | `-----BEGIN (RSA \|EC \|OPENSSH \|PGP )?PRIVATE KEY-----` |
+| URL с кредами | connection strings | `[a-z][a-z0-9+.-]*://[^/\s:@]+:[^@\s]+@` |
+| Присваивания | generic | `(?i)(password\|passwd\|secret\|api_?key\|token)\s*[:=]\s*['"][^'"]{8,}` |
 
-## Где искать
+## 2. Где искать (все четыре слоя)
 ```bash
-rg -n --hidden -g '!node_modules' -g '!.git' '<паттерн>'   # рабочее дерево
-git ls-files | grep -iE '\.env'                             # .env закоммичен? есть ли в .gitignore
-git log -p --all -S '<паттерн>' --pickaxe-regex             # вся история, все ветки
-git log --all --diff-filter=D --summary                     # удалённые файлы
+rg -n --hidden -g '!node_modules' -g '!.git' '<паттерн>'      # 1. рабочее дерево (включая dotfiles)
+git ls-files | grep -iE '\.env'                                # 2. .env закоммичен? + есть ли в .gitignore
+git log -p --all -S 'AKIA' --pickaxe-regex                     # 3. вся история, все ветки
+git log --all --diff-filter=D --summary | grep delete          # 4. удалённые файлы (диффы смотри git show <commit>^:<path>)
+git grep -nE '<паттерн>' $(git rev-list --all) -- .            # альтернатива: grep по каждому коммиту (медленно, полно)
 ```
-Плюс: `git diff --cached` (staged), `git stash show -p`, сорсмапы/артефакты сборки.
+Не забывай: staged-изменения (`git diff --cached`), stash (`git stash list` + `git stash show -p`), сорсмапы и артефакты сборки, если закоммичены.
 
-## Инструменты
-Есть `gitleaks` — `gitleaks detect --log-opts="--all" -v`; есть `trufflehog` — `trufflehog git file://. --only-verified`. Нет — ручные `rg`/`git log -p -S`/`git grep` по таблице паттернов, прогон помечай как ручной. Ничего не устанавливай в чужой проект при read-only аудите.
+## 3. Инструменты (если установлены) и ручной fallback
+| Инструмент | Команда | Что даёт |
+|---|---|---|
+| **gitleaks** | `gitleaks detect --log-opts="--all" -v` | дерево + вся история, готовые правила, низкий шум |
+| **trufflehog** | `trufflehog git file://. --only-verified` | верификация ключей живыми запросами к провайдеру |
+| нет ни того ни другого | `rg`/`git log -p -S`/`git grep` по таблице §1 | ручной прогон — честно пометь это в отчёте |
+Ничего не устанавливай в чужой проект в рамках read-only аудита — при отсутствии инструментов работай grep'ами.
 
-## Что НЕ секрет
-Env-подстановки (`${VAR}`, `${VAR:-default}`, `process.env.X`); плейсхолдеры (`<your-key>`, `xxx`, `changeme`, `sk-...`); очевидные фейки в тестах/доках (`AKIAIOSFODNN7EXAMPLE`); публичные по дизайну ключи (Maps browser key с рестрикциями, Sentry DSN) — понижай severity, проверяй рестрикции. Сомнительное — секция «требует проверки».
+## 4. Что НЕ секрет (фильтр до отчёта)
+- **Env-подстановки:** `${API_KEY}`, `${DB_URL:-postgres://localhost}`, `process.env.SECRET`, `$ENV_VAR` — это ссылки на секрет, не секрет.
+- **Плейсхолдеры:** `<your-api-key>`, `xxx`, `changeme`, `sk-...`, `TODO`, `dummy`, `example`.
+- **Документация/тесты:** очевидные фейки (`sk-test-1234`, `AKIAIOSFODNN7EXAMPLE` — официальный пример AWS), faker-данные.
+- **Публичные по дизайну:** Google Maps browser key с рестрикциями, публичные Sentry DSN, VAPID public key — понизь severity/пометь, но проверь рестрикции.
+Сомневаешься, реальный ли ключ (энтропия высокая, но контекст неясен) — секция «требует проверки», не false confidence в обе стороны.
 
-## Протокол при находке
-1. **Ротация ключа — первична и обязательна** (отозвать/перевыпустить у провайдера).
-2. Проверить логи провайдера за период экспозиции.
-3. Чистка истории (`git filter-repo`/BFG) — вторично, задачей на роль gitflow (force-push, координация).
-4. Предотвращение: секреты в env/менеджер, `.env` в `.gitignore`, pre-push чек, gitleaks в CI.
-5. В отчёте значение **маскируй** (`sk-ant-…Xy9Q`); указывай `file:line`/коммит, провайдера, severity (реальный ключ = critical).
+## 5. Протокол при находке
+1. **Ротация ключа — обязательна и первична.** Отозвать/перевыпустить у провайдера. Удаление строки/переписывание истории утечку не отменяет.
+2. Проверить логи провайдера на использование ключа за период экспозиции.
+3. Чистка истории (`git filter-repo`/BFG) — вторично, отдельной задачей на `gitflow` (переписывание истории — force-push, координация с командой).
+4. Предотвращение: секрет → env/менеджер секретов, `.env` в `.gitignore`, pre-push чек (`/security:pre-push`), gitleaks в CI.
+5. Отчёт: `file:line` или коммит-хэш + путь, провайдер, severity (реальный ключ = critical), значение в отчёте — **маскировать** (`sk-ant-…Xy9Q`, первые/последние 4 символа).

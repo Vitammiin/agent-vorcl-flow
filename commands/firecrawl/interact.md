@@ -1,7 +1,6 @@
 ---
-description: Взаимодействие с живой страницей через Firecrawl: клики, формы и навигация, когда scrape недостаточно.
+description: "Взаимодействие с живой страницей через Firecrawl: клики, формы и навигация, когда scrape недостаточно."
 argument-hint: "<URL> — <действия/цель>"
-allowed-tools: Read, Write, Bash, Grep, Glob, WebFetch
 ---
 
 Выполни browser interaction: **$ARGUMENTS**.

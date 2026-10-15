@@ -65,7 +65,7 @@ function output(value) {
 
 const { command, options } = argsOf(process.argv.slice(2))
 const root = path.resolve(options.root || process.cwd())
-const stateRoot = path.join(root, '.taskmaster')
+const stateRoot = path.join(root, '.agent-vorcl')
 const runsDir = path.join(stateRoot, 'runs')
 const claimsDir = path.join(stateRoot, 'claims')
 const locksDir = path.join(stateRoot, 'claim-locks')

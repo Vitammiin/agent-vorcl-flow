@@ -1,26 +1,68 @@
 ---
 name: git-workflow
-description: Git-гигиена и релизная дисциплина — Conventional Commits и BREAKING CHANGE, semver-бамп, поимённые коммиты и запрет `git add .`/`-A` при параллельных сессиях, ловушка squash-merge (`merge-base --is-ancestor`, `merge -s ours`), Keep a Changelog, запрет force-push и push без явного подтверждения. Use для коммитов, PR, changelog и релизов.
+description: Git-гигиена и релизная дисциплина — Conventional Commits (таблица типов, BREAKING CHANGE), semver-правила бампа, поимённые коммиты и запрет `git add .`/`git add -A` при параллельных сессиях, ловушка squash-merge долгоживущей ветки (`git merge-base --is-ancestor`, рецепт `git merge -s ours`), worktree для параллельной работы, запрет force-push и push без явного подтверждения. Use для коммитов, PR, changelog, версионирования и релизов.
+version: 1.0.0
 ---
 
 # Навык: Git-workflow и релизы
 
-История — публичный документ. Состояние репозитория проверяй сам (`git status`, `git diff`), не верь отчётам на слово.
+Ключевой принцип: **история — публичный документ**. Каждый коммит читают ревьюеры, `git bisect` и генератор changelog. Состояние репозитория проверяй сам (`git status`, `git diff`) — не верь отчётам «всё чисто» на слово.
 
-## Conventional Commits
-`тип(scope): суть` (до ~72 симв.): `feat` → minor; `fix`/`docs`/`refactor`/`perf` → patch; `test`/`chore`/`ci`/`build` → без бампа. **BREAKING CHANGE** (`!` после типа и/или футер) — единственное, что бампает major. Версия релиза = максимум по коммитам с прошлого тега; тег `vX.Y.Z` обязан совпадать с версиями манифестов.
+## 1. Conventional Commits
+Формат: `тип(scope): суть в повелительном наклонении` — до ~72 символов, без точки в конце.
 
-## Поимённые коммиты
-Параллельные сессии слепы друг к другу — `git add .`/`-A` молча захватит чужой WIP. Всегда: `git status --porcelain` → `git diff -- <файл>` → `git add <файл> <файл>` по именам → `git commit` → снова `git status` (чужой WIP нетронут). Незнакомые изменения — стоп и спроси владельца.
+| Тип | Когда | Semver |
+|---|---|---|
+| `feat` | Новая функциональность для пользователя | minor |
+| `fix` | Исправление бага | patch |
+| `docs` | Только документация | patch/— |
+| `refactor` | Перестройка кода без изменения поведения | patch |
+| `perf` | Ускорение без изменения поведения | patch |
+| `test` | Добавление/правка тестов | — |
+| `chore` | Обслуживание: зависимости, конфиги, скрипты | — |
+| `ci` / `build` | Пайплайны / система сборки | — |
 
-## Squash-merge ловушка
-После squash-PR base не связан с историей ветки → ложные конфликты в следующем PR. Перед пушем: `git fetch && git merge-base --is-ancestor origin/main HEAD`; base ушёл вперёд и `git diff origin/main <squash-точка>` пуст (feat — надмножество) → `git merge -s ours origin/main` (делает base предком без потерь). Анализируй заранее, не жди GitHub.
+**BREAKING CHANGE:** несовместимое изменение → `!` после типа (`feat!:`) и/или футер `BREAKING CHANGE: описание миграции`. Это единственное, что бампает **major** — независимо от типа.
 
-## Worktree
-Параллельная/фоновая задача в том же репо → `git worktree add <root>/<repo>-<slug>-<stamp> -b feat/<slug> HEAD`; после вливания — `git worktree remove --force … && git worktree prune`.
+## 2. Semver: что бампает версию
+- **major** (X.0.0) — любой BREAKING CHANGE (API, схема, формат конфига).
+- **minor** (x.Y.0) — хотя бы один `feat` без breaking.
+- **patch** (x.y.Z) — только `fix`/`refactor`/`perf`/`docs`.
+- Версия релиза = максимум по всем коммитам с прошлого тега. Тег `vX.Y.Z` обязан совпадать с версиями в манифестах (`package.json`, plugin.json и т.п.) — иначе релиз невоспроизводим.
 
-## Changelog (Keep a Changelog)
-`## [X.Y.Z] - YYYY-MM-DD`, `[Unreleased]` сверху; рубрики Added (feat) / Fixed (fix) / Changed (refactor, perf) / Breaking + Deprecated/Removed/Security. Пиши для человека, не пересказ коммитов; `chore`/`ci`/`test` не тащи.
+## 3. Поимённые коммиты — почему `git add .` опасен
+Параллельные сессии (multi-clauding) слепы друг к другу: в одном рабочем каталоге может лежать чужой незакоммиченный WIP. `git add .` / `git add -A` захватит его в твой коммит — молча.
 
-## Безопасность
-Force-push запрещён (в крайнем случае `--force-with-lease` с явного подтверждения). push/publish/release — только с явного подтверждения владельца; локальные коммиты и теги — свободно. Односложное «ок»/«go» — не авторизация: переспроси, назвав действие явно.
+```bash
+git status --porcelain            # сам посмотри, что реально изменено
+git diff -- src/api/users.ts      # проверь содержимое перед add
+git add src/api/users.ts src/api/users.test.ts   # ТОЛЬКО по именам
+git commit -m "fix(api): не терять 404 при пустом userId"
+git status                        # после коммита: чужой WIP остался нетронут
+```
+Незнакомые/несвязанные изменения в `git status` — **стоп и спроси владельца**, не включай их.
+
+## 4. Ловушка squash-merge долгоживущей ветки
+После squash-PR в `main` base получает один squash-коммит, не связанный с историей ветки → следующий PR той же ветки даёт **ложные конфликты** («те же файлы расходятся»).
+
+Диагностика ПЕРЕД пушем ветки, у которой уже был squash-PR:
+```bash
+git fetch
+git merge-base --is-ancestor origin/main HEAD && echo ok || echo "base ушёл вперёд"
+```
+Если base ушёл вперёд — feat почти всегда надмножество. Подтверди: `git diff origin/main <squash-точка>` пуст → разрешай:
+```bash
+git merge -s ours origin/main   # делает base предком, сохраняя дерево ветки без потерь
+```
+Анализируй заранее, не жди сообщения GitHub о конфликте.
+
+## 5. Worktree для параллельной работы
+Параллельная/фоновая задача в том же репо → отдельный каталог и ветка: `git worktree add <os-worktree-root>/<repo>-<slug>-<stamp> -b feat/<slug> HEAD`. Каждое окно получает свой каталог — коммиты не пересекаются. После вливания: `git worktree remove --force … && git worktree prune`. Канон — скилл `worktree-workflow`.
+
+## 6. Changelog (Keep a Changelog)
+`CHANGELOG.md`: секция `[Unreleased]` сверху, релизы `## [X.Y.Z] - YYYY-MM-DD`; рубрики **Added** (feat) / **Fixed** (fix) / **Changed** (refactor, perf, поведенческие правки) / **Breaking** (или Changed с пометкой) / Deprecated / Removed / Security. Источник — `git log <prev-tag>..HEAD`, но пиши для человека: что изменилось для пользователя, а не пересказ коммитов.
+
+## 7. Безопасность
+- **Force-push запрещён.** Rebase опубликованных веток, `push --force`, удаление чужих веток — только с явного подтверждения владельца (и предпочитай `--force-with-lease`).
+- **push / publish / release — только с явного подтверждения.** Локальные коммиты и теги готовь свободно; всё, что уходит наружу — стоп и спроси.
+- Неоднозначное односложное «ок»/«go»/«давай» — **не** авторизация необратимого действия. Переспроси, назвав действие явно: «пушу тег v2.0.0 и публикую релиз — подтверди».
