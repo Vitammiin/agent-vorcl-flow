@@ -52,7 +52,7 @@ Session-first сохранён: нет обязательной папки сп�
 
 ### 4. Проверки до публикации
 
-Ранее основной GitHub workflow запускался по release tag. Новый [Validate workflow](../.github/workflows/validate.yml) проверяет pull requests и dev/main на Node.js 20 и 24: registry/mirrors, tests с loopback HTTP, package budget и syntax. Он не публикует пакет и не использует release secrets. Добавление workflow не устраняет ограничение GitHub billing: успешный запуск на GitHub нужно проверять отдельно от локальных результатов.
+Ранее основной GitHub workflow запускался по release tag. Новый [Validate workflow](../.github/workflows/validate.yml) проверяет pull requests и dev/main на Node.js 20 и 24: registry/mirrors, tests с loopback HTTP, package budget и syntax. Он не публикует пакет и не использует release secrets. Успешный запуск на GitHub проверяется отдельно от локальных результатов. Первый запуск обнаружил зависимость старого Expo-теста от Node хоста: теперь отдельно проверяются совместимый runtime, нижняя граница Expo и фактическая версия Node в CLI. Требование AVF Node 20+ не означает, что каждый целевой Expo SDK тоже поддерживает Node 20.
 
 ## Что сознательно не перенесено
 
