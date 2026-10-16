@@ -1,14 +1,12 @@
 ---
-description: Цель по надёжности через Task Master — покрыть код try/catch и логами без «тихих» падений. Use when надёжность нужна по целому модулю/сервису циклом задач; точечно обернуть — harden, только логи — logging, найти дыры — audit (resilience)
+description: "Цель роли resilience: session-first план, реализация в разрешённом scope и независимая проверка; Task Master только по явному выбору."
 argument-hint: "<цель: модуль/фича/область>"
-allowed-tools: Read, Edit, Write, Bash, Grep, Glob
 ---
 
-Возьми цель по надёжности кода в работу через Task Master: **$ARGUMENTS**.
+Возьми цель **$ARGUMENTS** как роль `resilience`. Если цель уже понятна из контекста, продолжай; иначе уточни scope.
 
-1. Убедись, что Task Master инициализирован (`.taskmaster/`); если нет — `task-master init`.
-2. Разложи цель на задачи (`add_task`; крупное — PRD + `parse_prd`): какие границы покрыть try/catch, где нормализовать ошибки, какие логи и на каком уровне расставить, какие «тихие» падения убрать.
-3. `next_task` → `get_task`; правь код: try/catch на правильных границах (I/O/внешние/парсинг/транзакции), проброс с `cause` или осмысленная обработка + лог, `finally` для ресурсов, структурные логи (уровни, контекст, лог один раз, без секретов/PII). Ход фиксируй через `update_subtask`.
-4. Проверь `testStrategy` (нет пустых `catch`, ошибки нормализованы, логи на границе обработки без дублей и утечек, тесты зелёные) → `set_task_status --status=done`; вернись к шагу 3.
-
-Первопричину чини, а не глуши try/catch'ем. Опирайся на навыки `error-handling`, `backend-architecture`, `nodejs`, `typescript`, `react`, `workflow`, `task-master`. Делегируй субагенту `resilience`.
+1. Прочитай роль `resilience` и `workflow`; примени `workspace-capability-routing` для неоднозначного scope. Загрузи только необходимые domain/task skills и сохрани workspace evidence.
+2. По умолчанию используй session-first: зафиксируй scope, план, acceptance criteria и `testStrategy` в сессии. Не создавай `.taskmaster/`, не запускай init и не меняй MCP/provider/model configuration.
+3. Task Master подключай только по явному выбору пользователя и доступным в сессии capabilities. Тогда прочитай `task-master`, сохрани возвращённые IDs в allowlist, создай scoped run и сделай atomic claim перед `in-progress`. Bare `next_task` запрещён. Отсутствие Task Master не блокирует работу; не заявляй о сохранении статуса в недоступном трекере.
+4. Executor выполняет только согласованный scope. Независимый Checker проверяет `testStrategy`, не меняет implementation/acceptance tests и возвращает evidence. Только Orchestrator завершает задачу; не продолжай посторонний backlog.
+5. Если существует `PROJECT_DESCRIPTION.md`, соблюдай maintenance contract из `workflow`. Выдай результат, проверки и оставшиеся ограничения.

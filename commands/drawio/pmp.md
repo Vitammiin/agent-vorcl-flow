@@ -1,7 +1,6 @@
 ---
 description: Построить проектную диаграмму PMP/PMBOK в draw.io — WBS, PERT/CPM, Gantt, RACI, risk matrix, stakeholder grid (drawio). Use when нужен именно проектный артефакт со строгой семантикой метода; обычная диаграмма (flowchart/UML/ERD…) → /drawio:create
 argument-hint: "<тип: wbs|pert|gantt|raci|risk|stakeholder> + данные проекта"
-allowed-tools: Read, Write, Edit, Bash
 ---
 
 Построй проектную диаграмму PMP/PMBOK в draw.io: **$ARGUMENTS**.

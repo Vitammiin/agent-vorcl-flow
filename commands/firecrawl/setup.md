@@ -1,7 +1,6 @@
 ---
 description: "Установка и проверка полного Firecrawl toolkit: CLI, upstream build/workflow skills и browser auth. Мутирует окружение — требует подтверждения."
 argument-hint: "[установить | только проверить]"
-allowed-tools: Read, Write, Bash, Grep, Glob, WebFetch
 ---
 
 Проверь Firecrawl для задачи: **$ARGUMENTS**.

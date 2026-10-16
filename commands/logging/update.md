@@ -1,7 +1,6 @@
 ---
 description: Обновить существующие логи до канона Pino — убрать локальные pino()/console.log, добавить redact, event, requestId, не меняя бизнес-поведение. Use when легаси уже логирует криво; покрыть с нуля — /logging:cover, только отчёт — /logging:audit (logging)
 argument-hint: "<файл/модуль/область>"
-allowed-tools: Read, Edit, Write, Bash, Grep, Glob
 ---
 
 Приведи существующее логирование к канону Pino: **$ARGUMENTS**.

@@ -1,7 +1,6 @@
 ---
 description: Построить Mermaid-диаграмму по описанию — валидный синтаксис, читаемая раскладка, проверка реальным рендером (mermaid). Use when вход — описание словами; исходник (код/БД/.drawio) → /mermaid:convert, проверить готовый .mmd → /mermaid:validate, доработать → /mermaid:refine
 argument-hint: "<описание диаграммы> [тип: flowchart|sequence|class|state|er|gantt|gitgraph|c4|architecture|mindmap|timeline|kanban|charts|journey]"
-allowed-tools: Read, Write, Edit, Bash
 ---
 
 Построй Mermaid-диаграмму по описанию: **$ARGUMENTS**.

@@ -1,7 +1,6 @@
 ---
 description: Генерация тестов компонентов (frontend). Use when нужно покрыть React-компоненты/хуки поведенческими тестами (Testing Library + Vitest); готово = прогнанный зелёный набор, не текст тестов.
 argument-hint: "<что тестируем>"
-allowed-tools: Read, Write, Edit, Bash
 ---
 
 Напиши тесты для: **$ARGUMENTS**.

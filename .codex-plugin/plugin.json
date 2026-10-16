@@ -1,7 +1,7 @@
 {
   "name": "agent-vorcl-flow",
-  "version": "2.7.0",
-  "description": "Role-based engineering workflows plus cross-language read-only hardcode and mock-data integrity audits.",
+  "version": "3.0.0",
+  "description": "Role-based engineering skills, independent verification, and evidence-based audits. Uses the capabilities already available in your environment.",
   "author": {
     "name": "Christian Avis",
     "url": "https://github.com/Vitammiin"
@@ -9,15 +9,25 @@
   "homepage": "https://github.com/Vitammiin/agent-vorcl-flow",
   "repository": "https://github.com/Vitammiin/agent-vorcl-flow",
   "license": "MIT",
-  "keywords": ["agents", "code-integrity", "hardcode", "mock-data", "frontend", "backend", "polyglot"],
+  "keywords": [
+    "agents",
+    "code-integrity",
+    "hardcode",
+    "mock-data",
+    "frontend",
+    "backend",
+    "polyglot"
+  ],
   "skills": "./skills/",
   "interface": {
     "displayName": "Agent Vorcl Flow",
-    "shortDescription": "Role workflows and polyglot code integrity audits.",
-    "longDescription": "Adds role-based Task Master workflows and evidence-based read-only audits for hardcoded values and mock or fake data leaking into production frontend and backend code.",
+    "shortDescription": "Engineering roles and evidence-based workflows.",
+    "longDescription": "Adds focused engineering skills, adaptable workflows, and independent verification without configuring MCP servers, credentials, or task-management tools.",
     "developerName": "Christian Avis",
     "category": "Developer Tools",
-    "capabilities": ["Read"],
+    "capabilities": [
+      "Read"
+    ],
     "websiteURL": "https://github.com/Vitammiin/agent-vorcl-flow",
     "defaultPrompt": [
       "Audit this repository for production hardcode.",

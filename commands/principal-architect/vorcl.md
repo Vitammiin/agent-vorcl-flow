@@ -1,11 +1,12 @@
 ---
-description: Полная цель Principal Architect через Task Master — code extraction, архитектурный review, проверенные MD/JSON/HTML/PDF/draw.io/Mermaid артефакты и при запросе TARGET/MIGRATION.
+description: "Цель роли principal-architect: session-first план, реализация в разрешённом scope и независимая проверка; Task Master только по явному выбору."
 argument-hint: "<архитектурная цель>"
-allowed-tools: Read, Write, Edit, Bash, Grep, Glob
 ---
 
-Возьми цель в работу через `$workflow` и `$task-master`: **$ARGUMENTS**.
+Возьми цель **$ARGUMENTS** как роль `principal-architect`. Если цель уже понятна из контекста, продолжай; иначе уточни scope.
 
-Создай точечную задачу или PRD, затем `next_task` → `get_task` → при сложности `expand_task`. Реализуй через `$principal-architecture`: extraction из кода → model validation → ARCHITECTURE.md → рендеры → testStrategy. Не ставь `done`, пока артефакты реально не проверены. TARGET/MIGRATION добавляй только если это часть цели.
-
-Отдай пути, stats, findings, unknowns, trade-offs и статус Task Master. Веди как роль `$principal-architect`.
+1. Прочитай роль `principal-architect` и `workflow`; примени `workspace-capability-routing` для неоднозначного scope. Загрузи только необходимые domain/task skills и сохрани workspace evidence.
+2. По умолчанию используй session-first: зафиксируй scope, план, acceptance criteria и `testStrategy` в сессии. Не создавай `.taskmaster/`, не запускай init и не меняй MCP/provider/model configuration.
+3. Task Master подключай только по явному выбору пользователя и доступным в сессии capabilities. Тогда прочитай `task-master`, сохрани возвращённые IDs в allowlist, создай scoped run и сделай atomic claim перед `in-progress`. Bare `next_task` запрещён. Отсутствие Task Master не блокирует работу; не заявляй о сохранении статуса в недоступном трекере.
+4. Executor выполняет только согласованный scope. Независимый Checker проверяет `testStrategy`, не меняет implementation/acceptance tests и возвращает evidence. Только Orchestrator завершает задачу; не продолжай посторонний backlog.
+5. Если существует `PROJECT_DESCRIPTION.md`, соблюдай maintenance contract из `workflow`. Выдай результат, проверки и оставшиеся ограничения.

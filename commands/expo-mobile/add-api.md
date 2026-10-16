@@ -1,7 +1,6 @@
 ---
 description: "Добавить Expo mobile API boundary: runtime schema, DTO mapper, query keys и TanStack Query hook/mutation."
 argument-hint: "<endpoint / contract / module>"
-allowed-tools: Read, Write, Edit, Bash, Grep, Glob
 ---
 
 Добавь API интеграцию: **$ARGUMENTS**.

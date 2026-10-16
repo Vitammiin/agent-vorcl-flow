@@ -1,7 +1,6 @@
 ---
 description: LLM-обогащение готового architecture.json — память агентов, семантические dataflow-связи, назначение модулей; всё бездоказательное merge сам пометит inferred (archmap). Use when architecture.json уже извлечён и нужна семантика поверх фактов; извлечь JSON с нуля → /archmap:extract, сразу весь набор → /archmap:map
 argument-hint: "[путь к architecture.json или репо] [фокус: агенты|данные|потоки]"
-allowed-tools: Read, Write, Bash, Grep, Glob
 ---
 
 Обогати граф архитектуры LLM-аннотацией: **$ARGUMENTS**.

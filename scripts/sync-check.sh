@@ -21,7 +21,7 @@ fail() { printf 'FAIL: %s\n' "$1"; FAIL=$((FAIL + 1)); }
 
 # Registry is the deterministic inventory; validator also parses every Markdown
 # frontmatter and checks role/profile/router completeness.
-if node scripts/generate-role-skills.mjs && node scripts/generate-capability-catalog.mjs && node scripts/validate-registry.mjs; then
+if node scripts/generate-role-skills.mjs && node scripts/generate-capability-catalog.mjs && node scripts/generate-codex-skills.mjs && node scripts/validate-registry.mjs; then
   pass
 else
   fail "role registry/frontmatter validation failed"
@@ -92,11 +92,7 @@ for f in agents/*.md; do
     fail "агент $x не упомянут в codex/AGENTS.md"
   fi
 
-  if grep -q "^\[profiles\.$x\]" codex/config.toml 2>/dev/null; then
-    pass
-  else
-    fail "нет [profiles.$x] в codex/config.toml"
-  fi
+
 
 done
 
@@ -234,14 +230,7 @@ for skill in apple-design animate animate-expo; do
   fi
 done
 
-if [ -f kimi/agents/expo-mobile.yaml ] && grep -q 'expo-mobile' kimi/agents/expo-mobile.yaml; then pass; else fail "нет Kimi Expo custom agent"; fi
-if [ -f kimi/agents/logging.yaml ] && grep -q 'pino-logging' kimi/agents/logging.yaml; then pass; else fail "нет Kimi logging custom agent"; fi
-if [ -f kimi/hooks.toml ] && grep -q '__AVF_EXPO_GUARD__' kimi/hooks.toml && grep -q '__AVF_EXPO_UI_GUARD__' kimi/hooks.toml && grep -q '__AVF_EXPO_COMPATIBILITY__' kimi/hooks.toml && grep -q '__AVF_LOGGING_GUARD__' kimi/hooks.toml; then pass; else fail "нет полного Kimi Expo/logging hook template"; fi
-if grep -q 'srcAgents.*kimi.*agents' bin/install.mjs && grep -q 'srcHooks.*kimi.*hooks.toml' bin/install.mjs; then
-  pass
-else
-  fail "Kimi installer не подключает native agent/hook"
-fi
+# Optional host agents/hooks are reference assets, never an installation requirement.
 
 # ---------- Сводка ----------
 echo ""

@@ -1,15 +1,12 @@
 ---
-description: Цель по Pino-логированию через Task Master — покрыть или обновить structured logging до канона infrastructure/logging. Use when логирование нужно по целому модулю/сервису циклом задач; только найти дыры — audit, внедрить пакет — cover, привести легаси — update (logging)
+description: "Цель роли logging: session-first план, реализация в разрешённом scope и независимая проверка; Task Master только по явному выбору."
 argument-hint: "<цель: модуль/сервис/область>"
-allowed-tools: Read, Edit, Write, Bash, Grep, Glob
 ---
 
-Возьми цель по Pino structured logging в работу через Task Master: **$ARGUMENTS**.
+Возьми цель **$ARGUMENTS** как роль `logging`. Если цель уже понятна из контекста, продолжай; иначе уточни scope.
 
-1. Убедись, что Task Master инициализирован (`.taskmaster/`); если нет — `task-master init`.
-2. Разложи цель на задачи: где root logger, какие модули покрыть child logger, какие `console.log`/`pino()` убрать, где `requestId`/`event`/`redact`.
-3. Перед правками запусти `node <pino-logging>/scripts/scan.mjs --root <project> --format json`.
-4. `next_task` → `get_task`; правь только logging package и вызовы логов. Ход — `update_subtask`.
-5. Проверь `testStrategy` (scanner по затронутому дереву, нет секретов в образце JSON, тесты зелёные) → `set_task_status --status=done`.
-
-Опирайся на навыки `pino-logging`, `error-handling`, `backend-architecture`, `nodejs`, `workflow`, `task-master`. Делегируй субагенту `logging`. Не чини try/catch — это `resilience`.
+1. Прочитай роль `logging` и `workflow`; примени `workspace-capability-routing` для неоднозначного scope. Загрузи только необходимые domain/task skills и сохрани workspace evidence.
+2. По умолчанию используй session-first: зафиксируй scope, план, acceptance criteria и `testStrategy` в сессии. Не создавай `.taskmaster/`, не запускай init и не меняй MCP/provider/model configuration.
+3. Task Master подключай только по явному выбору пользователя и доступным в сессии capabilities. Тогда прочитай `task-master`, сохрани возвращённые IDs в allowlist, создай scoped run и сделай atomic claim перед `in-progress`. Bare `next_task` запрещён. Отсутствие Task Master не блокирует работу; не заявляй о сохранении статуса в недоступном трекере.
+4. Executor выполняет только согласованный scope. Независимый Checker проверяет `testStrategy`, не меняет implementation/acceptance tests и возвращает evidence. Только Orchestrator завершает задачу; не продолжай посторонний backlog.
+5. Если существует `PROJECT_DESCRIPTION.md`, соблюдай maintenance contract из `workflow`. Выдай результат, проверки и оставшиеся ограничения.

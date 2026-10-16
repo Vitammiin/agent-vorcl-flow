@@ -10,7 +10,7 @@ description: "Создавать и обновлять production-grade архи
 ## Обязательный pipeline
 
 1. Работать относительно текущего repository root (`cwd`); указанный `--scope` обязан оставаться внутри него.
-2. Для нетривиальной цели пройти `$workflow` + `$task-master` через `$principal-architect-vorcl`.
+2. Для нетривиальной цели пройти session-first `$workflow` через `$principal-architect-vorcl`; Task Master — только по явному выбору пользователя.
 3. Запустить независимый bundled runtime:
 
 ```bash

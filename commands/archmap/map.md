@@ -1,7 +1,6 @@
 ---
-description: Полная карта архитектуры репозитория — extraction в architecture.json, LLM-аннотация и все форматы: интерактивный HTML, draw.io, Mermaid, ARCHITECTURE.md, PDF (archmap). Use when нужен весь набор артефактов разом; только JSON → /archmap:extract, только HTML → /archmap:html, только диаграммы → /archmap:diagram, крупная цель с этапами → /archmap:vorcl
+description: "Полная карта архитектуры репозитория — extraction в architecture.json, LLM-аннотация и все форматы: интерактивный HTML, draw.io, Mermaid, ARCHITECTURE.md, PDF (archmap). Use when нужен весь набор артефактов разом; только JSON → /archmap:extract, только HTML → /archmap:html, только диаграммы → /archmap:diagram, крупная цель с этапами → /archmap:vorcl"
 argument-hint: "[путь к репо (default: текущий)] [--full: не схлопывать модули]"
-allowed-tools: Read, Write, Edit, Bash, Grep, Glob
 ---
 
 Построй полную карту архитектуры репозитория: **$ARGUMENTS**.

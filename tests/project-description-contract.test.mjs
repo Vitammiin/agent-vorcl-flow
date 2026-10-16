@@ -40,5 +40,6 @@ test('independent checker blocks proven description drift but cannot edit it', (
     assert.match(source, /НЕ ГОТОВО/, file)
     assert.match(source, /Checker документ не редактирует/, file)
   }
-  assert.match(read('commands/testing/verify.md'), /allowed-tools: Read, Bash, Grep, Glob/)
+  assert.doesNotMatch(read('commands/testing/verify.md'), /^allowed-tools:/m)
+  assert.match(read('commands/testing/verify.md'), /Checker работает report-only/)
 })

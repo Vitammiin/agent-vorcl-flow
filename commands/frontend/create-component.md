@@ -1,7 +1,6 @@
 ---
 description: Генерация UI-компонента по feature-структуре (frontend). Use when нужно создать НОВЫЙ React-компонент/фичу с нуля; для правки или ускорения существующего UI бери refactor/optimize.
 argument-hint: "<описание компонента>"
-allowed-tools: Read, Write, Edit, Bash
 ---
 
 Сгенерируй компонент: **$ARGUMENTS**.

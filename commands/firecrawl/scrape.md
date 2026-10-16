@@ -1,7 +1,6 @@
 ---
 description: Скрейп одного URL в markdown/JSON через Firecrawl (firecrawl). Use when URL известен и нужна ОДНА страница; много страниц раздела → /firecrawl:crawl, только список URL → /firecrawl:map, типизированный JSON с многих URL → /firecrawl:extract
 argument-hint: "<URL> [что извлечь / формат]"
-allowed-tools: Read, Write, Bash, Grep, Glob, WebFetch
 ---
 
 Скрейпни страницу: **$ARGUMENTS**.

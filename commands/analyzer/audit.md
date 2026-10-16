@@ -1,7 +1,6 @@
 ---
 description: Широкий read-only аудит кода — баги, типы, БД и структура backend/frontend. Hardcode/mock-data принадлежат integrity (analyzer)
 argument-hint: "[путь/область; по умолчанию весь репозиторий]"
-allowed-tools: Read, Grep, Glob, Bash
 ---
 
 Проведи полный **read-only** аудит: **$ARGUMENTS**.
@@ -16,4 +15,4 @@ allowed-tools: Read, Grep, Glob, Bash
 
 Hardcode, i18n literals и mock/fake/demo leakage не дублируй: перенаправь этот scope в `/integrity:audit`.
 
-Ничего не правь. Каждая находка — `file:line`, что нашли, первопричина, конкретная починка; severity `critical>high>medium>low`. В конце — сводка по областям и severity. По значимым находкам заведи задачи через `add_task` (Task Master). Опирайся на `workspace-capability-routing` и только профильные навыки обнаруженных boundaries. Делегируй субагенту `analyzer`.
+Ничего не правь. Каждая находка — `file:line`, что нашли, первопричина, конкретная починка; severity `critical>high>medium>low`. В конце — сводка по областям и severity. По значимым находкам составь remediation recommendations в отчёте. Опирайся на `workspace-capability-routing` и только профильные навыки обнаруженных boundaries. Делегируй субагенту `analyzer`.

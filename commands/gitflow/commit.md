@@ -1,7 +1,6 @@
 ---
 description: Поимённый коммит по Conventional Commits — сам проверь git status, файлы явно, чужой WIP не трогать. Use when нужно закоммитить изменения (gitflow)
 argument-hint: "[контекст задачи и/или файлы; пусто — коммит текущей работы]"
-allowed-tools: Read, Bash, Grep, Glob
 ---
 
 Закоммить изменения, относящиеся к задаче: **$ARGUMENTS**.

@@ -1,7 +1,6 @@
 ---
 description: Поиск секретов в рабочем дереве И git-истории — паттерны ключей, connection strings, git log -p по всем веткам. Use when нужно проверить утечку ключей/токенов/паролей или подозрение «ключ попал в коммит»; комплексный аудит с задачами — /security:vorcl (security)
 argument-hint: "[путь/область; по умолчанию весь репозиторий + вся история]"
-allowed-tools: Read, Grep, Glob, Bash
 ---
 
 Найди секреты (**read-only**): **$ARGUMENTS**.

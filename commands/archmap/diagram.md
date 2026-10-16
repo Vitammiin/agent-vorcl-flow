@@ -1,7 +1,6 @@
 ---
 description: Диаграммы draw.io и/или Mermaid из architecture.json — многостраничный mxfile (Overview/ERD/API/Agents) и .mmd (flowchart/erDiagram) строго из извлечённых фактов (archmap). Use when диаграмма нужна в редактируемом или git-friendly формате; интерактивная карта → /archmap:html, диаграмма по словесному описанию без кода → /drawio:create или /mermaid:create
 argument-hint: "[путь к architecture.json или репо] [drawio|mermaid|both] [--view overview|data|api|modules|all]"
-allowed-tools: Read, Write, Bash, Grep, Glob
 ---
 
 Построй диаграммы архитектуры из `architecture.json`: **$ARGUMENTS**.

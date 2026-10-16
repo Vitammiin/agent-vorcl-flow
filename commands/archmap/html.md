@@ -1,7 +1,6 @@
 ---
 description: Интерактивная HTML-карта архитектуры из architecture.json — self-contained файл с тумблерами слоёв, trace-подсветкой путей, панелью file:line, поиском и print-CSS (archmap). Use when нужен главный визуальный артефакт для изучения связей; нет ещё architecture.json → /archmap:map или /archmap:extract, draw.io/Mermaid → /archmap:diagram
 argument-hint: "[путь к architecture.json или репо] [--pdf: сразу напечатать PDF]"
-allowed-tools: Read, Write, Bash, Grep, Glob
 ---
 
 Собери интерактивную HTML-карту архитектуры: **$ARGUMENTS**.

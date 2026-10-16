@@ -22,7 +22,7 @@ Resolve `$SKILL_DIR` to this skill directory. Keep the audit read-only. Do not i
 3. Inspect every candidate in source context. A regex hit is evidence to review, not automatically a defect.
 4. Apply `$hardcode-detection` to hardcode candidates and `$mock-data-detection` to mock/fake-data candidates.
 5. Report only confirmed production-path findings. Keep uncertain candidates in a separate `review` section.
-6. For significant findings, create Task Master tasks with scope, severity, `file:line`, rule, evidence, remediation, and an appropriate implementation owner.
+6. For significant findings, include scope, severity, `file:line`, rule, evidence, remediation and an implementation owner in the report. Do not create tracker tasks in report-only mode.
 
 Read [references/language-routing.md](references/language-routing.md) when the repository is not primarily TypeScript/JavaScript or has mixed server/client languages.
 

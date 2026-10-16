@@ -1,7 +1,6 @@
 ---
 description: Шаг 2 конвейера pinpoint (read-only) — определить маршрут/страницу, на которой открыт экран со скриншота (App Router / React Router) (pinpoint). Use when вопрос «какая это страница/URL?»; сам файл компонента → /pinpoint:locate, элемент на странице → /pinpoint:control
 argument-hint: "<путь к скриншоту> [подсказка: раздел/URL]"
-allowed-tools: Read, Grep, Glob, Bash
 ---
 
 Определи маршрут/страницу, на которой открыт экран: **$ARGUMENTS**.

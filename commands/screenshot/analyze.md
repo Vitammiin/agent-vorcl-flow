@@ -1,7 +1,6 @@
 ---
 description: Read-only разбор скриншота — layout, компоненты, токены, состояния → план, без генерации кода (screenshot). Use when нужен план/разбор ПЕРЕД кодом; готовый код → /screenshot:convert, только токены → /screenshot:tokens
 argument-hint: "<путь к скриншоту>"
-allowed-tools: Read, Grep, Glob, Bash
 ---
 
 Проведи **read-only** разбор скриншота, код не пиши: **$ARGUMENTS**.

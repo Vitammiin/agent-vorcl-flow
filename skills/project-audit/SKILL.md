@@ -5,11 +5,11 @@ description: Глубокий read-only аудит любого репозито
 
 # Project Audit
 
-Проводи доказательный аудит существующего проекта без изменения production code. Разрешённые записи: один итоговый Markdown-отчёт и Task Master tasks по подтверждённым находкам.
+Проводи доказательный аудит существующего проекта без изменения production code. По умолчанию report-only: разрешён только явно запрошенный итоговый Markdown-отчёт, без task/product/config/data writes.
 
 ## Workflow
 
-1. Создай/получи Task Master audit-task через `$workflow` + `$task-master`; зафиксируй scope и output path.
+1. Примени session-first `$workflow`; зафиксируй scope, testStrategy и output path в сессии без Task Master.
 2. Запусти inventory:
 
    ```bash
@@ -28,7 +28,7 @@ description: Глубокий read-only аудит любого репозито
    node <skill-root>/scripts/validate-report.mjs <report.md>
    ```
 
-10. Для подтверждённых critical/high findings создай Task Master tasks с dependency order. Сам исправления не применяй.
+10. Для подтверждённых critical/high findings опиши remediation roadmap с dependency order в отчёте. Сам исправления и tracker writes не выполняй.
 
 ## Role routing
 
@@ -91,5 +91,5 @@ Inventory `coverageGaps` (malformed manifest, symlink, depth limit) обязат
 - Vulnerability data проверены online и имеют source/date; tool gaps видимы.
 - Все findings имеют `file:line`, root cause, impact, exact fix, target state и verification.
 - Current и target architecture, phased roadmap, dependency order и replacement table присутствуют.
-- Report validator зелёный; source tree не изменён кроме отчёта/Task Master metadata.
+- Report validator зелёный; source tree не изменён кроме запрошенного отчёта.
 - Для недоверенного repository не исполнялись package scripts, compiler/lint plugins, tests или binaries; ограничения явно записаны в coverage gaps.

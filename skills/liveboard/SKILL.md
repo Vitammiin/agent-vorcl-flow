@@ -34,7 +34,7 @@ Endpoints: `/` — HTML, `/health` — liveness, `/api/snapshot` — текущ�
 
 UI автоматически выбирает язык браузера и позволяет переключаться между 43 локалями. В набор входят English, Русский, Українська и ещё 40 языков Европы и Азии. Arabic, Hebrew, Persian и Urdu включают RTL. Выбор языка живёт только в памяти вкладки.
 
-Для Task Master настроить ключи в окружении (`ANTHROPIC_API_KEY` или `OPENAI_API_KEY`) и выбрать main-модель через `/task-master:provider <anthropic|openai|codex-cli> <model-id>`. `PERPLEXITY_API_KEY` нужен только для опциональной research-модели.
+Liveboard читает существующее локальное состояние как необязательный источник. Не настраивай для dashboard ключи, модели или MCP и не инициализируй Task Master.
 
 ## Источники
 

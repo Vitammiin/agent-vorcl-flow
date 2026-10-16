@@ -3,6 +3,11 @@ name: render
 description: Работа с Render через официальный MCP (mcp.render.com) — сервисы (web/static/cron), деплои, логи, метрики, Render Postgres и Key Value. Use при деплое/редеплое на Render, разборе упавших сборок и логов, анализе метрик, управлении env-переменными или read-only SQL по Render Postgres.
 ---
 
+## Capability discovery
+
+Названия MCP/tools и CLI ниже — примеры, а не требования к пользовательской конфигурации. Сначала найди доступные capabilities текущей сессии и проверь их фактические schemas/permissions. Не устанавливай серверы, не переписывай подключения, env, ключи, providers или модели. Команды настройки выполняются только по отдельному явному запросу; отсутствие MCP не блокирует независимую локальную работу.
+
+
 # Навык: Render (через MCP)
 
 Официальный удалённый MCP Render: `https://mcp.render.com/mcp` (Streamable HTTP + OAuth или API-ключ).
@@ -19,17 +24,8 @@ description: Работа с Render через официальный MCP (mcp.r
 > Ограничения MCP: создаются только web/static/cron/Postgres/Key Value; прочие типы, image-backed сервисы и IP-allowlist — через Dashboard/REST API. Из мутаций поддержаны триггер деплоя и обновление env-переменных.
 
 ## Аутентификация
-- **Claude Code** (по умолчанию): сервер подключён в `.mcp.json` (`{type:http, url:https://mcp.render.com/mcp}`); авторизуйся командой `/mcp` → `render` → Authenticate (OAuth в браузере).
-- **API-ключ** (headless/CI): задай `render_api_key` в userConfig плагина и замени запись `render` в `.mcp.json` на header-форму:
-  ```json
-  "render": {
-    "type": "http",
-    "url": "https://mcp.render.com/mcp",
-    "headers": { "Authorization": "Bearer ${user_config.render_api_key}" }
-  }
-  ```
-- **Codex**: `[mcp_servers.render]` в `config.toml` (`codex mcp add render --url https://mcp.render.com/mcp --oauth-client-id codex`).
-- Доступ MCP = доступ твоего аккаунта Render (OAuth и API-ключ дают все workspaces/сервисы аккаунта).
+
+Используй уже авторизованное подключение пользователя; пакет не поставляет активную MCP-запись и не требует конкретного имени сервера. Если доступ отсутствует, сообщи об ограничении remote-операции и продолжай доступный локальный анализ. Не редактируй `.mcp.json`, host config, env или credentials и не запускай OAuth автоматически. Отдельный явный запрос на подключение выполняй по текущей официальной документации выбранного клиентом транспорта.
 
 ## Как использовать
 - **Старт**: сначала `get_selected_workspace`; если не тот — `select_workspace` (или попроси владельца: «Set my Render workspace to <name>»).

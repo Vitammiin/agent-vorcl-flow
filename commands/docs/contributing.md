@@ -1,7 +1,6 @@
 ---
 description: CONTRIBUTING.md — setup, структура, тесты, конвенции коммитов и PR-процесс, согласованные с gitflow-процессом проекта. Use when нужно оформить правила контрибуции (docs)
 argument-hint: "[особенности процесса/акценты; по умолчанию корневой CONTRIBUTING.md]"
-allowed-tools: Read, Write, Edit, Bash, Grep, Glob
 ---
 
 Создай или обнови `CONTRIBUTING.md`: **$ARGUMENTS**.

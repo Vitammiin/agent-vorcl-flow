@@ -1,7 +1,6 @@
 ---
 description: Оптимизация рендера/бандла/Core Web Vitals (frontend). Use when нужно ускорить интерфейс — лишние ререндеры, тяжёлый бандл, плохие LCP/INP/CLS; сначала замер, потом правка по данным.
 argument-hint: "<что оптимизируем>"
-allowed-tools: Read, Write, Edit, Bash
 ---
 
 Оптимизируй: **$ARGUMENTS**.

@@ -1,7 +1,6 @@
 ---
 description: План безопасной обратимой миграции схемы/данных. Use when нужно ИЗМЕНИТЬ схему или данные (DDL/backfill) — единственная команда с мутациями по подтверждению; чтение и аналитика — /database:query (database)
 argument-hint: "<что мигрируем>"
-allowed-tools: Read, Edit, Write, Bash, Grep, Glob
 ---
 
 Спланируй и подготовь безопасную миграцию: **$ARGUMENTS**.

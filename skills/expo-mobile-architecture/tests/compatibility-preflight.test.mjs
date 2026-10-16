@@ -5,8 +5,10 @@ import os from 'node:os'
 import path from 'node:path'
 import test from 'node:test'
 import { fileURLToPath } from 'node:url'
+import { scanCompatibility } from '../scripts/compatibility-preflight.mjs'
 
 const script = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../scripts/compatibility-preflight.mjs')
+const alignedSdk57 = { dependencies: { expo: '^57.0.0', react: '19.2.3', 'react-native': '0.86.0', 'expo-router': '~57.0.7', 'react-native-reanimated': '~4.5.1', 'react-native-worklets': '0.10.1', 'react-native-gesture-handler': '~2.32.0' } }
 
 function fixture(pkg, files = {}) {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'expo-compat-'))
@@ -19,23 +21,35 @@ function fixture(pkg, files = {}) {
   return root
 }
 
-function run(root, nodeVersion = null) {
-  const bootstrap = nodeVersion
-    ? `process.versions.node=${JSON.stringify(nodeVersion)}; import(${JSON.stringify(script)})`
-    : null
-  return bootstrap
-    ? spawnSync(process.execPath, ['--input-type=module', '--eval', bootstrap, '--', '--root', root, '--offline', '--format', 'json'], { encoding: 'utf8' })
-    : spawnSync(process.execPath, [script, '--root', root, '--offline', '--format', 'json'], { encoding: 'utf8' })
+function run(root) {
+  return spawnSync(process.execPath, [script, '--root', root, '--offline', '--format', 'json'], { encoding: 'utf8' })
 }
 
-test('accepts an aligned SDK 57 dependency set offline', () => {
-  const root = fixture({ dependencies: { expo: '^57.0.0', react: '19.2.3', 'react-native': '0.86.0', 'expo-router': '~57.0.7', 'react-native-reanimated': '~4.5.1', 'react-native-worklets': '0.10.1', 'react-native-gesture-handler': '~2.32.0' } })
-  const result = run(root)
-  assert.equal(result.status, 0, result.stdout || result.stderr)
+test('accepts an aligned SDK 57 dependency set at its Node minimum', () => {
+  const report = scanCompatibility(fixture(alignedSdk57), '22.13.0')
+  assert.equal(report.sdk, 57)
+  assert.deepEqual(report.findings, [])
+})
+
+test('rejects Node versions below the Expo minimum while accepting compatible runtimes', () => {
+  const root = fixture(alignedSdk57)
+  for (const version of ['20.20.2', '22.12.0']) {
+    const findings = scanCompatibility(root, version).findings
+    assert.deepEqual(findings.map(({ rule, severity }) => ({ rule, severity })), [{ rule: 'COMPAT002', severity: 'error' }], version)
+    assert.match(findings[0].evidence, /22\.13\.0/)
+  }
+  for (const version of ['22.13.0', '24.0.0']) assert.deepEqual(scanCompatibility(root, version).findings, [], version)
+})
+
+test('offline CLI checks the actual host Node version independently of the AVF minimum', () => {
+  const result = run(fixture(alignedSdk57))
+  const [major, minor] = process.versions.node.split('.').map(Number)
+  const compatible = major > 22 || (major === 22 && minor >= 13)
+  assert.equal(result.status, compatible ? 0 : 1, result.stdout || result.stderr)
   const report = JSON.parse(result.stdout)
   assert.equal(report.sdk, 57)
   assert.equal(report.online, false)
-  assert.deepEqual(report.findings, [])
+  assert.deepEqual(report.findings.map(({ rule }) => rule), compatible ? [] : ['COMPAT002'])
 })
 
 test('detects exact SDK, Reanimated, Router, test and lockfile mismatches', () => {

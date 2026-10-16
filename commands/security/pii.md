@@ -1,7 +1,6 @@
 ---
 description: PII/GDPR-риски — email/телефоны/карты в коде и логах, личные пути разработчика, внутренние hostname. Use when нужен privacy-аудит перед публикацией репозитория/релизом; секреты-ключи — /security:secrets (security)
 argument-hint: "[путь/область; по умолчанию весь репозиторий]"
-allowed-tools: Read, Grep, Glob, Bash
 ---
 
 Найди PII/GDPR-риски (**read-only**): **$ARGUMENTS**.
@@ -13,6 +12,6 @@ allowed-tools: Read, Grep, Glob, Bash
 5. Отфильтруй ложное: `example.com`/`test@example.com`, faker-данные в тестах, документационные образцы — пометь отдельно, не как findings.
 6. Каждая находка: `file:line` + маскированная цитата (не копируй PII целиком в отчёт), тип данных, severity, починка (анонимизация/вынос в env/фильтр логов).
 
-Пустой **$ARGUMENTS** — весь репозиторий, включая фикстуры и конфиги. Ничего не правь: значимое — в `add_task` на `backend`/`frontend`; PII в git-истории — задача на `gitflow`.
+Пустой **$ARGUMENTS** — весь репозиторий, включая фикстуры и конфиги. Ничего не правь: значимое — в отчёт с владельцами `backend`/`frontend`; PII в git-истории — задача на `gitflow`.
 
 Опирайся на навыки `security-audit`, `secrets-detection`, `error-handling`. Делегируй субагенту `security`.

@@ -1,7 +1,6 @@
 ---
 description: CHANGELOG.md по Keep a Changelog из истории коммитов между тегами — рубрики Added/Fixed/Changed/Breaking. Use when нужно собрать или обновить changelog (gitflow)
 argument-hint: "[диапазон: <tag>..<tag|HEAD>; пусто — с последнего тега]"
-allowed-tools: Read, Write, Edit, Bash, Grep, Glob
 ---
 
 Собери/обнови `CHANGELOG.md` по истории коммитов: **$ARGUMENTS**.

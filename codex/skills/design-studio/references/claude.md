@@ -77,7 +77,7 @@ screenshot file to disk; report the path for the user to open manually.
 
 When the deliverable is ready, surface it (`SendUserFile`), preview it over the served URL, confirm it loads cleanly, and fix any errors before finishing. The user should always land on a view that doesn't crash.
 
-Preview through the Claude Preview MCP:
+Preview through an available browser/preview capability. The following Claude Preview names are examples: discover the actual session schemas and use an equivalent capability when names differ. Do not install or reconfigure an MCP server for this workflow:
 
 1. `mcp__Claude_Preview__preview_start` with `{name: "designs"}` (the `designs` config in `.claude/launch.json`).
 2. Open `http://localhost:<port>/<project>/<file>.html`.

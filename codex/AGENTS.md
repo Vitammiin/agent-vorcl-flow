@@ -4,7 +4,9 @@ Use `$vorcl` for a non-trivial implementation goal and `$audit` for a read-only 
 
 ## Workflow contract
 
-For non-trivial changes use `$workflow` + `$task-master`. Keep the IDs created for this run and work only from that allowlist; atomically claim before `in-progress`. The Executor implements, an independent Checker verifies `testStrategy`, and only the orchestrator marks `done`. Report-only permits only an explicitly requested report artifact—never Task Master or product-state writes.
+For non-trivial changes use `$workflow`: default to session-first planning and evidence without task-state writes. Task Master is opt-in only when explicitly selected by the user; its absence does not block work. Then load `$task-master`, keep only IDs returned for this run, and atomically claim before `in-progress`. The Executor implements, an independent Checker verifies `testStrategy`, and only the orchestrator marks completion. Report-only permits only an explicitly requested report artifact—never Task Master or product-state writes.
+
+Discover capabilities from the current session, not fixed MCP names. Preserve the user's connections, credentials, providers, models and permissions. Never install/configure MCP or initialize a tracker automatically. An existing MCP connection or `.taskmaster/` directory is not opt-in. AVF's optional run state belongs in `.agent-vorcl/`, separate from Task Master.
 
 If `PROJECT_DESCRIPTION.md` exists in task scope, every modifying role reads it before work and performs the `$init-code` description-impact check afterward. Update only sections whose described context materially changed; a proven stale description blocks `done`. Do not create the file automatically when it is absent.
 

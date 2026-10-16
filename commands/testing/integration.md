@@ -1,7 +1,6 @@
 ---
 description: Интеграционные тесты — API через Supertest/inject, БД с testcontainers или тестовой копией (testing). Use when нужно проверить связку слоёв роут → сервис → БД или контракт API.
 argument-hint: "<эндпоинт/модуль/фича>"
-allowed-tools: Read, Write, Edit, Bash, Grep, Glob
 ---
 
 Напиши интеграционные тесты для: **$ARGUMENTS**.

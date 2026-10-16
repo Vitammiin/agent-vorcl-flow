@@ -1,7 +1,6 @@
 ---
 description: Генерация API-эндпоинта (backend). Use when нужно создать НОВЫЙ REST-эндпоинт/роут с нуля — слои, валидация, Swagger; для правки существующего кода бери refactor/optimize.
 argument-hint: "<спецификация эндпоинта>"
-allowed-tools: Read, Write, Edit, Bash
 ---
 
 Сгенерируй REST-эндпоинт: **$ARGUMENTS**.

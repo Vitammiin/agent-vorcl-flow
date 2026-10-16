@@ -1,7 +1,6 @@
 ---
 description: "Статически прочитать код и создать evidence-based PROJECT_DESCRIPTION.md без запуска проекта и без выдуманных связей."
 argument-hint: "[путь; по умолчанию текущий репозиторий] [--update] [--output <file>]"
-allowed-tools: Read, Write, Bash, Grep, Glob
 ---
 
 Инициализируй описание кодовой базы **$ARGUMENTS** через `init-code` в режиме `report-only` из `$workflow`.

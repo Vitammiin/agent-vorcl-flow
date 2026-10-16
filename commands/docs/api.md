@@ -1,7 +1,6 @@
 ---
 description: Сгенерировать docs/API.md из OpenAPI/Swagger-спеки — таблица эндпоинтов, параметры/ответы, curl-примеры. Use when нужна человекочитаемая API-документация поверх спеки (docs)
 argument-hint: "[путь к спеке или модуль/тег; по умолчанию найти спеку автоматически]"
-allowed-tools: Read, Write, Edit, Bash, Grep, Glob
 ---
 
 Сгенерируй `docs/API.md` из OpenAPI-спеки: **$ARGUMENTS**.

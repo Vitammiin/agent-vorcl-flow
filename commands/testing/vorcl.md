@@ -1,18 +1,12 @@
 ---
-description: Цель тестирования через Task Master — покрытие/верификация до готового, зелёные прогоны как доказательство (testing). Use when дана цель по тестам/верификации и её нужно довести через задачи.
+description: "Цель роли testing: session-first план, реализация в разрешённом scope и независимая проверка; Task Master только по явному выбору."
 argument-hint: "<цель / objective>"
-allowed-tools: Read, Write, Edit, Bash, Grep, Glob
 ---
 
-Возьми цель по тестированию в работу через Task Master: **$ARGUMENTS**.
+Возьми цель **$ARGUMENTS** как роль `testing`. Если цель уже понятна из контекста, продолжай; иначе уточни scope.
 
-1. Определи тест-раннер проекта по `package.json` (Vitest/Jest/node:test/Playwright) — не навязывай свой.
-2. Убедись, что Task Master инициализирован (`.taskmaster/`); если нет — `task-master init`.
-3. Преврати цель в задачи: крупная (покрыть модуль, поднять покрытие, e2e-набор) — оформи/дополни PRD в `.taskmaster/docs/prd.txt` и запусти `parse_prd`; точечная — `add_task`.
-4. `next_task` → `get_task`; при высокой сложности — `expand_task` (после `analyze_project_complexity`).
-5. Пиши тесты: новый тест сначала покажи красным (без фикса / со сломанным ожиданием), потом делай зелёным. Ход фиксируй `update_subtask`.
-6. Прогони набор и вставь вывод раннера в отчёт; зелёный прогон = выполненная `testStrategy` → `set_task_status --status=done`; вернись к шагу 4, пока есть задачи.
-
-Край: пустой $ARGUMENTS — спроси цель (что покрывать / что верифицировать). Никогда не пиши «tests pass» без вставленного вывода команды.
-
-Опирайся на навыки `testing-strategy`, `e2e-playwright`, `workflow`, `task-master`. Делегируй субагенту `testing`.
+1. Прочитай роль `testing` и `workflow`; примени `workspace-capability-routing` для неоднозначного scope. Загрузи только необходимые domain/task skills и сохрани workspace evidence.
+2. По умолчанию используй session-first: зафиксируй scope, план, acceptance criteria и `testStrategy` в сессии. Не создавай `.taskmaster/`, не запускай init и не меняй MCP/provider/model configuration.
+3. Task Master подключай только по явному выбору пользователя и доступным в сессии capabilities. Тогда прочитай `task-master`, сохрани возвращённые IDs в allowlist, создай scoped run и сделай atomic claim перед `in-progress`. Bare `next_task` запрещён. Отсутствие Task Master не блокирует работу; не заявляй о сохранении статуса в недоступном трекере.
+4. Executor выполняет только согласованный scope. Независимый Checker проверяет `testStrategy`, не меняет implementation/acceptance tests и возвращает evidence. Только Orchestrator завершает задачу; не продолжай посторонний backlog.
+5. Если существует `PROJECT_DESCRIPTION.md`, соблюдай maintenance contract из `workflow`. Выдай результат, проверки и оставшиеся ограничения.

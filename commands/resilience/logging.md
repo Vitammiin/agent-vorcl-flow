@@ -1,7 +1,6 @@
 ---
 description: Расставить/выправить структурное логирование — уровни, контекст, без секретов/PII. Use when правим именно логи (уровни/поля/дубли); обернуть код обработкой ошибок — /resilience:harden (resilience)
 argument-hint: "<файл/модуль/область>"
-allowed-tools: Read, Edit, Write, Bash, Grep, Glob
 ---
 
 Грамотно расставь/выправи логи на границе ошибки: **$ARGUMENTS**.

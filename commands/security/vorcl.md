@@ -1,18 +1,14 @@
 ---
-description: Security-цель через Task Master — аудит → findings → задачи на фиксы → делегирование исполнителям. Use when аудит безопасности должен закончиться не отчётом, а задачами и циклом починки до готового; быстрый разовый чек — /security:pre-push (security)
+description: "Цель роли security: session-first план, реализация в разрешённом scope и независимая проверка; Task Master только по явному выбору."
 argument-hint: "<цель аудита / область>"
-allowed-tools: Read, Grep, Glob, Bash
 ---
 
-Возьми security-цель в работу через Task Master: **$ARGUMENTS**.
+Возьми цель **$ARGUMENTS** как роль `security`. Если цель уже понятна из контекста, продолжай; иначе уточни scope.
 
-1. Этот маршрут означает явно выбранный `track-only`; обычный security report Task Master не меняет.
-2. Прогони аудит (**read-only** — ничего не правь): секреты (рабочее дерево + `git log -p --all`), OWASP Top 10 в коде, зависимости (`npm audit`), PII в коде и логах. Каждая находка — с доказательством (`file:line` или коммит-хэш + цитата) и severity.
-3. Перед репортом проверь контекст каждой находки: `${VAR:-default}`, `process.env.*`, плейсхолдеры и фейки в тестах/доках — не findings.
-4. `add_task` для значимого finding; сохрани возвращённые IDs и создай scoped run. Реальный секрет — critical + обязательная ротация.
-5. Atomic claim каждого ID → `get_task` → `in-progress`; фиксы делегируй `backend`/`frontend`/`gitflow`. Bare `next_task` запрещён.
-6. Независимый `testing` выполняет `testStrategy`; только Orchestrator ставит `done`.
+1. Прочитай роль `security` и `workflow`; примени `workspace-capability-routing` для неоднозначного scope. Загрузи только необходимые domain/task skills и сохрани workspace evidence.
+2. По умолчанию используй session-first: зафиксируй scope, план, acceptance criteria и `testStrategy` в сессии. Не создавай `.taskmaster/`, не запускай init и не меняй MCP/provider/model configuration.
+3. Task Master подключай только по явному выбору пользователя и доступным в сессии capabilities. Тогда прочитай `task-master`, сохрани возвращённые IDs в allowlist, создай scoped run и сделай atomic claim перед `in-progress`. Bare `next_task` запрещён. Отсутствие Task Master не блокирует работу; не заявляй о сохранении статуса в недоступном трекере.
+4. Executor выполняет только согласованный scope. Независимый Checker проверяет `testStrategy`, не меняет implementation/acceptance tests и возвращает evidence. Только Orchestrator завершает задачу; не продолжай посторонний backlog.
+5. Если существует `PROJECT_DESCRIPTION.md`, соблюдай maintenance contract из `workflow`. Выдай результат, проверки и оставшиеся ограничения.
 
-Пустой **$ARGUMENTS** — полный аудит текущего репозитория (все четыре категории). В финале перечисли прогнанные проверки и что не проверялось — вердикт «чисто» только с выводом команд.
-
-Опирайся на навыки `security-audit`, `secrets-detection`, `workflow`, `task-master`. Сам аудит веди как субагент `security` (только чтение).
+По умолчанию `report-only`: никаких product/task-state writes. `track-only` и выбор трекера должны быть явными; remediation не разрешается одним запуском этого маршрута.

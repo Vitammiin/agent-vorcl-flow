@@ -1,7 +1,6 @@
 ---
 description: Покрыть код обработкой ошибок (try/catch/finally) + грамотные логи без «тихих» падений. Use when код надо ИЗМЕНИТЬ — обернуть границы и добавить обработку; только найти дыры без правок — /resilience:audit, только логи — /resilience:logging (resilience)
 argument-hint: "<файл/функция/модуль>"
-allowed-tools: Read, Edit, Write, Bash, Grep, Glob
 ---
 
 Грамотно покрой код обработкой ошибок и логами: **$ARGUMENTS**.

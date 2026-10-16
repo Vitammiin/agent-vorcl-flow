@@ -1,7 +1,6 @@
 ---
 description: Read-only SQL по Render Postgres (render). Use when нужны данные/аналитика из базы — строго SELECT/EXPLAIN, никаких мутаций; здоровье самого сервиса → /render:status|logs
 argument-hint: "<db> <SQL>"
-allowed-tools: Read, Bash, Grep, Glob, WebFetch
 ---
 
 Выполни **read-only** SQL по базе Render Postgres: **$ARGUMENTS**.

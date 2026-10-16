@@ -1,17 +1,12 @@
 ---
-description: Релизная/git-цель через Task Master — коммиты, PR, changelog, релиз до готового с доказательствами. Use when цель по git/релизу многошаговая (gitflow)
+description: "Цель роли gitflow: session-first план, реализация в разрешённом scope и независимая проверка; Task Master только по явному выбору."
 argument-hint: "<цель / objective>"
-allowed-tools: Read, Write, Edit, Bash, Grep, Glob
 ---
 
-Возьми git/релизную цель в работу через Task Master: **$ARGUMENTS**.
+Возьми цель **$ARGUMENTS** как роль `gitflow`. Если цель уже понятна из контекста, продолжай; иначе уточни scope.
 
-1. Убедись, что Task Master инициализирован (`.taskmaster/`); если нет — `task-master init`.
-2. Преврати цель в задачи: релиз целиком / серия PR — оформи PRD в `.taskmaster/docs/prd.txt` и запусти `parse_prd`; точечная (один коммит/PR) — `add_task`.
-3. `next_task` → `get_task`; при высокой сложности — `expand_task` (после `analyze_project_complexity`).
-4. Выполняй текущую задачу, фиксируя ход через `update_subtask`. Правила: `git status`/`git diff` смотри сам; коммиты — только поимённо (НИКОГДА `git add .`/`-A`); незнакомые изменения — стоп и спроси; push/publish/force — только с явного подтверждения владельца.
-5. Проверь `testStrategy` — доказательство выводом команд (`git status`, hash, ссылка на PR/release); при успехе — `set_task_status --status=done`; вернись к шагу 3, пока есть задачи.
-
-Если `$ARGUMENTS` пуст — определи по `git status`/`git log` вероятную цель (незакоммиченная работа? неотрелизенные коммиты?) и предложи её владельцу до создания задач.
-
-Опирайся на навыки `git-workflow`, `workflow`, `task-master`. Делегируй субагенту `gitflow`.
+1. Прочитай роль `gitflow` и `workflow`; примени `workspace-capability-routing` для неоднозначного scope. Загрузи только необходимые domain/task skills и сохрани workspace evidence.
+2. По умолчанию используй session-first: зафиксируй scope, план, acceptance criteria и `testStrategy` в сессии. Не создавай `.taskmaster/`, не запускай init и не меняй MCP/provider/model configuration.
+3. Task Master подключай только по явному выбору пользователя и доступным в сессии capabilities. Тогда прочитай `task-master`, сохрани возвращённые IDs в allowlist, создай scoped run и сделай atomic claim перед `in-progress`. Bare `next_task` запрещён. Отсутствие Task Master не блокирует работу; не заявляй о сохранении статуса в недоступном трекере.
+4. Executor выполняет только согласованный scope. Независимый Checker проверяет `testStrategy`, не меняет implementation/acceptance tests и возвращает evidence. Только Orchestrator завершает задачу; не продолжай посторонний backlog.
+5. Если существует `PROJECT_DESCRIPTION.md`, соблюдай maintenance contract из `workflow`. Выдай результат, проверки и оставшиеся ограничения.

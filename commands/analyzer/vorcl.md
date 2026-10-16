@@ -1,15 +1,14 @@
 ---
-description: Аудит цели через Task Master workflow — находки → задачи → цикл. Use when аудит должен закончиться не отчётом, а задачами и циклом починки до готового; разовый отчёт без Task Master — /analyzer:audit (analyzer)
+description: "Цель роли analyzer: session-first план, реализация в разрешённом scope и независимая проверка; Task Master только по явному выбору."
 argument-hint: "<цель аудита / область>"
-allowed-tools: Read, Grep, Glob, Bash
 ---
 
-Проведи аудит и оформи его в Task Master workflow: **$ARGUMENTS**.
+Возьми цель **$ARGUMENTS** как роль `analyzer`. Если цель уже понятна из контекста, продолжай; иначе уточни scope.
 
-1. Этот маршрут означает явно выбранный `track-only`: аудит остаётся read-only, но Task Master writes разрешены. Для одного отчёта используй `/analyzer:audit` без Task Master.
-2. Примени `workspace-capability-routing` и прогони только обнаруженные Frontend / Backend / Mobile / DB / Infrastructure boundaries; каждая находка — `file:line` + severity + root cause. Whole-project multi-role scope передай `/audit`.
-3. Создай задачи через `add_task`, сохрани только возвращённые IDs и создай scoped run через `workflow`.
-4. Для каждого ID: atomic claim → `get_task` → `in-progress`; remediation делегируй `backend`/`frontend`, сам analyzer код не меняет. Bare `next_task` запрещён.
-5. Независимый `testing` проверяет `testStrategy`; только Orchestrator ставит `done`.
+1. Прочитай роль `analyzer` и `workflow`; примени `workspace-capability-routing` для неоднозначного scope. Загрузи только необходимые domain/task skills и сохрани workspace evidence.
+2. По умолчанию используй session-first: зафиксируй scope, план, acceptance criteria и `testStrategy` в сессии. Не создавай `.taskmaster/`, не запускай init и не меняй MCP/provider/model configuration.
+3. Task Master подключай только по явному выбору пользователя и доступным в сессии capabilities. Тогда прочитай `task-master`, сохрани возвращённые IDs в allowlist, создай scoped run и сделай atomic claim перед `in-progress`. Bare `next_task` запрещён. Отсутствие Task Master не блокирует работу; не заявляй о сохранении статуса в недоступном трекере.
+4. Executor выполняет только согласованный scope. Независимый Checker проверяет `testStrategy`, не меняет implementation/acceptance tests и возвращает evidence. Только Orchestrator завершает задачу; не продолжай посторонний backlog.
+5. Если существует `PROJECT_DESCRIPTION.md`, соблюдай maintenance contract из `workflow`. Выдай результат, проверки и оставшиеся ограничения.
 
-Опирайся на навыки `workflow`, `task-master`, `workspace-capability-routing` и профильные аудита. Сам аудит веди как субагент `analyzer` (только чтение).
+По умолчанию `report-only`: никаких product/task-state writes. `track-only` и выбор трекера должны быть явными; remediation не разрешается одним запуском этого маршрута.

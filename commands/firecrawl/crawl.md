@@ -1,7 +1,6 @@
 ---
 description: Рекурсивный обход раздела/сайта через Firecrawl (firecrawl). Use when нужен контент МНОГИХ страниц раздела/сайта (дорого, всегда с limit); одна страница → /firecrawl:scrape, только список URL → /firecrawl:map
 argument-hint: "<URL раздела/сайта> [limit; что собрать]"
-allowed-tools: Read, Write, Bash, Grep, Glob, WebFetch
 ---
 
 Обойди сайт/раздел и собери контент: **$ARGUMENTS**.

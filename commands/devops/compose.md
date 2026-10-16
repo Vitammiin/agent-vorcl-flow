@@ -1,7 +1,6 @@
 ---
 description: docker-compose.yml для локальной разработки — приложение + postgres/mongo/redis, volumes, healthcheck, env-файл; поднять и довести все сервисы до healthy (devops). Use when нужно локальное окружение в контейнерах или починить compose.
 argument-hint: "[путь к проекту] [нужные сервисы: postgres|mongo|redis]"
-allowed-tools: Read, Write, Edit, Bash, Grep, Glob
 ---
 
 Собери docker-compose для локальной разработки: **$ARGUMENTS**.

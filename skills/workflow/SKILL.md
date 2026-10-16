@@ -1,26 +1,43 @@
 ---
 name: workflow
-description: "Безопасный scoped Task Master workflow: captured task IDs, atomic claim, независимый Checker и явные report-only/track-only/remediation режимы. Use для нетривиальной реализации или persistent task tracking."
+description: "Session-first workflow: ограниченный план, acceptance criteria и независимая проверка; Task Master — только явно выбранный адаптер со scoped IDs и atomic claim."
 ---
 
 # Workflow
 
-## Режим
+## Режим и трекер — независимые решения
 
-- **report-only** — только ответ или явно запрошенный audit/report artifact; без `.taskmaster`, product/config/data writes.
-- **track-only** — разрешены task metadata, но не product code.
-- **remediation** — задачи и код в пределах запроса пользователя.
+- **report-only** — только ответ или явно запрошенный report artifact; без Task Master, `.taskmaster/`, product/config/data writes.
+- **track-only** — только явно разрешённые task metadata; не разрешает implementation.
+- **remediation** — изменения в пределах запроса пользователя.
 
-Не повышай режим автоматически. Нетривиальная реализация идёт через `$task-master`; report-only — через эфемерный план.
+По умолчанию **session-first**: план, scope, прогресс и evidence остаются в текущей сессии. Нетривиальная задача не требует установки трекера, MCP, API-ключей или runtime. Наличие `.taskmaster/`, подключённого MCP или команды `/vorcl` не означает согласие использовать Task Master. Другой выбранный трекер используй через его доступные инструменты и границы текущей цели, не мигрируй backlog.
 
-## Scoped run
+## Session-first цикл
 
-1. Создай задачи через `add_task`/`parse_prd` и сохрани IDs прямо из результата write-операции. Bare `next_task` по общему backlog запрещён.
-2. Создай run: `node <plugin-root>/scripts/vorcl-run.mjs create --run <run-id> --tasks <id,id> --owner <agent> --root <project>`.
-3. Для каждого allowlisted ID: `claim --run <run-id> --task <id>` → `get_task <id>` → проверь статус → `set_task_status in-progress`. Долгая работа обновляет lease через `renew`; истёкший claim забирается только явным `reclaim --from-run <expected-old-run>`. Crashed operation-lock снимается после указанного expiry командой `unlock --expected-lock <id>`.
-4. Executor реализует только claimed task. `update_subtask` допустим лишь для существующего subtask; top-level progress фиксируй в доступном task note/evidence, не выдумывай subtask ID.
-5. Checker в отдельном контексте запускает `testStrategy`, не меняет implementation и acceptance tests, возвращает `ГОТОВО`/`НЕ ГОТОВО` с выводом.
-6. Только Orchestrator ставит `done`. Цикл заканчивается по allowlist run, а не по всему repository backlog.
+1. Зафиксируй цель, владельца scope, ограничения, acceptance criteria и `testStrategy`.
+2. Разбей работу на ограниченные шаги в сессии. Оркестратор распределяет независимые scopes; не выдавай один изменяемый scope двум исполнителям одновременно.
+3. Executor реализует разрешённый scope и передаёт changed paths, проверки и ограничения.
+4. Независимый Checker выполняет `testStrategy`, не меняет implementation и acceptance tests, возвращает `ГОТОВО`/`НЕ ГОТОВО` с evidence. Если отдельный контекст недоступен, честно укажи ограничение проверки; не имитируй независимого Checker.
+5. Только Orchestrator завершает шаг после проверки и останавливается по текущей цели. Работа не требует файлового task-state.
+
+## Контекст и доказательства
+
+Для нетривиальной передачи работы используй [краткий handoff](references/handoff.md): цель, границы, проверяемые критерии, relevant paths и ограничения. Загружай тело только выбранной роли и нужные references по мере работы; каталог навыков не является списком обязательных чтений. Executor с ограниченным scope продолжает выданную задачу, а не запускает весь orchestration заново.
+
+Свяжи каждый критерий с наблюдаемым результатом и способом проверки. Checker сначала независимо сопоставляет actual diff с критериями (пропуски, противоречия, лишние изменения), затем проверяет качество и регрессии в затронутом scope. Отчёт Executor — указатель на evidence, не доказательство успешности. Для каждой проверки различай `PASS`, `FAIL`, `NOT_RUN`; отсутствие инструмента или доступа не считается PASS.
+
+Масштаб проверки соответствует риску: простой обратимый edit не требует новой тестовой инфраструктуры. Не повторяй весь suite без новых изменений, сбоев или нерешённых рисков. Handoff и acceptance labels остаются в сессии; сами по себе они не разрешают создание task/report файлов, вызов Task Master или дополнительные пользовательские approval checkpoints.
+
+## Task Master: только по явному выбору
+
+Этот адаптер включается только если пользователь явно выбрал Task Master для текущей работы. Сначала прочитай **task-master** и обнаружь реальные capabilities текущей сессии; имена MCP-серверов и tools не фиксированы. Без доступного адаптера продолжай независимую работу session-first и сообщи, что persistence недоступна. Не устанавливай сервер, не запускай init и не меняй providers/models/ключи автоматически.
+
+1. Создай задачи через доступные операции `add_task`/`parse_prd` и сохрани IDs из результата записи. Не импортируй чужие задачи и не перезаписывай существующий PRD. Bare `next_task` по общему backlog запрещён.
+2. Создай scoped run: `node <plugin-root>/scripts/vorcl-run.mjs create --run <run-id> --tasks <id,id> --owner <agent> --root <project>`. В standalone skill используй `<workflow-skill>/scripts/vorcl-run.mjs`. AVF хранит claims/runs в `.agent-vorcl/`, никогда в `.taskmaster/`.
+3. Для каждого allowlisted ID: atomic `claim --run <run-id> --task <id>` → чтение задачи → проверка статуса → `in-progress`. Продлевай lease через `renew`; `reclaim --from-run <expected-old-run>` и `unlock --expected-lock <id>` требуют ожидаемого владельца/lock. Не обходи отказ claim.
+4. Executor работает только над claimed task; `update_subtask` — только для существующего subtask ID, не top-level task. Не редактируй Task Master JSON вручную.
+5. Checker возвращает независимый verdict по `testStrategy`; только Orchestrator записывает `done`. Цикл ограничен allowlist run, не repository backlog.
 
 ## PROJECT_DESCRIPTION maintenance
 
@@ -42,8 +59,8 @@ description: "Безопасный scoped Task Master workflow: captured task ID
 
 ## Запреты
 
-- Не брать ID, не созданный текущим run.
-- Не работать без успешного atomic claim и `in-progress`.
-- Не закрывать без независимого verdict и evidence.
+- Не изменять MCP configuration, providers, модели или секреты ради обычного workflow.
+- Не создавать Task Master state без явного выбора; report-only не пишет task/product state.
+- В Task Master режиме не брать чужие IDs и не работать без успешного atomic claim перед `in-progress`.
+- Не закрывать задачу без доказательств проверки и не скрывать отсутствие независимого Checker.
 - Не закрывать modifying task с подтверждённым дрейфом существующего `PROJECT_DESCRIPTION.md`.
-- Не писать Task Master или product state в report-only.

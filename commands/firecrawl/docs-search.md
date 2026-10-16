@@ -1,7 +1,6 @@
 ---
 description: Ответ на вопрос о Firecrawl по актуальной официальной документации с цитированием docs URL.
 argument-hint: "<как Firecrawl делает X?>"
-allowed-tools: Read, Write, Bash, Grep, Glob, WebFetch
 ---
 
 Найди ответ в актуальной документации: **$ARGUMENTS**.

@@ -1,7 +1,6 @@
 ---
 description: Статус сервиса Render + деплой + метрики (render). Use when нужна read-only сводка здоровья сервиса без действий; глубокая диагностика по логам → /render:logs, деплой → /render:deploy
 argument-hint: "<service>"
-allowed-tools: Read, Bash, Grep, Glob, WebFetch
 ---
 
 Дай сводку здоровья сервиса Render: **$ARGUMENTS**.

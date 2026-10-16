@@ -1,41 +1,34 @@
 ---
 name: task-master
-description: "Справочник Task Master: MCP/CLI, задачи, статусы, scoped run, safe retry и fallback. Use для persistent task tracking; дисциплину и режимы задаёт $workflow."
+description: "Опциональный адаптер Task Master для явно выбранного пользователем persistent tracking; существующие capabilities и настройки сохраняются, workflow задаёт scoped IDs и atomic claims."
 ---
 
-# Навык: Task Master
+# Task Master — opt-in adapter
 
-Task Master (`task-master-ai`) — управление задачами разработки, ведомое ИИ. MCP-сервер `task-master`. Хранилище — `.taskmaster/`.
+Загружай этот навык только если пользователь явно выбрал Task Master для текущей задачи или запросил его настройку. Наличие `.taskmaster/`, установленного CLI или подключённого MCP не является выбором. По умолчанию работай session-first по **workflow**; отсутствие Task Master не блокирует обычную разработку.
 
-## Инициализация
-```
-task-master init            # .taskmaster/, tasks/tasks.json, docs/prd.txt, config.json
-```
+## Обнаружение вместо установки
 
-## MCP-инструменты
-| Инструмент | Назначение |
-|---|---|
-| `parse_prd` | PRD → задачи |
-| `get_tasks` | Список задач |
-| `get_task` | Детали задачи (+`testStrategy`) |
-| `next_task` | Глобальная подсказка backlog; не claim scoped run |
-| `expand_task` | Разбить на подзадачи |
-| `set_task_status` | Обновить статус |
-| `update_subtask` | Заметки/прогресс |
-| `add_task` | Точечная задача |
-| `analyze_project_complexity` | Оценка сложности + рекомендации |
-| `models` | Посмотреть/выбрать main, research и fallback модель |
+1. Найди фактически доступные инструменты сессии по описаниям. Имя сервера, tool prefix, параметры и версия могут отличаться; не предполагай `mcp__task_master__*` или конкретный transport.
+2. Прочитай schema нужной операции и установи project root и tag/namespace, если они поддержаны. Не переключай глобальный active project/tag и не меняй чужие tasks.
+3. Если MCP недоступен, используй уже установленный и настроенный CLI только в явно выбранном Task Master режиме; проверь `--help` и передай project root поддерживаемым способом. Не выполняй `npx ...@latest`, install или init ради продолжения обычной работы.
+4. При недоступном адаптере сообщи, что persistence не выполнена, и продолжай независимую работу session-first. Не создавай replacement JSON и не заявляй об успешных статусах.
 
-## CLI-эквиваленты
-`init` · `parse-prd <file>` · `list [--status=<s>]` · `show <id>` · `next` · `expand --id=<id> [--research]` · `set-status --id=<id> --status=<s>` · `update-subtask --id=<id> --prompt="<лог>"` · `analyze-complexity` · `add-task` · `models`.
+## Operations (названия для ориентира)
 
-## Статусы
-`pending → in-progress → done`; плюс `deferred`, `cancelled`, `review`.
+| Возможность | Типичные названия | Граница |
+| --- | --- | --- |
+| Прочитать задачи | `get_tasks`, `get_task` / `list`, `show` | Только выбранный project/tag |
+| Создать задачи | `add_task`, `parse_prd` | Захватить IDs из ответа записи; не перезаписывать PRD или существующий backlog |
+| Разбить задачу | `expand_task` | Только allowlisted task и явная необходимость |
+| Изменить статус | `set_task_status` / `set-status` | Atomic claim до `in-progress`; только Orchestrator ставит `done` |
+| Прогресс подзадачи | `update_subtask` | Только реально существующий subtask ID; не top-level ID |
+| Посмотреть модели | `models` | Read-only inspection при запросе пользователя |
 
-## Дисциплина и конфигурация
-- Дисциплину задаёт `$workflow`. Сохраняй IDs текущего `add_task`/`parse_prd`; scoped run + atomic claim обязательны до `in-progress`. Bare `next_task` может вернуть чужую задачу.
-- `update_subtask` допустим только для настоящего `<task>.<subtask>`; top-level note API нет, JSON вручную не редактируй.
-- Transport: один retry только для idempotent reads. Перед retry write проверь через `get_task`/`get_tasks`, не применилось ли оно. Auth/provider/encoding: CLI с явным project root и UTF-8 file input или честный degraded mode, без слепого повтора.
-- `ANTHROPIC_API_KEY` обслуживает Claude, `OPENAI_API_KEY` — GPT; `PERPLEXITY_API_KEY` нужен только для Perplexity research. Ключи остаются в env/MCP.
-- Модели `main`/`research`/`fallback` выбираются через `task-master models`/MCP `models` и сохраняются в `.taskmaster/config.json`. Используй `$task-master-provider` для безопасного переключения.
-- Codex CLI работает через `task-master models --set-main=<id> --codex-cli` и OAuth (`codex login`) без API-ключа.
+`next_task`/`next` не являются claim: bare `next_task` по общему backlog запрещён. Для allowlisted задач следуй scoped run contract из **workflow**. AVF claims/runs хранятся отдельно в `.agent-vorcl/`; `.taskmaster/` принадлежит самому Task Master, JSON вручную не редактируй.
+
+При transport failure допустим один повтор idempotent read. После неизвестного исхода write сначала reconcile по read; не повторяй add/parse/status вслепую и не захватывай IDs неустановленной операции. Auth/provider/encoding ошибки не исправляй сменой конфигурации.
+
+## Настройка — отдельный явный запрос
+
+`task-master init` допустим только если пользователь отдельно попросил инициализацию конкретного проекта. Сначала проверь существующие файлы и `--help`; не перезаписывай project/backlog и не меняй MCP registration. Если пользователь запросил смену provider/model, используй `/task-master:provider` и только заданные поля. Существующие providers, main/research/fallback models, transport и credentials сохраняются по умолчанию. Ключи не выводи и не записывай в проект; используй существующий механизм секретов пользователя.

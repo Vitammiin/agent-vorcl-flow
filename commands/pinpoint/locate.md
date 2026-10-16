@@ -1,7 +1,6 @@
 ---
 description: Шаг 1 конвейера pinpoint (read-only) — найти по скриншоту УЖЕ существующие компонент/файл(ы) в проекте, file:line, без генерации нового (pinpoint). Use when вопрос «где этот экран в коде?»; какой это маршрут → /pinpoint:route, конкретный контрол → /pinpoint:control, логика до API → /pinpoint:trace
 argument-hint: "<путь к скриншоту> [подсказка: что именно ищем]"
-allowed-tools: Read, Grep, Glob, Bash
 ---
 
 Найди в существующем коде экран/компонент со скриншота: **$ARGUMENTS**.

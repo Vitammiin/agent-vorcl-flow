@@ -1,56 +1,34 @@
 ---
 name: task-master
-description: "Справочник Task Master (task-master-ai) — MCP-сервер и CLI для управления задачами: PRD → задачи → подзадачи → реализация → статусы. Use при работе с задачами, планировании из PRD, разбиении на подзадачи и отслеживании прогресса. Дисциплину задаёт скилл workflow."
+description: "Опциональный адаптер Task Master для явно выбранного пользователем persistent tracking; существующие capabilities и настройки сохраняются, workflow задаёт scoped IDs и atomic claims."
 ---
 
-# Навык: Task Master
+# Task Master — opt-in adapter
 
-Task Master (`task-master-ai`) — управление задачами разработки, ведомое ИИ. MCP-сервер `task-master`. Хранилище — каталог `.taskmaster/`.
+Загружай этот навык только если пользователь явно выбрал Task Master для текущей задачи или запросил его настройку. Наличие `.taskmaster/`, установленного CLI или подключённого MCP не является выбором. По умолчанию работай session-first по **workflow**; отсутствие Task Master не блокирует обычную разработку.
 
-## Инициализация
-```
-task-master init            # создаёт .taskmaster/, tasks/tasks.json, docs/prd.txt, config.json
-```
-PRD кладётся в `.taskmaster/docs/prd.txt`; задачи — в `.taskmaster/tasks/tasks.json`; конфиг моделей — `.taskmaster/config.json`.
+## Обнаружение вместо установки
 
-## MCP-инструменты
-| Инструмент | Назначение |
-|---|---|
-| `parse_prd` | Распарсить PRD в структурированные задачи |
-| `get_tasks` | Список задач (с фильтром по статусу) |
-| `get_task` | Детали задачи (описание, `testStrategy`, подзадачи) |
-| `next_task` | Глобальная подсказка backlog; не использовать для выбора внутри scoped run |
-| `expand_task` | Разбить задачу на подзадачи |
-| `set_task_status` | Обновить статус задачи |
-| `update_subtask` | Дописать заметки/прогресс в подзадачу |
-| `add_task` | Добавить точечную задачу (ИИ-ассист) |
-| `analyze_project_complexity` | Оценить сложность (1–10) и рекомендации по разбиению |
-| `models` | Посмотреть/выбрать main, research и fallback модель |
+1. Найди фактически доступные инструменты сессии по описаниям. Имя сервера, tool prefix, параметры и версия могут отличаться; не предполагай `mcp__task_master__*` или конкретный transport.
+2. Прочитай schema нужной операции и установи project root и tag/namespace, если они поддержаны. Не переключай глобальный active project/tag и не меняй чужие tasks.
+3. Если MCP недоступен, используй уже установленный и настроенный CLI только в явно выбранном Task Master режиме; проверь `--help` и передай project root поддерживаемым способом. Не выполняй `npx ...@latest`, install или init ради продолжения обычной работы.
+4. При недоступном адаптере сообщи, что persistence не выполнена, и продолжай независимую работу session-first. Не создавай replacement JSON и не заявляй об успешных статусах.
 
-## CLI-эквиваленты
-| CLI | Эквивалент |
-|---|---|
-| `task-master init` | инициализация |
-| `task-master parse-prd <file>` | `parse_prd` |
-| `task-master list [--status=<s>]` | `get_tasks` |
-| `task-master show <id>` | `get_task` |
-| `task-master next` | `next_task` |
-| `task-master expand --id=<id> [--research]` | `expand_task` |
-| `task-master set-status --id=<id> --status=<s>` | `set_task_status` |
-| `task-master update-subtask --id=<id> --prompt="<лог>"` | `update_subtask` |
-| `task-master analyze-complexity` | `analyze_project_complexity` |
-| `task-master add-task` | `add_task` |
-| `task-master models [--setup]` | показать/интерактивно выбрать модели |
-| `task-master models --set-main=<model-id>` | выбрать OpenAI/Anthropic main по известному model ID |
-| `task-master models --set-main=<model-id> --codex-cli` | выбрать Codex CLI через OAuth |
+## Operations (названия для ориентира)
 
-## Статусы задач
-`pending → in-progress → done`; дополнительно `deferred`, `cancelled`, `review`.
+| Возможность | Типичные названия | Граница |
+| --- | --- | --- |
+| Прочитать задачи | `get_tasks`, `get_task` / `list`, `show` | Только выбранный project/tag |
+| Создать задачи | `add_task`, `parse_prd` | Захватить IDs из ответа записи; не перезаписывать PRD или существующий backlog |
+| Разбить задачу | `expand_task` | Только allowlisted task и явная необходимость |
+| Изменить статус | `set_task_status` / `set-status` | Atomic claim до `in-progress`; только Orchestrator ставит `done` |
+| Прогресс подзадачи | `update_subtask` | Только реально существующий subtask ID; не top-level ID |
+| Посмотреть модели | `models` | Read-only inspection при запросе пользователя |
 
-## Дисциплина и конфигурация
-- Дисциплину цикла задаёт **workflow**. Сохраняй IDs, возвращённые текущим `add_task`/`parse_prd`; создай scoped run и atomic claim до `in-progress`. Bare `next_task` не является claim и может вернуть чужую задачу.
-- `update_subtask` принимает только настоящий ID вида `<task>.<subtask>`. Для top-level task отдельного note API в текущем MCP нет: не выдумывай subtask и не правь JSON вручную.
-- При transport failure один раз повторяй только idempotent reads. Перед повтором write сначала `get_task`/`get_tasks` и проверь, не создалась ли операция. Auth/provider/encoding ошибки не ретраить вслепую; перейти на CLI с явным project root и UTF-8 file input либо сообщить degraded mode.
-- Ключи: `ANTHROPIC_API_KEY` для Claude, `OPENAI_API_KEY` для GPT; `PERPLEXITY_API_KEY` нужен только при выборе Perplexity как research-модели. Хранить их в env/MCP, не в `.taskmaster/config.json`.
-- Выбор `main`/`research`/`fallback` хранится в `.taskmaster/config.json` и меняется через `task-master models` или MCP `models`. Быстрая команда плагина — `/task-master:provider`.
-- Codex CLI можно выбрать через `--codex-cli` и OAuth (`codex login`) без API-ключа.
+`next_task`/`next` не являются claim: bare `next_task` по общему backlog запрещён. Для allowlisted задач следуй scoped run contract из **workflow**. AVF claims/runs хранятся отдельно в `.agent-vorcl/`; `.taskmaster/` принадлежит самому Task Master, JSON вручную не редактируй.
+
+При transport failure допустим один повтор idempotent read. После неизвестного исхода write сначала reconcile по read; не повторяй add/parse/status вслепую и не захватывай IDs неустановленной операции. Auth/provider/encoding ошибки не исправляй сменой конфигурации.
+
+## Настройка — отдельный явный запрос
+
+`task-master init` допустим только если пользователь отдельно попросил инициализацию конкретного проекта. Сначала проверь существующие файлы и `--help`; не перезаписывай project/backlog и не меняй MCP registration. Если пользователь запросил смену provider/model, используй `/task-master:provider` и только заданные поля. Существующие providers, main/research/fallback models, transport и credentials сохраняются по умолчанию. Ключи не выводи и не записывай в проект; используй существующий механизм секретов пользователя.

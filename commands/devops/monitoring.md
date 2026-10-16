@@ -1,7 +1,6 @@
 ---
 description: Мониторинг сервиса — структурные логи (pino/JSON), health-эндпоинт, что алертить; на Render метрики/логи через агента render (devops). Use when нужно наладить наблюдаемость, логирование или health-чеки.
 argument-hint: "[путь к проекту или сервис]"
-allowed-tools: Read, Write, Edit, Bash, Grep, Glob
 ---
 
 Наладь мониторинг сервиса: **$ARGUMENTS**.

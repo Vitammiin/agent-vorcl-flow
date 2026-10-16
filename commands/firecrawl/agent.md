@@ -1,7 +1,6 @@
 ---
 description: Длительная автономная веб-задача через Firecrawl Agent с явным лимитом стоимости и критерием остановки.
 argument-hint: "<цель> [лимит кредитов/стоимости]"
-allowed-tools: Read, Write, Bash, Grep, Glob, WebFetch
 ---
 
 Запусти Firecrawl Agent для: **$ARGUMENTS**.

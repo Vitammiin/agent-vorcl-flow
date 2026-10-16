@@ -1,7 +1,12 @@
 ---
-description: Комплексная дизайн-цель через Task Master — контекст, варианты, HTML, preview, проверка и экспорт. Use для многошагового визуального проекта.
+description: "Цель роли design-studio: session-first план, реализация в разрешённом scope и независимая проверка; Task Master только по явному выбору."
 argument-hint: "<цель, аудитория, форматы, источники и путь сохранения>"
-allowed-tools: Read, Edit, Write, Bash, Grep, Glob, WebFetch, WebSearch
 ---
 
-Возьми дизайн-цель **$ARGUMENTS** через обязательный Task Master workflow. Делегируй роли `design-studio`, используй `$design-studio`, создай/получи задачу, выполни её в `designs/<project>/`, проверь реальным HTTP-preview и `testStrategy`, затем закрой. Не загружай все built-in skills: выбери только релевантные по `project-types.json`.
+Возьми цель **$ARGUMENTS** как роль `design-studio`. Если цель уже понятна из контекста, продолжай; иначе уточни scope.
+
+1. Прочитай роль `design-studio` и `workflow`; примени `workspace-capability-routing` для неоднозначного scope. Загрузи только необходимые domain/task skills и сохрани workspace evidence.
+2. По умолчанию используй session-first: зафиксируй scope, план, acceptance criteria и `testStrategy` в сессии. Не создавай `.taskmaster/`, не запускай init и не меняй MCP/provider/model configuration.
+3. Task Master подключай только по явному выбору пользователя и доступным в сессии capabilities. Тогда прочитай `task-master`, сохрани возвращённые IDs в allowlist, создай scoped run и сделай atomic claim перед `in-progress`. Bare `next_task` запрещён. Отсутствие Task Master не блокирует работу; не заявляй о сохранении статуса в недоступном трекере.
+4. Executor выполняет только согласованный scope. Независимый Checker проверяет `testStrategy`, не меняет implementation/acceptance tests и возвращает evidence. Только Orchestrator завершает задачу; не продолжай посторонний backlog.
+5. Если существует `PROJECT_DESCRIPTION.md`, соблюдай maintenance contract из `workflow`. Выдай результат, проверки и оставшиеся ограничения.

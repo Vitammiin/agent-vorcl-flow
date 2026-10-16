@@ -1,15 +1,14 @@
 ---
-description: Цель «найти и понять существующий UI по скриншоту» через Task Master — карта скриншот→исходники → задачи на правку → делегирование (pinpoint). Конвейер locate → route → control → trace → handoff, всё read-only. Use when цель комплексная («найди, пойми и организуй правку»); один шаг → отдельная pinpoint-команда, новый UI → /screenshot:convert
+description: "Цель роли pinpoint: session-first план, реализация в разрешённом scope и независимая проверка; Task Master только по явному выбору."
 argument-hint: "<цель: что найти/понять/изменить + путь к скриншоту>"
-allowed-tools: Read, Grep, Glob, Bash
 ---
 
-Возьми в работу через Task Master цель по существующему UI: **$ARGUMENTS**.
+Возьми цель **$ARGUMENTS** как роль `pinpoint`. Если цель уже понятна из контекста, продолжай; иначе уточни scope.
 
-1. Убедись, что Task Master инициализирован (`.taskmaster/`); если нет — `task-master init`.
-2. Определи режим: **существующий проект** (есть кодовая база и якоря со скриншота грепаются по ней) — твой случай; **новый/с нуля** (генерация нового UI) — перенаправь на `/screenshot:convert`.
-3. Открой скриншот через Read, собери якоря (видимый текст, ключи i18n, иконки, структура, контекст маршрута) и построй карту «скриншот → исходники» **типовым конвейером pinpoint**: `/pinpoint:locate` (экран/компонент `file:line`) → `/pinpoint:route` (маршрут/страница) → `/pinpoint:control` (конкретный контрол и обработчик) → `/pinpoint:trace` (логика: состояние/стор → data-fetch → API) → `/pinpoint:handoff` (заявка на правку и делегирование). Каждый шаг read-only; ненужные шаги пропускай.
-4. Оформи находки в задачи на правку `add_task` (область front/back, `file:line`, что менять в **существующем** коде — без новых файлов/компонентов). `next_task` → `get_task`; реализацию делегируй доменному субагенту (`frontend`/`backend`/`database`), ход — `update_subtask`.
-5. Проверь `testStrategy` → `set_task_status --status=done`; вернись к шагу 4.
+1. Прочитай роль `pinpoint` и `workflow`; примени `workspace-capability-routing` для неоднозначного scope. Загрузи только необходимые domain/task skills и сохрани workspace evidence.
+2. По умолчанию используй session-first: зафиксируй scope, план, acceptance criteria и `testStrategy` в сессии. Не создавай `.taskmaster/`, не запускай init и не меняй MCP/provider/model configuration.
+3. Task Master подключай только по явному выбору пользователя и доступным в сессии capabilities. Тогда прочитай `task-master`, сохрани возвращённые IDs в allowlist, создай scoped run и сделай atomic claim перед `in-progress`. Bare `next_task` запрещён. Отсутствие Task Master не блокирует работу; не заявляй о сохранении статуса в недоступном трекере.
+4. Executor выполняет только согласованный scope. Независимый Checker проверяет `testStrategy`, не меняет implementation/acceptance tests и возвращает evidence. Только Orchestrator завершает задачу; не продолжай посторонний backlog.
+5. Если существует `PROJECT_DESCRIPTION.md`, соблюдай maintenance contract из `workflow`. Выдай результат, проверки и оставшиеся ограничения.
 
-Только чтение и картирование — сам ничего не правишь и не создаёшь. Опирайся на навыки `ui-source-mapping`, `screenshot-to-code`, `frontend-architecture`, `react`, `nextjs`, `typescript`, `i18n`, `data-fetching`, `state-management`, `workflow`, `task-master`. Делегируй субагенту `pinpoint`.
+По умолчанию `report-only`: никаких product/task-state writes. `track-only` и выбор трекера должны быть явными; remediation не разрешается одним запуском этого маршрута.

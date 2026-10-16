@@ -1,7 +1,6 @@
 ---
-description: Создать полный code-grounded архитектурный пакет текущего репозитория: сначала ARCHITECTURE.md, затем JSON, HTML, draw.io, Mermaid и PDF. Use для первого анализа; существующий пакет обновляет /principal-architect:update.
+description: "Создать полный code-grounded архитектурный пакет текущего репозитория: сначала ARCHITECTURE.md, затем JSON, HTML, draw.io, Mermaid и PDF. Use для первого анализа; существующий пакет обновляет /principal-architect:update."
 argument-hint: "[--scope <relative-path>] [--formats all|md,html,pdf,drawio,mermaid] [--target]"
-allowed-tools: Read, Write, Edit, Bash, Grep, Glob
 ---
 
 Создай архитектурный пакет текущего репозитория: **$ARGUMENTS**.

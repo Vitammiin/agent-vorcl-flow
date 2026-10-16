@@ -1,7 +1,6 @@
 ---
 description: Создать production business module React Native + Expo по Modular Vertical Slice Architecture.
 argument-hint: "<business domain и требования>"
-allowed-tools: Read, Write, Edit, Bash, Grep, Glob
 ---
 
 Создай или расширь business module: **$ARGUMENTS**.

@@ -1,7 +1,6 @@
 ---
-description: Обновить существующий code-grounded архитектурный пакет после изменений кода: полный rescan, evidence diff и атомарная перегенерация всех форматов.
+description: "Обновить существующий code-grounded архитектурный пакет после изменений кода: полный rescan, evidence diff и атомарная перегенерация всех форматов."
 argument-hint: "[--scope <relative-path>] [--formats all|md,html,pdf,drawio,mermaid] [--target]"
-allowed-tools: Read, Write, Edit, Bash, Grep, Glob
 ---
 
 Обнови архитектурный пакет текущего репозитория: **$ARGUMENTS**.

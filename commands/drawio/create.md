@@ -1,7 +1,6 @@
 ---
 description: Построить диаграмму draw.io/diagrams.net по текстовому описанию — валидный XML, аккуратная раскладка, семантические цвета (drawio). Use when вход — описание словами; исходник (код/БД/mermaid/CSV) → /drawio:convert, PMP-артефакты → /drawio:pmp, правка готового .drawio → /drawio:refine
 argument-hint: "<описание диаграммы> [тип: flowchart|bpmn|uml|erd|network|orgchart|mindmap]"
-allowed-tools: Read, Write, Edit, Bash
 ---
 
 Построй диаграмму draw.io по описанию: **$ARGUMENTS**.

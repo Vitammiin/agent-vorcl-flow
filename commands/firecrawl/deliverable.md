@@ -1,7 +1,6 @@
 ---
-description: Готовый артефакт из веб-данных через официальные Firecrawl workflow skills: brief, SEO audit, leads, QA, knowledge base и другие.
+description: "Готовый артефакт из веб-данных через официальные Firecrawl workflow skills: brief, SEO audit, leads, QA, knowledge base и другие."
 argument-hint: "<желаемый артефакт и тема>"
-allowed-tools: Read, Write, Bash, Grep, Glob, WebFetch
 ---
 
 Подготовь deliverable: **$ARGUMENTS**.

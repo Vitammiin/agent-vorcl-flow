@@ -1,14 +1,12 @@
 ---
-description: Цель по картированию архитектуры через Task Master — до полного набора проверенных артефактов (archmap). Use when целей несколько или репо крупное/монорепо; разовая полная карта → /archmap:map, только JSON → /archmap:extract, только HTML → /archmap:html
+description: "Цель роли archmap: session-first план, реализация в разрешённом scope и независимая проверка; Task Master только по явному выбору."
 argument-hint: "<цель: что закартировать + путь к репо/контекст>"
-allowed-tools: Read, Edit, Write, Bash, Grep, Glob
 ---
 
-Возьми цель по картированию архитектуры в работу через Task Master: **$ARGUMENTS**.
+Возьми цель **$ARGUMENTS** как роль `archmap`. Если цель уже понятна из контекста, продолжай; иначе уточни scope.
 
-1. Убедись, что Task Master инициализирован (`.taskmaster/`); если нет — `task-master init`.
-2. Разложи цель на задачи (`add_task`; крупное репо/монорепо — PRD + `parse_prd`): scan и extraction по слоям, merge с проверкой контракта, LLM-аннотация, рендеры по форматам, финальная сверка артефактов.
-3. `next_task` → `get_task`; выполняй фазами скилла `archmap`: скрипты extraction → `architecture.json` (каждый узел с `source:{file,line}`) → `annotations.json` → рендеры строго из JSON. Ход фиксируй через `update_subtask`.
-4. Проверь `testStrategy` (повторный прогон даёт идентичный JSON; HTML открывается с `file://`; `xmllint --noout` для drawio; mermaid отрендерен; inferred помечен пунктиром) → `set_task_status --status=done`; вернись к шагу 3.
-
-Отдавай пути к артефактам + сводку из `stats` + список inferred. Опирайся на навыки `archmap`, `system-design`, `drawio-diagrams`, `mermaid-diagrams`, `workflow`, `task-master`. Делегируй субагенту `archmap`.
+1. Прочитай роль `archmap` и `workflow`; примени `workspace-capability-routing` для неоднозначного scope. Загрузи только необходимые domain/task skills и сохрани workspace evidence.
+2. По умолчанию используй session-first: зафиксируй scope, план, acceptance criteria и `testStrategy` в сессии. Не создавай `.taskmaster/`, не запускай init и не меняй MCP/provider/model configuration.
+3. Task Master подключай только по явному выбору пользователя и доступным в сессии capabilities. Тогда прочитай `task-master`, сохрани возвращённые IDs в allowlist, создай scoped run и сделай atomic claim перед `in-progress`. Bare `next_task` запрещён. Отсутствие Task Master не блокирует работу; не заявляй о сохранении статуса в недоступном трекере.
+4. Executor выполняет только согласованный scope. Независимый Checker проверяет `testStrategy`, не меняет implementation/acceptance tests и возвращает evidence. Только Orchestrator завершает задачу; не продолжай посторонний backlog.
+5. Если существует `PROJECT_DESCRIPTION.md`, соблюдай maintenance contract из `workflow`. Выдай результат, проверки и оставшиеся ограничения.

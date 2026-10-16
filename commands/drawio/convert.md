@@ -1,7 +1,6 @@
 ---
 description: Конвертировать исходник в диаграмму draw.io — схема БД → ERD, папки → дерево, код → UML/sequence, mermaid/CSV/JSON → draw.io (drawio). Use when вход — существующий артефакт (код/схема/файл); описание словами → /drawio:create, целевой формат Mermaid → /mermaid:convert
 argument-hint: "<путь к исходнику/коду> [целевой тип диаграммы]"
-allowed-tools: Read, Write, Edit, Bash, Grep, Glob
 ---
 
 Конвертируй исходник в диаграмму draw.io: **$ARGUMENTS**.
